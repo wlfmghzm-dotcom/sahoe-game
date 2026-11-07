@@ -7,6 +7,36 @@
 - 쓰는 법: 차시 페이지의 QR을 TV에 띄우면 학생이 휴대폰·태블릿 카메라로 바로 접속합니다. 로그인·설치 없음, 태블릿은 가로, 한 판 5~10분.
 - A 개념 체험: 개념을 직접 겪는 게임 / B 떠올리기 연습: 배운 개념을 칸에 나눠 담는 짧은 분류 게임.
 
+## 6-2 사회 (아이스크림미디어) 2. 시장경제와 국가 간 거래 › 1. 우리나라 시장경제의 특징
+
+- [16차시 시장경제가 무엇인지 알아볼까요 (교과서 60~62쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-16.html): 사과 값은 누가 정할까, 가계·기업·시장
+  - [사과 값은 누가 정할까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a1.html): A 개념 체험. 시장에 손님과 사과를 옮기며 사려는 양과 팔려는 양에 따라 값이 바뀌고, 가게끼리 경쟁하면 더 싸고 좋아지는 걸 겪어요.
+  - [가계·기업·시장](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b1.html): B 떠올리기 연습. 카드를 가계·기업·시장 칸에 나눠 담아요.
+- [17~18차시 가계와 기업의 역할을 알아볼까요 (교과서 63~68쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-17-18.html): 돈이 도는 마을, 가계가 할까, 기업이 할까
+  - [돈이 도는 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a2.html): A 개념 체험. 일하러 가서 소득을 받고, 그 돈으로 사면 기업에 이윤이 생겨요. 가계와 기업 사이를 도는 돈과 합리적 선택을 겪어요.
+  - [가계가 할까, 기업이 할까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b2.html): B 떠올리기 연습. 카드를 가계의 일·기업의 일 칸에 나눠 담아요.
+- [19차시 근로자의 권리를 보호하는 모습을 살펴볼까요 (교과서 69~71쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-19.html): 쉬어야 잘 만들지, 보호받는 일터일까
+  - [쉬어야 잘 만들지](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a3.html): A 개념 체험. 지친 근로자를 휴게실·집·회의실로 보내면 공장도 더 잘 돌아가요. 근로자 권리 보호가 왜 중요한지 겪어요.
+  - [보호받는 일터일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b3.html): B 떠올리기 연습. 카드를 보호받는 모습·못 받는 모습·보호 제도 칸에 나눠 담아요.
+- [20~21차시 기업의 자유와 사회적 책임을 알아볼까요 (교과서 72~77쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-20-21.html): 착한 공장, 잘되는 공장, 기업의 자유와 책임
+  - [착한 공장, 잘되는 공장](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a4.html): A 개념 체험. 사장이 되어 무엇을 얼마나 만들지 고르고, 폐수를 강에 버릴지 처리할지 결정하며 기업의 자유와 책임을 겪어요.
+  - [기업의 자유와 책임](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b4.html): B 떠올리기 연습. 카드를 자유로운 결정·사회적 책임·경쟁 속 문제 칸에 나눠 담아요.
+
+## 6-2 사회 (아이스크림미디어) 2. 시장경제와 국가 간 거래 › 2. 경제성장과 우리 생활
+
+- [22차시 경제성장이 무엇인지 알아볼까요 (교과서 78~80쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-22.html): 한강의 기적 연표, 경제성장의 발자취
+  - [한강의 기적 연표](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a5.html): A 개념 체험. 시대마다 공장을 짓고 수출하면 1인당 소득 막대가 교과서 그래프대로 자라요. 우리나라 경제성장 과정을 겪어요.
+  - [경제성장의 발자취](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b5.html): B 떠올리기 연습. 카드를 1960년대부터 오늘날까지 시대 칸에 나눠 담아요.
+- [23차시 경제성장이 우리 생활에 미치는 영향을 알아볼까요 (교과서 81~84쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-23.html): 풍요로운 마을 만들기, 경제성장이 바꾼 생활
+  - [풍요로운 마을 만들기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a6.html): A 개념 체험. 소득을 로봇 공장·공연장·학교·병원에 넣으며 경제성장이 생산·문화·교육·의료를 바꾼 모습을 겪어요.
+  - [경제성장이 바꾼 생활](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b6.html): B 떠올리기 연습. 카드를 첨단 기술·문화 산업·삶의 질 칸에 나눠 담아요.
+- [24차시 빠른 경제성장으로 발생한 문제를 알아볼까요 (교과서 85~87쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-24.html): 빨리 크는 도시, 어떤 문제일까
+  - [빨리 크는 도시](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a7.html): A 개념 체험. 도시를 빨리 키울수록 생기는 환경 문제·빈부 격차·과소비·노사 갈등을 찾아 목록에 모아요.
+  - [어떤 문제일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b7.html): B 떠올리기 연습. 카드를 환경 문제·빈부 격차·과소비·노사 갈등 칸에 나눠 담아요.
+- [25~26차시 빠른 경제성장으로 발생한 문제를 해결해 볼까요 (교과서 88~93쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-25-26.html): 모두의 바다, 누가 해결할까
+  - [모두의 바다](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a8.html): A 개념 체험. 어부가 되어 한 번 더 잡고 싶은 유혹을 겪고, 다 같이 욕심내면 바다가 비고 약속하면 지켜지는 공유지의 비극을 체험해요.
+  - [누가 해결할까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b8.html): B 떠올리기 연습. 카드를 정부·시민 단체와 개인·기업과 근로자 칸에 나눠 담아요.
+
 ## 6-2 사회 (아이스크림미디어) 2. 시장경제와 국가 간 거래 › 3. 세계 속의 무역
 
 - [27차시 무역이 무엇인지 알아볼까요 (교과서 94~96쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-27.html): 무역 속보 데스크

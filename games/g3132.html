@@ -1211,6 +1211,7 @@ function stageRibbon(){
 function engEndCard(){ if(!U||!G) return false; if(U.mode==='stageEnd'||G.phase==='stageEnd') return true; return typeof SCENE.endCard==='function' && !!SCENE.endCard(G); }
 function engEndSweep(){
   ovl.querySelectorAll('.fx').forEach(function(d){ d.remove(); });
+  var tz=ovl.querySelectorAll('.toast'); tz.forEach(function(d){ d._gone=1; d.remove(); }); if(tz.length) engBadgeBump();   /* 단계 끝 직전에 뜬 배지 토스트도 거둔다(배지 버튼 통통, 결과 선반에 있음) */
   ovl.querySelectorAll('.callout').forEach(function(d){ if(d._gone||d._dock) return; d.getAnimations().forEach(function(a){ a.cancel(); }); engDockPut(d); });
 }
 function onStageEnd(){
