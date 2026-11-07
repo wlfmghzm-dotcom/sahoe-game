@@ -220,7 +220,6 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 .rcard .ttl{font-family:var(--game);font-size:30px;background:var(--a-navy);color:var(--a-paper);border-radius:14px;padding:4px 18px}
 .rcard .rec{font-size:18px;color:var(--muted);min-height:1.4em}
 .rcard .btns{width:100%;margin-top:4px}
-.rcard .btns+.btns{margin-top:0}   /* '마지막 단계 다시' 줄(GAME.replayLast) */
 .bars{display:grid;grid-template-columns:auto minmax(0,1fr) 2.4em;gap:4px 10px;align-items:center;font-size:18px}
 .bars .bar{height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
 .bars .bar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .9s}
@@ -266,6 +265,34 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
   .rcard{padding:10px 14px;gap:6px}
   .rcard .ttl{font-size:26px}
 }
+/* §19 도전 모드: HUD 작은 표시, 타이틀·결과의 '도전' 버튼(남색 + 작은 번개 그림), 새 기록 효과 */
+.eng-chtag{display:inline-flex;align-items:center;gap:3px;font-family:var(--game);font-size:18px;line-height:1;background:var(--a-navy);color:var(--a-paper);border-radius:999px;padding:4px 10px 4px 6px;flex:none}
+.eng-chi{width:20px;height:20px;flex:none;display:block}
+#pbtn.eng-p2{display:flex;flex-direction:column;gap:8px}
+.big.eng-ch{background:var(--a-navy);color:var(--a-paper);box-shadow:inset 0 -5px 0 rgba(0,0,0,.35)}
+.big.eng-ch .eng-chi{width:24px;height:24px;color:var(--a-org)}
+.big.eng-ch small{font-size:18px;opacity:.85;margin-left:4px}
+.rcard .btns .btn2{white-space:nowrap}
+/* 결과 '도전'은 '다시 하기'와 같은 너비, 남색으로 구분(도전 결과에서는 주황 = 주 버튼) */
+.eng-pair{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn2.eng-ch.pri{background:var(--accent);color:var(--accent-ink)}.btn2.eng-ch.pri .eng-chi{color:var(--accent-ink)}
+.btn2.eng-ch{flex:1;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--a-navy);color:var(--a-paper)}
+.btn2.eng-ch .eng-chi{color:var(--a-org)}
+.btn2.eng-ch.new{animation:engChPop .5s ease-out 3}
+@keyframes engChPop{45%{transform:scale(1.08);box-shadow:0 0 0 4px var(--accent)}}
+.rcard .ttl.eng-new{background:var(--accent);color:var(--accent-ink);animation:engChPop .6s ease-out 3}
+.eng-chres{gap:6px}
+.rcard .ttl.eng-big{font-size:34px;padding:4px 22px}
+.eng-stars{display:flex;gap:6px}
+.eng-star{width:40px;height:40px;fill:var(--line)}
+.eng-star.on{fill:var(--accent);animation:engStar .5s ease-out both}
+.eng-star.on:nth-child(2){animation-delay:.25s}.eng-star.on:nth-child(3){animation-delay:.5s}
+@keyframes engStar{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.3);opacity:1}100%{transform:scale(1)}}
+.eng-goal{width:100%;display:flex;align-items:center;gap:10px;font-size:18px;color:var(--muted)}
+.eng-gbar{flex:1;height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
+.eng-gbar i{display:block;height:100%;background:var(--a-navy-l);transform-origin:left}
+.eng-chres.pass .eng-gbar i{background:var(--good)}
+.rcard .lab .eng-chi{display:inline-block;vertical-align:-3px;color:var(--accent)}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -274,7 +301,7 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 <div class="app" id="app">
   <header class="hud">
     <button class="ib" id="bReset" aria-label="처음으로"></button>
-    <div class="stg"><span id="stgName">더하기일까 빼기일까</span><span class="pips" id="stgPips"></span></div>
+    <div class="stg"><span id="stgName">더하기일까 빼기일까</span><span class="pips" id="stgPips"></span><span class="eng-chtag hide" id="engChTag"></span></div>
     <div class="sp"></div>
     <div class="combo" id="combo"></div>
     <div class="score"><small>점수</small><b id="score">0</b></div>
@@ -596,6 +623,15 @@ var NAMES = {};
 var MAXP = STAGES.reduce(function(a,S){ return a+Math.min(S.n,ITEMS.filter(function(it){ return S.bins.indexOf(it.answer)>=0; }).length)*(T.base+T.comboCap*T.comboStep+T.speedMax); },0);
 var TITLES = (C.titles||[[0,'기억 새싹'],[0.49,'기억 탐험가'],[0.70,'기억 달인'],[0.82,'기억 박사']]).map(function(x){ return [x[0]<1?Math.round(x[0]*MAXP/10)*10:x[0], x[1]]; });
 
+/* §19 도전(B형 공통): 모든 칸, 카드 RCH.n장이 이어서 내려오고 한 장마다 조금씩 빨라진다(accel). 실수(틀린 놓기·바닥) 3번이면 끝.
+   레벨이 오르면 처음 빠르기가 빨라지고(fall), 3레벨부터 두 장씩(at 2). 연속 정답 콤보가 점수를 가른다. 판 하나 약 1~1.5분 */
+var RCH = (function(){ var t={n:36, lives:3, fall0:7.5, fallK:0.88, fallMin:2.4, accel:0.985, two:3, goal0:0.48, goalK:0.035}; var u=C.challenge||{}; for(var k in u) t[k]=u[k]; return t; })();
+var CH_STAGES = [{name:'도전'}];
+function chStage(lv){ return {i:0, bins:BINS.map(function(b){ return b.id; }), add:[], at: lv>=RCH.two ? 2 : 1, fall: Math.max(RCH.fallMin, RCH.fall0*Math.pow(RCH.fallK, lv-1)), n:RCH.n, rush:false, rule:'ch', name:CH_STAGES[0].name, ch:lv}; }
+var CH_MAX = RCH.n*(T.base+T.comboCap*T.comboStep+T.speedMax);
+function chGoal(lv){ return Math.round(CH_MAX*Math.min(0.92, RCH.goal0+RCH.goalK*(lv-1))/5)*5; }
+/* 지금 판의 단계(도전이면 G.cs) */
+function SG(G){ return G && G.cs ? G.cs : STAGES[(G && G.si) || 0]; }
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
 function shuffle(G,a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(rnd(G)*(i+1)), x=a[i]; a[i]=a[j]; a[j]=x; } return a; }
@@ -607,6 +643,7 @@ function buildDeck(G,S){
     var g=shuffle(G,ITEMS.filter(function(it){ return it.answer===b; }).map(function(it){ return it.id; }));
     return g.sort(function(x,y){ return (S.rush?((G.errs[y]||0)-(G.errs[x]||0))*100:0) + ((G.seen[x]||0)-(G.seen[y]||0)); });
   });
+  if(S.rule==='ch'){ var all=[], pool=[]; while(all.length<S.n){ if(!pool.length) pool=shuffle(G,ITEMS.map(function(it){ return it.id; })); all.push(pool.shift()); } return all; }   /* §19 도전: 모든 카드를 섞어 n장(모자라면 다시 섞어 이어 붙임) */
   var pick=[], k=0, total=groups.reduce(function(a,g){ return a+g.length; },0), n=Math.min(S.n,total);
   if(S.rush){   /* 틀린 카드 먼저(많이 틀린 순), 나머지는 칸마다 번갈아 */
     var bad=ITEMS.filter(function(it){ return S.bins.indexOf(it.answer)>=0 && G.errs[it.id]; }).map(function(it){ return it.id; });
@@ -622,7 +659,8 @@ function buildDeck(G,S){
   return deck;
 }
 function startStage(G0,si){
-  var G=cl(G0), S=STAGES[si];
+  var G=cl(G0), S=G0.ch ? chStage(G0.ch) : STAGES[si];
+  if(G0.ch){ G.cs=S; G.lives=RCH.lives; G.nShown=0; }
   G.si=si; G.phase='play'; G.t=0; G.cards=[]; G.combo=0; G.lastOk=-99; G.shows={}; G.badBin=null;
   G.queue=buildDeck(G,S); G.cool=[T.first, T.first+T.lane2];
   G.res={total:G.queue.length, served:0, missed:0};
@@ -640,21 +678,24 @@ function start(G){ var g=cl(G); g.score=0; g.errs={}; g.seen={}; g.badges=[]; g.
 
 /* 카드가 장면을 떠날 때: 깨끗하면 초록, 아니면 몇 장 뒤에 다시(최대 maxShows번), 그래도 아니면 회색 */
 function leave(G,c,dirty,ev){
-  var S=STAGES[G.si];
+  var S=SG(G);
   if(!dirty){ G.res.served++; return; }
+  if(S.rule==='ch'){ G.res.missed++; return; }   /* 도전: 다시 나오지 않음 */
   if((G.shows[c.item]||0) < T.maxShows){ var at=Math.min(G.queue.length, S.rush?T.rushGap:T.reGap); G.queue.splice(at,0,c.item); ev.push({t:'again', item:c.item}); }
   else { G.res.missed++; ev.push({t:'miss', item:c.item}); }
 }
+/* 도전: 실수 하나 = 목숨 하나. 다 쓰면 남은 카드 없이 끝(점수는 그대로) */
+function chLose(G,ev){ if(G.lives<=0) return; G.lives--; ev.push({t:'life', n:G.lives}); if(G.lives<=0){ G.queue=[]; G.cards.forEach(function(c){ if(c.st==='fall'){ c.st='out'; c.outT=G.t; G.res.missed++; } }); } }
 function markErr(G,c){ if(!c.bad){ G.errs[c.item]=(G.errs[c.item]||0)+1; } c.bad++; }
 function whyHtml(id){ var it=ITEM[id], b=BIN[it.answer]; return '<em>'+b.label+'</em> '+it.why+(it.page?' <span style="opacity:.7">'+it.page+'</span>':''); }
 
 function tick(G0,dt){
-  var G=cl(G0), ev=[], S=STAGES[G.si]; if(G.phase!=='play') return {G:G, ev:ev};
+  var G=cl(G0), ev=[], S=SG(G); if(G.phase!=='play') return {G:G, ev:ev};
   G.t+=dt;
   G.cards.forEach(function(c){
     if(c.st!=='fall') return;
-    c.y+=dt/S.fall;
-    if(c.y>=1){ c.y=1; c.st='out'; c.outT=G.t; markErr(G,c); G.combo=0; G.stats.fell++; ev.push({t:'fall', id:c.id, item:c.item, why:whyHtml(c.item)}); leave(G,c,true,ev); }
+    c.y+=dt/(c.f||S.fall);
+    if(c.y>=1){ c.y=1; c.st='out'; c.outT=G.t; markErr(G,c); G.combo=0; G.stats.fell++; ev.push({t:'fall', id:c.id, item:c.item, why:whyHtml(c.item)}); leave(G,c,true,ev); if(S.rule==='ch') chLose(G,ev); }
   });
   G.cards=G.cards.filter(function(c){ return !(c.st==='out' && G.t-c.outT>T.out); });
   for(var l=0;l<S.at;l++){
@@ -662,7 +703,7 @@ function tick(G0,dt){
     G.cool[l]-=dt;
     if(G.cool[l]<=0){
       var id=G.queue.shift(); G.shows[id]=(G.shows[id]||0)+1; G.seen[id]=(G.seen[id]||0)+1;
-      G.cards.push({id:G.nid++, item:id, lane:l, y:0, st:'fall', bad:0, again:G.shows[id]>1 || (S.rush && !!G.errs[id]), badT:-9, outT:0});
+      G.cards.push({id:G.nid++, item:id, lane:l, y:0, st:'fall', bad:0, again:S.rule!=='ch' && (G.shows[id]>1 || (S.rush && !!G.errs[id])), badT:-9, outT:0, f:S.rule==='ch' ? S.fall*Math.pow(RCH.accel, G.nShown++) : 0});
       G.cool[l]=T.gap;
     }
   }
@@ -675,13 +716,14 @@ function drop(G0,src,dst,via){
   if(!G0 || G0.phase!=='play') return fail('phase');
   var sp=String(src).split(':'), dp=String(dst).split(':');
   if(sp[0]!=='card') return fail('src');
-  var S=STAGES[G0.si]; if(dp[0]!=='bin' || S.bins.indexOf(dp[1])<0) return fail('dst');
+  var S=SG(G0); if(dp[0]!=='bin' || S.bins.indexOf(dp[1])<0) return fail('dst');
   var G=cl(G0), ev=[], c=G.cards.find(function(x){ return String(x.id)===sp[1]; });
   if(!c || c.st!=='fall') return fail('gone');
   var it=ITEM[c.item];
   if(it.answer!==dp[1]){
     markErr(G,c); c.badT=G.t; G.combo=0; G.stats.wrong++; G.badBin={id:dp[1], t:G.t};
-    return {G:G, ok:false, why:'wrong', ev:[{t:'bounce', why:'wrong', src:src, dst:dst}, {t:'wrong', id:c.id, item:c.item, bin:dp[1], why:whyHtml(c.item)}]};
+    var wev=[{t:'bounce', why:'wrong', src:src, dst:dst}, {t:'wrong', id:c.id, item:c.item, bin:dp[1], why:whyHtml(c.item)}]; if(S.rule==='ch') chLose(G,wev);
+    return {G:G, ok:false, why:'wrong', ev:wev};
   }
   var clean=!via && !c.bad, pts=0;
   if(via){ markErr(G,c); pts=T.hintPts; G.combo=0; G.stats.hint++; }
@@ -695,7 +737,7 @@ function drop(G0,src,dst,via){
   leave(G,c,!clean,ev);
   return {G:G, ok:true, ev:ev};
 }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.cs || G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 /* 지금 할 만한 한 수(힌트·손가락 시범·자동 플레이 공용): 바닥에 가장 가까운 카드를 알맞은 칸에 */
 function hintMove(G){
   if(!G || G.phase!=='play') return null;
@@ -703,7 +745,7 @@ function hintMove(G){
   return c ? {src:'card:'+c.id, dst:'bin:'+ITEM[c.item].answer} : null;
 }
 function sources(G){ return G.cards.filter(function(c){ return c.st==='fall'; }).map(function(c){ return 'card:'+c.id; }); }
-function targets(G){ return STAGES[G.si].bins.map(function(b){ return 'bin:'+b; }); }
+function targets(G){ return SG(G).bins.map(function(b){ return 'bin:'+b; }); }
 function itemOf(G,id){ var p=String(id).split(':'); if(p[0]!=='card') return null; var c=G.cards.find(function(x){ return String(x.id)===p[1]; }); return c ? 'cardBlank' : null; }   /* 카드는 모두 글만(2차 블라인드) → 끄는 그림자는 빈 카드 */
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 /* 결과 화면: 자주 틀린 카드 3장(틀린 횟수가 많은 순) */
@@ -849,7 +891,7 @@ var GAME = (function(){
     },
     /* 단계 시작 시범: 1단계는 첫 카드로 끌기 시범(엔진 기본). 그 뒤 단계는 정답을 보여 주지 않도록 새 규칙만 가리킨다 */
     demo: function(G){
-      var S = STAGES[G.si], live = G.cards.filter(function(c){ return c.st==='fall'; });
+      var S = SG(G), live = G.cards.filter(function(c){ return c.st==='fall'; });
       /* 손가락만 가리킨다(말풍선 없음: 패널 한 줄이 이미 새 규칙을 말한다) */
       /* r5: 새 칸은 장면이 잠깐(1.5초, 첫 카드가 나오기 전) 솟아오르며 빛나는 것으로만 알린다. 테두리가 남으면 정답 표시처럼 보였다(4차 블라인드 b2·b4·b5·b7) */
       if(S.rule==='bin') return null;
@@ -860,10 +902,17 @@ var GAME = (function(){
     },
     /* '해 보기'(engine §12): 1단계 첫 카드만(보여 줄 수는 hintMove = 정답 칸). 2~4단계는 정답을 보이지 않도록 해 보기 없이 위 demo의 '새 규칙 가리키기'만 */
     tryIt: function(G){ return G.si===0 ? {label:'칸에 넣기'} : null; },
+    /* §19 도전(B형 공통, logic.js CH): 모든 칸·카드가 이어서, 점점 빨라짐, 실수 3번이면 끝. 레벨마다 처음 빠르기↑, 3레벨부터 두 장씩. 목표 = 점수 상한 × (0.48 + 0.035×(레벨-1)) */
+    challenge: {
+      stages: CH_STAGES,
+      goal: chGoal,
+      say: {start: ['실수 3번이면 끝!']},
+      ruleCards: [[['rFast','점점 빨라요'], ['rFall','실수 3번 끝', 1]]]
+    },
     explain: {reasons:{},              /* 시스템 코드로는 아무것도 띄우지 않는다(이유는 onEvent에서 FX.explain) */
       /* r4(engine §16): '왜?' 버튼은 늘 있다. 틀린 카드 이유가 아직 없을 때 누르면 이 단계 칸의 뜻풀이(gloss) + 교과서 쪽 */
       general: function(G){
-        var gl = STAGES[G.si].bins.map(function(id){ var B = BIN[id]; return B.gloss ? '<em>' + B.label + '</em> ' + B.gloss : ''; }).filter(Boolean);
+        var gl = SG(G).bins.map(function(id){ var B = BIN[id]; return B.gloss ? '<em>' + B.label + '</em> ' + B.gloss : ''; }).filter(Boolean);
         var pg = (String(C.subtitle||'').match(/\d+(~\d+)?쪽/) || [''])[0];
         return {why: gl.length ? gl.join('<br>') : '카드 글을 읽고 알맞은 칸을 떠올려요', page: pg};
       }},
@@ -931,7 +980,7 @@ var SCENE = (function(){
     if(lines.length>1 && lines[lines.length-1].replace(/\s/g,'').length<=1){ var pw=lines[lines.length-2].split(' '); if(pw.length>1){ lines[lines.length-1]=pw.pop()+' '+lines[lines.length-1]; lines[lines.length-2]=pw.join(' '); } }
     return lines;
   }
-  function stageOf(G){ return STAGES[G.si||0]; }
+  function stageOf(G){ return SG(G); }   /* §19: 도전이면 G.cs */
   function binBox(G,id){
     var bins=stageOf(G).bins, n=bins.length, i=bins.indexOf(id); if(i<0) return null;
     var gap=8, w=(VB.w-16-gap*(n-1))/n; return {x:8+i*(w+gap), y:BIN_Y, w:w, h:BIN_H};
@@ -956,7 +1005,9 @@ var SCENE = (function(){
     h+='<text class="frm" x="300" y="'+(HEAD-10)+'" text-anchor="middle" font-size="19" fill="#FBF8F1" style="font-family:var(--game)">'+esc(C.frame||'알맞은 칸에 넣어요')+'</text>';
     h+='<rect x="-700" y="'+(BIN_Y-12)+'" width="2000" height="900" class="f-woodd"/><rect x="-700" y="'+(BIN_Y-12)+'" width="2000" height="8" class="f-wood"/>';
     h+='<path d="M8 '+(BIN_Y-18)+'H592" stroke="#D9534F" stroke-width="3" stroke-dasharray="10 8" stroke-linecap="round" opacity=".75"/>';
-    gStatic.innerHTML=h; gStatic._frm=gStatic.querySelector('.frm'); gStatic._fo=null;
+    /* §19 도전: 위 띠 오른쪽에 목숨 3개(하트). 실수하면 하나씩 흐려진다 */
+    if(G.cs){ h+='<g class="lv">'; for(var li=0;li<RCH.lives;li++) h+='<path transform="translate('+(588-(RCH.lives-li)*30)+' 7)" d="M12 21s-9-5.6-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.4-9 12-9 12z" fill="#D9534F" stroke="#FBF8F1" stroke-width="2"/>'; h+='</g>'; }
+    gStatic.innerHTML=h; gStatic._frm=gStatic.querySelector('.frm'); gStatic._fo=null; gStatic._lv=gStatic.querySelector('.lv'); gStatic._lvn=null;
     gBins.innerHTML=''; binNodes={};
     /* 이름표 글자 크기는 한 화면 안에서 모두 같게(블라인드 시험: 칸마다 들쭉날쭉). 가장 긴 이름에 맞춘다.
        r5(4차 블라인드: 칸 4개 단계에서 '자원·/에너지', '비정부/기구'처럼 두 줄로 쪼개져 읽기 불편, 위 그림도 작아짐): 이름은 늘 한 줄.
@@ -1018,7 +1069,8 @@ var SCENE = (function(){
     g.innerHTML=h; g._trl=g.querySelector('.trl'); g._bd=g.querySelector('.wbd'); g._ag=g.querySelector('.ag'); g._tu=g.querySelector('.tu'); g._tdn=g.querySelector('.tdn'); return g;
   }
   function renderScene(G){
-    var s2=G.si+'|'+(G.phase==='title'); if(s2!==sig){ sig=s2; buildStatic(G); }
+    var s2=G.si+'|'+(G.phase==='title')+'|'+(G.ch||0); if(s2!==sig){ sig=s2; buildStatic(G); }
+    if(gStatic._lv){ var lv=G.cs?G.lives:-1; if(gStatic._lvn!==lv){ gStatic._lvn=lv; [].forEach.call(gStatic._lv.children,function(h,i){ h.setAttribute('opacity', i<lv?'1':'.25'); }); } }
     /* 2차 블라인드: '왜?'를 여는 동안 기준 띠와 말풍선이 사라져 화면이 비어 보였다 → 그대로 둔다(숨기지 않음) */
     var xo=!!document.getElementById('xpCard');
     /* '왜?' 카드가 열려 있는 동안 카드가 떨어지지 않게 멈춘다(블라인드 시험: 읽는 사이 카드가 바닥에 닿아 사라짐).
@@ -1119,27 +1171,59 @@ if(XPC){ var hb0=$('#bHint'), row0=document.createElement('div'); row0.className
   row0.insertAdjacentHTML('beforeend','<button class="xp-btn off" id="xpBtn" aria-expanded="false">'+(XPC.label||'왜?')+'</button>'); }
 
 function freshU(){ return {mode:'title', paused:false, drag:null, sel:null, hint:0, hintMv:null, bounces:0, lastAct:0, demo:null, demoDone:{}, callQ:[], callBusy:false, shown:0, busy:false, comboT:0,
-     toastQ:[], callNow:null, xpCur:null, xpKey:'', lastSnap:null, okAt:-1e9, okN:0, hf:null, tr:null, trPts:null,
-     labQ:[], txtAt:-1e9, callN:0, trKinds:{}, didKinds:{}, trSkip:{}, keepDemo:{}, lastKinds:null, dropPt:null, downAt:-1e9, autoH:{}, toastW:{}, actAt:-1e9}; }   /* r5: 마지막 학생 행동 시각(actAt): 그 뒤 0.6초는 직접 결과만 */   /* r4: 마지막 누름(downAt), 단계별 자동 힌트 1회(autoH), 미룬 토스트(toastW) */   /* r3: 글 줄(labQ·txtAt), 해 본 동작 종류(trKinds), 놓친 이유 기록(trSkip) */
-/* '마지막 단계 다시'(GAME.replayLast, 기본 켜짐): 마지막 단계가 시작될 때 G를 통째로 복사해 두었다가(점수·배지·기록 그대로) 결과 화면에서 그 단계만 다시 한다 */
-var REPLAY = GAME.replayLast!==false && NSTAGE>1;
-function deepCopy(v){
-  if(v===null||typeof v!=='object') return v;
-  if(Array.isArray(v)) return v.map(deepCopy);
-  if(v instanceof Map){ var m=new Map(); v.forEach(function(x,k){ m.set(k,deepCopy(x)); }); return m; }
-  if(v instanceof Set){ var t=new Set(); v.forEach(function(x){ t.add(deepCopy(x)); }); return t; }
-  var o={}; for(var k in v) if(Object.prototype.hasOwnProperty.call(v,k)) o[k]=deepCopy(v[k]); return o;
+     toastQ:[], callNow:null, xpCur:null, xpKey:'', okAt:-1e9, okN:0, hf:null, tr:null, trPts:null,
+     labQ:[], txtAt:-1e9, callN:0, trKinds:{}, didKinds:{}, trSkip:{}, keepDemo:{}, dropPt:null, downAt:-1e9, autoH:{}, toastW:{}, actAt:-1e9}; }   /* r5: 마지막 학생 행동 시각(actAt): 그 뒤 0.6초는 직접 결과만 */   /* r4: 마지막 누름(downAt), 단계별 자동 힌트 1회(autoH), 미룬 토스트(toastW) */   /* r3: 글 줄(labQ·txtAt), 해 본 동작 종류(trKinds), 놓친 이유 기록(trSkip) */
+/* '마지막 단계 다시'(§10)는 2026-11-07 폐지(§19 도전 모드로 대체). GAME.replayLast가 있어도 읽지 않는다 */
+/* §19 도전 모드 = 레벨 사다리. 엔진은 틀만(잠금 해제·레벨·판마다 새 시드·목표 점수·통과/아깝다/다시·별·기록·결과 화면).
+   도전 '내용'은 게임이 정의한다: GAME.challenge = {stages:[{name}…], goal(lv), say:{start:[…]}, ruleCards?:[…], speed?(lv), cfg?(lv)}.
+   LOGIC은 G.ch(레벨, 1부터)가 있으면 자기 도전 단계 표를 쓴다. GAME.challenge가 없으면 도전 버튼도 없다(잘못된 도전을 내보내지 않음).
+   아래 ENG-CHRULE 구역은 규칙(순수 함수)만: check.js가 잘라 Node에서 같은 규칙으로 봇 세션을 돌린다 */
+/* ENG-CHRULE-START */
+var CHC = GAME.challenge && typeof GAME.challenge==='object' && Array.isArray(GAME.challenge.stages) && GAME.challenge.stages.length ? GAME.challenge : null;
+var ENG_CHNEAR = 0.9;   /* 목표의 90% 이상이면 '아깝다' */
+var ENG_CHR = {
+  spd: function(lv){ return typeof CHC.speed==='function' ? (+CHC.speed(lv)||1) : 1; },   /* 시간 배속: 기본 1(시간만 줄인 도전 금지). 게임이 원하면 */
+  cfg: function(lv){ return typeof CHC.cfg==='function' ? CHC.cfg(lv) : (CHC.cfg||null); },   /* G.cfg로 LOGIC에 넘길 레벨별 값(선택) */
+  goal: function(lv){ return Math.max(1, Math.round(+CHC.goal(lv)||1)); },
+  stars: function(sc,g){ return sc<g ? 0 : sc>=g*1.3 ? 3 : sc>=g*1.15 ? 2 : 1; },
+  seed: function(n){ return ((GAME.seed||1)+7919*(n+1))>>>0; }
+};
+/* ENG-CHRULE-END */
+var ENG_CH_GAP = 900, ENG_CHON = false, ENG_CHLV = 1, ENG_CHSPD = 1, ENG_CHCFG = null, ENG_CHGOAL = 0, ENG_CHRS = Math.floor(Math.random()*100000);
+var ENG_CHM = {open:false, lv:1, top:0, best:{}, n:0};   /* lv = 열린 레벨(다음에 할 것), top = 깬 최고 레벨, best = 레벨별 최고 점수, n = 판 수 */
+function engHash(s){ var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return (h>>>0).toString(36); }
+var ENG_CHK = 'engch:'+(GAME.id ? String(GAME.id) : engHash(String(GAME.title)+'|'+String(GAME.subtitle)));
+/* ENG-STORE-START: 엔진이 브라우저 저장을 쓰는 곳은 이 두 함수뿐(check.js가 이 구역 밖의 사용과 try 없는 사용을 막는다). 막혀 있으면 ENG_CHM(메모리)만으로 이 접속 동안 동작 */
+function engChLoad(){ try{ var s=window.localStorage.getItem(ENG_CHK); if(s) engChMerge(JSON.parse(s)); }catch(e){} }
+function engChSave(){ try{ window.localStorage.setItem(ENG_CHK, JSON.stringify(ENG_CHM)); }catch(e){} }
+/* ENG-STORE-END */
+function engChMerge(o){ if(!o||typeof o!=='object') return; var M=ENG_CHM; if(o.open) M.open=true; ['lv','top','n'].forEach(function(k){ if(+o[k]>M[k]) M[k]=+o[k]; });
+  if(o.best&&typeof o.best==='object') for(var k in o.best) if(+o.best[k]>(M.best[k]||0)) M.best[k]=+o.best[k]; }
+function engChMark(g){ if(ENG_CHON && g && typeof g==='object' && g.ch!==ENG_CHLV){ g.ch=ENG_CHLV; if(ENG_CHCFG) g.cfg=ENG_CHCFG; } return g; }
+/* 지금 판의 단계 표·규칙 칸·시작 대사(도전이면 GAME.challenge 것) */
+function engStg(){ return ENG_CHON ? CHC.stages : GAME.stages; }
+function engRC(si){ return (ENG_CHON ? (CHC.ruleCards||[])[si] : GAME.ruleCards[si]) || []; }
+function engSay0(si){ return ENG_CHON ? ((CHC.say||{}).start||[])[si] || '' : SAY.start[si]; }   /* LOGIC이 새 G를 만들며 빠뜨려도 다시 붙인다 */
+function engChIcon(){ return '<svg class="eng-chi" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 2.2 4.8 13.6h6.1L9.4 21.8l9.8-12.2h-6.3z" fill="currentColor"/></svg>'; }
+function engStar(on){ return '<svg class="eng-star'+(on?' on':'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.2l-5.8 3.2 1.2-6.5L2.6 9.4l6.5-.8z"/></svg>'; }
+function engChStart(lv){
+  if(!CHC) return; lv=Math.max(1, +lv||ENG_CHM.lv); reset();
+  ENG_CHON=true; ENG_CHLV=lv; ENG_CHSPD=ENG_CHR.spd(lv); ENG_CHCFG=ENG_CHR.cfg(lv); ENG_CHGOAL=ENG_CHR.goal(lv);
+  G=engChMark(newGame(ENG_CHR.seed(ENG_CHM.n+ENG_CHRS))); ENG_CHM.n++; engChSave();   /* 판마다 새 시드 */
+  G=engChMark(start(G));
+  var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage();
 }
-function replayLast(){
-  if(!U.lastSnap) return; var snap=U.lastSnap;
-  var kinds=U.lastKinds; GEN++; ovl.innerHTML=''; engDockClear(); U=freshU(); U.lastSnap=snap; U.lastKinds=kinds; U.trKinds=deepCopy(kinds||{}); U.mode='play'; $('#app').classList.remove('trying');
-  if(XPC){ xpClose(); $('#xpBtn').classList.add('off'); }
-  $('#combo').classList.remove('on'); closeModal(); var r=$('.res'); if(r) r.remove(); $('#main').classList.remove('showres');
-  G=deepCopy(snap); U.shown=G.score; $('#score').textContent=G.score;
-  beginStage();
+/* §19-짝(2026-11-07, 교사 승인): 도전이 없는 체험 게임은 같은 차시 '떠올리기 연습'의 도전으로 이어 준다.
+   주소는 배포 때 넣는다: <meta name="eng-pair" content="주소"> 또는 GAME.pairUrl. 주소가 없으면 버튼도 없다. */
+function engPairUrl(){ try{ var m=document.querySelector('meta[name="eng-pair"]'); var u=(m&&m.getAttribute('content'))||GAME.pairUrl||''; return /^(https:\/\/|\.{0,2}\/|[\w-]+\.html)/.test(u)?u:''; }catch(e){ return ''; } }
+function engPairBtn(){ var u=engPairUrl(); if(!u) return ''; return '<a class="btn2 eng-ch eng-pair" id="engPair" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>'; }
+function engChTitleBtn(){
+  if(!CHC || !ENG_CHM.open) return; var p=$('#pbtn'); if(!p.children.length) return; p.classList.add('eng-p2');
+  p.insertAdjacentHTML('beforeend','<button class="big eng-ch" id="engChGo">'+engChIcon()+'도전 '+ENG_CHM.lv+'</button>');
+  $('#engChGo').onclick=function(){ if(U.busy) return; engChStart(ENG_CHM.lv); };
 }
 function reset(){
-  GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
+  ENG_CHON=false; GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
   U=freshU(); $('#app').classList.remove('trying');
   if(XPC){ xpClose(); $('#xpBtn').classList.add('off'); }
   $('#combo').classList.remove('on'); closeModal(); var r=$('.res'); if(r) r.remove(); $('#main').classList.remove('showres');
@@ -1148,13 +1232,14 @@ function reset(){
 }
 function stageHud(){
   var on=U.mode!=='title', si=G.si;
-  $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+GAME.stages[si].name+'</span>' : GAME.title;
-  $('#stgPips').innerHTML = on ? GAME.stages.map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
+  $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+engStg()[si].name+'</span>' : GAME.title;
+  $('#stgPips').innerHTML = on ? engStg().map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
+  var ct=$('#engChTag'); if(ct){ if(ENG_CHON) ct.innerHTML=engChIcon()+'도전 '+ENG_CHLV; ct.classList.toggle('hide', !ENG_CHON); }   /* §19 도전 중 표시 */
 }
 function say(html,who){ $('#say').innerHTML='<b>'+(who||GAME.guide)+'</b>'+html; }
-function setBtn(label,fn){ var p=$('#pbtn'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
+function setBtn(label,fn){ var p=$('#pbtn'); p.classList.remove('eng-p2'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
 function ruleCard(c){ return '<div class="rc'+(c[2]?' new':'')+'"><svg viewBox="0 0 120 60">'+useArt(c[0],0,0,120,60)+'</svg><span>'+c[1]+'</span></div>'; }
-function rulesPanel(){ var h=''; if(U.mode==='play'||U.mode==='stageEnd'){ GAME.ruleCards[G.si].forEach(function(c){ h+=ruleCard(c); }); } $('#rules').innerHTML=h; }
+function rulesPanel(){ var h=''; if(U.mode==='play'||U.mode==='stageEnd'){ engRC(G.si).forEach(function(c){ h+=ruleCard(c); }); } $('#rules').innerHTML=h; }
 /* 진행 표시: 끝낸 일(G.res.served) 초록, 놓친 일(G.res.missed) 회색, 남은 일 흐리게 */
 function progPanel(){
   var p=$('#prog'); if(U.mode!=='play'&&U.mode!=='stageEnd'){ p.classList.add('hide'); return; } p.classList.remove('hide');
@@ -1189,13 +1274,14 @@ function title(){
   U.mode='title'; panelAll();
   say(SAY.title);
   setBtn(SAY.startBtn||'시작',function(){ G=start(G); beginStage(); });
+  engChTitleBtn();   /* §19: 이 기기에서 이미 열렸으면 '도전'도 */
   ribbon(GAME.title,GAME.subtitle,0);
 }
 function beginStage(){
-  if(REPLAY && G.si===NSTAGE-1){ U.lastSnap=deepCopy(G); U.lastKinds=deepCopy(U.trKinds); }   /* 마지막 단계 시작 순간(r3: 그때까지 해 본 동작 종류도) */
   U.mode='play'; U.hint=0; U.hintMv=null; U.bounces=0; U.okN=0; U.lastAct=performance.now(); U.demo=null; U.demoAt=performance.now()+(G.si===0?2200:2400);
-  var tq=clearOvl(); setBtn(null); say(SAY.start[G.si]); panelAll(); U.xpCur=null;
-  ribbon((G.si+1)+'단계', GAME.stages[G.si].name, 1500);
+  var tq=clearOvl(); setBtn(null); say(engSay0(G.si)); panelAll(); U.xpCur=null;
+  if(ENG_CHON && G.si===0) ribbon('도전 '+ENG_CHLV, '목표 '+ENG_CHGOAL, 1400);   /* §19: 첫 단계는 레벨과 목표 점수 */
+  else ribbon((G.si+1)+'단계', engStg()[G.si].name, ENG_CHON?ENG_CH_GAP:1500);
   tryBegin();   /* §12 '해 보기': 새 규칙이 나오는 단계면 시간을 멈추고 한 번 직접 해 보게 한다 */
   tq.forEach(toast);
 }
@@ -1217,7 +1303,12 @@ function engEndSweep(){
 }
 function onStageEnd(){
   U.mode='stageEnd'; U.busy=true; tryClear(); engEndSweep(); stopDemo(); if(XPC){ U.xpCur=null; xpSync(); } clearRings(); hintBtn(); progPanel(); $('#combo').classList.remove('on'); U.comboT=0;
-  var sr=stageRibbon(); ribbon(sr.text, '', 1700); if(sr.ok) confetti();
+  var sr=stageRibbon();
+  if(ENG_CHON){   /* §19 도전: 단계 끝 대사·'다음'·비교 카드 없이 짧은 리본 뒤 바로 다음 단계(LOGIC next를 곧바로 불러 비교 카드 장면을 건너뜀) */
+    ribbon(sr.text, '', ENG_CH_GAP); if(sr.ok) confetti(); setBtn(null);
+    G=engChMark(next(G));
+    later(ENG_CH_GAP+100,function(){ U.busy=false; if(G.phase==='end') results(); else beginStage(); }); return; }
+  ribbon(sr.text, '', 1700); if(sr.ok) confetti();
   later(700,function(){ U.busy=false; var lines=SAY.end[G.si], k=0;
     var show=function(){ say(lines[k]); setBtn(k<lines.length-1?'다음':(G.si<NSTAGE-1?'다음 단계':'결과 보기'), function(){ k++; if(k<lines.length) show(); else { G=next(G); if(G.phase==='end') results(); else beginStage(); } }); };
     show(); });
@@ -1480,6 +1571,7 @@ function engDemoTap(id){
      {point:id, text, at}     손가락이 id를 가리키고 말풍선 text(at 위치). point가 null이면 아직 기다림
      {move:{src,dst}}         시작 시범을 이 수로. move가 null이면 아직 기다림 */
 function maybeDemo(now){
+  if(ENG_CHON) return;   /* §19 도전: 저절로 뜨는 손가락 시범 없음(답을 보여 주지 않음). 힌트 버튼은 그대로 */
   if(U.mode!=='play'||U.demo||U.drag||U.sel||U.busy||U.hint||tryHold()) return;   /* '해 보기' 중에는 시범 없음(§12) */   /* 힌트가 켜져 있으면 시범 없음(힌트가 보여 주는 수와 다른 곳을 가리키지 않게) */
   if(now-U.okAt<2000) return;   /* 바르게 놓은 직후 2초는 시범 없음(맞혔는데 틀린 줄 알게 됨, §11) */
   if(now-U.downAt<2500) return;   /* r4: 장면을 누른 직후 2.5초도 시범 없음(3차 블라인드: 버튼을 누르자 손가락이 '저절로' 나옴) */
@@ -1543,8 +1635,8 @@ function xpToggle(){
 /* r4: 이 단계의 일반 '왜?' — GAME.explain.general(G)(글 | {why, def, page}) → 없으면 단계 시작 대사 + 이번 규칙 칸 글 */
 function engXpGeneral(){
   if(typeof XPC.general==='function'){ var g=XPC.general(G); if(g) return xpHtml(g); }
-  var rc=(GAME.ruleCards[G.si]||[]).map(function(c){ return c[1]; }).filter(Boolean).join(' · ');
-  return xpHtml({why:SAY.start[G.si]||GAME.stages[G.si].name, def:rc?'이번 규칙: '+rc:''});
+  var rc=engRC(G.si).map(function(c){ return c[1]; }).filter(Boolean).join(' · ');
+  return xpHtml({why:engSay0(G.si)||engStg()[G.si].name, def:rc?'이번 규칙: '+rc:''});
 }
 /* 틀린 놓기 기본 동작: reasons[why 코드]가 있으면 대상 옆에 짧은 한 줄(bounce, 기본 '다시!')만 띄우고 이유는 '왜?'에 둔다 */
 function xpBounce(r,src,dst){
@@ -1754,7 +1846,8 @@ function tryClear(){
   var d=document.getElementById('tDim'); if(d) d.remove();
 }
 function tryBegin(){
-  tryClear(); if(GAME.tryIt===false) return;
+  tryClear(); if(ENG_CHON){ U.demoDone[G.si]=1; return; }   /* §19 도전: 해 보기·시작 시범 없음 */
+  if(GAME.tryIt===false) return;
   if(typeof GAME.tryIt!=='function' && !tryNewRule(G.si)) return;
   U.tr={phase:'pre', t0:performance.now(), seek:0, si:G.si, again:0, k:0};
 }
@@ -1955,17 +2048,29 @@ function resultArt(R){
 function results(){
   U.mode='result'; tryClear(); stopDemo(); clearOvl(); panelAll(); $('#combo').classList.remove('on'); U.comboT=0;
   $('#stgName').textContent='결과'; $('#stgPips').innerHTML='';
-  var R=GAME.result, sc=G.score, prev=BEST, rec=sc>prev&&prev>0; BEST=Math.max(BEST,sc);
+  var R=GAME.result, sc=G.score, CH=ENG_CHON, prev=BEST, rec=sc>prev&&prev>0, fresh=false, left;
+  if(CH){   /* §19 도전 결과: 큰 글 하나('도전 3 성공!' / '아깝다!' / '도전 3') + 별 + 점수와 목표 막대. 버튼 [다시 하기 | 도전 n+1 또는 다시] */
+    var lv=ENG_CHLV, goal=ENG_CHGOAL, pass=sc>=goal, near=!pass&&sc>=goal*ENG_CHNEAR, st=ENG_CHR.stars(sc,goal), pb=ENG_CHM.best[lv]||0;
+    ENG_CHM.best[lv]=Math.max(pb,sc); ENG_CHM.open=true; if(pass){ ENG_CHM.top=Math.max(ENG_CHM.top,lv); ENG_CHM.lv=Math.max(ENG_CHM.lv,lv+1); } engChSave();
+    U.chRes={lv:lv, goal:goal, pass:pass, near:near, stars:st, score:sc, next:pass?lv+1:lv};
+    left='<div class="rcard l eng-chres'+(pass?' pass':'')+'"><div class="ttl eng-big'+(pass||near?' eng-new':'')+'">'+(pass?'도전 '+lv+' 성공!':near?'아깝다!':'도전 '+lv)+'</div>'
+      +(pass?'<div class="eng-stars">'+[1,2,3].map(function(i){ return engStar(i<=st); }).join('')+'</div>':'')
+      +'<div class="num" id="rnum">0</div><div class="eng-goal"><div class="eng-gbar"><i style="transform:scaleX('+Math.min(1,sc/goal).toFixed(3)+')"></i></div><span>목표 '+goal+'</span></div>'
+      +'<div class="btns"><button class="btn2" id="again">다시 하기</button><button class="btn2 eng-ch pri'+(near?' new':'')+'" id="engCh">'+engChIcon()+(pass?'도전 '+(lv+1):'다시')+'</button></div></div>';
+  } else {
+    BEST=Math.max(BEST,sc); if(CHC){ fresh=!ENG_CHM.open; ENG_CHM.open=true; engChSave(); }   /* §19: 결과 화면에 닿으면 도전이 열린다 */
+    left='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div>'
+      +'<div class="btns"><button class="btn2 pri" id="again">다시 하기</button>'+(CHC?'<button class="btn2 eng-ch'+(fresh?' new':'')+'" id="engCh">'+engChIcon()+'도전 '+ENG_CHM.lv+'</button>':engPairBtn())+'</div></div>';   /* 결과 버튼은 [다시 하기 | 도전] 둘만. 처음으로는 HUD ⟲ */
+  }
   var rows=R.rows(G), mx=Math.max.apply(null,[1].concat(rows.map(function(r){ return r[1]; })));
   var d=document.createElement('div'); d.className='res';
-  d.innerHTML='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div><div class="btns"><button class="btn2 pri" id="again">다시 하기</button><button class="btn2" id="home">처음으로</button></div>'+(REPLAY&&U.lastSnap?'<div class="btns"><button class="btn2" id="againLast">마지막 단계 다시</button></div>':'')+'</div>'
+  d.innerHTML=left
    +'<div class="rcard"><div class="rh">'+R.label+'<small>'+R.note+'</small></div><div class="bars">'+rows.map(function(r){ return '<span>'+r[0]+'</span><div class="bar"><i data-v="'+(r[1]/mx)+'"></i></div><b>'+r[1]+'</b>'; }).join('')+'</div>'
    +resultArt(R)+'<div class="formula">'+R.formula+'</div>'+shelfHtml(null)+'<div class="nextq">배지를 누르면 뜻이 나와요.<br>'+R.next+'</div></div>';
   $('#main').appendChild(d); $('#main').classList.add('showres');
   d.querySelectorAll('[data-bd]').forEach(function(x){ x.onclick=function(){ badgeModal(x.dataset.bd); }; });
   $('#again').onclick=function(){ reset(); G=start(G); var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage(); };
-  $('#home').onclick=reset;
-  if($('#againLast')) $('#againLast').onclick=replayLast;
+  if($('#engCh')) $('#engCh').onclick=function(){ engChStart(CH ? U.chRes.next : ENG_CHM.lv); };
   say(R.say); setBtn(null);
   requestAnimationFrame(function(){ d.querySelectorAll('.bar i').forEach(function(i){ i.style.transform='scaleX('+i.dataset.v+')'; }); });
   var t0=performance.now(), g=GEN; (function roll(){ if(g!==GEN) return; var p=Math.min(1,(performance.now()-t0)/(RM?1:900)); var n=$('#rnum'); if(n) n.textContent=Math.round(sc*p); if(p<1) requestAnimationFrame(roll); })();
@@ -1983,7 +2088,8 @@ var LAST=performance.now(), RAF=0;
 function frame(now){
   var dt=Math.min(0.1,(now-LAST)/1000); LAST=now;
   var frz = U.mode==='play' && tryFrame(now,dt);   /* '해 보기' 동안 게임 시간은 멈춘다 */
-  if(U.mode==='play' && !U.paused && !frz){ var r=tick(G,dt); G=r.G; if(r.ev.length) handle(r.ev); }
+  if(U.mode==='play' && !U.paused && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G;   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
+    if(r.ev.length) handle(r.ev); }
   SCENE.renderScene(G);
   syncRings(); if(U.mode==='play'){ unblockOverlays(now); hintCheck(now); hintFingerStep(now); hintArrowSync(); }
   if(U.shown!==G.score && !engHeld(now)){ U.shown += Math.ceil((G.score-U.shown)/4); if(U.shown>G.score) U.shown=G.score; $('#score').textContent=U.shown; }
@@ -1995,6 +2101,7 @@ function frame(now){
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ cancelAnimationFrame(RAF); RAF=0; } else if(!RAF){ LAST=performance.now(); RAF=requestAnimationFrame(frame); } });
 window.addEventListener('resize',function(){ clearRings('.ring:not(.bad)'); if(U.hint&&U.hintMv) hintShow(U.hintMv,U.hint,false); if(U.tr&&U.tr.phase==='wait') trySpot(U.tr,false); });
 
+engChLoad();
 reset();
 RAF=requestAnimationFrame(frame);
 </script>

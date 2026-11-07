@@ -28,7 +28,7 @@
   - [한강의 기적 연표](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a5.html): A 개념 체험. 시대마다 공장을 짓고 수출하면 1인당 소득 막대가 교과서 그래프대로 자라요. 우리나라 경제성장 과정을 겪어요.
   - [경제성장의 발자취](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b5.html): B 떠올리기 연습. 카드를 1960년대부터 오늘날까지 시대 칸에 나눠 담아요.
 - [23차시 경제성장이 우리 생활에 미치는 영향을 알아볼까요 (교과서 81~84쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-23.html): 풍요로운 마을 만들기, 경제성장이 바꾼 생활
-  - [풍요로운 마을 만들기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a6.html): A 개념 체험. 소득을 로봇 공장·공연장·학교·병원에 넣으며 경제성장이 생산·문화·교육·의료를 바꾼 모습을 겪어요.
+  - [풍요로운 마을 만들기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a6.html): A 개념 체험. 한정된 동전을 주민이 바라는 공연장·학교·병원에 쓸까, 로봇 공장에 먼저 투자할까? 성장한 소득을 어디에 쓰는지 골라요.
   - [경제성장이 바꾼 생활](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b6.html): B 떠올리기 연습. 카드를 첨단 기술·문화 산업·삶의 질 칸에 나눠 담아요.
 - [24차시 빠른 경제성장으로 발생한 문제를 알아볼까요 (교과서 85~87쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-24.html): 빨리 크는 도시, 어떤 문제일까
   - [빨리 크는 도시](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a7.html): A 개념 체험. 도시를 빨리 키울수록 생기는 환경 문제·빈부 격차·과소비·노사 갈등을 찾아 목록에 모아요.
