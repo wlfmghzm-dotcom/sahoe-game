@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>저작권 안내 · 사회 게임실</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 사회 게임실 공용 스타일: 색 토큰(라이트/다크), 글꼴, 버튼. index·about·404가 함께 씁니다. */
+:root{
+  --bg:#E6F1F3; --surface:#FFFFFF; --ink:#12324A; --muted:#5A7584; --line:#C7DBE0;
+  --sea:#9FD3DE; --accent:#E0532B; --accent-ink:#FFFFFF; --banana:#E3A400; --banana-soft:#FFF0BF;
+  --fish:#2377C4; --fish-soft:#D9E9FA; --good:#23804F; --good-soft:#D9F1E2; --bad-soft:#FBE3DB; --veil:rgba(10,30,45,.6);
+  --game:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1922; --surface:#132736; --ink:#E5F0F4; --muted:#93ADBC; --line:#24435A;
+  --sea:#14465A; --accent:#FF7A55; --accent-ink:#1A0E09; --banana:#F5C63E; --banana-soft:#3A3115;
+  --fish:#62ADF2; --fish-soft:#173450; --good:#5CCB8C; --good-soft:#163828; --bad-soft:#3A2119; --veil:rgba(0,0,0,.72); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1922; --surface:#132736; --ink:#E5F0F4; --muted:#93ADBC; --line:#24435A;
+  --sea:#14465A; --accent:#FF7A55; --accent-ink:#1A0E09; --banana:#F5C63E; --banana-soft:#3A3115;
+  --fish:#62ADF2; --fish-soft:#173450; --good:#5CCB8C; --good-soft:#163828; --bad-soft:#3A2119; --veil:rgba(0,0,0,.72); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:900px;margin:0 auto;padding-block:20px 80px;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--game);font-weight:400;margin:0;line-height:1.2;text-wrap:balance}
+a{color:var(--fish)}
+button,.btn{font-family:var(--game)}
+button{cursor:pointer;color:var(--ink)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--fish);outline-offset:2px}
+
+.mast{display:grid;gap:10px;padding:22px 22px 20px;border-radius:24px;background:var(--sea);position:relative;overflow:hidden}
+.mast::after{content:"";position:absolute;right:-30px;bottom:-40px;width:180px;height:180px;border-radius:50%;background:var(--surface);opacity:.18;pointer-events:none}
+.eyebrow{font-family:var(--game);font-size:.95rem;opacity:.75;letter-spacing:.04em}
+.mast h1{font-size:clamp(2.2rem,8vw,3.2rem)}
+.mast p{margin:0;max-width:34em;text-wrap:pretty}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:6px 16px;border-radius:14px;border:none;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-size:1.1rem;line-height:1.2}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.sm{min-height:44px;font-size:1rem;padding:4px 12px}
+.chipbtn{min-height:44px;border-radius:12px;border:1.5px solid var(--ink);background:var(--surface);padding:6px 14px;font-size:1.05rem;font-family:var(--game);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center}
+
+.foot{color:var(--muted);font-size:.9rem;display:flex;gap:6px 16px;flex-wrap:wrap;border-top:1.5px solid var(--line);padding-top:14px}
+.foot a{color:var(--muted)}
+
+/* Layout: masthead → stacked notice blocks → credits table (cards on phones) → per-game credit list. */
+.mast h1{font-size:clamp(1.9rem,6vw,2.6rem)}
+.blk{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:16px 18px;display:grid;gap:8px}
+.blk h2{font-size:1.4rem}
+.blk p,.blk ul{margin:0}
+.blk ul{padding-left:1.2em;display:grid;gap:4px}
+.cr{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.cr li{border-top:1.5px dashed var(--line);padding-top:10px;display:grid;gap:2px}
+.cr li:first-child{border-top:none;padding-top:0}
+.cr b{font-family:var(--game);font-weight:400;font-size:1.1rem}
+.cr .m{font-size:.9rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow">사회 게임실</div>
+    <h1>저작권·출처 안내</h1>
+    <p>초등 교사 한 명이 수업용으로 직접 만들어 올리는 비영리 게임 모음입니다. 교과서 출판사와 관계없습니다.입니다.</p>
+    <div><a class="chipbtn" href="./">← 게임 찾기로</a></div>
+  </header>
+
+  <section class="blk">
+    <h2>비영리 수업용</h2>
+    <ul>
+      <li>이 사이트는 돈을 받지 않고, 광고도 없습니다. 로그인이나 개인정보 입력도 없습니다.</li>
+      <li>서버가 없는 정적 사이트라, 게임에서 한 활동은 어디에도 보내지거나 저장되지 않습니다.</li>
+      <li>교사가 수업에 맞게 직접 만들어 올리며, 다른 사람이 게임을 등록하는 기능은 없습니다.</li>
+    </ul>
+  </section>
+
+  <section class="blk">
+    <h2>교과서 내용</h2>
+    <ul>
+      <li>게임은 교과서 차시의 개념을 겪어 보도록 새로 만든 활동입니다. 교과서의 그림·사진·지문은 옮겨 싣지 않습니다.</li>
+      <li>낱말 뜻처럼 짧은 정의 한 줄만, 교과서 이름과 쪽수를 밝혀 인용합니다(저작권법 제28조 공표된 저작물의 인용).</li>
+      <li>출판사 이름과 차시 이름은 찾기 편하도록 적은 것이며, 출판사와 관계가 없습니다.</li>
+    </ul>
+  </section>
+
+  <section class="blk">
+    <h2>그림·자료·도구 출처</h2>
+    <ul class="cr"><li><b>게임 그림 일부</b><span>Kenney (kenney.nl) · CC0 1.0 (퍼블릭 도메인)</span><span class="m">출처 표기 의무는 없지만 고마움을 담아 적습니다.</span><a class="m" href="https://kenney.nl" rel="noopener">https://kenney.nl</a></li>
+<li><b>지도·지형</b><span>Natural Earth 1:110m Admin 0 Countries (world-atlas@2.0.2로 받음) · 퍼블릭 도메인 (world-atlas 재배포: ISC)</span><span class="m">3단원 게임의 세계지도에 씁니다. 무역 단원 지도와 항구는 직접 그린 그림입니다.</span><a class="m" href="https://www.naturalearthdata.com/about/terms-of-use/" rel="noopener">https://www.naturalearthdata.com/about/terms-of-use/</a></li>
+<li><b>QR 코드 만들기</b><span>qrcode-generator (Kazuhiko Arase) · MIT</span><span class="m">이 사이트 안에 파일로 들어 있어 외부에 접속하지 않습니다. QR 코드는 (주)덴소웨이브의 등록 상표입니다.</span><a class="m" href="https://github.com/kazuhikoarase/qrcode-generator" rel="noopener">https://github.com/kazuhikoarase/qrcode-generator</a></li>
+<li><b>글꼴</b><span>Jua, Gowun Dodum (Google Fonts) · SIL Open Font License 1.1</span><span class="m">무료 글꼴 서비스에서 불러옵니다. 연결이 안 되면 기기 기본 글꼴로 보입니다.</span><a class="m" href="https://fonts.google.com/specimen/Jua" rel="noopener">https://fonts.google.com/specimen/Jua</a></li>
+<li><b>방문·좋아요 세기</b><span>GoatCounter (goatcounter.com) · 오픈 소스(EUPL), 무료</span><span class="m">찾기 화면에만 붙어 있고 게임 화면에는 없습니다. 쿠키를 쓰지 않고 개인을 알아보지 않으며, 방문 수와 좋아요 수만 셉니다.</span><a class="m" href="https://www.goatcounter.com/" rel="noopener">https://www.goatcounter.com/</a></li>
+<li><b>교과서 내용</b><span>게임 속 설명은 교과서 내용을 바꿔 쓰고 쪽수만 밝혔습니다</span><span class="m">교과서 문장·그림·사진을 그대로 옮기지 않았습니다. 교과서 출판사와 관계없는 자료입니다.</span></li></ul>
+  </section>
+
+  <section class="blk">
+    <h2>게임별 그림 출처</h2>
+    <ul class="cr"><li><b>무역 속보 데스크</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>두 섬 이야기</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>대한민국 무역항</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>스마트폰 공장 이야기</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>사람이 모이는 땅</b><span class="m">그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)</span></li>
+<li><b>자연일까 인문일까</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>떠나는 사람, 오는 사람</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>어느 나라 이야기일까</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>한 칸에 몇 명?</b><span class="m">그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)</span></li>
+<li><b>밀도 높을까 낮을까</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>나이 탑 모양 맞추기</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>어느 나이층일까</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>쓰면 줄어드는 마을</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>어떤 지구촌 문제일까</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>먼 연기, 가까운 가뭄</b><span class="m">그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)</span></li>
+<li><b>상황일까 원인일까</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>지구촌 도움 현장</b><span class="m">그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)</span></li>
+<li><b>누구의 노력일까</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>바꾸고 넘겨요</b><span class="m">그림: Kenney (CC0)</span></li>
+<li><b>더하기일까 빼기일까</b><span class="m">그림: Kenney (CC0)</span></li></ul>
+  </section>
+
+  
+  <footer class="foot"><a href="./">게임 찾기</a><span>비영리 수업용</span></footer>
+</div>
+</body>
+</html>

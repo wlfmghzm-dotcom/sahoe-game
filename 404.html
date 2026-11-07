@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>페이지를 찾지 못했어요 · 사회 게임실</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 사회 게임실 공용 스타일: 색 토큰(라이트/다크), 글꼴, 버튼. index·about·404가 함께 씁니다. */
+:root{
+  --bg:#E6F1F3; --surface:#FFFFFF; --ink:#12324A; --muted:#5A7584; --line:#C7DBE0;
+  --sea:#9FD3DE; --accent:#E0532B; --accent-ink:#FFFFFF; --banana:#E3A400; --banana-soft:#FFF0BF;
+  --fish:#2377C4; --fish-soft:#D9E9FA; --good:#23804F; --good-soft:#D9F1E2; --bad-soft:#FBE3DB; --veil:rgba(10,30,45,.6);
+  --game:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1922; --surface:#132736; --ink:#E5F0F4; --muted:#93ADBC; --line:#24435A;
+  --sea:#14465A; --accent:#FF7A55; --accent-ink:#1A0E09; --banana:#F5C63E; --banana-soft:#3A3115;
+  --fish:#62ADF2; --fish-soft:#173450; --good:#5CCB8C; --good-soft:#163828; --bad-soft:#3A2119; --veil:rgba(0,0,0,.72); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1922; --surface:#132736; --ink:#E5F0F4; --muted:#93ADBC; --line:#24435A;
+  --sea:#14465A; --accent:#FF7A55; --accent-ink:#1A0E09; --banana:#F5C63E; --banana-soft:#3A3115;
+  --fish:#62ADF2; --fish-soft:#173450; --good:#5CCB8C; --good-soft:#163828; --bad-soft:#3A2119; --veil:rgba(0,0,0,.72); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:900px;margin:0 auto;padding-block:20px 80px;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--game);font-weight:400;margin:0;line-height:1.2;text-wrap:balance}
+a{color:var(--fish)}
+button,.btn{font-family:var(--game)}
+button{cursor:pointer;color:var(--ink)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--fish);outline-offset:2px}
+
+.mast{display:grid;gap:10px;padding:22px 22px 20px;border-radius:24px;background:var(--sea);position:relative;overflow:hidden}
+.mast::after{content:"";position:absolute;right:-30px;bottom:-40px;width:180px;height:180px;border-radius:50%;background:var(--surface);opacity:.18;pointer-events:none}
+.eyebrow{font-family:var(--game);font-size:.95rem;opacity:.75;letter-spacing:.04em}
+.mast h1{font-size:clamp(2.2rem,8vw,3.2rem)}
+.mast p{margin:0;max-width:34em;text-wrap:pretty}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:6px 16px;border-radius:14px;border:none;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-size:1.1rem;line-height:1.2}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.sm{min-height:44px;font-size:1rem;padding:4px 12px}
+.chipbtn{min-height:44px;border-radius:12px;border:1.5px solid var(--ink);background:var(--surface);padding:6px 14px;font-size:1.05rem;font-family:var(--game);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center}
+
+.foot{color:var(--muted);font-size:.9rem;display:flex;gap:6px 16px;flex-wrap:wrap;border-top:1.5px solid var(--line);padding-top:14px}
+.foot a{color:var(--muted)}
+
+/* Layout: one centered card with a big home button. */
+.wrap{min-height:100vh;min-height:100dvh;justify-content:center}
+.box{background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 22px;display:grid;gap:12px;justify-items:center;text-align:center}
+.box .big{font-family:var(--game);font-size:3.4rem;line-height:1}
+.box h1{font-size:clamp(1.7rem,6vw,2.4rem)}
+.box p{margin:0;color:var(--muted);max-width:28em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="box">
+    <div class="big" aria-hidden="true">🧭</div>
+    <h1>이 주소에는 게임이 없어요</h1>
+    <p>주소가 바뀌었거나 잘못 적혔을 수 있어요. 게임실 첫 화면에서 차시를 다시 찾아 주세요.</p>
+    <a class="btn" id="home" href="https://wlfmghzm-dotcom.github.io/sahoe-game/">🏠 게임실 첫 화면으로</a>
+  </div>
+</div>
+<script>
+/* GitHub Pages shows this page for any wrong address, at any depth. With no fixed address in site.json,
+   guess the site folder: https://<id>.github.io/<저장소>/ */
+(function(){
+  var a=document.getElementById('home'); if(/^https?:/.test(a.getAttribute('href'))) return;
+  try{
+    var seg=location.pathname.split('/').filter(Boolean)[0];
+    var user=/\.github\.io$/i.test(location.hostname) && seg && location.hostname.split('.')[0].toLowerCase()!==seg.toLowerCase();
+    a.href = location.origin + '/' + (user && !/\.html?$/i.test(seg) ? seg + '/' : '');
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

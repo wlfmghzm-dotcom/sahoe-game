@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>사회 게임실</title>
+<meta name="description" content="사회 게임실 · 교과·출판사·차시별 수업용 게임 모음">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 사회 게임실 공용 스타일: 색 토큰(라이트/다크), 글꼴, 버튼. index·about·404가 함께 씁니다. */
+:root{
+  --bg:#E6F1F3; --surface:#FFFFFF; --ink:#12324A; --muted:#5A7584; --line:#C7DBE0;
+  --sea:#9FD3DE; --accent:#E0532B; --accent-ink:#FFFFFF; --banana:#E3A400; --banana-soft:#FFF0BF;
+  --fish:#2377C4; --fish-soft:#D9E9FA; --good:#23804F; --good-soft:#D9F1E2; --bad-soft:#FBE3DB; --veil:rgba(10,30,45,.6);
+  --game:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1922; --surface:#132736; --ink:#E5F0F4; --muted:#93ADBC; --line:#24435A;
+  --sea:#14465A; --accent:#FF7A55; --accent-ink:#1A0E09; --banana:#F5C63E; --banana-soft:#3A3115;
+  --fish:#62ADF2; --fish-soft:#173450; --good:#5CCB8C; --good-soft:#163828; --bad-soft:#3A2119; --veil:rgba(0,0,0,.72); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1922; --surface:#132736; --ink:#E5F0F4; --muted:#93ADBC; --line:#24435A;
+  --sea:#14465A; --accent:#FF7A55; --accent-ink:#1A0E09; --banana:#F5C63E; --banana-soft:#3A3115;
+  --fish:#62ADF2; --fish-soft:#173450; --good:#5CCB8C; --good-soft:#163828; --bad-soft:#3A2119; --veil:rgba(0,0,0,.72); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:900px;margin:0 auto;padding-block:20px 80px;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--game);font-weight:400;margin:0;line-height:1.2;text-wrap:balance}
+a{color:var(--fish)}
+button,.btn{font-family:var(--game)}
+button{cursor:pointer;color:var(--ink)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--fish);outline-offset:2px}
+
+.mast{display:grid;gap:10px;padding:22px 22px 20px;border-radius:24px;background:var(--sea);position:relative;overflow:hidden}
+.mast::after{content:"";position:absolute;right:-30px;bottom:-40px;width:180px;height:180px;border-radius:50%;background:var(--surface);opacity:.18;pointer-events:none}
+.eyebrow{font-family:var(--game);font-size:.95rem;opacity:.75;letter-spacing:.04em}
+.mast h1{font-size:clamp(2.2rem,8vw,3.2rem)}
+.mast p{margin:0;max-width:34em;text-wrap:pretty}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:6px 16px;border-radius:14px;border:none;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-size:1.1rem;line-height:1.2}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.sm{min-height:44px;font-size:1rem;padding:4px 12px}
+.chipbtn{min-height:44px;border-radius:12px;border:1.5px solid var(--ink);background:var(--surface);padding:6px 14px;font-size:1.05rem;font-family:var(--game);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center}
+
+.foot{color:var(--muted);font-size:.9rem;display:flex;gap:6px 16px;flex-wrap:wrap;border-top:1.5px solid var(--line);padding-top:14px}
+.foot a{color:var(--muted)}
+
+/* Layout: masthead → finder (step chips: 교과 → 출판사 → 학년·학기 → 단원 → 차시, plus a search box for 성취기준/낱말) → result sections (단원·주제) → 차시 cards. 1 col on phones, 2 on wide screens. */
+.mtools{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+
+/* finder */
+.finder{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:12px 14px;display:grid;gap:8px}
+.crumb{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font-family:var(--game);font-size:1.05rem;padding:2px 2px 4px}
+.crumb span{color:var(--muted)}
+#steps{display:grid;gap:8px}
+.step{display:grid;grid-template-columns:6.2em 1fr;gap:8px;align-items:start}
+.step>.sl{font-family:var(--game);color:var(--muted);font-size:.95rem;padding-top:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.chip{min-height:44px;border-radius:999px;border:1.5px solid var(--line);background:var(--bg);padding:4px 14px;font-size:1rem;font-family:var(--game);max-width:100%;text-align:left}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.one{cursor:default}
+.search{display:flex;gap:8px;align-items:center}
+.search input{flex:1;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;min-height:46px}
+@media (max-width:520px){.step{grid-template-columns:1fr;gap:4px}.step>.sl{padding-top:0;font-size:.85rem}}
+
+/* results */
+.sec{display:grid;gap:12px}
+.unit{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
+.grade{font-family:var(--game);background:var(--ink);color:var(--bg);border-radius:999px;padding:1px 10px}
+.sec h2{font-size:1.7rem}
+.found{font-family:var(--game);color:var(--muted)}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+@media (min-width:720px){.list{grid-template-columns:1fr 1fr}}
+
+.card{display:grid;grid-template-columns:auto 1fr;gap:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:14px;min-width:0}
+.no{width:66px;border-radius:14px;background:var(--banana-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;text-align:center;align-self:stretch}
+.no span{font-size:.75rem;color:var(--muted)}
+.no b{font-family:var(--game);font-weight:400;font-size:1.7rem;line-height:1.05;font-variant-numeric:tabular-nums;word-break:keep-all}
+.no b.long{font-size:1.25rem}
+.body{display:flex;flex-direction:column;gap:10px;min-width:0}
+.lt{font-size:.9rem;color:var(--muted)}
+.gm{display:flex;flex-direction:column;gap:6px;min-width:0}
+.gm+.gm{border-top:1.5px dashed var(--line);padding-top:10px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.card h3{font-size:1.45rem}
+.card p{margin:0;font-size:.98rem}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.like[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.pill{display:inline-block;font-family:var(--game);font-size:.85rem;border-radius:999px;padding:1px 10px;background:var(--fish-soft);color:var(--fish);width:max-content;line-height:1.5}
+.pill.a{background:var(--banana-soft);color:var(--ink)}
+.pill.b{background:var(--fish-soft);color:var(--fish)}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.pill.cls{background:var(--good);color:var(--surface)}
+.pill.no-check{background:var(--bad-soft);color:var(--ink)}
+.std{font-size:.8rem;color:var(--muted)}
+.credit{font-size:.8rem;color:var(--muted)}
+.card.soon{border-style:dashed;background:transparent}
+.card.soon .no{background:var(--bg)}
+.empty{border:2px dashed var(--line);border-radius:20px;padding:28px;text-align:center;color:var(--muted)}
+
+/* short landscape screens (tablet 1000×480): tighter masthead and finder */
+@media (max-height:560px) and (min-width:700px){
+  .wrap{padding-block:12px 60px;gap:16px}
+  .mast{padding:14px 20px;gap:6px;grid-template-columns:1fr auto;align-items:center}
+  .mast h1{font-size:2.2rem}
+  .mast p{grid-column:1/-1;font-size:.95rem;max-width:none}
+  .mast .mtools{grid-row:1/3;grid-column:2}
+  .finder{padding:10px 12px;gap:6px}
+}
+
+/* QR modal */
+.modal{position:fixed;inset:0;background:var(--veil);display:grid;place-items:center;z-index:30;
+  padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.qcard{background:#FFFFFF;color:#12324A;border-radius:26px;padding:22px;display:grid;gap:10px;justify-items:center;text-align:center;max-width:100%;max-height:100%;overflow:auto;animation:pop .25s}
+.qcard .ql{font-size:1rem;color:#5A7584}
+.qcard h2{font-size:clamp(1.8rem,6vw,2.8rem)}
+.qbox{background:#FFFFFF;padding:10px;border-radius:12px;line-height:0}
+.qbox canvas{display:block;image-rendering:pixelated}
+.qurl{font-size:.8rem;color:#5A7584;word-break:break-all;max-width:36em;user-select:all}
+.qcard .btn.alt{color:#12324A;border-color:#C7DBE0}
+.qcard .btn{background:#E0532B;color:#FFFFFF}
+.qcard .btn.alt{background:transparent}
+@media (max-height:560px) and (min-width:700px){.qcard{grid-template-columns:auto minmax(12em,20em);column-gap:22px;text-align:left;justify-items:start;align-items:center}.qcard .qbox{grid-row:1/7;grid-column:1}}
+@keyframes pop{from{transform:scale(.92);opacity:0}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:999px;padding:8px 18px;z-index:40;font-family:var(--game);max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion:reduce){.qcard{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"><noscript><div class="wrap"><p>이 페이지는 자바스크립트가 켜져 있어야 보여요.</p></div></noscript></div>
+
+<script type="application/json" id="data">{"site":{"title":"사회 게임실","tagline":"개념 체험 게임 모음","baseUrl":"https://wlfmghzm-dotcom.github.io/sahoe-game/","gc":"sahoe-game","discuss":""},"games":{"g27":{"id":"g27","subject":"사회","standard":"","type":"A","game":"무역 속보 데스크","file":"games/g27.html","desc":"쏟아지는 제보 카드를 단서로 읽고 ⭐ 나라 입장에서 수입·수출·무역 아님을 가려요. 벽란도부터 오늘날까지.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"g28":{"id":"g28","subject":"사회","standard":"","type":"A","game":"두 섬 이야기","file":"games/g28.html","desc":"섬마다 잘 만드는 것이 달라요. 남는 바나나·물고기·옷을 배로 보내 바꾸면, 혼자일 때 반만 차던 두 섬 바구니가 모두 가득 차요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"g2930":{"id":"g2930","subject":"사회","standard":"","type":"A","game":"대한민국 무역항","file":"games/g2930.html","desc":"배가 가져온 원유·철광석을 공장에 넣고, 나온 물건을 달라는 배에 실어 보내요. 마지막엔 싱가포르 항구에서 배에서 배로!","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"g3132":{"id":"g3132","subject":"사회","standard":"","type":"A","game":"스마트폰 공장 이야기","file":"games/g3132.html","desc":"여러 나라 배가 가져온 부품을 끼워 스마트폰을 만들고 수출해요. 다른 나라 공장과의 경쟁, 관세가 붙은 나라까지.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a1":{"id":"u3a1","subject":"사회","standard":"","type":"A","game":"사람이 모이는 땅","file":"games/u3a1.html","desc":"평야·해안·산·사막 땅에 마을을 지어 보며, 자연환경과 인문환경이 사람이 모이는 곳을 정한다는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)"},"u3b1":{"id":"u3b1","subject":"사회","standard":"","type":"B","game":"자연일까 인문일까","file":"games/u3b1.html","desc":"떨어지는 카드를 자연환경·인문환경 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a2":{"id":"u3a2","subject":"사회","standard":"","type":"A","game":"떠나는 사람, 오는 사람","file":"games/u3a2.html","desc":"아기가 태어나고 일자리를 찾아 사람이 오가며 나라마다 인구수가 달라지는 까닭을 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3b2":{"id":"u3b2","subject":"사회","standard":"","type":"B","game":"어느 나라 이야기일까","file":"games/u3b2.html","desc":"인구수 이야기 카드를 알맞은 나라 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a3":{"id":"u3a3","subject":"사회","standard":"","type":"A","game":"한 칸에 몇 명?","file":"games/u3a3.html","desc":"같은 넓이에 몇 명이 사는지 견주어 빽빽한 땅부터 줄 세우며 인구 밀도를 익혀요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)"},"u3b3":{"id":"u3b3","subject":"사회","standard":"","type":"B","game":"밀도 높을까 낮을까","file":"games/u3b3.html","desc":"카드를 인구 밀도 높음·낮음 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a4":{"id":"u3a4","subject":"사회","standard":"","type":"A","game":"나이 탑 모양 맞추기","file":"games/u3a4.html","desc":"해마다 아기를 넣고 노인이 남는 정도를 바꾸며 인구 피라미드 모양을 직접 만들어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3b4":{"id":"u3b4","subject":"사회","standard":"","type":"B","game":"어느 나이층일까","file":"games/u3b4.html","desc":"카드를 유소년층·청장년층·노년층 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a5":{"id":"u3a5","subject":"사회","standard":"","type":"A","game":"쓰면 줄어드는 마을","file":"games/u3a5.html","desc":"석유를 쓰고 숲을 개간하며 자원 고갈·기후변화·생태계 파괴·난민 문제가 생기는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3b5":{"id":"u3b5","subject":"사회","standard":"","type":"B","game":"어떤 지구촌 문제일까","file":"games/u3b5.html","desc":"카드를 자원·에너지, 기후변화, 생태계 파괴, 난민 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a6":{"id":"u3a6","subject":"사회","standard":"","type":"A","game":"먼 연기, 가까운 가뭄","file":"games/u3a6.html","desc":"물을 나르다 굴뚝에 뚜껑을 덮어 봐요. 먼 곳의 연기가 줄면 하늘이 맑아지고 우리 마을 가뭄도 나아지는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)"},"u3b6":{"id":"u3b6","subject":"사회","standard":"","type":"B","game":"상황일까 원인일까","file":"games/u3b6.html","desc":"카드를 문제 상황·원인 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a7":{"id":"u3a7","subject":"사회","standard":"","type":"A","game":"지구촌 도움 현장","file":"games/u3a7.html","desc":"병을 분리수거함에 넣고, 꽉 찬 통을 공장에 보내 운동화로 바꿔요. 혼자서는 조금, 개인과 기업이 함께하면 끝까지 치워요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)"},"u3b7":{"id":"u3b7","subject":"사회","standard":"","type":"B","game":"누구의 노력일까","file":"games/u3b7.html","desc":"노력 카드를 개인·국제기구·비정부 기구 등 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3a8":{"id":"u3a8","subject":"사회","standard":"","type":"A","game":"바꾸고 넘겨요","file":"games/u3a8.html","desc":"종이컵·전등 같은 생활 물건을 바꾸고 친구에게 바통을 넘기며 더하기·빼기 실천을 익혀요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"},"u3b8":{"id":"u3b8","subject":"사회","standard":"","type":"B","game":"더하기일까 빼기일까","file":"games/u3b8.html","desc":"실천 카드를 더하기 노력·빼기 노력 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)"}},"lessons":[{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"27","lessonTitle":"무역이 무엇인지 알아볼까요","pages":"94~96쪽","standard":"","games":["g27"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"28","lessonTitle":"무역이 이루어지는 까닭을 알아볼까요","pages":"97~99쪽","standard":"","games":["g28"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"29~30","lessonTitle":"무역이 이루어지는 다양한 모습을 살펴볼까요","pages":"100~105쪽","standard":"","games":["g2930"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"31~32","lessonTitle":"무역을 통한 세계 여러 나라의 상호 의존과 경쟁 관계를 살펴볼까요","pages":"106~111쪽","standard":"","games":["g3132"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"1","lessonTitle":"세계의 인구 분포를 알아볼까요","pages":"124~128쪽","standard":"","games":["u3a1","u3b1"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"2","lessonTitle":"세계 여러 나라의 인구수를 알아볼까요","pages":"129~131쪽","standard":"","games":["u3a2","u3b2"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"3","lessonTitle":"세계 여러 나라의 인구 밀도를 알아볼까요","pages":"132~134쪽","standard":"","games":["u3a3","u3b3"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"4","lessonTitle":"세계 여러 나라의 인구 구조를 알아볼까요","pages":"135~139쪽","standard":"","games":["u3a4","u3b4"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"5","lessonTitle":"지구촌을 위협하는 여러 가지 문제를 알아볼까요","pages":"140~142쪽","standard":"","games":["u3a5","u3b5"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"6","lessonTitle":"지구촌을 위협하는 여러 가지 문제를 조사해 볼까요","pages":"143~147쪽","standard":"","games":["u3a6","u3b6"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"7","lessonTitle":"지속가능한 미래를 위한 노력을 살펴볼까요","pages":"148~151쪽","standard":"","games":["u3a7","u3b7"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"8","lessonTitle":"지속가능한 미래를 위해 우리가 할 수 있는 일을 실천해 볼까요","pages":"152~154쪽","standard":"","games":["u3a8","u3b8"]}]}</script>
+<script src="vendor/qrcode.js"></script>
+<script data-goatcounter="https://sahoe-game.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script>
+(function(){
+let D;
+try{ D=JSON.parse(document.getElementById('data').textContent); }catch(e){ D={site:{},games:{},lessons:[]}; }
+const S=D.site||{}, G=D.games||{}, L=D.lessons||[];
+const app=document.getElementById('app');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cmp=(a,b)=>String(a).localeCompare(String(b),'ko',{numeric:true});
+const num=l=>{const n=parseInt(l,10);return isNaN(n)?9999:n;};
+const gradeLabel=g=>{const m=/^(\d+)-(\d+)$/.exec(g||'');return m?`${m[1]}학년 ${m[2]}학기`:(g||'');};
+const TYPE={A:['a','A 개념 체험'],B:['b','B 떠올리기 연습']};
+const VER={classroom:['cls','★ 수업 검증'],checked:['ok','✔ 점검 통과']};
+const norm=s=>String(s||'').toLowerCase().replace(/[\s\[\]\(\)·.,\-~_]/g,'');
+
+/* where this site lives: the fixed address from site.json if set, otherwise the current folder */
+const here=location.href.split('#')[0].split('?')[0].replace(/index\.html$/,'');
+const BASE=/^https?:\/\//.test(S.baseUrl||'')?S.baseUrl.replace(/\/?$/,'/'):here;
+const gameUrl=g=>new URL(g.file,BASE).href;
+
+/* ---------- selection (kept in the address bar #… so a teacher can bookmark a 차시) ---------- */
+const LEVELS=[['subject','교과'],['publisher','출판사'],['grade','학년·학기'],['unit','단원'],['lesson','차시']];
+let sel={subject:'',publisher:'',grade:'',unit:'',lesson:''}, q='';
+try{ const h=new URLSearchParams(location.hash.slice(1)); for(const [k] of LEVELS){ if(h.get(k)) sel[k]=h.get(k); } q=h.get('q')||''; }catch(e){}
+
+function pool(upto){ /* lessons matching the levels before `upto` */
+  return L.filter(l=>LEVELS.slice(0,upto).every(([k])=>!sel[k]||l[k]===sel[k]));
+}
+function options(i){
+  const k=LEVELS[i][0], vals=[...new Set(pool(i).map(l=>l[k]).filter(Boolean))];
+  return k==='lesson'?vals.sort((a,b)=>num(a)-num(b)||cmp(a,b)):vals.sort(cmp);
+}
+function settle(){ /* drop stale choices; pick the only option automatically */
+  LEVELS.forEach(([k],i)=>{ const o=options(i); if(sel[k]&&!o.includes(sel[k])) sel[k]=''; if(!sel[k]&&o.length===1&&k!=='lesson') sel[k]=o[0]; });
+}
+function writeHash(){
+  const h=new URLSearchParams();
+  for(const [k] of LEVELS) if(sel[k]) h.set(k,sel[k]);
+  if(q) h.set('q',q);
+  const s=h.toString();
+  try{ history.replaceState(null,'',s?'#'+s:location.pathname+location.search); }catch(e){}
+}
+
+function lessonText(l){
+  const gs=(l.games||[]).map(id=>G[id]).filter(Boolean);
+  return norm([l.standard,l.lessonTitle,l.unit,l.topic,l.publisher,l.subject,l.lesson+'차시',...gs.flatMap(g=>[g.standard,g.game,g.desc])].join(' '));
+}
+function results(){
+  if(q.trim()) return L.filter(l=>lessonText(l).includes(norm(q)));
+  return pool(LEVELS.length);
+}
+
+/* ---------- render ---------- */
+function chipRow(i){
+  const [k,label]=LEVELS[i], o=options(i);
+  if(!o.length) return '';
+  const show=v=>k==='grade'?gradeLabel(v):k==='lesson'?v+'차시':v;
+  let h=`<div class="step"><div class="sl">${label}</div><div class="chips" role="group" aria-label="${label}">`;
+  if(o.length===1 && k!=='lesson') h+=`<button class="chip one" aria-pressed="true" tabindex="-1">${esc(show(o[0]))}</button>`;
+  else{
+    h+=`<button class="chip" data-k="${k}" data-v="" aria-pressed="${!sel[k]}">전체</button>`;
+    for(const v of o) h+=`<button class="chip" data-k="${k}" data-v="${esc(v)}" aria-pressed="${sel[k]===v}">${esc(show(v))}</button>`;
+  }
+  return h+'</div></div>';
+}
+
+function gameBlock(g,lesson){
+  const ready=g.status==='ready';
+  const t=TYPE[g.type]||TYPE.A, v=VER[g.verified];
+  return `<div class="gm">
+    <div class="tags"><span class="pill ${t[0]}">${t[1]}</span>${ready?(v?`<span class="pill ${v[0]}">${v[1]}</span>`:'<span class="pill no-check">점검 전</span>'):'<span class="pill">준비 중</span>'}</div>
+    <h3>${esc(g.game)}</h3>
+    ${g.desc?`<p>${esc(g.desc)}</p>`:''}
+    ${ready?`<div class="acts">
+      <a class="btn" href="${esc(g.file)}" target="_blank" rel="noopener">▶ 열기</a>
+      <button class="btn alt" data-act="qr" data-id="${esc(g.id)}" data-l="${esc(lesson.key)}">▦ QR</button>
+      <button class="btn alt sm" data-act="copy" data-id="${esc(g.id)}">링크 복사</button>
+      ${S.gc?`<button class="btn alt sm like" data-act="like" data-id="${esc(g.id)}" aria-pressed="${liked(g.id)}" aria-label="좋아요">👍 <span data-lk="${esc(g.id)}">${likeN[g.id]==null?'':esc(likeN[g.id])}</span></button>`:''}
+      ${(g.discuss||S.discuss)?`<a class="btn alt sm" href="${esc(g.discuss||S.discuss)}" target="_blank" rel="noopener">💬 의견 남기기</a>`:''}</div>`:''}
+    ${g.standard?`<div class="std">성취기준 ${esc(g.standard)}</div>`:''}
+    ${g.credit?`<div class="credit">${esc(g.credit)}</div>`:''}
+  </div>`;
+}
+function card(l){
+  const gs=(l.games||[]).map(id=>G[id]).filter(Boolean).sort((a,b)=>cmp(a.type,b.type));
+  const ready=gs.some(g=>g.status==='ready');
+  const long=String(l.lesson).length>3;
+  return `<li class="card ${ready?'':'soon'}">
+    <div class="no"><span>차시</span><b class="${long?'long':''}">${esc(l.lesson)}</b></div>
+    <div class="body">
+      <div class="lt">${esc(l.lessonTitle)}${l.pages?' · '+esc(l.pages):''}${l.standard?' · '+esc(l.standard):''}</div>
+      ${gs.length?gs.map(g=>gameBlock(g,l)).join(''):'<span class="pill">게임 준비 중</span>'}
+    </div></li>`;
+}
+
+function shell(){
+  app.innerHTML=`<div class="wrap">
+    <header class="mast">
+      <div class="eyebrow">${esc(S.tagline||'')}</div>
+      <h1>${esc(S.title||'게임실')}</h1>
+      <p>차시를 찾아 <b>▦ QR</b>을 누르고 TV에 띄우면, 학생들이 휴대폰 카메라로 바로 들어와요.</p>
+      <div class="mtools"><button class="chipbtn" data-act="siteqr">▦ 이 사이트 QR</button></div>
+    </header>
+    <section class="finder" aria-label="차시 찾기">
+      <div id="steps"></div>
+      <div class="search"><input id="q" type="search" value="${esc(q)}" placeholder="성취기준 코드나 낱말로 찾기 (예: 무역)" aria-label="성취기준이나 낱말로 찾기" list="stds" enterkeyhint="search" autocomplete="off"><button class="btn alt sm" data-act="clearq" id="clearq" ${q?'':'hidden'}>지우기</button></div>
+      <datalist id="stds">${[...new Set(L.map(l=>l.standard).concat(Object.values(G).map(g=>g.standard)).filter(Boolean))].sort(cmp).map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
+    </section>
+    <div id="results" style="display:flex;flex-direction:column;gap:24px"></div>
+    <footer class="foot"><a href="about.html">저작권·출처 안내</a><span>비영리 수업용</span></footer></div>`;
+}
+function render(){ /* updates only the step chips and the results, never the search box (keeps 한글 입력 intact) */
+  settle(); writeHash();
+  const searching=!!q.trim();
+  /* levels with only one choice collapse into one breadcrumb line; levels with several choices get a chip row */
+  let st='';
+  if(!searching){
+    const fixed=[], rows=[];
+    LEVELS.forEach(([k,label],i)=>{ const o=options(i); if(!o.length) return; if(o.length===1&&k!=='lesson') fixed.push(k==='grade'?gradeLabel(o[0]):o[0]); else rows.push(chipRow(i)); });
+    if(fixed.length) st+=`<div class="crumb" aria-label="고른 범위">${fixed.map(esc).join('<span aria-hidden="true">›</span>')}</div>`;
+    st+=rows.join('');
+  }
+  document.getElementById('steps').innerHTML=st;
+  document.getElementById('clearq').hidden=!q;
+  const r=results();
+  let h='';
+  if(searching) h+=`<div class="found" aria-live="polite">「${esc(q)}」로 찾은 차시 ${r.length}개</div>`;
+  if(!r.length) h+=`<div class="empty">${searching?'맞는 차시가 없어요. 다른 낱말로 찾아 보세요.':'아직 올라온 게임이 없어요.'}</div>`;
+  const groups=new Map();
+  [...r].sort((a,b)=>cmp(a.subject,b.subject)||cmp(a.publisher,b.publisher)||cmp(a.grade,b.grade)||cmp(a.unit,b.unit)||cmp(a.topic,b.topic)||num(a.lesson)-num(b.lesson))
+    .forEach(l=>{ const k=[l.subject,l.publisher,l.grade,l.unit,l.topic].join('|'); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(l); });
+  for(const [k,list] of groups){
+    const [subject,publisher,grade,unit,topic]=k.split('|');
+    h+=`<section class="sec"><div class="unit"><span class="grade">${esc(gradeLabel(grade))}</span>${esc(subject)} · ${esc(publisher)} · ${esc(unit)}</div><h2>${esc(topic||unit)}</h2><ol class="list">${list.map(card).join('')}</ol></section>`;
+  }
+  document.getElementById('results').innerHTML=h;
+}
+L.forEach((l,i)=>l.key=String(i));
+
+/* ---------- QR & copy ---------- */
+function toast(t){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),1800); }
+function copy(url){
+  const fallback=()=>{ try{ const t=document.createElement('textarea'); t.value=url; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); const ok=document.execCommand('copy'); t.remove(); toast(ok?'링크를 복사했어요':url); }catch(e){ toast(url); } };
+  try{ navigator.clipboard.writeText(url).then(()=>toast('링크를 복사했어요'),fallback); }catch(e){ fallback(); }
+}
+function qrMatrix(url){
+  const qr=qrcode(0,'M'); qr.addData(url); qr.make(); return qr;
+}
+function drawQR(canvas,qr,px,margin){
+  const n=qr.getModuleCount(), cell=Math.max(1,Math.floor(px/(n+margin*2))), size=cell*(n+margin*2);
+  canvas.width=size; canvas.height=size;
+  const c=canvas.getContext('2d'); c.fillStyle='#FFFFFF'; c.fillRect(0,0,size,size); c.fillStyle='#12324A';
+  for(let r=0;r<n;r++) for(let k=0;k<n;k++) if(qr.isDark(r,k)) c.fillRect((k+margin)*cell,(r+margin)*cell,cell,cell);
+  return size;
+}
+function savePNG(qr,title,sub,id){ /* printable card: QR + 게임 이름 + 차시 */
+  const cv=document.createElement('canvas'), W=900, q2=document.createElement('canvas');
+  const s=drawQR(q2,qr,760,4);
+  cv.width=W; cv.height=s+230; const c=cv.getContext('2d');
+  c.fillStyle='#FFFFFF'; c.fillRect(0,0,cv.width,cv.height); c.drawImage(q2,(W-s)/2,30);
+  c.fillStyle='#12324A'; c.textAlign='center'; c.font='64px Jua, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif'; c.fillText(title,W/2,s+110,W-60);
+  c.fillStyle='#5A7584'; c.font='32px "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif'; c.fillText(sub,W/2,s+170,W-60);
+  const a=document.createElement('a'); a.download=(id||'qr')+'.png'; a.href=cv.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove();
+}
+function showQR(title,sub,url,id){
+  const m=document.createElement('div'); m.className='modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-label',title+' QR');
+  m.innerHTML=`<div class="qcard"><div class="qbox"><canvas aria-label="QR 코드"></canvas></div><div class="ql">${esc(sub)}</div><h2>${esc(title)}</h2>
+    <div class="ql">📱 휴대폰 카메라로 찍어요</div><div class="qurl">${esc(url)}</div>
+    <div class="acts" style="justify-content:center"><button class="btn alt sm" data-q="copy">링크 복사</button><button class="btn alt sm" data-q="png">인쇄용 PNG</button><button class="btn sm" data-q="close">닫기</button></div></div>`;
+  document.body.appendChild(m);
+  const wide=innerHeight<560&&innerWidth>=700;
+  const px=Math.floor(Math.max(180,Math.min(wide?innerHeight*0.78:innerWidth*0.78,wide?innerHeight*0.78:innerHeight*0.5,560)));
+  let qr=null;
+  try{ qr=qrMatrix(url); drawQR(m.querySelector('canvas'),qr,px,2); }
+  catch(e){ m.querySelector('.qbox').innerHTML='<div style="line-height:1.4;padding:20px;color:#5A7584">QR을 그리지 못했어요.<br>아래 링크를 써 주세요.</div>'; }
+  const close=()=>{ m.remove(); document.removeEventListener('keydown',key); opener&&opener.focus&&opener.focus(); };
+  const opener=document.activeElement;
+  const key=e=>{ if(e.key==='Escape') close(); };
+  document.addEventListener('keydown',key);
+  m.addEventListener('click',e=>{ const b=e.target.closest('[data-q]'); if(e.target===m||(b&&b.dataset.q==='close')) close(); else if(b&&b.dataset.q==='copy') copy(url); else if(b&&b.dataset.q==='png'&&qr) savePNG(qr,title,sub,id); });
+  m.querySelector('[data-q="close"]').focus();
+}
+
+/* ---------- likes (GoatCounter: anonymous, no cookies; one per browser) ---------- */
+const likeN={};
+function liked(id){ try{ return localStorage.getItem('like:'+id)==='1'; }catch(e){ return false; } }
+function setLk(id,v){ likeN[id]=v; document.querySelectorAll('[data-lk="'+id+'"]').forEach(s=>s.textContent=v); }
+function loadLikes(){
+  if(!S.gc) return;
+  Object.keys(G).forEach(id=>{
+    if(likeN[id]!=null) return;
+    fetch('https://'+S.gc+'.goatcounter.com/counter/'+encodeURIComponent('/like/'+id)+'.json')
+      .then(r=>r.ok?r.json():{count:'0'}).then(j=>{ if(likeN[id]==null||+likeN[id]<+String(j.count).replace(/\D/g,'')) setLk(id,String(j.count).replace(/\D/g,'')||'0'); })
+      .catch(()=>{});
+  });
+}
+function like(id,btn){
+  if(liked(id)){ toast('이미 좋아요를 눌렀어요'); return; }
+  try{ localStorage.setItem('like:'+id,'1'); }catch(e){}
+  try{ window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:'/like/'+id, title:'좋아요 '+id}); }catch(e){}
+  setLk(id,String((+likeN[id]||0)+1)); btn.setAttribute('aria-pressed','true'); toast('좋아요를 보냈어요');
+}
+/* count which games teachers open (anonymous event) */
+app.addEventListener('click',e=>{ const a=e.target.closest('a.btn[href^="games/"]'); if(!a||!S.gc) return;
+  try{ window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:'open-'+a.getAttribute('href').replace(/^games\/|\.html$/g,''), title:'게임 열기', event:true}); }catch(e){} });
+
+/* ---------- events ---------- */
+app.addEventListener('click',e=>{
+  const c=e.target.closest('.chip[data-k]');
+  if(c){ const k=c.dataset.k, i=LEVELS.findIndex(x=>x[0]===k); sel[k]=c.dataset.v; LEVELS.slice(i+1).forEach(([kk])=>sel[kk]=''); return render(); }
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const a=b.dataset.act, g=G[b.dataset.id];
+  if(a==='qr'&&g){ const l=L[+b.dataset.l]||{}; return showQR(g.game,`${gradeLabel(l.grade)} · ${l.lesson}차시 · ${l.lessonTitle||''}`,gameUrl(g),g.id); }
+  if(a==='copy'&&g) return copy(gameUrl(g));
+  if(a==='like'&&g) return like(g.id,b);
+  if(a==='siteqr') return showQR(S.title||'게임실',S.tagline||'',BASE,'site');
+  if(a==='clearq'){ q=''; const i=document.getElementById('q'); i.value=''; render(); i.focus(); }
+});
+let tmr;
+app.addEventListener('input',e=>{ if(e.target.id!=='q') return; q=e.target.value; clearTimeout(tmr); tmr=setTimeout(render,150); });
+shell(); render(); loadLikes();
+})();
+</script>
+</body>
+</html>
