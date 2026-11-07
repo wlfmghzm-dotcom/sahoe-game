@@ -84,9 +84,9 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 .chipbtn[aria-expanded="true"]{background:var(--ink);color:var(--bg)}
 @media (max-width:560px){.bt b{font-size:1.15rem;white-space:normal;word-break:keep-all;line-height:1.1}.bt small{display:none}.brand .logo{width:36px;height:36px}.chipbtn .lb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.btools{gap:6px}.btools .chipbtn{padding:6px 10px;min-width:44px;justify-content:center}}
 /* Layout (대문): 머리띠 한 줄(.bar) → [찾기 칸(열 때만)] → 본문.
-   가로 ≥900px: 두 칸, 페이지 스크롤 없음. 왼쪽 = 목차 나무(과목 → 학년·학기 → 단원, 자체 스크롤).
-   오른쪽(자체 스크롤) = 빵부스러기 → 좁혀 보기 칩 한 줄 → 고른 곳 아래 게임 전부(차시 묶음 격자, A·B 나란히).
-   차시 하나를 고르면 그 차시 게임만 큰 카드로. 세로·폰 <900px: '과목·학년 › 단원' 고르기 → 칩 → 격자.
+   가로 ≥900px: 두 칸, 페이지 스크롤 없음. 왼쪽 = 목차 나무(과목 → 학년·학기 → 단원 → 주제 → 차시, 자체 스크롤).
+   왼쪽 나무는 단원 아래 주제·차시(번호 + 교과서 차시명)까지 펼쳐진다. 오른쪽(자체 스크롤) = 빵부스러기 → 고른 곳 아래 게임 전부
+   (차시 묶음 격자, A·B 나란히). 차시를 고르면 그 차시 게임만 큰 카드로. 세로·폰 <900px: '과목·학년 › 단원 › 차시' 고르기 → 격자.
    선택은 주소 조각으로 열린다: #soc(과목) #soc62(학년) #soc62-u2(단원) #soc62-u2-16(차시), 예전 #u2-16도. */
 body{padding:0}
 .app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;
@@ -101,25 +101,34 @@ body{padding:0}
 /* 왼쪽 목차 나무: 과목 → 학년·학기 → 단원 (site.json에 새 과목·학년·단원이 들어오면 가지가 저절로 생김).
    ▸ 단추 = 펼침/접힘, 이름 = 그 아래 게임 모두 보기 */
 .side{display:none}
-.tree{display:grid;gap:2px;padding:8px 0}
-.tr{display:flex;align-items:stretch;gap:2px;padding-left:calc(var(--d,0) * 16px)}
-.tx{flex:none;width:44px;min-height:48px;border:none;background:transparent;border-radius:12px;color:var(--muted);font-size:1rem}
+.tree{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:8px 0}
+.side{overflow-x:hidden}
+.tr{display:flex;align-items:stretch;gap:0;padding-left:calc(var(--d,0) * 10px);min-width:0}
+.tx{flex:none;width:36px;min-height:48px;border:none;background:transparent;border-radius:12px;color:var(--muted);font-size:1rem}
 .tx span{display:inline-block;transition:transform .15s}
 .tx[aria-expanded="true"] span{transform:rotate(90deg)}
-.tl{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border:2px solid transparent;border-radius:14px;background:transparent;text-align:left;font-size:1.2rem;line-height:1.25}
+.tl{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border:2px solid transparent;border-radius:14px;background:transparent;text-align:left;font-size:1.2rem;line-height:1.25}
 .tx:hover,.tl:hover{background:var(--surface)}
 .tl .c{margin-left:auto;font-family:var(--body);font-size:.8rem;color:var(--muted);white-space:nowrap}
 .tr.g .tl{font-size:1.1rem}
-.tr.u{padding-left:calc(var(--d,0) * 16px + 14px)}
+.tr.u{padding-left:calc(var(--d,0) * 10px)}
 .tr.u .tl{display:grid;grid-template-columns:auto 1fr;column-gap:10px;font-family:var(--body);font-size:1.1rem;min-height:56px}
 .tr.u .n{grid-row:1/3;font-family:var(--game);font-size:1rem;background:var(--surface);border-radius:10px;padding:4px 8px;white-space:nowrap}
 .tr.u .t{word-break:keep-all}
 .tr.u .c{margin:0;grid-column:2}
+.tp{padding:8px 8px 0 32px;font-size:.85rem;color:var(--muted);line-height:1.3}
+.tr.l{padding-left:22px}
+.tr.l .tl{font-family:var(--body);font-size:1rem;min-height:48px;padding:5px 8px;gap:7px}
+.tr.l .tl{align-items:flex-start}
+.tr.l .no{flex:none;min-width:1.2em;font-family:var(--game);font-weight:400;font-size:.95rem;line-height:1.3;padding-top:1px}
+.tr.l .t{min-width:0;word-break:keep-all;line-height:1.3}
+.tr.l .tl[aria-current="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ph .tb,.lh small{color:var(--muted);font-size:.8rem;font-family:var(--body)}
 .tl[aria-current="true"]{background:var(--surface);border-color:var(--accent)}
 .tr.u .tl[aria-current="true"] .n{background:var(--accent);color:var(--accent-ink)}
 .nomatch{color:var(--muted);padding:16px 8px}
 
-/* 오른쪽 위: [세로 화면: 고르기] → 빵부스러기 → 좁혀 보기 칩 한 줄 */
+/* 오른쪽 위: [세로 화면: 고르기] → 빵부스러기 */
 .ptop{display:grid;gap:6px;min-width:0;position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 6px;border-bottom:1.5px solid var(--line)}
 .usel{display:none}
 .usel select{width:100%;min-height:52px;font:inherit;font-family:var(--game);font-size:1.1rem;color:var(--ink);background:var(--surface);border:2px solid var(--ink);border-radius:14px;padding:6px 12px}
@@ -128,10 +137,6 @@ body{padding:0}
 .crumb b{font-weight:400;padding:6px 4px}
 .crumb .sep{color:var(--muted)}
 .crumb .cq{color:var(--accent);margin-right:6px}
-.chiprow{display:flex;gap:6px;align-items:center;overflow-x:auto;padding-bottom:4px;scroll-padding-inline:16px;min-width:0}
-.tlab{flex:none;font-size:.85rem;color:var(--muted);padding:0 2px 0 8px;white-space:nowrap;max-width:12em;overflow:hidden;text-overflow:ellipsis}
-.chip{flex:none;min-height:48px;min-width:56px;border-radius:999px;border:2px solid var(--line);background:var(--surface);padding:4px 16px;font-size:1.05rem;white-space:nowrap}
-.chip[aria-current="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 @media (max-width:899.98px){ .usel{display:block} .ptop{margin-top:-14px} }
 
 /* 격자(과목·학년·단원): 차시 묶음(A·B 나란히)이 칸을 채움. 칸 수 --cols: 폰 2 · 세로 태블릿/가로 4 · TV 6 */
@@ -144,7 +149,9 @@ body{padding:0}
 .uh2 button{border:none;background:transparent;font-size:inherit;padding:4px 0;min-height:44px;text-align:left;color:var(--ink)}
 .lg{grid-column:span var(--k);display:grid;grid-template-columns:repeat(var(--k),minmax(0,1fr));gap:6px 10px;min-width:0;align-items:stretch}
 .lh{grid-column:1/-1;display:flex;align-items:center;gap:6px;border-top:2px solid var(--line);padding-top:2px;min-width:0}
-.lh button{flex:1;min-width:0;border:none;background:transparent;text-align:left;font-family:var(--body);font-size:.95rem;color:var(--muted);padding:6px 0;min-height:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lh button{flex:1;min-width:0;border:none;background:transparent;text-align:left;font-family:var(--body);font-size:.95rem;color:var(--muted);padding:4px 0;min-height:44px;display:flex;flex-direction:column;line-height:1.25}
+.lh button>*{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.lh button span{color:var(--ink);font-size:1rem}
 .lh button b{font-family:var(--game);font-weight:400;color:var(--accent);font-size:1.05rem;margin-right:2px}
 .lh a{flex:none;font-size:.85rem;color:var(--muted);padding:8px 4px}
 .mc{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:8px;min-width:0}
@@ -311,14 +318,15 @@ ORDER.forEach(l=>{
   let s=ROOT.kids.find(x=>x.name===l.subject); if(!s){ s={lv:'s',code:l.sc,name:l.subject,label:l.subject,kids:[],lessons:[],up:ROOT}; ROOT.kids.push(s); NODES.set(s.code,s); }
   let g=s.kids.find(x=>x.grade===l.grade); if(!g){ g={lv:'g',code:l.gc,grade:l.grade,label:gradeLabel(l.grade),kids:[],lessons:[],up:s}; s.kids.push(g); NODES.set(g.code,g); }
   let u=g.kids.find(x=>x.code===l.uc); if(!u){ u={lv:'u',code:l.uc,unit:l.unit,publisher:l.publisher,label:(unitNo(l.unit)<9999?unitNo(l.unit)+'단원':'단원'),name:unitName(l.unit),kids:[],lessons:[],up:g}; g.kids.push(u); NODES.set(u.code,u); }
-  const n={lv:'l',code:l.hid,l,label:l.lesson+'차시',kids:[],lessons:[l],up:u}; u.kids.push(n); NODES.set(n.code,n); l.node=n; l.u=u;
+  const n={lv:'l',code:l.hid,l,label:`${l.lesson}차시 ${l.lessonTitle}`,kids:[],lessons:[l],up:u}; u.kids.push(n); NODES.set(n.code,n); l.node=n; l.u=u;
   s.lessons.push(l); g.lessons.push(l); u.lessons.push(l);
 });
 ROOT.kids.forEach(s=>s.kids.forEach(g=>{ g.multiPub=new Set(g.kids.map(u=>u.publisher)).size>1; }));
 const lessonGames=l=>(l.games||[]).map(id=>G[id]).filter(Boolean).sort((a,b)=>cmp(a.type,b.type));
 const readyN=ls=>ls.reduce((n,l)=>n+lessonGames(l).filter(g=>g.status==='ready').length,0);
 const pathTo=n=>{ const p=[]; for(let x=n;x&&x!==ROOT;x=x.up) p.unshift(x); return p; };
-const nodeName=n=>n.lv==='u'?`${n.label} ${n.name}${n.up.multiPub?' ('+n.publisher+')':''}`:n.lv==='l'?`${n.label} ${n.l.lessonTitle}`:n.label;
+const nodeName=n=>n.lv==='u'?`${n.label} ${n.name}${n.up.multiPub?' ('+n.publisher+')':''}`:n.label;
+const tbRef=l=>l.pages?`교과서 ${l.pages}`:'';
 
 function lessonText(l){
   const gs=lessonGames(l);
@@ -368,7 +376,6 @@ function shell(){
         <div class="ptop">
           <div class="usel"><select id="unitSel" aria-label="과목·학년 › 단원 고르기"></select></div>
           <nav class="crumb" id="crumb" aria-label="지금 고른 위치"></nav>
-          <div class="chiprow" id="chips" role="group" aria-label="좁혀 보기"></div>
         </div>
         <div id="view" aria-live="polite"></div>
       </section>
@@ -383,8 +390,16 @@ function renderNav(){
   /* 왼쪽 나무: ▸ 단추는 펼침/접힘, 이름은 그 아래 게임 모두 보기 */
   const node=(n,depth)=>{
     if(!has(n,m)) return '';
-    if(n.lv==='u') return `<div class="tr u" style="--d:${depth}"><button class="tl" data-sc="${esc(n.code)}" aria-current="${cur(n)}"><span class="n">${esc(n.label)}</span><span class="t">${esc(n.name)}${n.up.multiPub?` <small>${esc(n.publisher)}</small>`:''}</span><small class="c">${searching?`찾은 차시 ${n.lessons.filter(l=>m.has(l)).length}`:`게임 ${readyN(n.lessons)}`}</small></button></div>`;
     const o=isOpen(n);
+    if(n.lv==='u'){
+      let h=`<div class="tr u" style="--d:${depth}"><button class="tx" data-node="${esc(n.code)}" aria-expanded="${o}" aria-label="${esc(n.label)} ${o?'접기':'펼치기'}"><span aria-hidden="true">▸</span></button><button class="tl" data-sc="${esc(n.code)}" aria-current="${scope===n}"><span class="n">${esc(n.label)}</span><span class="t">${esc(n.name)}${n.up.multiPub?` <small>${esc(n.publisher)}</small>`:''}</span><small class="c">${searching?`찾은 것 ${n.lessons.filter(l=>m.has(l)).length}`:`게임 ${readyN(n.lessons)}`}</small></button></div>`;
+      if(!o) return h;
+      let topic=null;
+      for(const k of n.kids){ if(!m.has(k.l)) continue;
+        if(k.l.topic&&k.l.topic!==topic){ topic=k.l.topic; h+=`<div class="tp" style="--d:${depth+1}">${esc(unitName(topic))}</div>`; }
+        h+=`<div class="tr l" style="--d:${depth+1}"><button class="tl" data-sc="${esc(k.code)}" aria-current="${scope===k}"><b class="no">${esc(k.l.lesson)}</b><span class="t">${esc(k.l.lessonTitle)}</span></button></div>`; }
+      return h;
+    }
     return `<div class="tr ${n.lv}" style="--d:${depth}"><button class="tx" data-node="${esc(n.code)}" aria-expanded="${o}" aria-label="${esc(n.label)} ${o?'접기':'펼치기'}"><span aria-hidden="true">▸</span></button><button class="tl" data-sc="${esc(n.code)}" aria-current="${cur(n)}"><span class="t">${esc(n.label)}</span><small class="c">게임 ${readyN(n.lessons)}</small></button></div>`
       +(o?n.kids.map(k=>node(k,depth+1)).join(''):'');
   };
@@ -396,29 +411,18 @@ function renderNav(){
     o+=`<option value="${esc(s.code)}"${scope===s?' selected':''}>${esc(s.label)} 전체</option>`;
     for(const g of s.kids){ if(!has(g,m)) continue;
       o+=`<optgroup label="${esc(s.label+' · '+g.label)}"><option value="${esc(g.code)}"${scope===g?' selected':''}>${esc(s.label+' '+g.label)} 전체</option>`
-        +g.kids.filter(u=>has(u,m)).map(u=>`<option value="${esc(u.code)}"${scope===u||(scope&&scope.up===u)?' selected':''}>${esc(nodeName(u))}</option>`).join('')+'</optgroup>'; } }
+        +g.kids.filter(u=>has(u,m)).map(u=>`<option value="${esc(u.code)}"${scope===u?' selected':''}>${esc(nodeName(u))} 전체</option>`
+          +u.kids.filter(k=>m.has(k.l)).map(k=>`<option value="${esc(k.code)}"${scope===k?' selected':''}>\u3000· ${esc(k.label)}</option>`).join('')).join('')+'</optgroup>'; } }
   document.getElementById('unitSel').innerHTML=o;
   /* 빵부스러기 */
   const p=scope?pathTo(scope):[];
   document.getElementById('crumb').className='crumb lv-'+(scope?scope.lv:'all');
   document.getElementById('crumb').innerHTML=(searching?`<span class="cq">찾기 「${esc(q)}」</span>`:'')+
     (p.length?p.map((n,i)=>i===p.length-1?`<b aria-current="page">${esc(nodeName(n))}</b>`:`<button data-sc="${esc(n.code)}">${esc(n.lv==='u'?n.label:nodeName(n))}</button>`).join('<span class="sep" aria-hidden="true">›</span>'):`<b>${searching?'찾은 차시 전체':'전체'}</b>`);
-  /* 좁혀 보기 칩: 단원·차시를 고르면 [전체]+차시, 학년이면 [전체]+단원, 과목이면 [전체]+학년(학년이 하나면 단원) */
-  let root=scope?(scope.lv==='l'?scope.up:scope):ROOT;
-  let kids=root.kids;
-  if(root.lv==='s'&&kids.length===1) kids=kids[0].kids;
-  if(root===ROOT&&kids.length===1){ kids=kids[0].kids; if(kids.length===1) kids=kids[0].kids; }
-  let c=`<button class="chip all" data-sc="${esc(root.code)}" aria-current="${scope===root||(!scope&&root===ROOT)}">전체</button>`, topic=null;
-  for(const k of kids){ if(!has(k,m)) continue;
-    if(k.lv==='l'&&k.l.topic&&k.l.topic!==topic){ topic=k.l.topic; c+=`<span class="tlab" title="${esc(topic)}">${esc(topic)}</span>`; }
-    c+=`<button class="chip" data-sc="${esc(k.code)}" aria-current="${scope===k}">${esc(k.lv==='u'?nodeName(k):k.label)}</button>`; }
-  const chips=document.getElementById('chips'); chips.innerHTML=c;
   const f=document.getElementById('found'); if(f) f.textContent=searching?`차시 ${m.size}개`:'';
   /* 고른 줄·칩이 보이게 (페이지는 움직이지 않음) */
   const r=side.querySelector('.tl[aria-current="true"]');
   if(r&&side.clientHeight){ const top=r.offsetTop-side.offsetTop, b=top+r.offsetHeight; if(top<side.scrollTop||b>side.scrollTop+side.clientHeight) side.scrollTop=Math.max(0,top-side.clientHeight/3); }
-  const ch=chips.querySelector('.chip[aria-current="true"]');
-  if(ch&&chips.clientWidth){ const left=ch.offsetLeft-chips.offsetLeft; if(left<chips.scrollLeft||left+ch.offsetWidth>chips.scrollLeft+chips.clientWidth) chips.scrollLeft=Math.max(0,left-60); }
 }
 
 const tags=g=>{ const t=TYPE[g.type]||TYPE.A, v=VER[g.verified], ready=g.status==='ready';
@@ -460,7 +464,7 @@ function renderView(){
   if(scope&&scope.lv==='l'){
     const l=scope.l, gs=lessonGames(l);
     box.innerHTML=`<div class="ph">
-        <div class="meta">${l.topic?esc(l.topic):''}${l.pages?' · 교과서 '+esc(l.pages):''}${l.standard?' · '+esc(l.standard):''}</div>
+        <div class="meta">${l.topic?esc(unitName(l.topic))+' · ':''}${l.pages?`<span class="tb">${esc(tbRef(l))}</span>`:''}${l.standard?' · '+esc(l.standard):''}</div>
         ${l.page?`<a class="chipbtn ghost" href="${esc(l.page)}">차시 안내 →</a>`:''}
       </div>
       ${gs.length?`<div class="games ${gs.length===1?'one':'two'}">${gs.map(g=>gameCard(g,l)).join('')}</div>`:'<div class="empty">이 차시 게임은 준비 중이에요.</div>'}`;
@@ -474,8 +478,8 @@ function renderView(){
     if(wide&&(!scope||scope.lv==='all'||scope.lv==='s')&&l.u.up!==g){ g=l.u.up; if(new Set(ls.map(x=>x.u.up)).size>1) h+=`<h2 class="gh">${esc(g.up.label)} ${esc(g.label)}</h2>`; }
     if(wide&&l.u!==u){ u=l.u; h+=`<h2 class="uh2"><button data-sc="${esc(u.code)}">${esc(nodeName(u))}</button></h2>`; }
     const gs=lessonGames(l), k=Math.max(1,Math.min(gs.length,2));
-    h+=`<section class="lg" style="--k:${k}" aria-label="${esc(l.lesson)}차시 ${esc(l.lessonTitle)}">
-      <div class="lh"><button data-sc="${esc(l.hid)}" title="${esc(l.lesson)}차시 ${esc(l.lessonTitle)}"><b>${esc(l.lesson)}차시</b> ${esc(l.lessonTitle)}</button>${l.page?`<a href="${esc(l.page)}" aria-label="${esc(l.lesson)}차시 안내">안내</a>`:''}</div>
+    h+=`<section class="lg" style="--k:${k}" aria-label="${esc(l.node.label)}">
+      <div class="lh"><button data-sc="${esc(l.hid)}" title="${esc(l.node.label)}"><span><b>${esc(l.lesson)}차시</b> ${esc(l.lessonTitle)}</span>${l.pages?`<small>${esc(tbRef(l))}</small>`:''}</button>${l.page?`<a href="${esc(l.page)}" aria-label="${esc(l.node.label)} 차시 안내">안내</a>`:''}</div>
       ${gs.length?gs.map(g=>miniCard(g,l)).join(''):'<div class="empty">준비 중</div>'}</section>`;
   }
   box.innerHTML=h+'</div>';
@@ -485,7 +489,7 @@ function setScope(n,opts){
   const p=pathTo(n);
   scope=n; writeHash(); if(!(opts&&opts.quiet)) store('lastScope',n.code);
   /* 지금 고른 곳까지 가는 가지만 펼침 */
-  open=new Set(p.filter(x=>x.lv==='s'||x.lv==='g').map(x=>x.code));
+  open=new Set(p.filter(x=>x.lv==='s'||x.lv==='g'||x.lv==='u').map(x=>x.code)); /* 지금 단원(·차시)만 펼침 */
   if(n.lv==='s') n.kids.forEach(g=>open.add(g.code)); /* 과목을 고르면 학년 가지까지 펼쳐 단원이 보이게 */
   renderNav(); renderView();
   const pane=document.getElementById('pane'); if(pane) pane.scrollTop=0;
@@ -569,7 +573,7 @@ app.addEventListener('click',e=>{
   const n=e.target.closest('[data-node]');
   if(n){ if(q.trim()) return; const k=n.dataset.node; open.has(k)?open.delete(k):open.add(k); return renderNav(); }
   const s=e.target.closest('[data-sc]');
-  if(s){ const node=s.dataset.sc===''?ROOT:NODES.get(s.dataset.sc); if(node&&node.lv!=='all'){ if(node===scope&&node.lv!=='l'&&node.lv!=='u'){ open.has(node.code)?open.delete(node.code):open.add(node.code); return renderNav(); } setScope(node); } else if(node===ROOT){ scope=null; writeHash(); renderNav(); renderView(); } return; }
+  if(s){ const node=s.dataset.sc===''?ROOT:NODES.get(s.dataset.sc); if(node&&node.lv!=='all'){ if(node===scope&&node.lv!=='l'){ open.has(node.code)?open.delete(node.code):open.add(node.code); return renderNav(); } setScope(node); } else if(node===ROOT){ scope=null; writeHash(); renderNav(); renderView(); } return; }
   const b=e.target.closest('[data-act]'); if(!b) return;
   const a=b.dataset.act, g=G[b.dataset.id];
   if(a==='desc'){ const d=b.closest('.mc').querySelector('.ds'); if(d){ d.hidden=!d.hidden; b.setAttribute('aria-expanded',String(!d.hidden)); } return; }
