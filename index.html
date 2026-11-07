@@ -84,8 +84,10 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 .chipbtn[aria-expanded="true"]{background:var(--ink);color:var(--bg)}
 @media (max-width:560px){.bt b{font-size:1.15rem;white-space:normal;word-break:keep-all;line-height:1.1}.bt small{display:none}.brand .logo{width:36px;height:36px}.chipbtn .lb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.btools{gap:6px}.btools .chipbtn{padding:6px 10px;min-width:44px;justify-content:center}}
 /* Layout (대문): 머리띠 한 줄(.bar) → [찾기 칸(열 때만)] → 본문.
-   가로 ≥900px: 두 칸, 페이지 스크롤 없음. 왼쪽 = 단원별 차시 목록(자체 스크롤), 오른쪽 = 고른 차시의 게임 카드(체험 A · 연습 B 나란히).
-   세로·폰 <900px: 단원 탭 → 차시 칩 한 줄(가로 스크롤) → 게임 카드. 선택은 #u2-16 같은 주소 조각으로 열린다. */
+   가로 ≥900px: 두 칸, 페이지 스크롤 없음. 왼쪽 = 목차 나무(과목 → 학년·학기 → 단원, 자체 스크롤).
+   오른쪽(자체 스크롤) = 빵부스러기 → 좁혀 보기 칩 한 줄 → 고른 곳 아래 게임 전부(차시 묶음 격자, A·B 나란히).
+   차시 하나를 고르면 그 차시 게임만 큰 카드로. 세로·폰 <900px: '과목·학년 › 단원' 고르기 → 칩 → 격자.
+   선택은 주소 조각으로 열린다: #soc(과목) #soc62(학년) #soc62-u2(단원) #soc62-u2-16(차시), 예전 #u2-16도. */
 body{padding:0}
 .app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;
   padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px))}
@@ -96,37 +98,81 @@ body{padding:0}
 .findbar input{flex:1 1 16em;min-width:0;font:inherit;font-size:1.05rem;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:8px 12px;min-height:48px}
 .found{font-family:var(--game);color:var(--muted);font-size:1rem}
 
-/* 왼쪽 차시 목록 */
+/* 왼쪽 목차 나무: 과목 → 학년·학기 → 단원 (site.json에 새 과목·학년·단원이 들어오면 가지가 저절로 생김).
+   ▸ 단추 = 펼침/접힘, 이름 = 그 아래 게임 모두 보기 */
 .side{display:none}
-.ugrp{display:grid;gap:4px;padding-bottom:14px}
-.uh{font-family:var(--game);font-size:1.2rem;line-height:1.25;padding:12px 6px 4px;position:sticky;top:0;background:var(--bg);z-index:1;box-shadow:0 1.5px 0 var(--line)}
-.uh span{color:var(--muted);font-size:.9rem;margin-right:4px}
-.th2{font-size:.85rem;color:var(--muted);padding:6px 8px 0}
-.row{display:grid;grid-template-columns:3.4em 1fr;gap:8px;align-items:center;width:100%;min-height:56px;padding:6px 8px;border:2px solid transparent;border-radius:14px;background:transparent;text-align:left;font-family:var(--body);font-size:1.125rem;line-height:1.3}
-.row:hover{background:var(--surface)}
-.row .n{font-family:var(--game);font-size:1.15rem;text-align:center;background:var(--surface);border-radius:10px;padding:4px 2px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.row .t{word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.row[aria-current="true"]{background:var(--surface);border-color:var(--accent)}
-.row[aria-current="true"] .n{background:var(--accent);color:var(--accent-ink)}
+.tree{display:grid;gap:2px;padding:8px 0}
+.tr{display:flex;align-items:stretch;gap:2px;padding-left:calc(var(--d,0) * 16px)}
+.tx{flex:none;width:44px;min-height:48px;border:none;background:transparent;border-radius:12px;color:var(--muted);font-size:1rem}
+.tx span{display:inline-block;transition:transform .15s}
+.tx[aria-expanded="true"] span{transform:rotate(90deg)}
+.tl{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border:2px solid transparent;border-radius:14px;background:transparent;text-align:left;font-size:1.2rem;line-height:1.25}
+.tx:hover,.tl:hover{background:var(--surface)}
+.tl .c{margin-left:auto;font-family:var(--body);font-size:.8rem;color:var(--muted);white-space:nowrap}
+.tr.g .tl{font-size:1.1rem}
+.tr.u{padding-left:calc(var(--d,0) * 16px + 14px)}
+.tr.u .tl{display:grid;grid-template-columns:auto 1fr;column-gap:10px;font-family:var(--body);font-size:1.1rem;min-height:56px}
+.tr.u .n{grid-row:1/3;font-family:var(--game);font-size:1rem;background:var(--surface);border-radius:10px;padding:4px 8px;white-space:nowrap}
+.tr.u .t{word-break:keep-all}
+.tr.u .c{margin:0;grid-column:2}
+.tl[aria-current="true"]{background:var(--surface);border-color:var(--accent)}
+.tr.u .tl[aria-current="true"] .n{background:var(--accent);color:var(--accent-ink)}
 .nomatch{color:var(--muted);padding:16px 8px}
 
-/* 세로: 단원 탭 + 차시 칩 */
-.picker{display:grid;gap:8px;padding:10px 0 8px;position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1.5px solid var(--line)}
-.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.tab{flex:none;min-height:48px;padding:6px 16px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-size:1.05rem}
-.tab .un{font-size:.85em}
-@media (max-width:560px){.tab .un{display:none}}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.chiprow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scroll-padding-inline:16px}
+/* 오른쪽 위: [세로 화면: 고르기] → 빵부스러기 → 좁혀 보기 칩 한 줄 */
+.ptop{display:grid;gap:6px;min-width:0;position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 6px;border-bottom:1.5px solid var(--line)}
+.usel{display:none}
+.usel select{width:100%;min-height:52px;font:inherit;font-family:var(--game);font-size:1.1rem;color:var(--ink);background:var(--surface);border:2px solid var(--ink);border-radius:14px;padding:6px 12px}
+.crumb{display:flex;flex-wrap:wrap;align-items:center;gap:0 4px;font-family:var(--game);font-size:1.05rem;line-height:1.3;min-width:0}
+.crumb button{border:none;background:transparent;color:var(--fish);font-size:inherit;padding:6px 4px;min-height:40px;text-decoration:underline;text-underline-offset:3px}
+.crumb b{font-weight:400;padding:6px 4px}
+.crumb .sep{color:var(--muted)}
+.crumb .cq{color:var(--accent);margin-right:6px}
+.chiprow{display:flex;gap:6px;align-items:center;overflow-x:auto;padding-bottom:4px;scroll-padding-inline:16px;min-width:0}
+.tlab{flex:none;font-size:.85rem;color:var(--muted);padding:0 2px 0 8px;white-space:nowrap;max-width:12em;overflow:hidden;text-overflow:ellipsis}
 .chip{flex:none;min-height:48px;min-width:56px;border-radius:999px;border:2px solid var(--line);background:var(--surface);padding:4px 16px;font-size:1.05rem;white-space:nowrap}
 .chip[aria-current="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+@media (max-width:899.98px){ .usel{display:block} .ptop{margin-top:-14px} }
+
+/* 격자(과목·학년·단원): 차시 묶음(A·B 나란히)이 칸을 채움. 칸 수 --cols: 폰 2 · 세로 태블릿/가로 4 · TV 6 */
+.grid{--cols:2;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:14px 10px;align-items:start}
+@media (min-width:640px){.grid{--cols:4}}
+@media (min-width:1500px) and (min-height:800px){.grid{--cols:6}}
+.gh,.uh2{grid-column:1/-1;margin:6px 0 -6px}
+.gh{font-size:1.5rem}
+.uh2{font-size:1.25rem}
+.uh2 button{border:none;background:transparent;font-size:inherit;padding:4px 0;min-height:44px;text-align:left;color:var(--ink)}
+.lg{grid-column:span var(--k);display:grid;grid-template-columns:repeat(var(--k),minmax(0,1fr));gap:6px 10px;min-width:0;align-items:stretch}
+.lh{grid-column:1/-1;display:flex;align-items:center;gap:6px;border-top:2px solid var(--line);padding-top:2px;min-width:0}
+.lh button{flex:1;min-width:0;border:none;background:transparent;text-align:left;font-family:var(--body);font-size:.95rem;color:var(--muted);padding:6px 0;min-height:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lh button b{font-family:var(--game);font-weight:400;color:var(--accent);font-size:1.05rem;margin-right:2px}
+.lh a{flex:none;font-size:.85rem;color:var(--muted);padding:8px 4px}
+.mc{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:8px;min-width:0}
+.mc .th{border-radius:12px;min-height:0;flex:none}
+.mtag{display:flex;align-items:center;gap:4px;min-height:28px}
+.mtag .pill{font-size:.85rem}
+.ib{margin-left:auto;width:36px;height:36px;margin-block:-6px;border:none;background:transparent;border-radius:50%;font-size:1.1rem;color:var(--muted)}
+.ib[aria-expanded="true"]{background:var(--bg);color:var(--ink)}
+.nm{font-family:var(--game);font-size:1.15rem;line-height:1.2;color:var(--ink);text-decoration:none;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+.ds{margin:0;font-size:.95rem;line-height:1.4}
+.mc .go{min-height:48px;font-size:1.15rem;border-radius:14px;margin-top:auto}
+.mini{display:flex;gap:4px}
+.mini .btn{flex:1 1 0;min-width:0;min-height:48px;padding:2px 4px;font-size:1rem;border-width:1.5px}
+.mini .lb2{display:none}
+@media (min-width:1200px){.mini .lb2{display:inline}}
+.mc.soon{border-style:dashed;background:transparent}
+.lg .empty{padding:12px}
 
 /* 오른쪽: 고른 차시 */
 .pane{display:flex;flex-direction:column;gap:12px;padding:14px 0 18px;min-width:0}
 .ph{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap}
-.ph .meta{flex:1 1 100%;font-size:.95rem;color:var(--muted);line-height:1.3}
+.ph .meta{flex:1 1 12em;font-size:.95rem;color:var(--muted);line-height:1.3}
+.crumb.lv-l b{font-size:1.3rem;color:var(--ink)}
+.crumb.lv-l b::first-line{color:inherit}
+.card>*:not(.th){flex:none}
 .ph h1{flex:1 1 14em;font-size:1.6rem;line-height:1.25;min-width:0;word-break:keep-all}
 .ph h1 .ln{color:var(--accent);margin-right:.25em;white-space:nowrap}
+#view{display:flex;flex-direction:column;gap:12px;min-height:0;flex:1 1 auto}
 .games{display:grid;gap:14px;align-content:start}
 .card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:12px;min-width:0;min-height:0}
 .th{display:block;border-radius:14px;overflow:hidden;aspect-ratio:480/230;background:var(--bg);flex:0 1 auto;min-height:72px}
@@ -163,8 +209,7 @@ body{padding:0}
 @media (min-width:900px){
   .app{height:100vh;height:100dvh;overflow:hidden}
   .main{flex:1;min-height:0;display:grid;grid-template-columns:clamp(250px,27vw,340px) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;column-gap:18px}
-  .picker{display:none}
-  .side{display:block;grid-column:1;grid-row:1;overflow-y:auto;overscroll-behavior:contain;padding:0 6px 8px 0;border-right:1.5px solid var(--line)}
+  .side{display:block;grid-column:1;grid-row:1;overflow-y:auto;overscroll-behavior:contain;padding:0 8px 8px 0;border-right:1.5px solid var(--line)}
   .app>.main>.foot{grid-column:1;grid-row:2;border-right:1.5px solid var(--line);padding:6px 8px 8px 0;border-top:1.5px solid var(--line);gap:0 10px;line-height:1.4}
   .pane{grid-column:2;grid-row:1/3;overflow-y:auto;min-height:0;padding:12px 2px 12px 0}
   .games{flex:1 1 auto;min-height:0;grid-template-rows:minmax(0,1fr);align-items:start}
@@ -182,7 +227,8 @@ body{padding:0}
   .pane{gap:10px;padding-top:10px}
   .card{padding:10px;gap:6px}
   .card h2{font-size:1.4rem}
-  .card p{-webkit-line-clamp:2}
+  .card p{-webkit-line-clamp:1}
+  .card .fine{display:none}
   .acts .go{min-height:52px}
 }
 /* 큰 화면(TV를 PC 해상도로 띄울 때): 전체 글자 키우기 */
@@ -229,7 +275,7 @@ html.js-ok #static-wrap{position:fixed!important;top:0;left:0;width:1px;height:1
 </section>
 </div>
 
-<script type="application/json" id="data">{"site":{"title":"차게임의 게임공장","tagline":"6학년 사회 개념 체험 게임","baseUrl":"https://wlfmghzm-dotcom.github.io/sahoe-game/","gc":"sahoe-game","discuss":""},"games":{"g27":{"id":"g27","subject":"사회","standard":"","type":"A","game":"무역 속보 데스크","file":"games/g27.html","desc":"쏟아지는 제보 카드를 단서로 읽고 ⭐ 나라 입장에서 수입·수출·무역 아님을 가려요. 벽란도부터 오늘날까지.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g27.jpg"},"g28":{"id":"g28","subject":"사회","standard":"","type":"A","game":"두 섬 이야기","file":"games/g28.html","desc":"섬마다 잘 만드는 것이 달라요. 남는 바나나·물고기·옷을 배로 보내 바꾸면, 혼자일 때 반만 차던 두 섬 바구니가 모두 가득 차요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g28.jpg"},"g2930":{"id":"g2930","subject":"사회","standard":"","type":"A","game":"대한민국 무역항","file":"games/g2930.html","desc":"배가 가져온 원유·철광석을 공장에 넣고, 나온 물건을 달라는 배에 실어 보내요. 마지막엔 싱가포르 항구에서 배에서 배로!","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g2930.jpg"},"g3132":{"id":"g3132","subject":"사회","standard":"","type":"A","game":"스마트폰 공장 이야기","file":"games/g3132.html","desc":"여러 나라 배가 가져온 부품을 끼워 스마트폰을 만들고 수출해요. 다른 나라 공장과의 경쟁, 관세가 붙은 나라까지.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g3132.jpg"},"u3a1":{"id":"u3a1","subject":"사회","standard":"","type":"A","game":"사람이 모이는 땅","file":"games/u3a1.html","desc":"평야·해안·산·사막 땅에 마을을 지어 보며, 자연환경과 인문환경이 사람이 모이는 곳을 정한다는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a1.jpg"},"u3b1":{"id":"u3b1","subject":"사회","standard":"","type":"B","game":"자연일까 인문일까","file":"games/u3b1.html","desc":"떨어지는 카드를 자연환경·인문환경 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b1.jpg"},"u3a2":{"id":"u3a2","subject":"사회","standard":"","type":"A","game":"떠나는 사람, 오는 사람","file":"games/u3a2.html","desc":"아기가 태어나고 일자리를 찾아 사람이 오가며 나라마다 인구수가 달라지는 까닭을 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a2.jpg"},"u3b2":{"id":"u3b2","subject":"사회","standard":"","type":"B","game":"어느 나라 이야기일까","file":"games/u3b2.html","desc":"인구수 이야기 카드를 알맞은 나라 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b2.jpg"},"u3a3":{"id":"u3a3","subject":"사회","standard":"","type":"A","game":"한 칸에 몇 명?","file":"games/u3a3.html","desc":"빽빽한 땅부터 줄 세우고, 사람이 숨은 땅은 땅 모습만 보고 밀도를 짐작해요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a3.jpg"},"u3b3":{"id":"u3b3","subject":"사회","standard":"","type":"B","game":"밀도 높을까 낮을까","file":"games/u3b3.html","desc":"카드를 인구 밀도 높음·낮음 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b3.jpg"},"u3a4":{"id":"u3a4","subject":"사회","standard":"","type":"A","game":"나이 탑 모양 맞추기","file":"games/u3a4.html","desc":"아기 수와 오래 사는 사람을 바꾸며 나이 탑을 만들고, 조건을 보고 몇 해 뒤 모양을 짐작해요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a4.jpg"},"u3b4":{"id":"u3b4","subject":"사회","standard":"","type":"B","game":"어느 나이층일까","file":"games/u3b4.html","desc":"카드를 유소년층·청장년층·노년층 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b4.jpg"},"u3a5":{"id":"u3a5","subject":"사회","standard":"","type":"A","game":"쓰면 줄어드는 마을","file":"games/u3a5.html","desc":"석유를 쓰고 숲을 개간하며 자원 고갈·기후변화·생태계 파괴·난민 문제가 생기는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a5.jpg"},"u3b5":{"id":"u3b5","subject":"사회","standard":"","type":"B","game":"어떤 지구촌 문제일까","file":"games/u3b5.html","desc":"카드를 자원·에너지, 기후변화, 생태계 파괴, 난민 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b5.jpg"},"u3a6":{"id":"u3a6","subject":"사회","standard":"","type":"A","game":"먼 연기, 가까운 가뭄","file":"games/u3a6.html","desc":"물을 나르다 굴뚝에 뚜껑을 덮어 봐요. 먼 곳의 연기가 줄면 하늘이 맑아지고 우리 마을 가뭄도 나아지는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a6.jpg"},"u3b6":{"id":"u3b6","subject":"사회","standard":"","type":"B","game":"상황일까 원인일까","file":"games/u3b6.html","desc":"카드를 문제 상황·원인 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b6.jpg"},"u3a7":{"id":"u3a7","subject":"사회","standard":"","type":"A","game":"지구촌 도움 현장","file":"games/u3a7.html","desc":"병을 분리수거함에 넣고, 꽉 찬 통을 공장에 보내 운동화로 바꿔요. 혼자서는 조금, 개인과 기업이 함께하면 끝까지 치워요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a7.jpg"},"u3b7":{"id":"u3b7","subject":"사회","standard":"","type":"B","game":"누구의 노력일까","file":"games/u3b7.html","desc":"노력 카드를 개인·국제기구·비정부 기구 등 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b7.jpg"},"u3a8":{"id":"u3a8","subject":"사회","standard":"","type":"A","game":"바꾸고 넘겨요","file":"games/u3a8.html","desc":"종이컵·전등 같은 생활 물건을 바꾸고 친구에게 바통을 넘기며 더하기·빼기 실천을 익혀요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a8.jpg"},"u3b8":{"id":"u3b8","subject":"사회","standard":"","type":"B","game":"더하기일까 빼기일까","file":"games/u3b8.html","desc":"실천 카드를 더하기 노력·빼기 노력 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b8.jpg"},"u2a1":{"id":"u2a1","subject":"사회","standard":"","type":"A","game":"사과 값은 누가 정할까","file":"games/u2a1.html","desc":"손님과 날씨를 보고 사과 상자를 몇 개 가져갈까? 너무 많으면 값이 떨어지고, 옆 가게보다 비싸면 손님이 떠나요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a1.jpg"},"u2b1":{"id":"u2b1","subject":"사회","standard":"","type":"B","game":"가계·기업·시장","file":"games/u2b1.html","desc":"카드를 가계·기업·시장 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b1.jpg"},"u2a2":{"id":"u2a2","subject":"사회","standard":"","type":"A","game":"돈이 도는 마을","file":"games/u2a2.html","desc":"일하러 가서 소득을 받고, 그 돈으로 사면 기업에 이윤이 생겨요. 가계와 기업 사이를 도는 돈과 합리적 선택을 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a2.jpg"},"u2b2":{"id":"u2b2","subject":"사회","standard":"","type":"B","game":"가계가 할까, 기업이 할까","file":"games/u2b2.html","desc":"카드를 가계의 일·기업의 일 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b2.jpg"},"u2a3":{"id":"u2a3","subject":"사회","standard":"","type":"A","game":"쉬어야 잘 만들지","file":"games/u2a3.html","desc":"지친 근로자를 휴게실·집·회의실로 보내면 공장도 더 잘 돌아가요. 근로자 권리 보호가 왜 중요한지 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a3.jpg"},"u2b3":{"id":"u2b3","subject":"사회","standard":"","type":"B","game":"보호받는 일터일까","file":"games/u2b3.html","desc":"카드를 보호받는 모습·못 받는 모습·보호 제도 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b3.jpg"},"u2a4":{"id":"u2a4","subject":"사회","standard":"","type":"A","game":"착한 공장, 잘되는 공장","file":"games/u2a4.html","desc":"사장이 되어 무엇을 얼마나 만들지 고르고, 폐수를 강에 버릴지 처리할지 결정하며 기업의 자유와 책임을 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a4.jpg"},"u2b4":{"id":"u2b4","subject":"사회","standard":"","type":"B","game":"기업의 자유와 책임","file":"games/u2b4.html","desc":"카드를 자유로운 결정·사회적 책임·경쟁 속 문제 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b4.jpg"},"u2a5":{"id":"u2a5","subject":"사회","standard":"","type":"A","game":"한강의 기적 연표","file":"games/u2a5.html","desc":"시대마다 가진 것(일손·돈·기술)에 맞는 공장을 골라 지어요. 형편에 맞으면 소득 막대가 쑥쑥 자라요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a5.jpg"},"u2b5":{"id":"u2b5","subject":"사회","standard":"","type":"B","game":"경제성장의 발자취","file":"games/u2b5.html","desc":"카드를 1960년대부터 오늘날까지 시대 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b5.jpg"},"u2a6":{"id":"u2a6","subject":"사회","standard":"","type":"A","game":"풍요로운 마을 만들기","file":"games/u2a6.html","desc":"한정된 동전을 주민이 바라는 공연장·학교·병원에 쓸까, 로봇 공장에 먼저 투자할까? 성장한 소득을 어디에 쓰는지 골라요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a6.jpg"},"u2b6":{"id":"u2b6","subject":"사회","standard":"","type":"B","game":"경제성장이 바꾼 생활","file":"games/u2b6.html","desc":"카드를 첨단 기술·문화 산업·삶의 질 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b6.jpg"},"u2a7":{"id":"u2a7","subject":"사회","standard":"","type":"A","game":"빨리 크는 도시","file":"games/u2a7.html","desc":"도시를 빨리 키울수록 생기는 환경 문제·빈부 격차·과소비·노사 갈등을 찾아 목록에 모아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a7.jpg"},"u2b7":{"id":"u2b7","subject":"사회","standard":"","type":"B","game":"어떤 문제일까","file":"games/u2b7.html","desc":"카드를 환경 문제·빈부 격차·과소비·노사 갈등 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b7.jpg"},"u2a8":{"id":"u2a8","subject":"사회","standard":"","type":"A","game":"모두의 바다","file":"games/u2a8.html","desc":"매주 몇 번 바다에 나갈까? 욕심내면 바다가 비고, 마을 약속을 정하면 모두의 물고기가 많아져요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a8.jpg"},"u2b8":{"id":"u2b8","subject":"사회","standard":"","type":"B","game":"누가 해결할까","file":"games/u2b8.html","desc":"카드를 정부·시민 단체와 개인·기업과 근로자 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b8.jpg"}},"lessons":[{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"16","lessonTitle":"시장경제가 무엇인지 알아볼까요","pages":"60~62쪽","standard":"","games":["u2a1","u2b1"],"page":"lessons/6-2-2-16.html","hid":"u2-16","teaches":["시장","가계","기업","가격","경쟁","시장경제"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"17~18","lessonTitle":"가계와 기업의 역할을 알아볼까요","pages":"63~68쪽","standard":"","games":["u2a2","u2b2"],"page":"lessons/6-2-2-17-18.html","hid":"u2-17-18","teaches":["가계","기업","소득","소비","이윤","합리적 선택"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"19","lessonTitle":"근로자의 권리를 보호하는 모습을 살펴볼까요","pages":"69~71쪽","standard":"","games":["u2a3","u2b3"],"page":"lessons/6-2-2-19.html","hid":"u2-19","teaches":["근로자","근로자의 권리","휴식","유급 휴가","근로 조건 협의"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"20~21","lessonTitle":"기업의 자유와 사회적 책임을 알아볼까요","pages":"72~77쪽","standard":"","games":["u2a4","u2b4"],"page":"lessons/6-2-2-20-21.html","hid":"u2-20-21","teaches":["기업의 자유","이윤","사회적 책임","환경 오염","공정한 경쟁"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"22","lessonTitle":"경제성장이 무엇인지 알아볼까요","pages":"78~80쪽","standard":"","games":["u2a5","u2b5"],"page":"lessons/6-2-2-22.html","hid":"u2-22","teaches":["경제성장","1인당 국민 총소득","경공업","중화학 공업","첨단 기술","한강의 기적"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"23","lessonTitle":"경제성장이 우리 생활에 미치는 영향을 알아볼까요","pages":"81~84쪽","standard":"","games":["u2a6","u2b6"],"page":"lessons/6-2-2-23.html","hid":"u2-23","teaches":["경제성장","첨단 기술","문화 산업","삶의 질","기대 수명"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"24","lessonTitle":"빠른 경제성장으로 발생한 문제를 알아볼까요","pages":"85~87쪽","standard":"","games":["u2a7","u2b7"],"page":"lessons/6-2-2-24.html","hid":"u2-24","teaches":["경제성장","환경 문제","빈부 격차","과소비","노사 갈등"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"25~26","lessonTitle":"빠른 경제성장으로 발생한 문제를 해결해 볼까요","pages":"88~93쪽","standard":"","games":["u2a8","u2b8"],"page":"lessons/6-2-2-25-26.html","hid":"u2-25-26","teaches":["공유지의 비극","공동의 이익","약속과 규칙","정부의 노력","기업과 근로자의 노력","시민 단체와 개인의 노력"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"27","lessonTitle":"무역이 무엇인지 알아볼까요","pages":"94~96쪽","standard":"","games":["g27"],"page":"lessons/6-2-2-27.html","hid":"u2-27","teaches":["무역","수출","수입","교류"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"28","lessonTitle":"무역이 이루어지는 까닭을 알아볼까요","pages":"97~99쪽","standard":"","games":["g28"],"page":"lessons/6-2-2-28.html","hid":"u2-28","teaches":["무역의 까닭","특화","교환","자원과 기술의 차이"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"29~30","lessonTitle":"무역이 이루어지는 다양한 모습을 살펴볼까요","pages":"100~105쪽","standard":"","games":["g2930"],"page":"lessons/6-2-2-29-30.html","hid":"u2-29-30","teaches":["가공 무역","원자재 수입","공산품 수출","중계 무역","무역항"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"31~32","lessonTitle":"무역을 통한 세계 여러 나라의 상호 의존과 경쟁 관계를 살펴볼까요","pages":"106~111쪽","standard":"","games":["g3132"],"page":"lessons/6-2-2-31-32.html","hid":"u2-31-32","teaches":["상호 의존","경쟁","관세","무역 갈등","세계 분업"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"1","lessonTitle":"세계의 인구 분포를 알아볼까요","pages":"124~128쪽","standard":"","games":["u3a1","u3b1"],"page":"lessons/6-2-3-1.html","hid":"u3-1","teaches":["인구 분포","자연환경","인문환경","기후","지형"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"2","lessonTitle":"세계 여러 나라의 인구수를 알아볼까요","pages":"129~131쪽","standard":"","games":["u3a2","u3b2"],"page":"lessons/6-2-3-2.html","hid":"u3-2","teaches":["인구수","출생","이주","인구 이동"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"3","lessonTitle":"세계 여러 나라의 인구 밀도를 알아볼까요","pages":"132~134쪽","standard":"","games":["u3a3","u3b3"],"page":"lessons/6-2-3-3.html","hid":"u3-3","teaches":["인구 밀도","넓이","인구수 비교"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"4","lessonTitle":"세계 여러 나라의 인구 구조를 알아볼까요","pages":"135~139쪽","standard":"","games":["u3a4","u3b4"],"page":"lessons/6-2-3-4.html","hid":"u3-4","teaches":["인구 구조","인구 피라미드","유소년층","청장년층","노년층","저출산","고령화"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"5","lessonTitle":"지구촌을 위협하는 여러 가지 문제를 알아볼까요","pages":"140~142쪽","standard":"","games":["u3a5","u3b5"],"page":"lessons/6-2-3-5.html","hid":"u3-5","teaches":["지구촌 문제","자원 고갈","기후 변화","생태계 파괴","난민"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"6","lessonTitle":"지구촌을 위협하는 여러 가지 문제를 조사해 볼까요","pages":"143~147쪽","standard":"","games":["u3a6","u3b6"],"page":"lessons/6-2-3-6.html","hid":"u3-6","teaches":["지구촌 문제의 원인","대기 오염","가뭄","국경을 넘는 문제"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"7","lessonTitle":"지속가능한 미래를 위한 노력을 살펴볼까요","pages":"148~151쪽","standard":"","games":["u3a7","u3b7"],"page":"lessons/6-2-3-7.html","hid":"u3-7","teaches":["지속가능한 미래","국제기구","비정부 기구","기업과 개인의 노력","재활용"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"8","lessonTitle":"지속가능한 미래를 위해 우리가 할 수 있는 일을 실천해 볼까요","pages":"152~154쪽","standard":"","games":["u3a8","u3b8"],"page":"lessons/6-2-3-8.html","hid":"u3-8","teaches":["지속가능한 생활 실천","더하기 실천","빼기 실천","친환경 생활"]}]}</script>
+<script type="application/json" id="data">{"site":{"title":"차게임의 게임공장","tagline":"6학년 사회 개념 체험 게임","baseUrl":"https://wlfmghzm-dotcom.github.io/sahoe-game/","gc":"sahoe-game","discuss":""},"games":{"g27":{"id":"g27","subject":"사회","standard":"","type":"A","game":"무역 속보 데스크","file":"games/g27.html","desc":"쏟아지는 제보 카드를 단서로 읽고 ⭐ 나라 입장에서 수입·수출·무역 아님을 가려요. 벽란도부터 오늘날까지.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g27.jpg"},"g28":{"id":"g28","subject":"사회","standard":"","type":"A","game":"두 섬 이야기","file":"games/g28.html","desc":"섬마다 잘 만드는 것이 달라요. 남는 바나나·물고기·옷을 배로 보내 바꾸면, 혼자일 때 반만 차던 두 섬 바구니가 모두 가득 차요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g28.jpg"},"g2930":{"id":"g2930","subject":"사회","standard":"","type":"A","game":"대한민국 무역항","file":"games/g2930.html","desc":"배가 가져온 원유·철광석을 공장에 넣고, 나온 물건을 달라는 배에 실어 보내요. 마지막엔 싱가포르 항구에서 배에서 배로!","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g2930.jpg"},"g3132":{"id":"g3132","subject":"사회","standard":"","type":"A","game":"스마트폰 공장 이야기","file":"games/g3132.html","desc":"여러 나라 배가 가져온 부품을 끼워 스마트폰을 만들고 수출해요. 다른 나라 공장과의 경쟁, 관세가 붙은 나라까지.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/g3132.jpg"},"u3a1":{"id":"u3a1","subject":"사회","standard":"","type":"A","game":"사람이 모이는 땅","file":"games/u3a1.html","desc":"평야·해안·산·사막 땅에 마을을 지어 보며, 자연환경과 인문환경이 사람이 모이는 곳을 정한다는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a1.jpg"},"u3b1":{"id":"u3b1","subject":"사회","standard":"","type":"B","game":"자연일까 인문일까","file":"games/u3b1.html","desc":"떨어지는 카드를 자연환경·인문환경 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b1.jpg"},"u3a2":{"id":"u3a2","subject":"사회","standard":"","type":"A","game":"떠나는 사람, 오는 사람","file":"games/u3a2.html","desc":"아기가 태어나고 일자리를 찾아 사람이 오가며 나라마다 인구수가 달라지는 까닭을 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a2.jpg"},"u3b2":{"id":"u3b2","subject":"사회","standard":"","type":"B","game":"어느 나라 이야기일까","file":"games/u3b2.html","desc":"인구수 이야기 카드를 알맞은 나라 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b2.jpg"},"u3a3":{"id":"u3a3","subject":"사회","standard":"","type":"A","game":"한 칸에 몇 명?","file":"games/u3a3.html","desc":"빽빽한 땅부터 줄 세우고, 사람이 숨은 땅은 땅 모습만 보고 밀도를 짐작해요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a3.jpg"},"u3b3":{"id":"u3b3","subject":"사회","standard":"","type":"B","game":"밀도 높을까 낮을까","file":"games/u3b3.html","desc":"카드를 인구 밀도 높음·낮음 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b3.jpg"},"u3a4":{"id":"u3a4","subject":"사회","standard":"","type":"A","game":"나이 탑 모양 맞추기","file":"games/u3a4.html","desc":"아기 수와 오래 사는 사람을 바꾸며 나이 탑을 만들고, 조건을 보고 몇 해 뒤 모양을 짐작해요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a4.jpg"},"u3b4":{"id":"u3b4","subject":"사회","standard":"","type":"B","game":"어느 나이층일까","file":"games/u3b4.html","desc":"카드를 유소년층·청장년층·노년층 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b4.jpg"},"u3a5":{"id":"u3a5","subject":"사회","standard":"","type":"A","game":"쓰면 줄어드는 마을","file":"games/u3a5.html","desc":"석유를 쓰고 숲을 개간하며 자원 고갈·기후변화·생태계 파괴·난민 문제가 생기는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a5.jpg"},"u3b5":{"id":"u3b5","subject":"사회","standard":"","type":"B","game":"어떤 지구촌 문제일까","file":"games/u3b5.html","desc":"카드를 자원·에너지, 기후변화, 생태계 파괴, 난민 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b5.jpg"},"u3a6":{"id":"u3a6","subject":"사회","standard":"","type":"A","game":"먼 연기, 가까운 가뭄","file":"games/u3a6.html","desc":"물을 나르다 굴뚝에 뚜껑을 덮어 봐요. 먼 곳의 연기가 줄면 하늘이 맑아지고 우리 마을 가뭄도 나아지는 걸 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a6.jpg"},"u3b6":{"id":"u3b6","subject":"사회","standard":"","type":"B","game":"상황일까 원인일까","file":"games/u3b6.html","desc":"카드를 문제 상황·원인 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b6.jpg"},"u3a7":{"id":"u3a7","subject":"사회","standard":"","type":"A","game":"지구촌 도움 현장","file":"games/u3a7.html","desc":"병을 분리수거함에 넣고, 꽉 찬 통을 공장에 보내 운동화로 바꿔요. 혼자서는 조금, 개인과 기업이 함께하면 끝까지 치워요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0) · 지도: Natural Earth (퍼블릭 도메인)","img":"thumbs/u3a7.jpg"},"u3b7":{"id":"u3b7","subject":"사회","standard":"","type":"B","game":"누구의 노력일까","file":"games/u3b7.html","desc":"노력 카드를 개인·국제기구·비정부 기구 등 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b7.jpg"},"u3a8":{"id":"u3a8","subject":"사회","standard":"","type":"A","game":"바꾸고 넘겨요","file":"games/u3a8.html","desc":"종이컵·전등 같은 생활 물건을 바꾸고 친구에게 바통을 넘기며 더하기·빼기 실천을 익혀요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3a8.jpg"},"u3b8":{"id":"u3b8","subject":"사회","standard":"","type":"B","game":"더하기일까 빼기일까","file":"games/u3b8.html","desc":"실천 카드를 더하기 노력·빼기 노력 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u3b8.jpg"},"u2a1":{"id":"u2a1","subject":"사회","standard":"","type":"A","game":"사과 값은 누가 정할까","file":"games/u2a1.html","desc":"손님과 날씨를 보고 사과 상자를 몇 개 가져갈까? 너무 많으면 값이 떨어지고, 옆 가게보다 비싸면 손님이 떠나요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a1.jpg"},"u2b1":{"id":"u2b1","subject":"사회","standard":"","type":"B","game":"가계·기업·시장","file":"games/u2b1.html","desc":"카드를 가계·기업·시장 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b1.jpg"},"u2a2":{"id":"u2a2","subject":"사회","standard":"","type":"A","game":"돈이 도는 마을","file":"games/u2a2.html","desc":"일하러 가서 소득을 받고, 그 돈으로 사면 기업에 이윤이 생겨요. 가계와 기업 사이를 도는 돈과 합리적 선택을 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a2.jpg"},"u2b2":{"id":"u2b2","subject":"사회","standard":"","type":"B","game":"가계가 할까, 기업이 할까","file":"games/u2b2.html","desc":"카드를 가계의 일·기업의 일 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b2.jpg"},"u2a3":{"id":"u2a3","subject":"사회","standard":"","type":"A","game":"쉬어야 잘 만들지","file":"games/u2a3.html","desc":"지친 근로자를 휴게실·집·회의실로 보내면 공장도 더 잘 돌아가요. 근로자 권리 보호가 왜 중요한지 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a3.jpg"},"u2b3":{"id":"u2b3","subject":"사회","standard":"","type":"B","game":"보호받는 일터일까","file":"games/u2b3.html","desc":"카드를 보호받는 모습·못 받는 모습·보호 제도 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b3.jpg"},"u2a4":{"id":"u2a4","subject":"사회","standard":"","type":"A","game":"착한 공장, 잘되는 공장","file":"games/u2a4.html","desc":"사장이 되어 무엇을 얼마나 만들지 고르고, 폐수를 강에 버릴지 처리할지 결정하며 기업의 자유와 책임을 겪어요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a4.jpg"},"u2b4":{"id":"u2b4","subject":"사회","standard":"","type":"B","game":"기업의 자유와 책임","file":"games/u2b4.html","desc":"카드를 자유로운 결정·사회적 책임·경쟁 속 문제 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b4.jpg"},"u2a5":{"id":"u2a5","subject":"사회","standard":"","type":"A","game":"한강의 기적 연표","file":"games/u2a5.html","desc":"시대마다 가진 것(일손·돈·기술)에 맞는 공장을 골라 지어요. 형편에 맞으면 소득 막대가 쑥쑥 자라요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a5.jpg"},"u2b5":{"id":"u2b5","subject":"사회","standard":"","type":"B","game":"경제성장의 발자취","file":"games/u2b5.html","desc":"카드를 1960년대부터 오늘날까지 시대 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b5.jpg"},"u2a6":{"id":"u2a6","subject":"사회","standard":"","type":"A","game":"풍요로운 마을 만들기","file":"games/u2a6.html","desc":"한정된 동전을 주민이 바라는 공연장·학교·병원에 쓸까, 로봇 공장에 먼저 투자할까? 성장한 소득을 어디에 쓰는지 골라요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a6.jpg"},"u2b6":{"id":"u2b6","subject":"사회","standard":"","type":"B","game":"경제성장이 바꾼 생활","file":"games/u2b6.html","desc":"카드를 첨단 기술·문화 산업·삶의 질 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b6.jpg"},"u2a7":{"id":"u2a7","subject":"사회","standard":"","type":"A","game":"빨리 크는 도시","file":"games/u2a7.html","desc":"도시를 빨리 키울수록 생기는 환경 문제·빈부 격차·과소비·노사 갈등을 찾아 목록에 모아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a7.jpg"},"u2b7":{"id":"u2b7","subject":"사회","standard":"","type":"B","game":"어떤 문제일까","file":"games/u2b7.html","desc":"카드를 환경 문제·빈부 격차·과소비·노사 갈등 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b7.jpg"},"u2a8":{"id":"u2a8","subject":"사회","standard":"","type":"A","game":"모두의 바다","file":"games/u2a8.html","desc":"매주 몇 번 바다에 나갈까? 욕심내면 바다가 비고, 마을 약속을 정하면 모두의 물고기가 많아져요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2a8.jpg"},"u2b8":{"id":"u2b8","subject":"사회","standard":"","type":"B","game":"누가 해결할까","file":"games/u2b8.html","desc":"카드를 정부·시민 단체와 개인·기업과 근로자 칸에 나눠 담아요.","status":"ready","verified":"checked","credit":"그림: Kenney (CC0)","img":"thumbs/u2b8.jpg"}},"lessons":[{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"16","lessonTitle":"시장경제가 무엇인지 알아볼까요","pages":"60~62쪽","standard":"","games":["u2a1","u2b1"],"page":"lessons/6-2-2-16.html","hid":"soc62-u2-16","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["시장","가계","기업","가격","경쟁","시장경제"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"17~18","lessonTitle":"가계와 기업의 역할을 알아볼까요","pages":"63~68쪽","standard":"","games":["u2a2","u2b2"],"page":"lessons/6-2-2-17-18.html","hid":"soc62-u2-17-18","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["가계","기업","소득","소비","이윤","합리적 선택"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"19","lessonTitle":"근로자의 권리를 보호하는 모습을 살펴볼까요","pages":"69~71쪽","standard":"","games":["u2a3","u2b3"],"page":"lessons/6-2-2-19.html","hid":"soc62-u2-19","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["근로자","근로자의 권리","휴식","유급 휴가","근로 조건 협의"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"1. 우리나라 시장경제의 특징","lesson":"20~21","lessonTitle":"기업의 자유와 사회적 책임을 알아볼까요","pages":"72~77쪽","standard":"","games":["u2a4","u2b4"],"page":"lessons/6-2-2-20-21.html","hid":"soc62-u2-20-21","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["기업의 자유","이윤","사회적 책임","환경 오염","공정한 경쟁"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"22","lessonTitle":"경제성장이 무엇인지 알아볼까요","pages":"78~80쪽","standard":"","games":["u2a5","u2b5"],"page":"lessons/6-2-2-22.html","hid":"soc62-u2-22","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["경제성장","1인당 국민 총소득","경공업","중화학 공업","첨단 기술","한강의 기적"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"23","lessonTitle":"경제성장이 우리 생활에 미치는 영향을 알아볼까요","pages":"81~84쪽","standard":"","games":["u2a6","u2b6"],"page":"lessons/6-2-2-23.html","hid":"soc62-u2-23","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["경제성장","첨단 기술","문화 산업","삶의 질","기대 수명"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"24","lessonTitle":"빠른 경제성장으로 발생한 문제를 알아볼까요","pages":"85~87쪽","standard":"","games":["u2a7","u2b7"],"page":"lessons/6-2-2-24.html","hid":"soc62-u2-24","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["경제성장","환경 문제","빈부 격차","과소비","노사 갈등"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"2. 경제성장과 우리 생활","lesson":"25~26","lessonTitle":"빠른 경제성장으로 발생한 문제를 해결해 볼까요","pages":"88~93쪽","standard":"","games":["u2a8","u2b8"],"page":"lessons/6-2-2-25-26.html","hid":"soc62-u2-25-26","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["공유지의 비극","공동의 이익","약속과 규칙","정부의 노력","기업과 근로자의 노력","시민 단체와 개인의 노력"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"27","lessonTitle":"무역이 무엇인지 알아볼까요","pages":"94~96쪽","standard":"","games":["g27"],"page":"lessons/6-2-2-27.html","hid":"soc62-u2-27","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["무역","수출","수입","교류"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"28","lessonTitle":"무역이 이루어지는 까닭을 알아볼까요","pages":"97~99쪽","standard":"","games":["g28"],"page":"lessons/6-2-2-28.html","hid":"soc62-u2-28","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["무역의 까닭","특화","교환","자원과 기술의 차이"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"29~30","lessonTitle":"무역이 이루어지는 다양한 모습을 살펴볼까요","pages":"100~105쪽","standard":"","games":["g2930"],"page":"lessons/6-2-2-29-30.html","hid":"soc62-u2-29-30","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["가공 무역","원자재 수입","공산품 수출","중계 무역","무역항"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"2. 시장경제와 국가 간 거래","topic":"3. 세계 속의 무역","lesson":"31~32","lessonTitle":"무역을 통한 세계 여러 나라의 상호 의존과 경쟁 관계를 살펴볼까요","pages":"106~111쪽","standard":"","games":["g3132"],"page":"lessons/6-2-2-31-32.html","hid":"soc62-u2-31-32","sc":"soc","gc":"soc62","uc":"soc62-u2","teaches":["상호 의존","경쟁","관세","무역 갈등","세계 분업"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"1","lessonTitle":"세계의 인구 분포를 알아볼까요","pages":"124~128쪽","standard":"","games":["u3a1","u3b1"],"page":"lessons/6-2-3-1.html","hid":"soc62-u3-1","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["인구 분포","자연환경","인문환경","기후","지형"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"2","lessonTitle":"세계 여러 나라의 인구수를 알아볼까요","pages":"129~131쪽","standard":"","games":["u3a2","u3b2"],"page":"lessons/6-2-3-2.html","hid":"soc62-u3-2","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["인구수","출생","이주","인구 이동"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"3","lessonTitle":"세계 여러 나라의 인구 밀도를 알아볼까요","pages":"132~134쪽","standard":"","games":["u3a3","u3b3"],"page":"lessons/6-2-3-3.html","hid":"soc62-u3-3","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["인구 밀도","넓이","인구수 비교"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"1. 세계의 인구 분포","lesson":"4","lessonTitle":"세계 여러 나라의 인구 구조를 알아볼까요","pages":"135~139쪽","standard":"","games":["u3a4","u3b4"],"page":"lessons/6-2-3-4.html","hid":"soc62-u3-4","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["인구 구조","인구 피라미드","유소년층","청장년층","노년층","저출산","고령화"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"5","lessonTitle":"지구촌을 위협하는 여러 가지 문제를 알아볼까요","pages":"140~142쪽","standard":"","games":["u3a5","u3b5"],"page":"lessons/6-2-3-5.html","hid":"soc62-u3-5","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["지구촌 문제","자원 고갈","기후 변화","생태계 파괴","난민"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"6","lessonTitle":"지구촌을 위협하는 여러 가지 문제를 조사해 볼까요","pages":"143~147쪽","standard":"","games":["u3a6","u3b6"],"page":"lessons/6-2-3-6.html","hid":"soc62-u3-6","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["지구촌 문제의 원인","대기 오염","가뭄","국경을 넘는 문제"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"7","lessonTitle":"지속가능한 미래를 위한 노력을 살펴볼까요","pages":"148~151쪽","standard":"","games":["u3a7","u3b7"],"page":"lessons/6-2-3-7.html","hid":"soc62-u3-7","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["지속가능한 미래","국제기구","비정부 기구","기업과 개인의 노력","재활용"]},{"publisher":"아이스크림미디어","subject":"사회","grade":"6-2","unit":"3. 지구촌 사람들","topic":"2. 지구촌의 문제와 지속가능한 미래","lesson":"8","lessonTitle":"지속가능한 미래를 위해 우리가 할 수 있는 일을 실천해 볼까요","pages":"152~154쪽","standard":"","games":["u3a8","u3b8"],"page":"lessons/6-2-3-8.html","hid":"soc62-u3-8","sc":"soc","gc":"soc62","uc":"soc62-u3","teaches":["지속가능한 생활 실천","더하기 실천","빼기 실천","친환경 생활"]}]}</script>
 <script src="vendor/qrcode.js"></script>
 <script data-goatcounter="https://sahoe-game.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <script>
@@ -253,40 +299,51 @@ const here=location.href.split('#')[0].split('?')[0].replace(/index\.html$/,'');
 const BASE=/^https?:\/\//.test(S.baseUrl||'')?S.baseUrl.replace(/\/?$/,'/'):here;
 const gameUrl=g=>new URL(g.file,BASE).href;
 
-/* ---------- 차시 순서: 교과 → 출판사 → 학년·학기 → 단원 번호 → 차시 번호 ---------- */
-L.forEach((l,i)=>{ l.key=String(i); if(!l.hid) l.hid='l'+i; });
-const ORDER=[...L].sort((a,b)=>cmp(a.subject,b.subject)||cmp(a.publisher,b.publisher)||cmp(a.grade,b.grade)||unitNo(a.unit)-unitNo(b.unit)||cmp(a.unit,b.unit)||num(a.lesson)-num(b.lesson)||cmp(a.lesson,b.lesson));
-const UNITS=[]; /* [{key,label,unit,grade,lessons:[...]}] */
-ORDER.forEach(l=>{ const k=[l.subject,l.publisher,l.grade,l.unit].join('|'); let u=UNITS.find(x=>x.k===k); if(!u){ u={k,i:UNITS.length,unit:l.unit,grade:l.grade,lessons:[]}; UNITS.push(u); } u.lessons.push(l); l.u=u; });
-const multiGrade=new Set(UNITS.map(u=>u.grade)).size>1;
-const unitShort=u=>(multiGrade?gradeLabel(u.grade)+' ':'')+(unitNo(u.unit)<9999?unitNo(u.unit)+'단원':unitName(u.unit));
+/* ---------- 목차: 과목(site.json 순서) → 학년·학기(오름차순) → [출판사] → 단원 번호 → 차시 번호 ---------- */
+L.forEach((l,i)=>{ l.key=String(i); if(!l.hid) l.hid='l'+i; if(!l.uc) l.uc='u'+i; if(!l.gc) l.gc='g'+i; if(!l.sc) l.sc='s'+i; });
+const firstIdx=k=>{ const m=new Map(); L.forEach((l,i)=>{ if(!m.has(l[k])) m.set(l[k],i); }); return v=>m.get(v); };
+const subjIdx=firstIdx('subject'), pubIdx=firstIdx('publisher');
+const ORDER=[...L].sort((a,b)=>subjIdx(a.subject)-subjIdx(b.subject)||cmp(a.grade,b.grade)||pubIdx(a.publisher)-pubIdx(b.publisher)||unitNo(a.unit)-unitNo(b.unit)||cmp(a.unit,b.unit)||num(a.lesson)-num(b.lesson)||cmp(a.lesson,b.lesson));
+/* nodes: {lv:'all'|'s'|'g'|'u'|'l', code, label, kids, lessons, up} */
+const ROOT={lv:'all',code:'',label:'전체',kids:[],lessons:ORDER,up:null};
+const NODES=new Map();
+ORDER.forEach(l=>{
+  let s=ROOT.kids.find(x=>x.name===l.subject); if(!s){ s={lv:'s',code:l.sc,name:l.subject,label:l.subject,kids:[],lessons:[],up:ROOT}; ROOT.kids.push(s); NODES.set(s.code,s); }
+  let g=s.kids.find(x=>x.grade===l.grade); if(!g){ g={lv:'g',code:l.gc,grade:l.grade,label:gradeLabel(l.grade),kids:[],lessons:[],up:s}; s.kids.push(g); NODES.set(g.code,g); }
+  let u=g.kids.find(x=>x.code===l.uc); if(!u){ u={lv:'u',code:l.uc,unit:l.unit,publisher:l.publisher,label:(unitNo(l.unit)<9999?unitNo(l.unit)+'단원':'단원'),name:unitName(l.unit),kids:[],lessons:[],up:g}; g.kids.push(u); NODES.set(u.code,u); }
+  const n={lv:'l',code:l.hid,l,label:l.lesson+'차시',kids:[],lessons:[l],up:u}; u.kids.push(n); NODES.set(n.code,n); l.node=n; l.u=u;
+  s.lessons.push(l); g.lessons.push(l); u.lessons.push(l);
+});
+ROOT.kids.forEach(s=>s.kids.forEach(g=>{ g.multiPub=new Set(g.kids.map(u=>u.publisher)).size>1; }));
 const lessonGames=l=>(l.games||[]).map(id=>G[id]).filter(Boolean).sort((a,b)=>cmp(a.type,b.type));
+const readyN=ls=>ls.reduce((n,l)=>n+lessonGames(l).filter(g=>g.status==='ready').length,0);
+const pathTo=n=>{ const p=[]; for(let x=n;x&&x!==ROOT;x=x.up) p.unshift(x); return p; };
+const nodeName=n=>n.lv==='u'?`${n.label} ${n.name}${n.up.multiPub?' ('+n.publisher+')':''}`:n.lv==='l'?`${n.label} ${n.l.lessonTitle}`:n.label;
 
 function lessonText(l){
   const gs=lessonGames(l);
-  return norm([l.standard,l.lessonTitle,l.unit,l.topic,l.publisher,l.subject,l.lesson+'차시',...(l.teaches||[]),...gs.flatMap(g=>[g.standard,g.game,g.desc])].join(' '));
+  return norm([l.standard,l.lessonTitle,l.unit,l.topic,l.publisher,l.subject,gradeLabel(l.grade),l.lesson+'차시',...(l.teaches||[]),...gs.flatMap(g=>[g.standard,g.game,g.desc])].join(' '));
 }
 L.forEach(l=>l.txt=lessonText(l));
 
-/* ---------- 선택: #u2-16 → 마지막으로 연 차시 → 첫 차시 ---------- */
-let q='', cur=null, searchOpen=false;
-const byHid=h=>L.find(l=>l.hid===h);
+/* ---------- 선택(scope): #soc 과목 · #soc62 학년 · #soc62-u2 단원 · #soc62-u2-16 차시 (예전 #u2-16도 열림) ---------- */
+let q='', scope=null, searchOpen=false, open=new Set(), beforeFind=null;
 function fromHash(){
-  const h=decodeURIComponent(location.hash.slice(1)||'');
+  const raw=decodeURIComponent(location.hash.slice(1)||''), h=raw.toLowerCase();
   if(!h) return null;
-  const direct=byHid(h); if(direct) return direct;
-  try{ /* 예전 주소(#subject=…&lesson=…)도 연다 */
-    const p=new URLSearchParams(h); const ls=p.get('lesson'), un=p.get('unit');
-    if(ls) return ORDER.find(l=>l.lesson===ls&&(!un||l.unit===un))||null;
-    if(un) return ORDER.find(l=>l.unit===un)||null;
+  if(NODES.has(h)) return NODES.get(h);
+  if(/^u\d/.test(h)){ const t=[...NODES.values()].find(n=>(n.lv==='l'||n.lv==='u')&&n.code.endsWith('-'+h)); if(t) return t; }
+  try{ /* 더 예전 주소(#subject=…&lesson=…) */
+    const p=new URLSearchParams(raw); const ls=p.get('lesson'), un=p.get('unit');
+    if(ls){ const l=ORDER.find(l=>l.lesson===ls&&(!un||l.unit===un)); if(l) return l.node; }
+    if(un){ const l=ORDER.find(l=>l.unit===un); if(l) return l.u; }
   }catch(e){}
   return null;
 }
-function remembered(){ try{ return byHid(localStorage.getItem('lastLesson')||''); }catch(e){ return null; } }
-function remember(l){ try{ localStorage.setItem('lastLesson',l.hid); }catch(e){} }
-function writeHash(){ try{ history.replaceState(null,'','#'+cur.hid); }catch(e){} }
-
-function matches(){ return q.trim()?ORDER.filter(l=>l.txt.includes(norm(q))):ORDER; }
+function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+function writeHash(){ try{ history.replaceState(null,'',scope&&scope.code?'#'+scope.code:location.pathname+location.search); }catch(e){} }
+const mset=()=>new Set(q.trim()?ORDER.filter(l=>l.txt.includes(norm(q))):ORDER);
+const has=(n,m)=>n.lessons.some(l=>m.has(l));
 
 /* ---------- render ---------- */
 function shell(){
@@ -306,77 +363,133 @@ function shell(){
       <datalist id="stds">${[...new Set(L.map(l=>l.standard).concat(Object.values(G).map(g=>g.standard)).filter(Boolean))].sort(cmp).map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
     </div>
     <div class="main">
-      <nav class="side" id="side" aria-label="단원별 차시 목록"></nav>
-      <div class="picker" id="picker"><div class="tabs" id="tabs" role="tablist" aria-label="단원"></div><div class="chiprow" id="chips" aria-label="차시"></div></div>
-      <section class="pane" id="pane" aria-live="polite"></section>
+      <nav class="side" id="side" aria-label="과목·단원 목차"></nav>
+      <section class="pane" id="pane">
+        <div class="ptop">
+          <div class="usel"><select id="unitSel" aria-label="과목·학년 › 단원 고르기"></select></div>
+          <nav class="crumb" id="crumb" aria-label="지금 고른 위치"></nav>
+          <div class="chiprow" id="chips" role="group" aria-label="좁혀 보기"></div>
+        </div>
+        <div id="view" aria-live="polite"></div>
+      </section>
       <footer class="foot"><a href="about.html">소개·출처 안내</a><span>교사 개인 제작 · 출판사와 관계없음</span><span>비영리 수업용</span></footer>
     </div></div>`;
 }
 
 function renderNav(){
-  const m=new Set(matches());
-  /* 왼쪽 목록: 단원 → 주제 → 차시 줄 */
-  let h='';
-  for(const u of UNITS){
-    const ls=u.lessons.filter(l=>m.has(l)); if(!ls.length) continue;
-    h+=`<div class="ugrp"><div class="uh"><span>${esc(unitShort(u))}</span>${esc(unitName(u.unit))}</div>`;
-    let topic=null;
-    for(const l of ls){
-      if(l.topic&&l.topic!==topic){ topic=l.topic; h+=`<div class="th2">${esc(l.topic)}</div>`; }
-      h+=`<button class="row" data-l="${l.key}" aria-current="${l===cur}"><span class="n">${esc(l.lesson)}</span><span class="t">${esc(l.lessonTitle)}</span></button>`;
-    }
-    h+='</div>';
-  }
-  if(!m.size) h=`<div class="nomatch">「${esc(q)}」에 맞는 차시가 없어요.</div>`;
-  const side=document.getElementById('side'); side.innerHTML=h;
-  /* 세로: 단원 탭 + 차시 칩 */
-  const units=UNITS.filter(u=>u.lessons.some(l=>m.has(l)));
-  const cu=(cur&&units.includes(cur.u))?cur.u:units[0];
-  document.getElementById('tabs').innerHTML=units.map(u=>`<button class="tab" role="tab" data-u="${u.i}" aria-selected="${u===cu}">${esc(unitShort(u))}<span class="un"> ${esc(unitName(u.unit))}</span></button>`).join('');
-  const chips=document.getElementById('chips');
-  chips.innerHTML=cu?cu.lessons.filter(l=>m.has(l)).map(l=>`<button class="chip" data-l="${l.key}" aria-current="${l===cur}">${esc(l.lesson)}차시</button>`).join(''):`<span class="nomatch">맞는 차시가 없어요.</span>`;
-  const f=document.getElementById('found'); if(f) f.textContent=q.trim()?`차시 ${m.size}개`:'';
-  /* 고른 줄이 보이게 (페이지는 움직이지 않음) */
-  const r=side.querySelector('.row[aria-current="true"]');
-  if(r&&side.clientHeight){ const top=r.offsetTop-side.offsetTop, b=top+r.offsetHeight; if(top<side.scrollTop+40||b>side.scrollTop+side.clientHeight) side.scrollTop=Math.max(0,top-side.clientHeight/3); }
-  const c=chips.querySelector('.chip[aria-current="true"]');
-  if(c&&chips.clientWidth){ const left=c.offsetLeft-chips.offsetLeft; if(left<chips.scrollLeft||left+c.offsetWidth>chips.scrollLeft+chips.clientWidth) chips.scrollLeft=Math.max(0,left-16); }
+  const m=mset(), searching=!!q.trim();
+  const isOpen=n=>searching||open.has(n.code);
+  const cur=n=>scope===n||(scope&&scope.lv==='l'&&scope.up===n);
+  /* 왼쪽 나무: ▸ 단추는 펼침/접힘, 이름은 그 아래 게임 모두 보기 */
+  const node=(n,depth)=>{
+    if(!has(n,m)) return '';
+    if(n.lv==='u') return `<div class="tr u" style="--d:${depth}"><button class="tl" data-sc="${esc(n.code)}" aria-current="${cur(n)}"><span class="n">${esc(n.label)}</span><span class="t">${esc(n.name)}${n.up.multiPub?` <small>${esc(n.publisher)}</small>`:''}</span><small class="c">${searching?`찾은 차시 ${n.lessons.filter(l=>m.has(l)).length}`:`게임 ${readyN(n.lessons)}`}</small></button></div>`;
+    const o=isOpen(n);
+    return `<div class="tr ${n.lv}" style="--d:${depth}"><button class="tx" data-node="${esc(n.code)}" aria-expanded="${o}" aria-label="${esc(n.label)} ${o?'접기':'펼치기'}"><span aria-hidden="true">▸</span></button><button class="tl" data-sc="${esc(n.code)}" aria-current="${cur(n)}"><span class="t">${esc(n.label)}</span><small class="c">게임 ${readyN(n.lessons)}</small></button></div>`
+      +(o?n.kids.map(k=>node(k,depth+1)).join(''):'');
+  };
+  const side=document.getElementById('side');
+  side.innerHTML=m.size?`<div class="tree">${ROOT.kids.map(s=>node(s,0)).join('')}</div>`:`<div class="nomatch">「${esc(q)}」에 맞는 차시가 없어요.</div>`;
+  /* 세로: 과목·학년 › 단원 고르기 */
+  let o=`<option value="">${searching?'찾은 차시 전체':'전체 과목'}</option>`;
+  for(const s of ROOT.kids){ if(!has(s,m)) continue;
+    o+=`<option value="${esc(s.code)}"${scope===s?' selected':''}>${esc(s.label)} 전체</option>`;
+    for(const g of s.kids){ if(!has(g,m)) continue;
+      o+=`<optgroup label="${esc(s.label+' · '+g.label)}"><option value="${esc(g.code)}"${scope===g?' selected':''}>${esc(s.label+' '+g.label)} 전체</option>`
+        +g.kids.filter(u=>has(u,m)).map(u=>`<option value="${esc(u.code)}"${scope===u||(scope&&scope.up===u)?' selected':''}>${esc(nodeName(u))}</option>`).join('')+'</optgroup>'; } }
+  document.getElementById('unitSel').innerHTML=o;
+  /* 빵부스러기 */
+  const p=scope?pathTo(scope):[];
+  document.getElementById('crumb').className='crumb lv-'+(scope?scope.lv:'all');
+  document.getElementById('crumb').innerHTML=(searching?`<span class="cq">찾기 「${esc(q)}」</span>`:'')+
+    (p.length?p.map((n,i)=>i===p.length-1?`<b aria-current="page">${esc(nodeName(n))}</b>`:`<button data-sc="${esc(n.code)}">${esc(n.lv==='u'?n.label:nodeName(n))}</button>`).join('<span class="sep" aria-hidden="true">›</span>'):`<b>${searching?'찾은 차시 전체':'전체'}</b>`);
+  /* 좁혀 보기 칩: 단원·차시를 고르면 [전체]+차시, 학년이면 [전체]+단원, 과목이면 [전체]+학년(학년이 하나면 단원) */
+  let root=scope?(scope.lv==='l'?scope.up:scope):ROOT;
+  let kids=root.kids;
+  if(root.lv==='s'&&kids.length===1) kids=kids[0].kids;
+  if(root===ROOT&&kids.length===1){ kids=kids[0].kids; if(kids.length===1) kids=kids[0].kids; }
+  let c=`<button class="chip all" data-sc="${esc(root.code)}" aria-current="${scope===root||(!scope&&root===ROOT)}">전체</button>`, topic=null;
+  for(const k of kids){ if(!has(k,m)) continue;
+    if(k.lv==='l'&&k.l.topic&&k.l.topic!==topic){ topic=k.l.topic; c+=`<span class="tlab" title="${esc(topic)}">${esc(topic)}</span>`; }
+    c+=`<button class="chip" data-sc="${esc(k.code)}" aria-current="${scope===k}">${esc(k.lv==='u'?nodeName(k):k.label)}</button>`; }
+  const chips=document.getElementById('chips'); chips.innerHTML=c;
+  const f=document.getElementById('found'); if(f) f.textContent=searching?`차시 ${m.size}개`:'';
+  /* 고른 줄·칩이 보이게 (페이지는 움직이지 않음) */
+  const r=side.querySelector('.tl[aria-current="true"]');
+  if(r&&side.clientHeight){ const top=r.offsetTop-side.offsetTop, b=top+r.offsetHeight; if(top<side.scrollTop||b>side.scrollTop+side.clientHeight) side.scrollTop=Math.max(0,top-side.clientHeight/3); }
+  const ch=chips.querySelector('.chip[aria-current="true"]');
+  if(ch&&chips.clientWidth){ const left=ch.offsetLeft-chips.offsetLeft; if(left<chips.scrollLeft||left+ch.offsetWidth>chips.scrollLeft+chips.clientWidth) chips.scrollLeft=Math.max(0,left-60); }
 }
 
+const tags=g=>{ const t=TYPE[g.type]||TYPE.A, v=VER[g.verified], ready=g.status==='ready';
+  return `<span class="pill ${t[0]}">${t[1]}</span>${ready?(v?`<span class="pill ${v[0]}">${v[1]}</span>`:'<span class="pill no-check">점검 전</span>'):'<span class="pill">준비 중</span>'}`; };
+const likeBtn=(g,cls)=>S.gc?`<button class="btn alt like ${cls||''}" data-act="like" data-id="${esc(g.id)}" aria-pressed="${liked(g.id)}" aria-label="좋아요">👍 <span data-lk="${esc(g.id)}">${likeN[g.id]==null?'':esc(likeN[g.id])}</span></button>`:'';
+const discussBtn=g=>(g.discuss||S.discuss)?`<a class="btn alt" href="${esc(g.discuss||S.discuss)}" target="_blank" rel="noopener">💬 의견 남기기</a>`:'';
+const thumb=(g,ready)=>g.img?(ready?`<a class="th" href="${esc(g.file)}" target="_blank" rel="noopener" tabindex="-1">`:'<div class="th">')+`<img src="${esc(g.img)}" width="480" height="230" loading="lazy" decoding="async" alt="${esc(g.game+' 게임 화면: '+(g.desc||''))}">`+(ready?'</a>':'</div>'):'';
+
+/* 큰 카드: 차시 하나만 골랐을 때 */
 function gameCard(g,l){
   const ready=g.status==='ready';
-  const t=TYPE[g.type]||TYPE.A, v=VER[g.verified];
   return `<article class="card ${ready?'':'soon'}">
-    ${g.img?(ready?`<a class="th" href="${esc(g.file)}" target="_blank" rel="noopener" tabindex="-1">`:'<div class="th">')+`<img src="${esc(g.img)}" width="480" height="230" decoding="async" alt="${esc(g.game+' 게임 화면: '+(g.desc||''))}">`+(ready?'</a>':'</div>'):''}
-    <div class="tags"><span class="pill ${t[0]}">${t[1]}</span>${ready?(v?`<span class="pill ${v[0]}">${v[1]}</span>`:'<span class="pill no-check">점검 전</span>'):'<span class="pill">준비 중</span>'}</div>
+    ${thumb(g,ready)}
+    <div class="tags">${tags(g)}</div>
     <h2>${esc(g.game)}</h2>
     ${g.desc?`<p title="${esc(g.desc)}">${esc(g.desc)}</p>`:''}
     ${ready?`<div class="acts">
       <a class="btn go" href="${esc(g.file)}" target="_blank" rel="noopener">▶ 열기</a>
       <button class="btn alt" data-act="qr" data-id="${esc(g.id)}" data-l="${esc(l.key)}">▦ QR</button>
       <button class="btn alt" data-act="copy" data-id="${esc(g.id)}">🔗 링크 복사</button>
-      ${S.gc?`<button class="btn alt like" data-act="like" data-id="${esc(g.id)}" aria-pressed="${liked(g.id)}" aria-label="좋아요">👍 <span data-lk="${esc(g.id)}">${likeN[g.id]==null?'':esc(likeN[g.id])}</span></button>`:''}
-      ${(g.discuss||S.discuss)?`<a class="btn alt" href="${esc(g.discuss||S.discuss)}" target="_blank" rel="noopener">💬 의견 남기기</a>`:''}</div>`:''}
+      ${likeBtn(g)}${discussBtn(g)}</div>`:''}
     ${(g.standard||g.credit)?`<div class="fine">${g.standard?`<span>성취기준 ${esc(g.standard)}</span>`:''}${g.credit?`<span>${esc(g.credit)}</span>`:''}</div>`:''}
   </article>`;
 }
-function renderPane(){
-  const pane=document.getElementById('pane'), l=cur;
-  if(!l){ pane.innerHTML='<div class="empty">아직 올라온 게임이 없어요.</div>'; return; }
-  const gs=lessonGames(l);
-  pane.innerHTML=`<div class="ph">
-      <div class="meta">${esc(gradeLabel(l.grade))} ${esc(l.subject)} · ${esc(unitShort(l.u))} ${esc(unitName(l.unit))}${l.topic?' › '+esc(l.topic):''}${l.pages?' · 교과서 '+esc(l.pages):''}${l.standard?' · '+esc(l.standard):''}</div>
-      <h1><span class="ln">${esc(l.lesson)}차시</span>${esc(l.lessonTitle)}</h1>
-      ${l.page?`<a class="chipbtn ghost" href="${esc(l.page)}">차시 안내 →</a>`:''}
-    </div>
-    ${gs.length?`<div class="games ${gs.length===1?'one':'two'}">${gs.map(g=>gameCard(g,l)).join('')}</div>`:'<div class="empty">이 차시 게임은 준비 중이에요.</div>'}`;
+/* 작은 카드: 과목·학년·단원 격자 */
+function miniCard(g,l){
+  const ready=g.status==='ready', t=TYPE[g.type]||TYPE.A;
+  return `<article class="mc ${ready?'':'soon'}">
+    ${thumb(g,ready)}
+    <div class="mtag"><span class="pill ${t[0]}">${g.type==='B'?'B 연습':'A 체험'}</span>${g.desc?`<button class="ib" data-act="desc" aria-expanded="false" aria-label="${esc(g.game)} 설명 보기">ⓘ</button>`:''}</div>
+    ${ready?`<a class="nm" href="${esc(g.file)}" target="_blank" rel="noopener">${esc(g.game)}</a>`:`<span class="nm">${esc(g.game)}</span>`}
+    ${g.desc?`<p class="ds" hidden>${esc(g.desc)}</p>`:''}
+    ${ready?`<a class="btn go" href="${esc(g.file)}" target="_blank" rel="noopener">▶ 열기</a>
+    <div class="mini"><button class="btn alt" data-act="qr" data-id="${esc(g.id)}" data-l="${esc(l.key)}" aria-label="${esc(g.game)} QR">▦<span class="lb2"> QR</span></button><button class="btn alt" data-act="copy" data-id="${esc(g.id)}" aria-label="${esc(g.game)} 링크 복사">🔗<span class="lb2"> 복사</span></button>${likeBtn(g)}</div>`:'<span class="pill">준비 중</span>'}
+  </article>`;
 }
-function select(l,opts){
-  if(!l) return;
-  cur=l; writeHash(); if(!(opts&&opts.quiet)) remember(l);
-  renderNav(); renderPane();
+function renderView(){
+  const box=document.getElementById('view'), m=mset();
+  if(scope&&scope.lv==='l'){
+    const l=scope.l, gs=lessonGames(l);
+    box.innerHTML=`<div class="ph">
+        <div class="meta">${l.topic?esc(l.topic):''}${l.pages?' · 교과서 '+esc(l.pages):''}${l.standard?' · '+esc(l.standard):''}</div>
+        ${l.page?`<a class="chipbtn ghost" href="${esc(l.page)}">차시 안내 →</a>`:''}
+      </div>
+      ${gs.length?`<div class="games ${gs.length===1?'one':'two'}">${gs.map(g=>gameCard(g,l)).join('')}</div>`:'<div class="empty">이 차시 게임은 준비 중이에요.</div>'}`;
+    return;
+  }
+  const ls=(scope||ROOT).lessons.filter(l=>m.has(l));
+  if(!ls.length){ box.innerHTML=`<div class="empty">${q.trim()?'맞는 차시가 없어요. 다른 낱말로 찾아 보세요.':'아직 올라온 게임이 없어요.'}</div>`; return; }
+  const wide=!scope||scope.lv!=='u'; /* 단원보다 넓게 고르면 단원 머리도 */
+  let h='<div class="grid">', u=null, g=null;
+  for(const l of ls){
+    if(wide&&(!scope||scope.lv==='all'||scope.lv==='s')&&l.u.up!==g){ g=l.u.up; if(new Set(ls.map(x=>x.u.up)).size>1) h+=`<h2 class="gh">${esc(g.up.label)} ${esc(g.label)}</h2>`; }
+    if(wide&&l.u!==u){ u=l.u; h+=`<h2 class="uh2"><button data-sc="${esc(u.code)}">${esc(nodeName(u))}</button></h2>`; }
+    const gs=lessonGames(l), k=Math.max(1,Math.min(gs.length,2));
+    h+=`<section class="lg" style="--k:${k}" aria-label="${esc(l.lesson)}차시 ${esc(l.lessonTitle)}">
+      <div class="lh"><button data-sc="${esc(l.hid)}" title="${esc(l.lesson)}차시 ${esc(l.lessonTitle)}"><b>${esc(l.lesson)}차시</b> ${esc(l.lessonTitle)}</button>${l.page?`<a href="${esc(l.page)}" aria-label="${esc(l.lesson)}차시 안내">안내</a>`:''}</div>
+      ${gs.length?gs.map(g=>miniCard(g,l)).join(''):'<div class="empty">준비 중</div>'}</section>`;
+  }
+  box.innerHTML=h+'</div>';
+}
+function setScope(n,opts){
+  if(!n) return;
+  const p=pathTo(n);
+  scope=n; writeHash(); if(!(opts&&opts.quiet)) store('lastScope',n.code);
+  /* 지금 고른 곳까지 가는 가지만 펼침 */
+  open=new Set(p.filter(x=>x.lv==='s'||x.lv==='g').map(x=>x.code));
+  if(n.lv==='s') n.kids.forEach(g=>open.add(g.code)); /* 과목을 고르면 학년 가지까지 펼쳐 단원이 보이게 */
+  renderNav(); renderView();
   const pane=document.getElementById('pane'); if(pane) pane.scrollTop=0;
-  try{ document.title=`${l.lesson}차시 ${l.lessonTitle} · ${S.title||''}`; }catch(e){}
+  try{ document.title=`${nodeName(n)} · ${S.title||''}`; }catch(e){}
 }
 
 /* ---------- QR & copy ---------- */
@@ -443,21 +556,23 @@ function like(id,btn){
   setLk(id,String((+likeN[id]||0)+1)); btn.setAttribute('aria-pressed','true'); toast('좋아요를 보냈어요');
 }
 /* count which games teachers open (anonymous event) */
-app.addEventListener('click',e=>{ const a=e.target.closest('a.btn[href^="games/"],a.th[href^="games/"]'); if(!a||!S.gc) return;
+app.addEventListener('click',e=>{ const a=e.target.closest('a.btn[href^="games/"],a.th[href^="games/"],a.nm[href^="games/"]'); if(!a||!S.gc) return;
   try{ window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:'open-'+a.getAttribute('href').replace(/^games\/|\.html$/g,''), title:'게임 열기', event:true}); }catch(e){} });
 /* ---------- events ---------- */
-function setFind(open){
-  searchOpen=open; const fb=document.getElementById('findbar'), btn=app.querySelector('[data-act="find"]'), i=document.getElementById('q');
-  fb.hidden=!open; btn.setAttribute('aria-expanded',String(open));
-  if(open) i.focus(); else if(q){ q=''; i.value=''; renderNav(); }
+function setFind(on){
+  searchOpen=on; const fb=document.getElementById('findbar'), btn=app.querySelector('[data-act="find"]'), i=document.getElementById('q');
+  fb.hidden=!on; btn.setAttribute('aria-expanded',String(on));
+  if(on){ beforeFind=scope; i.focus(); }
+  else if(q){ q=''; i.value=''; setScope(beforeFind||scope||ROOT.kids[0],{quiet:true}); }
 }
 app.addEventListener('click',e=>{
-  const r=e.target.closest('[data-l]:not([data-act])');
-  if(r){ const l=L[+r.dataset.l]; if(l&&l!==cur) select(l); return; }
-  const t=e.target.closest('.tab[data-u]');
-  if(t){ const u=UNITS[+t.dataset.u], m=new Set(matches()); const l=(cur&&cur.u===u)?cur:u.lessons.find(x=>m.has(x)); if(l) select(l); return; }
+  const n=e.target.closest('[data-node]');
+  if(n){ if(q.trim()) return; const k=n.dataset.node; open.has(k)?open.delete(k):open.add(k); return renderNav(); }
+  const s=e.target.closest('[data-sc]');
+  if(s){ const node=s.dataset.sc===''?ROOT:NODES.get(s.dataset.sc); if(node&&node.lv!=='all'){ if(node===scope&&node.lv!=='l'&&node.lv!=='u'){ open.has(node.code)?open.delete(node.code):open.add(node.code); return renderNav(); } setScope(node); } else if(node===ROOT){ scope=null; writeHash(); renderNav(); renderView(); } return; }
   const b=e.target.closest('[data-act]'); if(!b) return;
   const a=b.dataset.act, g=G[b.dataset.id];
+  if(a==='desc'){ const d=b.closest('.mc').querySelector('.ds'); if(d){ d.hidden=!d.hidden; b.setAttribute('aria-expanded',String(!d.hidden)); } return; }
   if(a==='qr'&&g){ const l=L[+b.dataset.l]||{}; return showQR(g.game,`${gradeLabel(l.grade)} · ${l.lesson}차시 · ${l.lessonTitle||''}`,gameUrl(g),g.id); }
   if(a==='copy'&&g) return copy(gameUrl(g));
   if(a==='like'&&g) return like(g.id,b);
@@ -465,14 +580,15 @@ app.addEventListener('click',e=>{
   if(a==='find') return setFind(!searchOpen);
   if(a==='closefind') return setFind(false);
 });
+app.addEventListener('change',e=>{ if(e.target.id!=='unitSel') return; const v=e.target.value; if(!v){ scope=null; writeHash(); renderNav(); renderView(); } else setScope(NODES.get(v)); });
 let tmr;
 app.addEventListener('input',e=>{ if(e.target.id!=='q') return; q=e.target.value; clearTimeout(tmr); tmr=setTimeout(()=>{
-  const m=matches(); if(m.length&&!m.includes(cur)) select(m[0],{quiet:true}); else renderNav(); },150); });
+  const m=mset(); if(q.trim()){ scope=null; writeHash(); open=new Set(); } else if(!scope) scope=beforeFind; renderNav(); renderView(); if(!q.trim()) writeHash(); },150); });
 app.addEventListener('keydown',e=>{ if(e.target.id==='q'&&e.key==='Escape') setFind(false); });
-addEventListener('hashchange',()=>{ const l=fromHash(); if(l&&l!==cur) select(l); });
+addEventListener('hashchange',()=>{ const n=fromHash(); if(n&&n!==scope) setScope(n); });
 
 shell();
-select(fromHash()||remembered()||ORDER[0],{quiet:!fromHash()});
+{ const h=fromHash(); setScope(h||NODES.get(store('lastScope')||'')||(ORDER[0]&&ORDER[0].u),{quiet:!h}); if(!ORDER.length){ renderNav(); renderView(); } }
 try{ document.documentElement.classList.add('js-ok'); }catch(e){}
 loadLikes();
 addEventListener('resize',()=>{ clearTimeout(window.__rz); window.__rz=setTimeout(renderNav,200); });
