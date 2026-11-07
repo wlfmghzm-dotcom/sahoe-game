@@ -411,10 +411,67 @@ var NAMES = {
 };
 var TITLES = [[0,'새내기 사장'],[560,'공장 사장'],[660,'믿음직한 사장'],[710,'착한 공장 사장']];   /* full 제안 0/600/720/730(성실 분포가 720~724로 좁음) → 느린 학생 p1(574) 위, 무작위 p90(636) 위, 맨 위는 사람 속도만큼 낮춤. 강에 버린 판(약 614)은 위 두 칭호에 못 닿음 */
 
+/* §19 추론형 도전(2026-11-07, GAME.challenge.kind='reason').
+   한 줄 설계: "하루마다 손님 말풍선(무엇을 원하나)과 두 재료 상자 아래 동전(재료값)을 보고 이윤이 큰 재료를 기계에 넣고, 나온 폐수 통은 처리장으로 — 그 레벨의 날을 모두 바르게 꾸리면 통과".
+   일반 판에서 해 본 동작만: 재료 상자 → 기계(1·2단계), 폐수 통 → 강/처리장(3단계). 단계 rule = 'waste'. 시간 막대·빠르기 점수·콤보 없음(손님은 기다린다).
+   판 돈은 손님 한 명에 동전 1개(CH.sale) — 그래야 '많이 원함'과 '싼 재료'가 서로 맞설 수 있다(2개면 손님 1명 차이가 재료값 차이 2를 늘 이김). 이윤 = 사는 손님 수 − 재료 동전 수(교과서 73쪽 '적은 비용으로 큰 이윤').
+   레벨이 올리는 것 = 함께 따질 개념 요소:
+     1 수요 + 책임: 두 재료값이 같다 → 많이 원하는 것, 폐수는 처리장(강은 지금 공짜지만 물고기·손님을 잃음, 74~75쪽)
+     2 + 비용: 재료값이 다르다(손님 3) — 수요·비용을 함께   3 손님 3~5, 값이 같은 날·다른 날 섞임   4 손님 5, 함정 둘씩
+     5 함정 셋씩, 이윤 차이 2 이하   6 이윤 차이가 늘 1(가장 촘촘), 날 수 늘림
+   함정(반쪽만 알면 틀림): 레벨 1부터 폐수(돈만 보면 강), 레벨 2부터 판마다 '많이 원하는 것만 보면' 틀리는 날과 '싼 것만 보면' 틀리는 날이 적어도 하나씩
+   (손님 1명 차이를 재료값 차이 2가 뒤집으려면 손님 수가 홀수여야 해서 3·5명).
+   점수: 하루(재료·폐수 두 판단)를 모두 바르게 하면 10. 틀린 판단·힌트로 둔 수가 있는 날은 0. 목표 = 10 × 날 수(한 번이라도 틀리면 못 넘음). 판마다 시드로 새 손님·재료값 */
+var CH = { pts:10, maxLv:6, sale:1, coins0:8, cap:40,
+  days:  [0, 8,9,10,11,12,13],
+  nc:    [0, [3,3],[3,3],[3,5],[5,5],[5,5],[5,5]],      /* 손님 수(최소, 최대) */
+  gmax:  [0, 9,9,9,9,2,1],                              /* 두 재료 이윤 차이의 최대(6은 늘 1 차이) */
+  eq:    [0, 1,0,2,2,2,2],                              /* 1 = 두 재료값 같음(수요만), 0 = 늘 다름, 2 = 섞임 */
+  traps: [0, 0,1,1,2,3,3] };                            /* 반쪽 봇 함정 날 수(각각) */
+var CH_PARTIALS = ['많이 원하는 것만 봄(재료값을 안 봄)', '싼 재료만 봄(손님을 안 셈)', '지금 돈만 봄(폐수를 강에)'];
+function chLv(lv){ lv=Math.max(1,Math.min(CH.maxLv,lv||1)); return {lv:lv, D:CH.days[lv], nc:CH.nc[lv], gmax:CH.gmax[lv], eq:CH.eq[lv], traps:CH.traps[lv]}; }
+function chStages(lv){ return [{key:'c1', name:'이윤도, 책임도', rule:'waste', ch:true, P:chLv(lv), seed:CH.coins0, cap:CH.cap, goal:0}]; }
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+function chGoal(lv){ return CH.pts*chLv(lv).D; }
+function stOf(G,si){ var i=si==null?G.si:si; return G && G.ch ? chStages(G.ch)[i] : STAGES[i]; }
+function nStages(G){ return G && G.ch ? 1 : STAGES.length; }
+function rnd(G){ var s=(G.rs+0x6D2B79F5)>>>0; G.rs=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
+/* 한 날의 판단: 이윤 = 사는 손님 − 재료값. mode 0 완벽, 1 수요만(같으면 싼 것), 2 값만(같으면 많이 원하는 것) */
+function profit(w,pr,k){ return sales(w,k)*CH.sale - pr[k==='b'?0:1]; }
+function chPick(w,pr,mode){
+  var nb=sales(w,'b'), nd=sales(w,'d'), pb=pr[0], pd=pr[1];
+  if(mode===1) return nb!==nd ? (nb>nd?'b':'d') : (pb<=pd?'b':'d');
+  if(mode===2) return pb!==pd ? (pb<pd?'b':'d') : (nb>=nd?'b':'d');
+  return profit(w,pr,'b')>=profit(w,pr,'d') ? 'b' : 'd';
+}
+/* 날 하나: 조건에 맞는 (손님 수, 공 원하는 수, 두 재료값)을 모두 늘어놓고 시드로 하나 고른다. kind 'any' | 't1'(수요만 보면 틀림) | 't2'(값만 보면 틀림) */
+function chDay(G,P,kind){
+  var C=[], n, nb, pb, pd;
+  for(n=P.nc[0];n<=P.nc[1];n++) for(nb=0;nb<=n;nb++) for(pb=1;pb<=3;pb++) for(pd=1;pd<=3;pd++){
+    if(nb*2===n) continue;
+    if(P.eq===1 ? (pb!==pd || pb>2) : P.eq===0 ? pb===pd : false) continue;
+    var w=[], i; for(i=0;i<n;i++) w.push(i<nb?'b':'d');
+    var pr=[pb,pd], g=Math.abs(profit(w,pr,'b')-profit(w,pr,'d'));
+    if(g<1 || g>P.gmax) continue;
+    var best=chPick(w,pr,0), a=chPick(w,pr,1)!==best, b=chPick(w,pr,2)!==best;
+    if(kind==='t1' ? !a : kind==='t2' ? !b : (P.traps && (a||b))) continue;   /* 함정은 정한 수만큼만(나머지 날은 많이 원하는 것이 싸거나 값이 같음) */
+    C.push({w:w, pr:pr});
+  }
+  var d=cl(C[Math.floor(rnd(G)*C.length)]), w2=d.w;
+  for(var k=w2.length-1;k>0;k--){ var j=Math.floor(rnd(G)*(k+1)), x=w2[k]; w2[k]=w2[j]; w2[j]=x; }
+  return d;
+}
+function chMake(G,P){
+  var kinds=[], i; for(i=0;i<P.traps;i++){ kinds.push('t1'); kinds.push('t2'); }
+  while(kinds.length<P.D) kinds.push('any');
+  for(i=kinds.length-1;i>0;i--){ var j=Math.floor(rnd(G)*(i+1)), x=kinds[i]; kinds[i]=kinds[j]; kinds[j]=x; }
+  return kinds.map(function(k){ return chDay(G,P,k); });
+}
+
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
-function nRounds(S){ return S.rounds ? S.rounds.length : S.nr; }
+function firstName(G,ev,k,at){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function nRounds(S,G){ return (G && G.ch) ? G.chR.length : S.rounds ? S.rounds.length : S.nr; }
 
 /* ---- 비교 카드용 계산(같은 손님 순서, 선택만 다르게) ---- */
 function sales(wants,k){ return wants.filter(function(x){ return x===k; }).length; }
@@ -431,22 +488,24 @@ function cfStage(si){
 }
 
 /* ---- 단계·판 ---- */
-function custN(G){ var S=STAGES[G.si]; return S.rounds ? S.rounds[G.r].length : G.trust; }
+function chWants(G){ var w=G.chR[G.r].w; return w.slice(0, Math.max(1, w.length-(G.cut||0))); }   /* 강에 버린 만큼 손님이 덜 온다(일반 판 3단계와 같은 결과) */
+function custN(G){ if(G.ch) return chWants(G).length; var S=STAGES[G.si]; return S.rounds ? S.rounds[G.r].length : G.trust; }
 function startRound(G,ev){
-  var S=STAGES[G.si];
-  G.rt=G.t; G.st='come'; G.made=null; G.out=[]; G.barrel=false; G.crate=null;
-  var wants=S.rounds ? S.rounds[G.r] : null, n=custN(G);
+  var S=stOf(G);
+  G.rt=G.t; G.st='come'; G.made=null; G.out=[]; G.barrel=false; G.crate=null; G.dayBad=0;
+  var wants=G.ch ? chWants(G) : S.rounds ? S.rounds[G.r] : null, n=custN(G);
   G.cust=[]; for(var i=0;i<n;i++) G.cust.push({i:i, want:wants?wants[i]:'x', st:'in', t0:G.t+0.12*i});
   if(S.rule==='tree' && G.lastN!=null && n>G.lastN) firstName(G,ev,'come','queue');
   G.lastN=n;
-  if(S.price) G.price=S.price[G.r].slice();
+  if(G.ch) G.price=G.chR[G.r].pr.slice(); else if(S.price) G.price=S.price[G.r].slice();
   ev.push({t:'round', r:G.r});
 }
 function startStage(G0,si){
-  var G=cl(G0), S=STAGES[si];
+  var G=cl(G0), S=stOf(G0,si);
   G.si=si; G.phase='play'; G.t=0; G.combo=0; G.lastOk=-99; G.r=0; G.coins=S.seed; G.coinLog=[]; G.trust=S.trust||3; G.fish=5; G.dirty=[]; G.trees=[]; G.seedlings=S.spots||0;
-  G.endAt=null; G.lastN=null; G.cf=cfStage(si); G.sel={good:0, bad:0}; G.leftover=0; G.leave=[];
-  G.res={total:nRounds(S), served:0, missed:0};
+  G.endAt=null; G.lastN=null; G.cf=G.ch ? null : cfStage(si); G.sel={good:0, bad:0}; G.leftover=0; G.leave=[]; G.cut=0; G.verd=[];
+  if(G.ch){ G.rs=(G.seed^0x5A4C)>>>0; G.chR=chMake(G,S.P); }   /* 도전: 판마다 시드로 새 손님·재료값 */
+  G.res={total:nRounds(S,G), served:0, missed:0};
   var ev=[]; startRound(G,ev); G.pend=ev;
   return G;
 }
@@ -460,31 +519,33 @@ function start(G){ var g=cl(G); g.score=0; g.t=0; return startStage(g,0); }
 
 function addCoins(G,n,from){ G.coins=Math.max(0,G.coins+n); G.coinLog.push({t:G.t, n:n, from:from}); if(G.coinLog.length>40) G.coinLog.shift(); }
 function sell(G,ev){
-  var S=STAGES[G.si], k=G.made, sold=0;
+  var S=stOf(G), k=G.made, sold=0;
   G.cust.forEach(function(c){ var ok=(k==='x'||c.want===k); c.st=ok?'buy':'sad'; c.t0=G.t+0.15*c.i; if(ok) sold++; });
   G.sold=sold; var lo=G.cust.length-sold; G.leftover+=lo;
-  if(sold){ addCoins(G,sold*T.price,'cust'); G.score+=sold*T.coinPts*T.price; G.stats.coins+=sold*T.price; ev.push({t:'sold', n:sold, pts:sold*T.coinPts*T.price}); firstName(G,ev,'profit','jar'); }
+  if(sold && G.ch){ addCoins(G,sold*CH.sale,'cust'); G.stats.coins+=sold*CH.sale; ev.push({t:'sold', n:sold, pts:0}); }   /* 도전: 점수는 하루 판단으로만 */
+  else if(sold){ addCoins(G,sold*T.price,'cust'); G.score+=sold*T.coinPts*T.price; G.stats.coins+=sold*T.price; ev.push({t:'sold', n:sold, pts:sold*T.coinPts*T.price}); firstName(G,ev,'profit','jar'); }
   if(lo && G.si===0) firstName(G,ev,'left','shopwin');
-  if(G.si===0){ if(lo>sold) G.res.missed++; else G.res.served++; }
+  if(G.ch){ }
+  else if(G.si===0){ if(lo>sold) G.res.missed++; else G.res.served++; }
   else if(G.si===1){ G.res.served++; }
 }
 function endStage(G,ev){
-  var S=STAGES[G.si];
+  var S=stOf(G);
   G.rec[G.si]={coins:G.coins, cap:S.cap, goal:S.goal, fish:G.fish, cust:G.trust, trees:G.trees.length, cf:G.cf};
-  G.phase='stageEnd'; award(G,ev,['free','cost','resp','grow'][G.si]); ev.push({t:'stageEnd', si:G.si});
+  G.phase='stageEnd'; if(!G.ch) award(G,ev,['free','cost','resp','grow'][G.si]); ev.push({t:'stageEnd', si:G.si});
 }
 function nextRound(G,ev){
   G.r++;
-  if(G.r>=nRounds(STAGES[G.si])){ G.st='done'; G.endAt=G.t+1.4; return; }
+  if(G.r>=nRounds(stOf(G),G)){ G.st='done'; G.endAt=G.t+1.4; return; }
   startRound(G,ev);
 }
 function tick(G0,dt){
   var G=cl(G0), ev=G.pend||[]; G.pend=[];
   if(G.phase!=='play') return {G:G, ev:ev};
-  var S=STAGES[G.si];
+  var S=stOf(G);
   G.t+=dt;
   if(G.endAt!=null){ if(G.t>=G.endAt) endStage(G,ev); return {G:G, ev:ev}; }
-  if(G.st==='come' && G.t-G.rt>=T.walk){ G.st=(S.rule==='make'||S.rule==='cost')?'wait':'make'; G.mt=G.t; if(G.st==='make') G.made='x'; }
+  if(G.st==='come' && G.t-G.rt>=T.walk){ G.st=(S.rule==='make'||S.rule==='cost'||G.ch)?'wait':'make'; G.mt=G.t; if(G.st==='make') G.made='x'; }
   if(G.st==='make' && G.t-G.mt>=T.make){ G.st='sell'; G.mt=G.t; sell(G,ev); }
   if(G.st==='sell' && G.t-G.mt>=T.sell){
     if(S.rule==='waste'){ G.st='barrel'; G.barrel=true; G.mt=G.t; ev.push({t:'barrel'}); }
@@ -493,11 +554,12 @@ function tick(G0,dt){
   if(G.st==='gap' && G.t-G.mt>=T.gap) nextRound(G,ev);
   G.coinLog=G.coinLog.filter(function(c){ return G.t-c.t<1.6; });
   G.leave=G.leave.filter(function(c){ return G.t-c.t<1.6; });
+  if(G.verd) G.verd=G.verd.filter(function(v){ return G.t-v.t<1.8; });
   return {G:G, ev:ev};
 }
 /* 놓을 수 있는가 */
 function canDrop(G,src,dst){
-  var S=STAGES[G.si], sp=String(src).split(':'), dp=String(dst).split(':');
+  var S=stOf(G), sp=String(src).split(':'), dp=String(dst).split(':');
   if(sp[0]==='crate'){ if(G.st!=='wait'||!G.cust.length) return 'notYet'; if(dst!=='mach') return 'dst'; return null; }
   if(sp[0]==='barrel'){ if(!G.barrel) return 'src'; if(dst==='river'||dst==='plant') return null; return 'dst'; }
   if(sp[0]==='sap'){ if(G.seedlings<=0) return 'src'; if(dp[0]!=='spot') return 'dst'; if(G.trees.indexOf(+dp[1])>=0) return 'spotFull'; return null; }
@@ -509,7 +571,8 @@ function drop(G0,src,dst,via){
   if(!G0 || G0.phase!=='play' || G0.endAt!=null) return fail('phase');
   if(sources(G0).indexOf(src)<0) return fail('src');
   var why=canDrop(G0,src,dst); if(why) return fail(why);
-  var G=cl(G0), ev=[], S=STAGES[G.si], sp=String(src).split(':'), good=false, at=dst;
+  var G=cl(G0), ev=[], S=stOf(G), sp=String(src).split(':'), good=false, at=dst;
+  if(G.ch) return chDrop(G,ev,sp,dst,via);
   if(sp[0]==='crate'){
     var k, cost=0;
     if(S.rule==='make'){ k=sp[1]; good=sales(G.cust.map(function(c){ return c.want; }),k)*2>=G.cust.length; }
@@ -530,35 +593,70 @@ function drop(G0,src,dst,via){
   G.score+=pts; ev.push({t:'put', dst:at, pts:pts, combo:via?0:G.combo, good:good});
   return {G:G, ok:true, ev:ev};
 }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+/* 도전 판의 놓기: 점수는 하루가 끝날 때(폐수까지) 두 판단이 모두 맞고 힌트를 쓰지 않았으면 10.
+   틀린 판단은 놓은 자리에 곧바로 판정(verd → 장면이 빨간 가위표, data-verdict="bad")하고 그날을 놓침으로 센다 */
+function chBad(G,ev,at){ if(!G.dayBad){ G.dayBad=1; G.res.missed++; } G.verd.push({at:at, t:G.t}); ev.push({t:'wrong', at:at}); }
+function chDrop(G,ev,sp,dst,via){
+  if(via) G.dayHelp=1;
+  if(sp[0]==='crate'){
+    var k=sp[1], i=k==='b'?0:1, cost=G.price[i], w=G.cust.map(function(c){ return c.want; }), o=k==='b'?'d':'b';
+    var good=profit(w,G.price,k)>=profit(w,G.price,o);
+    addCoins(G,-cost,'crate:'+i); G.made=k; G.crate='crate:'+k; G.st='make'; G.mt=G.t;
+    ev.push({t:'make', k:k, cost:cost}); ev.push({t:'put', dst:'mach', pts:0, combo:0, good:good});
+    if(!good) chBad(G,ev,'mach');
+    return {G:G, ok:true, ev:ev};
+  }
+  G.barrel=false; G.st='gap'; G.mt=G.t;
+  if(dst==='river'){ G.dirty.push(G.t); G.fish=Math.max(0,G.fish-1); G.cut=(G.cut||0)+1; G.stats.river++; G.leave.push({t:G.t}); ev.push({t:'river'}); ev.push({t:'put', dst:'river', pts:0, combo:0, good:false}); chBad(G,ev,'river'); }
+  else { addCoins(G,-1,'plant'); G.stats.plant++; ev.push({t:'plant'}); }
+  var ok=!G.dayBad && !G.dayHelp, pts=ok?CH.pts:0;
+  if(ok){ G.score+=pts; G.res.served++; G.stats.good++; }
+  else if(!G.dayBad){ G.res.missed++; }   /* 힌트로 둔 날: 판정은 맞지만 점수 없음(회색 날) */
+  G.dayHelp=0;
+  ev.push({t:'day', ok:ok, pts:pts, at:dst});
+  if(dst==='plant') ev.push({t:'put', dst:'plant', pts:0, combo:0, good:true});
+  return {G:G, ok:true, ev:ev};
+}
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 /* 지금 할 만한 한 수: 많이 원하는 재료 / 싼 재료 / 처리장 / 빈자리에 나무 */
 function hintMove(G){
-  if(!G || G.phase!=='play' || G.endAt!=null) return null; var S=STAGES[G.si];
+  if(!G || G.phase!=='play' || G.endAt!=null) return null; var S=stOf(G);
+  if(G.ch){ if(G.st==='wait'&&G.cust.length) return {src:'crate:'+chPick(G.cust.map(function(c){ return c.want; }),G.price,0), dst:'mach'}; if(G.barrel) return {src:'barrel', dst:'plant'}; return null; }
   if(S.rule==='make' && G.st==='wait') return {src:'crate:'+major(G.cust.map(function(c){ return c.want; })), dst:'mach'};
   if(S.rule==='cost' && G.st==='wait') return {src:'crate:'+(G.price[0]<=G.price[1]?0:1), dst:'mach'};
   if(G.barrel) return {src:'barrel', dst:'plant'};
   if(S.rule==='tree' && G.seedlings>0){ for(var k=0;k<S.spots;k++) if(G.trees.indexOf(k)<0) return {src:'sap', dst:'spot:'+k}; }
   return null;
 }
+/* §19 추론형 측정: k번째 '반쪽만 아는 봇' — 0 수요만, 1 값만, 2 이윤은 맞게 고르지만 폐수를 강에(지금 돈만) */
+function partialMove(G,k){
+  if(!G || !G.ch || G.phase!=='play' || G.endAt!=null) return null;
+  if(G.st==='wait'&&G.cust.length) return {src:'crate:'+chPick(G.cust.map(function(c){ return c.want; }),G.price,k===0?1:k===1?2:0), dst:'mach'};
+  if(G.barrel) return {src:'barrel', dst:k===2?'river':'plant'};
+  return null;
+}
 function sources(G){
-  if(!G || G.phase!=='play' || G.endAt!=null) return []; var S=STAGES[G.si];
+  if(!G || G.phase!=='play' || G.endAt!=null) return []; var S=stOf(G);
+  if(G.ch) return G.st==='wait' ? ['crate:b','crate:d'] : G.barrel ? ['barrel'] : [];
   if(S.rule==='make') return G.st==='wait' ? ['crate:b','crate:d'] : [];
   if(S.rule==='cost') return G.st==='wait' ? ['crate:0','crate:1'] : [];
   if(S.rule==='waste') return G.barrel ? ['barrel'] : [];
   return G.seedlings>0 ? ['sap'] : [];
 }
 function targets(G){
-  if(!G || G.phase!=='play' || G.endAt!=null) return []; var S=STAGES[G.si];
+  if(!G || G.phase!=='play' || G.endAt!=null) return []; var S=stOf(G);
+  if(G.ch) return ['mach','river','plant'];
   if(S.rule==='make'||S.rule==='cost') return ['mach'];
   if(S.rule==='waste') return ['river','plant'];
   var a=[]; for(var k=0;k<S.spots;k++) if(G.trees.indexOf(k)<0) a.push('spot:'+k); return a;
 }
-function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='crate') return G.si===0 ? 'crate_'+p[1] : 'crate_'+(G.cust[0]?G.cust[0].want:'b'); if(p[0]==='barrel') return 'barrel'; if(p[0]==='sap') return 'sapling'; return null; }
+function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='crate') return (G.si===0||G.ch) ? 'crate_'+p[1] : 'crate_'+(G.cust[0]?G.cust[0].want:'b'); if(p[0]==='barrel') return 'barrel'; if(p[0]==='sap') return 'sapling'; return null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
 if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,
-  cfStage:cfStage,custN:custN,canDrop:canDrop,major:major};
+  cfStage:cfStage,custN:custN,canDrop:canDrop,major:major,
+  CH:CH,CH_PARTIALS:CH_PARTIALS,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,chLv:chLv,chPick:chPick,profit:profit,stOf:stOf,nStages:nStages,partialMove:partialMove};
 /* LOGIC-END */
 
 /* ===== ① GAME-START: 게임 설정 (games/<이름>/game.js) ===== */
@@ -573,6 +671,8 @@ var XP = [
   {why:'강에 버리면 지금은 돈이 안 들지만 물고기와 손님을 잃어요', def:NOPG(BADGES[2].def), page:'교과서 74~75쪽 참고 · 게임 속 손님 수는 예시'},
   {why:'나무를 심으면 마을의 믿음이 쌓여 손님이 늘어요', def:NOPG(BADGES[3].def), page:'교과서 75~76쪽 참고 · 게임 속 손님 수는 예시'}
 ];
+/* 도전 '왜?': 이윤 = 사는 손님 수(동전 1개씩) − 재료 동전 수 */
+var XPCH = {why:'사는 손님 한 명에 동전 1개. 손님 수에서 재료값을 빼 이윤이 큰 재료를 골라요. 폐수는 처리장으로', def:NOPG(BADGES[1].def)+' '+NOPG(BADGES[2].def), page:'교과서 73~75쪽 참고 · 게임 속 동전 수는 예시'};
 var GAME = {
   title: '착한 공장, 잘되는 공장',
   subtitle: '6학년 2학기 사회 · 기업의 자유와 사회적 책임',
@@ -619,7 +719,17 @@ var GAME = {
     cards: [['rMake','재료를 기계에 넣어요'],['rWaste','폐수 통은 강이나 처리장으로'],['rTree','빈자리에 나무를 심어요']],
     note: '돈 항아리를 점선까지 채워요.'
   },
-  stageRibbon: function(G){ var s=STAGES[G.si]; return G.coins>=s.goal ? null : {text:(G.si+1)+'단계 끝!', confetti:false}; },
+  /* §19 추론형 도전(logic.js CH): 일반 판에서 해 본 두 끌기(재료 상자 → 기계, 폐수 통 → 강/처리장)만. 무엇을 거나 = 손님 수와 재료값이 맞서는 날, 무엇을 고르나 = 이윤이 큰 재료 + 폐수는 처리장 */
+  challenge: {
+    kind: 'reason',
+    maxLevel: CH.maxLv,
+    stages: CH_STAGES,
+    goal: chGoal,
+    partials: CH_PARTIALS,
+    say: {start: ['손님 수 빼기 재료값! 폐수는?']},
+    ruleCards: [[['rMake','재료 넣기'],['rCost','재료값'],['rWaste','폐수 통 옮기기']]]
+  },
+  stageRibbon: function(G){ if(G.ch) return null; var s=STAGES[G.si]; return G.coins>=s.goal ? null : {text:(G.si+1)+'단계 끝!', confetti:false}; },
   result: {
     label: '내 회사 기록', note: '',
     rows: function(G){ return [['번 동전', G.stats.coins], ['심은 나무', G.stats.trees]]; },
@@ -638,12 +748,13 @@ var GAME = {
       notYet:   {line:'손님을 기다려요', why:'손님이 다 오면 재료를 넣어요'},
       spotFull: {line:'이미 심었어요', why:'점선 빈자리에 심어요'}
     },
-    general: function(G){ return XP[G.si]||null; }
+    general: function(G){ return G.ch ? XPCH : (XP[G.si]||null); }
   },
   toast: {show:'name'},
   tryPts: 0,
-  demo: function(G){ if(STAGES[G.si].rule==='cost') return {point:G.st==='wait'?'crate:0':null, text:NAMES.cost, at:'crate:0'}; return null; },
+  demo: function(G){ if(G.ch) return null; if(STAGES[G.si].rule==='cost') return {point:G.st==='wait'?'crate:0':null, text:NAMES.cost, at:'crate:0'}; return null; },
   tryIt: function(G){
+    if(G.ch) return null;
     var S=STAGES[G.si];
     if(S.rule==='make') return G.st==='wait' ? {src:'crate:'+major(G.cust.map(function(c){ return c.want; })), dst:'mach', label:'재료 넣기'} : {wait:true};
     if(S.rule==='cost') return null;
@@ -652,8 +763,11 @@ var GAME = {
     return null;
   },
   onEvent: function(e,FX){
+    if(e.t==='day'){ if(e.pts) FX.score(e.at, e.pts, true, 0); return; }   /* 도전: 하루를 바르게 꾸리면 10 */
+    if(e.t==='wrong'){ FX.comboOff(); return; }
+    if(e.t==='put' && e.pts===0){ FX.burst(e.dst, e.good?6:3); return; }
     if(e.t==='put'){ FX.score(e.dst, e.pts, e.good, e.combo); FX.burst(e.dst, e.good?7:4); }
-    else if(e.t==='sold'){ FX.score('jar', e.pts, false, 0); }
+    else if(e.t==='sold'){ if(e.pts) FX.score('jar', e.pts, false, 0); }
     else if(e.t==='bounce') FX.comboOff();
   }
 };
@@ -687,25 +801,30 @@ function itemSvg(item){ return iconSvg(item,'it'); }
    놓은 자리에서 0.3초 안에: 깔때기에 상자 / 강에 갈색 얼룩 + 물고기 뒤집힘 / 처리장 거품 / 빈자리에 나무.
    먼 결과는 이어지는 움직임으로: 동전이 항아리로·에서 날아감, 얼룩이 강을 따라 손님 쪽으로 흘러간 뒤 손님 하나가 떠남, 나무에서 잎이 마을로. */
 var SCENE = (function(){
-  var VB={w:640,h:424}, svg, L={}, sig='', cardKey='', custEl={}, coinEl=[], seenCoin=0, prodEl=[], prodKey='', stainEl=[], leaveEl=[], treeKey='', fishKey='', jarKey='', crateKey='', boxKey='';
-  var JAR={x:12,y:8,w:92,h:144}, FAC={x:116,y:22,w:204,h:164}, FUN={x:122,y:168,w:84,h:72}, WIN={x:300,y:120}, BAR={x:226,y:236}, PLANT={x:6,y:300,w:128,h:118};
+  var VB={w:640,h:424}, svg, L={}, sig='', cardKey='', custEl={}, coinEl=[], seenCoin=0, prodEl=[], prodKey='', stainEl=[], leaveEl=[], treeKey='', fishKey='', jarKey='', crateKey='', boxKey='', verdKey='';
+  var JAR={x:12,y:8,w:92,h:144}, FAC={x:116,y:22,w:204,h:164}, FUN={x:122,y:168,w:84,h:72}, WIN={x:300,y:120}, BAR0={x:226,y:236}, PLANT0={x:6,y:300,w:128,h:118}, BAR=BAR0, PLANT=PLANT0;
+  /* §19 도전: 재료 상자 두 칸과 처리장이 함께 있어 처리장을 깔때기 아래로, 폐수 통을 공장 오른쪽(강 위)으로 옮긴다 */
+  var BAR_CH={x:282,y:236}, PLANT_CH={x:140,y:300,w:128,h:118};
   var CR=[{x:12,y:160},{x:12,y:232}], QX=372, QDX=48, QY=150, RIVER_Y=306, SPOTS=[[378,270],[446,276],[514,270],[582,276]];
   var FISH=[[300,356],[380,392],[460,350],[540,388],[600,346]];
   function el(tag,attrs,html){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(html!=null) e.innerHTML=html; return e; }
   function txt(x,y,s,size,fill,anchor){ return '<text x="'+x+'" y="'+y+'" text-anchor="'+(anchor||'middle')+'" font-family="Jua,sans-serif" font-size="'+(size||20)+'" fill="'+(fill||'#1E2B3A')+'">'+s+'</text>'; }
   function pill(x,y,w,s,cls,tc){ return '<rect x="'+(x-w/2)+'" y="'+(y-15)+'" width="'+w+'" height="30" rx="10" class="'+(cls||'f-navy')+'"/>'+txt(x,y+7,s,20,tc||'#FBF8F1'); }
-  function S(G){ return STAGES[G.si||0]; }
-  function rule(G){ return G.phase==='title' ? 'title' : S(G).rule; }
+  function chv(G){ return !!(G && G.ch && G.phase!=='title'); }
+  function S(G){ return chv(G) ? stOf(G) : STAGES[G.si||0]; }
+  function rule(G){ return G.phase==='title' ? 'title' : chv(G) ? 'ch' : S(G).rule; }
+  function lay(G){ var c=chv(G); BAR=c?BAR_CH:BAR0; PLANT=c?PLANT_CH:PLANT0; }
+  function wasteV(r){ return r==='waste'||r==='tree'||r==='ch'; }
   function mount(host){
     svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
-    ['bg','river','stain','fish','plant','trees','jar','crates','fac','cust','fly','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
+    ['bg','river','stain','fish','plant','trees','jar','crates','fac','cust','fly','verd','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
     host.insertBefore(svg, host.firstChild);
   }
   /* ---- 바탕 ---- */
   function buildBg(G){
     var r=rule(G), h='<rect x="-700" y="-600" width="2000" height="1640" class="f-land"/>';
     h+='<rect x="-700" y="'+RIVER_Y+'" width="2000" height="800" class="f-shal"/><path d="M-700 '+RIVER_Y+'H1340" stroke="#779D78" stroke-width="6"/>';
-    if(r==='waste'||r==='tree') h+='<rect x="-700" y="'+(RIVER_Y-4)+'" width="'+(700+PLANT.x+PLANT.w+4)+'" height="900" class="f-land"/>';
+    if(wasteV(r)) h+='<rect x="-700" y="'+(RIVER_Y-4)+'" width="'+(700+PLANT.x+PLANT.w+4)+'" height="900" class="f-land"/>';
     [[320,330],[520,410],[420,322]].forEach(function(p){ h+='<path d="M'+p[0]+' '+p[1]+'q10-6 20 0t20 0" fill="none" stroke="#DDE8F2" stroke-width="3" stroke-linecap="round" opacity=".7"/>'; });
     h+='<rect x="'+(JAR.x-4)+'" y="'+(JAR.y-2)+'" width="'+(JAR.w+8)+'" height="'+(JAR.h+6)+'" rx="14" class="f-landd" opacity=".5"/>';
     h+='<rect x="'+(CR[0].x-4)+'" y="'+(CR[0].y-4)+'" width="104" height="146" rx="12" class="f-landd" opacity=".5"/>';
@@ -715,41 +834,46 @@ var SCENE = (function(){
     /* 공장 */
     var f='<g data-keep="공장">'+useArt('factory',FAC.x,FAC.y,FAC.w,FAC.h)+'</g>';
     f+='<rect x="'+(WIN.x-6)+'" y="'+(WIN.y-10)+'" width="44" height="54" rx="6" class="f-paper" stroke="#8C603F" stroke-width="2.5"/><path d="M'+(WIN.x-10)+' '+(WIN.y-10)+'h52l-6 12h-40z" class="f-org"/>';
-    if(r==='make'||r==='cost'||r==='title') f+='<g id="fun">'+useArt('funnel',FUN.x,FUN.y,FUN.w,FUN.h)+'</g>';
+    if(r==='make'||r==='cost'||r==='title'||r==='ch') f+='<g id="fun">'+useArt('funnel',FUN.x,FUN.y,FUN.w,FUN.h)+'</g>';
     if(r==='tree') f+='<path d="M200 214q-30 0-40 40t-60 50" fill="none" stroke="#55657A" stroke-width="10" stroke-linecap="round"/><path d="M200 214q-30 0-40 40t-60 50" fill="none" stroke="#A9B4C1" stroke-width="5" stroke-linecap="round"/>';
     f+='<g id="inFun"></g><g id="leftover"></g>';
     L.fac.innerHTML=f; L.barG=null; L.inFun=L.fac.querySelector('#inFun'); L.left=L.fac.querySelector('#leftover');
     /* 처리장 */
     var p='';
-    if(r==='waste'||r==='tree'){ p+='<g data-keep="처리장">'+useArt('plantBld',PLANT.x+4,PLANT.y+6,120,110)+'</g><g id="tagP">'+pill(PLANT.x+64,PLANT.y-4,82,'처리장')+'</g>';
+    if(wasteV(r)){ p+='<g data-keep="처리장">'+useArt('plantBld',PLANT.x+4,PLANT.y+6,120,110)+'</g><g id="tagP">'+pill(PLANT.x+64,PLANT.y-4,82,'처리장')+'</g>';
       p+='<path d="M'+(PLANT.x+PLANT.w-4)+' '+(PLANT.y+96)+'h20" stroke="#55657A" stroke-width="8" stroke-linecap="round"/><g id="plantFx"></g>'; }
     L.plant.innerHTML=p; L.plantFx=L.plant.querySelector('#plantFx');
-    L.card.innerHTML=''; cardKey=''; L.cust.innerHTML=''; custEl={}; L.fly.innerHTML=''; coinEl=[]; prodEl=[]; prodKey=''; L.stain.innerHTML=''; stainEl=[]; leaveEl=[];
+    L.card.innerHTML=''; cardKey=''; L.verd.innerHTML=''; verdKey=''; L.cust.innerHTML=''; custEl={}; L.fly.innerHTML=''; coinEl=[]; prodEl=[]; prodKey=''; L.stain.innerHTML=''; stainEl=[]; leaveEl=[];
     treeKey=''; fishKey=''; jarKey=''; crateKey=''; boxKey='';
     seenCoin=G.coinLog?G.coinLog.length:0; L.seenLeave=G.leave?G.leave.length:0; L.seenDirty=G.dirty?G.dirty.length:0; L.lastLog=G.coinLog&&G.coinLog.length?G.coinLog[G.coinLog.length-1].t:-1;
   }
   /* ---- 돈 항아리 ---- */
-  function jarSvg(x,y,w,h,coins,cap,goal,id){
+  function jarSvg(x,y,w,h,coins,cap,goal,id,noGoal){
     var f=Math.max(0,Math.min(1,coins/cap)), gl=Math.min(1,goal/cap), ih=h-26, iy=y+22, cid='jc'+id;
     var s='<rect x="'+(x+w*0.26)+'" y="'+y+'" width="'+(w*0.48)+'" height="14" rx="4" class="f-woodd"/>';
     s+='<clipPath id="'+cid+'"><rect x="'+(x+3)+'" y="'+iy+'" width="'+(w-6)+'" height="'+ih+'" rx="'+(w*0.18)+'"/></clipPath>';
     s+='<rect x="'+x+'" y="'+(iy-4)+'" width="'+w+'" height="'+(ih+8)+'" rx="'+(w*0.2)+'" class="f-paper" opacity=".85" stroke="#55657A" stroke-width="3"/>';
     s+='<g clip-path="url(#'+cid+')"><rect x="'+x+'" y="'+(iy+ih*(1-f)).toFixed(1)+'" width="'+w+'" height="'+(ih*f+4).toFixed(1)+'" class="f-org"/>';
     for(var k=1;k<12;k++){ var yy=iy+ih-k*(ih/12); if(yy>iy+ih*(1-f)) s+='<path d="M'+x+' '+yy.toFixed(1)+'h'+w+'" stroke="#C95F2C" stroke-width="1.6" opacity=".7"/>'; }
-    s+='</g><path d="M'+(x-4)+' '+(iy+ih*(1-gl)).toFixed(1)+'h'+(w+8)+'" stroke="#1E2B3A" stroke-width="3" stroke-dasharray="7 5"/>';
+    s+='</g>'; if(noGoal) return s;   /* 도전: 목표는 '하루를 모두 바르게'(HUD)라 항아리 점선은 없음 */
+    s+='<path d="M'+(x-4)+' '+(iy+ih*(1-gl)).toFixed(1)+'h'+(w+8)+'" stroke="#1E2B3A" stroke-width="3" stroke-dasharray="7 5"/>';
     if(coins>=goal) s+='<circle cx="'+(x+w-4)+'" cy="'+(iy+ih*(1-gl)-2).toFixed(1)+'" r="11" class="f-grn"/><path d="M'+(x+w-10)+' '+(iy+ih*(1-gl)-2).toFixed(1)+'l4 4 7-8" fill="none" stroke="#FBF8F1" stroke-width="3" stroke-linecap="round"/>';
     return s;
   }
   function drawJar(G){
-    var s=S(G), coins=G.phase==='title'?14:G.coins, k=coins+'|'+G.si+'|'+G.phase; if(k===jarKey) return; jarKey=k;
-    L.jar.innerHTML='<g data-keep="돈 항아리">'+jarSvg(JAR.x,JAR.y,JAR.w,JAR.h,coins,s.cap,s.goal,'m')+useArt('coin',JAR.x+JAR.w/2-14,JAR.y+JAR.h-40,28,28)+'</g>';
+    var s=S(G), coins=G.phase==='title'?14:G.coins, k=coins+'|'+G.si+'|'+G.phase+'|'+chv(G); if(k===jarKey) return; jarKey=k;
+    L.jar.innerHTML='<g data-keep="돈 항아리">'+jarSvg(JAR.x,JAR.y,JAR.w,JAR.h,coins,s.cap,s.goal,'m',chv(G))+useArt('coin',JAR.x+JAR.w/2-14,JAR.y+JAR.h-40,28,28)+'</g>';
   }
   /* ---- 재료 상자 / 묘목 ---- */
   function drawCrates(G){
     var r=rule(G), k=r+'|'+G.st+'|'+(G.price||[]).join(',')+'|'+(G.seedlings||0)+'|'+G.phase+'|'+((G.cust&&G.cust[0])?G.cust[0].want:'');
     if(k===crateKey) return; crateKey=k; var h='';
     var on=G.phase==='play' && G.st==='wait';
-    if(r==='make'||r==='title'){ ['b','d'].forEach(function(t,i){ h+='<g opacity="'+(on||r==='title'?1:.45)+'">'+useArt('crate_'+t,CR[i].x,CR[i].y,96,66)+'</g>'; }); }
+    if(r==='ch'){   /* 도전: 공 상자·인형 상자 아래에 각자 재료값 동전(일반 판 1·2단계 그림을 함께) */
+      ['b','d'].forEach(function(t,i){ var c=CR[i], pr=G.price?G.price[i]:1; h+='<g opacity="'+(on?1:.45)+'">'+useArt('crate_'+t,c.x+16,c.y-2,64,44);
+        h+='<rect x="'+(c.x+2)+'" y="'+(c.y+40)+'" width="92" height="30" rx="9" class="f-paper" opacity=".85"/>';
+        for(var n=0;n<pr;n++) h+=useArt('coin',c.x+48-pr*15+n*30,c.y+41,28,28); h+='</g>'; }); }
+    else if(r==='make'||r==='title'){ ['b','d'].forEach(function(t,i){ h+='<g opacity="'+(on||r==='title'?1:.45)+'">'+useArt('crate_'+t,CR[i].x,CR[i].y,96,66)+'</g>'; }); }
     else if(r==='cost'){ var want=G.cust[0]?G.cust[0].want:'b';
       /* u2: 재료값 동전을 상자 아래 한 줄로 크게(28px, 겹치지 않게) — 1개와 3개가 한눈에 */
       [0,1].forEach(function(i){ var c=CR[i], pr=G.price?G.price[i]:1; h+='<g opacity="'+(on?1:.45)+'">'+useArt('crate_'+want,c.x+16,c.y-2,64,44);
@@ -766,7 +890,7 @@ var SCENE = (function(){
     return [q[0], q[1], false];
   }
   function drawCust(G){
-    var seen={}, r=rule(G), bub=(r==='make'||r==='cost'||r==='title');
+    var seen={}, r=rule(G), bub=(r==='make'||r==='cost'||r==='title'||r==='ch');
     (G.cust||[]).forEach(function(c,j){
       var k=(G.si||0)+':'+G.r+':'+j, n=custEl[k]; seen[k]=1;
       if(!n){ n=custEl[k]=el('g',{}); n.innerHTML='<g class="bd">'+useArt('cust'+((j+G.r*2)%6),-26,0,52,78)+'</g><g class="bb"></g><g class="fc"></g>'; L.cust.appendChild(n); n._bb=n.querySelector('.bb'); n._fc=n.querySelector('.fc'); n._s=''; }
@@ -829,6 +953,13 @@ var SCENE = (function(){
     if(!L.barG){ L.barG=el('g',{}); L.fac.appendChild(L.barG); }
     L.barG.innerHTML=on?'<g class="pop">'+useArt('barrel',BAR.x,BAR.y,48,62)+'</g>':'';
   }
+  /* ---- 도전: 틀린 판단의 판정(놓은 자리에 곧바로 빨간 가위표, data-verdict="bad") ---- */
+  function drawVerd(G){
+    var v=(chv(G)&&G.phase==='play')?(G.verd||[]):[], k=v.map(function(o){ return o.at+o.t; }).join('|'); if(k===verdKey) return; verdKey=k; var h='';
+    v.forEach(function(o){ var x=o.at==='mach'?FUN.x+FUN.w/2:330, y=o.at==='mach'?FUN.y+20:RIVER_Y+44;
+      h+='<g class="pop" data-verdict="bad"><circle cx="'+x+'" cy="'+y+'" r="26" fill="#FBF8F1" stroke="#D9534F" stroke-width="5"/><path d="M'+(x-11)+' '+(y-11)+'l22 22m0-22l-22 22" stroke="#D9534F" stroke-width="6" stroke-linecap="round"/></g>'; });
+    L.verd.innerHTML=h;
+  }
   /* ---- 나무 자리 ---- */
   function drawTrees(G){
     var r=rule(G), k=r+'|'+(G.trees||[]).join(','); if(k===treeKey) return; treeKey=k; var h='';
@@ -856,12 +987,12 @@ var SCENE = (function(){
   }
   function renderScene(G){
     if(!svg) return;
-    var s2=(G.si||0)+'|'+(G.phase==='title'?'t':'p');
-    if(s2!==sig){ sig=s2; buildBg(G); L.barOn=null; L.plantOn=null; }
-    drawRiver(G); drawTrees(G); drawJar(G); drawCrates(G); drawFactory(G); drawBarrel(G); drawCust(G); drawCoins(G); drawCard(G);
+    lay(G); var s2=(G.si||0)+'|'+(G.phase==='title'?'t':'p')+'|'+chv(G);
+    if(s2!==sig){ sig=s2; buildBg(G); L.barOn=null; L.plantOn=null; if(L.barG){ L.barG.remove(); L.barG=null; } }
+    drawRiver(G); drawTrees(G); drawJar(G); drawCrates(G); drawFactory(G); drawBarrel(G); drawCust(G); drawCoins(G); drawVerd(G); drawCard(G);
   }
   function vbRect(G,id){
-    var p=String(id).split(':');
+    lay(G); var p=String(id).split(':');
     if(p[0]==='crate'){ var i=(p[1]==='b'||p[1]==='0')?0:1; return {x:CR[i].x-2, y:CR[i].y-2, w:100, h:70}; }
     if(id==='mach') return {x:FUN.x-6, y:FUN.y-30, w:FUN.w+30, h:FUN.h+34};
     if(id==='barrel') return G.barrel?{x:BAR.x-6, y:BAR.y-4, w:60, h:70}:null;
@@ -884,10 +1015,10 @@ var SCENE = (function(){
     return {left:x1, top:y1, right:x2, bottom:y2, width:x2-x1, height:y2-y1, cx:(x1+x2)/2, cy:(y1+y2)/2};
   }
   function avoid(G){ if(G.phase==='stageEnd') return ['card']; return sources(G).concat(targets(G).filter(function(t){ return t!=='river'; })).concat(['jar']); }
-  function labels(G){ var r=rule(G); return (r==='waste'||r==='tree')?['tagP']:[]; }
+  function labels(G){ var r=rule(G); return wasteV(r)?['tagP']:[]; }
   function keepClear(G){ var r=rule(G), a=['jar','queue'];
     if(G.phase==='stageEnd'){ a=['card','queue']; if(r==='waste') a.push('fishes'); if(r==='tree') a.push('trees'); return a; }
-    if(r==='waste'||r==='tree') a.push('fishes'); return a; }
+    if(wasteV(r)) a.push('fishes'); return a; }
   function idleAt(G){ return 'queue'; }
   var css=".pop{transform-box:fill-box;transform-origin:50% 50%;animation:pop .28s ease-out}@keyframes pop{0%{transform:scale(.3);opacity:.2}70%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}"
     +".grow{transform-box:fill-box;transform-origin:50% 100%;animation:grw .3s ease-out}@keyframes grw{0%{transform:scale(.2)}75%{transform:scale(1.12)}100%{transform:scale(1)}}"

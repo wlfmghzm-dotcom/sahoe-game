@@ -433,6 +433,31 @@ var STAGES = [
   {name:'우리나라도',    rule:'pins',  n:12, smoke:true,  card:true,  pins:true,  grow:0.045, conc:2, gap:3.0, minGap:2.6}
   /* 5차(블라인드 4차 3·4단계 '볼 것 3개 넘음'): 뚜껑이 새로 나오는 3단계는 목마른 곳 1곳씩, 4단계는 2곳까지(전 2·3) */   /* 개념 점검(11-04): 0.06이면 줄이기를 쉬지 않아도 띠가 0.42 아래로 못 내려가 '함께 가라앉는' 장면이 거의 안 나왔다(힌트 연타·성실 1.0/1.5/2.0초 모두). 0.045면 3초 반응 학생 말고는 모두 도달 */
 ];
+/* §19 도전 '뚜껑 작전' → '우리나라도'. 한 줄 설계: 굴뚝마다 연기가 느는 빠르기가 다르고(판마다 다른 굴뚝이 '큰 원인') 뚜껑이 귀할 때,
+   뚜껑을 어느 굴뚝에 언제 덮을지(원인)와 물을 어느 목마른 칸에 나를지(결과)를 고른다. 더울수록 우물이 늦게 차서(일반 판 그대로) 물만 날라서는 못 막는다.
+   일반 판에서 한 동작·규칙만: 1 = 3단계 'card'(물 + 뚜껑), 2 = 4단계 'pins'(+ 폭염 해). 새 규칙 0, 수치만 다름.
+   판마다 시드로: 어느 굴뚝이 빠른지, 목마른 칸 순서·간격, (레벨 3부터) 판 중간에 빠른 굴뚝이 바뀌는 때.
+   레벨이 오르면: 굴뚝 사이 빠르기 차이 ↑, 뚜껑이 쉬는 시간 5 → 8초(한 번이 귀함), 목마른 칸 수 ↑·동시 2 → 3, 빠른 굴뚝이 판 중간에 바뀜.
+   손 빠르기 점수(콤보·빨리 덤)는 없다. 도전용 수치는 이 CFG와 cfgFor(G)에만 */
+var CFG = {
+  pts: {water:10, lid:12, calm:9},                         /* 물 한 통 10, 뚜껑 = 12 × (덮은 연기 ÷ 그때 가장 짙은 연기), 폭염이 가라앉으면 9 */
+  n:[7,0.75,12], conc3At:3, gap:[3.8,-0.04,3.5], minGap:[3.4,-0.03,3.2], cool:[5,0.5,8], grow:[0.05,0.004,0.07], fast:[3.0,0.1,3.6], slow:[0.25,0.35], heatWell:3.0, swapAt:3,
+  goal: {f:[0.7, 0.03, 0.95]}                             /* 목표 = 판의 어림 최고점 × (f0 + f1×(레벨-1)) */
+};
+function cv(a,k){ var v=a[0]+a[1]*k; return a[1]<0 ? Math.max(a[2],v) : Math.min(a[2],v); }
+function cfgFor(G){ var k=Math.max(0,(G&&G.ch||1)-1), C=CFG;
+  return {n:Math.floor(cv(C.n,k)), conc:k+1>=C.conc3At?3:2, gap:cv(C.gap,k), minGap:cv(C.minGap,k), cool:cv(C.cool,k), grow:cv(C.grow,k), fast:cv(C.fast,k), swap:k+1>=C.swapAt}; }
+function chStages(lv){ var c=cfgFor({ch:lv});
+  return [ {key:'c1', name:'뚜껑 작전', rule:'card', n:c.n, smoke:true, card:true, pins:false, grow:c.grow, conc:c.conc, gap:c.gap, minGap:c.minGap, gen:c},
+           {key:'c2', name:'우리나라도', rule:'pins', n:c.n, smoke:true, card:true, pins:true, grow:c.grow, conc:c.conc, gap:c.gap, minGap:c.minGap, gen:c} ]; }
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+/* 어림 최고점: 2단계 × (물 n통 × 10 + 뚜껑 (단계 길이 ÷ 쉬는 시간)번 × 꽉 찬 연기 12) + 폭염 가라앉힘 2번 */
+function chMax(lv){ var c=cfgFor({ch:lv}), len=c.n*Math.max(c.minGap,c.gap*0.8)+4; return Math.round(2*(c.n*CFG.pts.water + (1+len/c.cool)*CFG.pts.lid) + 2*CFG.pts.calm); }
+function chGoal(lv){ return Math.round(chMax(lv)*cv(CFG.goal.f,lv-1)/5)*5; }
+function stOf(G,si){ var i=si==null?G.si:si; return G.ch ? chStages(G.ch)[i] : STAGES[i]; }
+function nStages(G){ return G.ch ? CH_STAGES.length : STAGES.length; }
+function coolOf(G){ return G.ch ? stOf(G).gen.cool : T.cardCool; }
+
 var BADGES = [
   {k:'climate', name:'기후변화',   art:'pbClimate', def:'석유·석탄 같은 화석 연료를 너무 많이 써서 기후변화가 점점 심해지고 있어요.(교과서 142쪽 참고)'},
   {k:'global',  name:'지구촌 문제', art:'globe',     def:'나라들은 서로 가깝게 이어져 있어서, 지구촌 문제는 문제가 생긴 나라뿐 아니라 다른 나라에도 영향을 미쳐요.(교과서 143쪽 참고)'},
@@ -451,21 +476,28 @@ var TITLES = [[0,'새내기 탐험가'],[180,'지구촌 탐험가'],[600,'지구
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function firstName(G,ev,k,at){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
 function avgSmoke(G){ var s=0, fly=G.cap>=0 && G.t-G.lastFacT<T.reachBand;
   G.smoke.forEach(function(x,i){ if(i!==G.cap) s+=x; else if(fly) s+=G.capS; }); return s/G.smoke.length; }   /* 뚜껑 덮인 굴뚝은 연기를 내지 않는다(덮기 전에 나온 연기는 1초 동안 아직 올라가는 중) */
-function heat(G){ return STAGES[G.si].smoke ? G.band : 0; }                 /* 더위 = 하늘 띠의 짙기 */
-function hotPins(G){ return STAGES[G.si].pins && G.hot ? PINS.length : 0; }
+function heat(G){ return stOf(G).smoke ? G.band : 0; }                 /* 더위 = 하늘 띠의 짙기 */
+function hotPins(G){ return stOf(G).pins && G.hot ? PINS.length : 0; }
 
 function thirstyN(G){ var n=0; G.slots.forEach(function(s){ if(s.st==='thirsty') n++; }); return n; }
 function slotsNew(){ return KINDS.map(function(k,i){ return {i:i, kind:k, st:'ok', wait:0, pat:0, walk:0}; }); }
 function startStage(G0,si){
-  var G=cl(G0), S=STAGES[si];
+  var G=cl(G0), S=stOf(G0,si);
   G.si=si; G.phase='play'; G.t=0; G.combo=0; G.lastDel=-99; G.well=T.cap; G.slots=slotsNew();
   G.spawn=S.n; G.nextAt=T.first; G.card=S.card?0:-1; G.cap=-1; G.capS=0; G.rB=-1; G.rV=-1; G.lastFac=-1; G.lastFacT=-99; G.lastVia=false; G.hot=false;
   G.smoke = S.smoke ? (si===1 ? [T.smoke0, T.smoke0+0.1, T.smoke0+0.05] : G.smoke.map(function(x){ return Math.max(x, 0.7); })) : [0,0,0];
   G.band = S.smoke ? (si===1 ? T.band0 : Math.max(G.band, 0.6)) : 0;
+  G.gr=null; G.swT=-1;
+  if(G.ch){   /* 도전: 굴뚝마다 빠르기(하나가 '큰 원인'), 시작 연기는 빠르기를 따라, 레벨 3부터 판 중간에 빠른 굴뚝이 바뀜 */
+    var g=S.gen, fi=Math.floor(rnd(G)*3), sl=CFG.slow, gr=[0,0,0], o=0;
+    for(var i=0;i<3;i++) gr[i]= i===fi ? g.grow*g.fast : g.grow*sl[o++];
+    G.gr=gr; G.smoke=gr.map(function(x){ return Math.min(0.9, 0.2+6*x); }); G.band=0.45;
+    G.swT = g.swap ? +(S.n*Math.max(S.minGap,S.gap*0.8)*(0.35+0.3*rnd(G))).toFixed(2) : -1;
+  }
   G.res={total:S.n, served:0, missed:0};
   return G;
 }
@@ -474,28 +506,29 @@ function newGame(seed){
     smoke:[0,0,0], band:0, spawn:0, nextAt:0, card:-1, cap:-1, capS:0, rB:-1, rV:-1, lastFac:-1, lastFacT:-99, lastVia:false, hot:false,
     stats:{field:0, person:0, cut:0, dry:0}, res:{total:0, served:0, missed:0}};
 }
-function start(G){ var g=cl(G); g.score=0; g.stats={field:0, person:0, cut:0, dry:0}; return startStage(g,0); }
+function start(G){ var g=cl(G); g.score=0; g.si=0; g.stats={field:0, person:0, cut:0, dry:0}; return startStage(g,0); }
 function stageDone(G){ return G.res.served+G.res.missed>=G.res.total && G.slots.every(function(s){ return s.st==='ok'||s.st==='dry'; }); }
 
 function tick(G0,dt){
-  var G=cl(G0), ev=[], S=STAGES[G.si]; if(G.phase!=='play') return {G:G, ev:ev};
+  var G=cl(G0), ev=[], S=stOf(G0); if(G.phase!=='play') return {G:G, ev:ev};
   G.t+=dt;
-  G.well=Math.min(T.cap, G.well+dt/(T.refill*(1+T.heatWell*heat(G))));   /* 가뭄: 더울수록 우물이 늦게 찬다(143쪽 '물이 매우 부족'). 요구 수가 아니라 물이 모자라서 어려워진다 */
+  G.well=Math.min(T.cap, G.well+dt/(T.refill*(1+(G.ch?CFG.heatWell:T.heatWell)*heat(G))));   /* 가뭄: 더울수록 우물이 늦게 찬다(143쪽 '물이 매우 부족'). 요구 수가 아니라 물이 모자라서 어려워진다 */
   if(G.card>0){ G.card=Math.max(0, G.card-dt); if(G.card===0) G.cap=-1; }   /* 테두리가 다 차면 뚜껑이 제자리로 */
-  if(S.smoke){ G.smoke=G.smoke.map(function(x,i){ return i===G.cap ? x : Math.min(1, x+S.grow*dt); });
+  if(G.ch && G.swT>=0 && G.t>=G.swT){ G.swT=-1; var f0=G.gr.indexOf(Math.max.apply(null,G.gr)), f1=(f0+1+Math.floor(rnd(G)*2))%3, tmp=G.gr[f0]; G.gr[f0]=G.gr[f1]; G.gr[f1]=tmp; }   /* 도전: 빠른 굴뚝이 바뀜(연기 기둥이 굵어지는 것으로 보임) */
+  if(S.smoke){ G.smoke=G.smoke.map(function(x,i){ return i===G.cap ? x : Math.min(1, x+(G.gr?G.gr[i]:S.grow)*dt); });
     G.band=Math.max(0, Math.min(1, G.band+(avgSmoke(G)-G.band)*Math.min(1, T.bandRate*dt))); }
   if(G.rB>=0 && G.t>=G.rB){ G.band=Math.max(0, G.band-T.bandCut*G.capS/3); G.rB=-1; ev.push({t:'reachBand', i:G.lastFac, pts:G.capPts||0}); G.capPts=0; }   /* 그 굴뚝 몫이 띠에서 빠짐 */
   if(G.rV>=0 && G.t>=G.rV){ G.rV=-1; var rl=[];                                                                   /* 열기가 줄어 마을에 닿음 */
     G.slots.forEach(function(s){ if(s.st==='thirsty'){ s.wait=Math.max(0, s.wait-T.relief*s.pat); rl.push(s.i); }
       else if(s.st==='dry'){ s.st='ok'; s.wait=0; rl.push(s.i); } });                                              /* 말라 갈라진 밭도 살아난다(놓친 수는 그대로) */
-    ev.push({t:'relief', slots:rl}); if(STAGES[G.si].card) firstName(G,ev,'cut','sun'); }
+    ev.push({t:'relief', slots:rl}); if(stOf(G).card) firstName(G,ev,'cut','sun'); }
   var h=heat(G);
   if(S.smoke && h>=0.4 && G.t>=4) firstName(G,ev,'band','band');   /* 블라인드 2차: 단계 시작 '연기가 하늘에 쌓여요' 가리키기와 겹치지 않게 4초 뒤 */
   if(S.smoke && h>=0.6 && G.first.band && G.t>=3) firstName(G,ev,'heat','sun');
   if(S.pins){
     if(!G.hot && h>=T.hot){ G.hot=true; ev.push({t:'hot'}); }
     else if(G.hot && h<T.cool){ G.hot=false;
-      if(G.t-G.lastFacT<=T.calmWin){ var cp=G.lastVia ? 0 : PINS.length*T.pinPts; G.score+=cp; ev.push({t:'calm', pts:cp}); firstName(G,ev,'pins','pin:KOR'); } }
+      if(G.t-G.lastFacT<=T.calmWin){ var cp=G.lastVia ? 0 : G.ch ? CFG.pts.calm : PINS.length*T.pinPts; G.score+=cp; ev.push({t:'calm', pts:cp}); firstName(G,ev,'pins','pin:KOR'); } }
   }
   G.slots.forEach(function(s){
     if(s.st==='thirsty'){ s.wait+=dt; if(s.wait>=s.pat){ s.st='dry'; s.wait=0; G.res.missed++; G.stats.dry++; G.combo=0; ev.push({t:'miss', i:s.i}); firstName(G,ev,'dry','slot:'+s.i); } }
@@ -507,7 +540,7 @@ function tick(G0,dt){
     if(free.length){ var s=free[Math.floor(rnd(G)*free.length)]; s.st='thirsty'; s.wait=0; s.pat=T.pat*(1-T.heatPat*h); G.spawn--;
       G.nextAt=G.t+Math.max(S.minGap, S.gap*(1-T.heatGap*h))*(0.9+0.2*rnd(G)); }
   }
-  if(stageDone(G)){ G.phase='stageEnd'; if(G.si===2) ev.push({t:'cool3', ok:G.band<0.6});   /* 3단계 끝 대사가 화면(띠·해)과 맞게: 연기를 줄였는지 */
+  if(stageDone(G)){ G.phase='stageEnd'; if(G.si===2 && !G.ch) ev.push({t:'cool3', ok:G.band<0.6});   /* 3단계 끝 대사가 화면(띠·해)과 맞게: 연기를 줄였는지 */
      if(G.si===1) award(G,ev,'climate'); if(G.si===2) award(G,ev,'global'); if(G.si===3) award(G,ev,'cause'); ev.push({t:'stageEnd', si:G.si}); }
   return {G:G, ev:ev};
 }
@@ -522,27 +555,29 @@ function drop(G0,src,dst,via){
     if(dp[0]!=='slot') return fail('wrong');
     var s=G.slots[i]; if(!s || s.st!=='thirsty') return fail('wrong');
     G.well-=1; s.st='coming'; s.walk=0; G.res.served++; G.stats[s.kind]++;
-    pts = via ? T.hintPts : T.base+combo(G)+Math.round(4*Math.max(0,1-s.wait/s.pat));
+    pts = via ? T.hintPts : G.ch ? (G.combo=0, CFG.pts.water) : T.base+combo(G)+Math.round(4*Math.max(0,1-s.wait/s.pat));
     s.pts=pts; s.cb=via?0:G.combo; ev.push({t:'water', i:i});   /* 5차(행동 직후 0.3초엔 결과 하나 = 물통이 걸어가기 시작): 점수·이름표는 물통이 닿을 때 */
     return {G:G, ok:true, ev:ev};
   }
   if(src==='card'){
-    if(!STAGES[G.si].card || G.card!==0) return fail('empty');
+    if(!stOf(G).card || G.card!==0) return fail('empty');
     if(dp[0]!=='fac' || !(i>=0 && i<3)) return fail('wrong');
     var before=G.smoke[i];
-    G.smoke[i]=Math.max(0, before-T.cut); G.card=T.cardCool; G.cap=i; G.capS=before; G.rB=G.t+T.reachBand; G.rV=G.t+T.reachVil; G.stats.cut++; G.lastFac=i; G.lastFacT=G.t; G.lastVia=!!via;
-    pts = via ? T.hintPts : Math.round(T.cutPts*before);
+    G.smoke[i]=Math.max(0, before-T.cut); G.card=coolOf(G); G.cap=i; G.capS=before; G.rB=G.t+T.reachBand; G.rV=G.t+T.reachVil; G.stats.cut++; G.lastFac=i; G.lastFacT=G.t; G.lastVia=!!via;
+    var mx=Math.max.apply(null,G0.smoke);
+    pts = via ? T.hintPts : G.ch ? Math.round(CFG.pts.lid*(mx>0?before/mx:0)) : Math.round(T.cutPts*before);   /* 도전: 그때 가장 짙은 굴뚝이면 12, 옅을수록 적게(미뤄 쌓인 연기로 점수를 벌지 못하게) */
     G.score+=pts; G.capPts=pts; ev.push({t:'cut', i:i, pts:pts});
     return {G:G, ok:true, ev:ev};   /* 5차: 이름표('굴뚝에 뚜껑')와 겹치지 않게 '마을 더위가 줄어요'는 열기가 마을에 닿을 때(relief) */
   }
   return fail('src');
 }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 /* 지금 할 만한 한 수: 연기가 크고 카드가 준비되면 가장 큰 연기 → 아니면 가장 급한(말풍선 막대가 가장 짧은) 칸에 물 */
 function bigFac(G){ var b=0; G.smoke.forEach(function(x,i){ if(x>G.smoke[b]) b=i; }); return b; }
 function hintMove(G){
   if(!G || G.phase!=='play') return null;
-  var cardOk = STAGES[G.si].card && G.card===0, bf=bigFac(G);
+  var cardOk = stOf(G).card && G.card===0, bf=bigFac(G);
+  if(cardOk && G.ch && G.smoke[bf]>=0.25) return {src:'card', dst:'fac:'+bf};   /* 도전: 뚜껑이 준비되면 가장 짙은 굴뚝(원인)부터 */
   if(cardOk && G.smoke[bf]>=0.6) return {src:'card', dst:'fac:'+bf};
   /* 가장 급한 칸. 단, 1.2초 안에 마를 칸은 뒤로(가리키는 사이 말라 버리지 않게) */
   if(G.well>=1){ var left=function(s){ return s.pat-s.wait; }, th=G.slots.filter(function(s){ return s.st==='thirsty'; }).sort(function(a,b){ return left(a)-left(b); });
@@ -551,17 +586,17 @@ function hintMove(G){
   if(cardOk && G.smoke[bf]>=0.3) return {src:'card', dst:'fac:'+bf};
   return null;
 }
-function sources(G){ var a=['well']; if(G && G.phase==='play' && STAGES[G.si].card) a.push('card'); return a; }
+function sources(G){ var a=['well']; if(G && G.phase==='play' && stOf(G).card) a.push('card'); return a; }
 function targets(G){
   if(!G || G.phase!=='play') return [];
   var a=G.slots.filter(function(s){ return s.st==='thirsty'; }).map(function(s){ return 'slot:'+s.i; });
-  if(STAGES[G.si].card) a=a.concat(['fac:0','fac:1','fac:2']);
+  if(stOf(G).card) a=a.concat(['fac:0','fac:1','fac:2']);
   return a;
 }
 function itemOf(G,id){ return id==='well' ? 'bucket' : id==='card' ? 'lid' : null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,KINDS:KINDS,PINS:PINS,
+if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,CFG:CFG,cfgFor:cfgFor,chStages:chStages,chGoal:chGoal,CH_STAGES:CH_STAGES,stOf:stOf,coolOf:coolOf,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,KINDS:KINDS,PINS:PINS,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,heat:heat,hotPins:hotPins,avgSmoke:avgSmoke,thirstyN:thirstyN};
 /* LOGIC-END */
 
@@ -603,6 +638,14 @@ var GAME = {
           ['지구촌 문제는 우리 모두와 이어져 있어.', '원인이 뭔지 함께 살펴보자!']],
     idle: '물이 차는 중이에요'
   },
+  /* §19 도전(logic.js CFG·chStages): 무엇을 거나 = 굴뚝마다 연기 빠르기가 달라 '큰 원인'이 판마다 다르고 뚜껑이 귀함, 더울수록 우물이 늦게 참.
+     무엇을 고르나 = 뚜껑을 어느 굴뚝에(원인), 물을 어느 목마른 칸에(결과) */
+  challenge: {
+    stages: CH_STAGES,
+    goal: chGoal,
+    say: {start: ['어느 굴뚝이 가장 짙을까?', '우리나라 해도 지켜봐!']},
+    ruleCards: [[['rWater','물 나르기'],['rCut','굴뚝에 뚜껑']], [['rWater','물'],['rCut','뚜껑'],['rHeat','모두 더워']]]
+  },
   ruleCards: [
     [['rWater','물 나르기',1]],
     [['rWater','물 나르기'],['rSmoke','더워져요',1]],
@@ -618,6 +661,7 @@ var GAME = {
     },
     of: function(G){
       if(G.phase!=='play') return null;
+      if(G.ch) return {why:'연기가 가장 짙은 굴뚝이 하늘을 가장 많이 덥혀요. 더우면 우물이 늦게 차요', def:'여러 산업에서 태우는 화석 연료는 탄소를 많이 내보내서 기후변화의 가장 큰 원인으로 여겨져요.', page:'교과서 143쪽 참고'};
       return [
         {why:'친구들은 6 km 넘게 걸어 물을 구해요', page:'143쪽 편지'},
         {why:'연기가 하늘에 쌓이면 지구 전체가 더워져요', def:'원인: 탄소를 많이 내보내 온실 효과가 커지고 지구가 더워짐', page:'교과서 145쪽 참고'},
@@ -639,8 +683,9 @@ var GAME = {
   /* 1단계: 멈출 때마다 물통 → 목마른 칸 시범. 2단계: 손가락이 하늘 띠를 가리킨다(새 규칙은 '보이는 상태'). 3단계: 시작 시범은 늘 뚜껑 → 가장 큰 연기 굴뚝(물이 급해도). 4단계: 우리나라 폭염 해를 가리킨다 */
   /* '해 보기'(engine §12, 2026-11-05 통합 점검): 2단계 '더워져요'·4단계 '모두 더워'는 학생 동작이 아니다(띠·폭염 핀 = 보이는 상태) → 없음. demo가 그 자리를 가리킨다 */
   /* 5차(블라인드 4차 2단계: 마을이 어둡게 가려져 물을 날라도 되는지 모름): 2단계 시작에 '물은 계속'을 직접 한 번(같은 끌기라 force). 그 뒤 하늘을 빛 테두리로 가리킨다 */
-  tryIt: function(G){ if(G.si===1) return {label:'물은 계속', force:true}; return G.si===3 ? null : {}; },
+  tryIt: function(G){ if(G.ch) return null; if(G.si===1) return {label:'물은 계속', force:true}; return G.si===3 ? null : {}; },
   demo: function(G){
+    if(G.ch) return null;
     if(G.si===0 && !G.first.water) return {repeat:true};
     if(G.si===1) return {point:'band', text:'연기가 하늘에 쌓여요', at:'band'};   /* 블라인드 2차: 장면의 위 화살표(연기 → 띠)와 같은 말 */
     if(G.si===2 && !G.first.cut){ var b=0; G.smoke.forEach(function(x,i){ if(x>G.smoke[b]) b=i; }); return G.card===0 ? {move:{src:'card', dst:'fac:'+b}} : {move:null}; }
@@ -997,7 +1042,7 @@ var SCENE = (function(){
   function el(tag,attrs,html){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(html!=null) e.innerHTML=html; return e; }
   function pill(t,x,y,fs){ fs=fs||20; var w=t.length*fs*0.98+14, h=fs+9; return '<rect x="'+(x-w/2).toFixed(1)+'" y="'+(y-h/2).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+h+'" rx="'+(h/2)+'" class="f-paper" opacity=".94"/><text x="'+x+'" y="'+(y+fs*0.36).toFixed(1)+'" font-size="'+fs+'" text-anchor="middle" class="wm-lab">'+t+'</text>'; }
   var on=function(G){ return G.phase!=='title'; };
-  var stg=function(G){ return STAGES[G.si||0]; };
+  var stg=function(G){ return stOf(G,G.si||0)||STAGES[0]; };   /* 도전이면 도전 단계(logic stOf) */
 
   function box(G,id){
     var p=String(id).split(':'), i=+p[1];
@@ -1022,7 +1067,7 @@ var SCENE = (function(){
     vb:[VW,VH], map:[0,MY,452], tray:null, tint:'continent',
     view:function(){ return {}; },
     rect:function(G,id){ return box(G,id); },
-    avoid:function(G){ var a=['well','sun','village','band'].concat(targets(G)); if(on(G) && stg(G).card) a.push('card'); if(on(G) && (G.si===1||G.si===3)) a.push('keep'); if(on(G) && stg(G).pins) a=a.concat(['pin:KOR','pin:EUR','pin:USA','lab:KOR']); return a; },
+    avoid:function(G){ var a=['well','sun','village','band'].concat(targets(G)); if(on(G) && stg(G).card) a.push('card'); if(on(G) && !G.ch && (G.si===1||G.si===3)) a.push('keep'); if(on(G) && stg(G).pins) a=a.concat(['pin:KOR','pin:EUR','pin:USA','lab:KOR']); return a; },
     idleAt:function(){ return 'well'; },
     over:function(G,layer){ if(!built){ build(layer); built=true; } render(G); },
     css:'.a6-hole{fill:#9FD3DF}.a6-heat{fill:none;stroke:#E8743B;stroke-width:2.8;stroke-linecap:round}.a6-puff{fill:var(--a-paper-d);stroke:var(--a-navy-l);stroke-width:1.5}.a6-path{fill:none;stroke:var(--a-sand-d);stroke-width:5;stroke-dasharray:2 9;stroke-linecap:round}'
@@ -1097,9 +1142,10 @@ var SCENE = (function(){
                           : useArt('envFarm',-34,GY-32,68,61))
         +'<path class="dry f-sand" d="M-30 '+(GY-12)+'L0 '+(GY-29)+'L30 '+(GY-12)+'L30 '+(GY+6)+'L0 '+(GY+22)+'L-30 '+(GY+6)+'z" opacity="0"/>'
         +'<path class="crk" d="M-14 '+(GY-12)+'l8 6l-3 8M6 '+(GY-18)+'l4 9l9 3M-4 '+(GY+6)+'l6 -6" fill="none" stroke="#1E2B3A" stroke-opacity=".45" stroke-width="2" opacity="0"/>'
+        +'<g class="vx" data-verdict="bad" opacity="0"><circle cx="20" cy="'+(GY-34)+'" r="15" fill="#FBF8F1"/><circle cx="20" cy="'+(GY-34)+'" r="15" fill="none" stroke="#C8423B" stroke-width="4"/><path d="M13 '+(GY-41)+'l14 14M27 '+(GY-41)+'l-14 14" stroke="#C8423B" stroke-width="4.5" stroke-linecap="round"/></g>'   /* 도전: 말라 버린 칸에 빨간 가위표(공리 5) */
         +'<g class="bub"><path d="M-23 316h46a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6h-17l-6 7-6-7h-17a6 6 0 0 1-6-6v-20a6 6 0 0 1 6-6z" class="f-paper"/>'+useArt('drop',-9,319,18,23)
         +'<rect x="-19" y="341" width="38" height="7" rx="3.5" class="f-navyl" opacity=".35"/><rect class="a6-bar bar f-grn" x="-19" y="341" width="38" height="7" rx="3.5"/></g>';
-      N.slots.appendChild(g); g._art=g.querySelector('use'); g._dry=g.querySelector('.dry'); g._crk=g.querySelector('.crk'); g._bub=g.querySelector('.bub'); g._bar=g.querySelector('.bar'); return g; });
+      N.slots.appendChild(g); g._art=g.querySelector('use'); g._dry=g.querySelector('.dry'); g._crk=g.querySelector('.crk'); g._bub=g.querySelector('.bub'); g._bar=g.querySelector('.bar'); g._vx=g.querySelector('.vx'); return g; });
     /* 살아난 밭의 초록 반짝임(칸마다 4개) */
     N.spk=SX.map(function(x){ var g=el('g',{transform:'translate('+x+' 0)'}), h2='';
       for(var q=0;q<4;q++) h2+='<g class="sp">'+useArt('spark',-13,-13,26,26)+'</g>'; g.innerHTML=h2; g.style.display='none'; N.slots.appendChild(g); g._sp=[].slice.call(g.querySelectorAll('.sp')); return g; });
@@ -1118,8 +1164,8 @@ var SCENE = (function(){
   function attr(e,k,v){ if(e['_'+k]!==v){ e['_'+k]=v; e.setAttribute(k,v); } }
   function render(G){
     var S0=stg(G), live=on(G), sm=live && S0.smoke, h=heat(G), t=G.t||0;
-    var cueOn = live && G.si===1 && G.phase==='play' && t<9 && !RM;
-    show(N.cueA, cueOn || (RM && live && G.si===1 && G.phase==='play' && t<9));
+    var cueOn = live && !G.ch && G.si===1 && G.phase==='play' && t<9 && !RM;
+    show(N.cueA, cueOn || (RM && live && !G.ch && G.si===1 && G.phase==='play' && t<9));
     if(cueOn){ var cu=(t*0.8)%1; attr(N.cueA,'transform','translate(0 '+(-14*cu).toFixed(1)+')'); attr(N.cueA,'opacity',(cu<0.15?cu/0.15:cu>0.8?(1-cu)/0.2:1).toFixed(2)); }
     /* 5차(블라인드 4차 2·4단계: 마을이 어둡게 가려져 물을 날라도 되는지 헷갈림, '물은 계속' 띠가 말풍선을 가림): 흐린 막·띠를 쓰지 않는다.
        '물은 계속'은 2단계 해 보기가, 새로 볼 것은 엔진 빛 테두리가 맡는다 */
@@ -1135,7 +1181,7 @@ var SCENE = (function(){
     attr(N.bandG,'opacity', sm ? (0.08+0.92*h).toFixed(3) : '0.05');
     show(N.bandBase, sm);
     /* 공장과 연기 기둥 */
-    var cv=live && S0.card, lf=G.lastFac, age=lf>=0 ? t-G.lastFacT : 99, capT=G.lastFacT, relT=G.lastFacT+T.cardCool;
+    var CC=coolOf(G), cv=live && S0.card, lf=G.lastFac, age=lf>=0 ? t-G.lastFacT : 99, capT=G.lastFacT, relT=G.lastFacT+CC;   /* CC: 뚜껑 쉬는 시간(도전은 레벨마다 김) */
     show(N.fac, sm); show(N.puff, sm);
     if(lf>=0 && G.lastFacT!==lastSeen){ lastSeen=G.lastFacT; sBefore[lf]=prevS[lf]; }
     if(sm){
@@ -1150,9 +1196,9 @@ var SCENE = (function(){
     }
     /* 띠에서 이어지는 결과(시각은 LOGIC과 같음): 1초 = 마지막 연기가 띠에 닿아 그 굴뚝 몫이 빠짐 → 그 위 띠에 맑은 구멍 →
        맑아짐이 띠를 따라 왼쪽으로 → 지나가는 해가 그 순간 작아짐 → '이 마을' 해에서 내려오는 열기가 가늘어짐 → 2.2초 = 마을 해가 작아지고 목마른 밭 막대가 다시 늚 */
-    var hx = lf>=0 ? MO(lf)[0]+8 : 0, fx = sm && cv && lf>=0 && age<T.cardCool+1.6, tW0=T.reachBand+0.1, vW=Math.max(200,(hx-VIL[0])/(T.reachVil-0.5-tW0));
+    var hx = lf>=0 ? MO(lf)[0]+8 : 0, fx = sm && cv && lf>=0 && age<CC+1.6, tW0=T.reachBand+0.1, vW=Math.max(200,(hx-VIL[0])/(T.reachVil-0.5-tW0));
     if(fx){
-      var ho = age<T.reachBand ? 0 : age<T.reachBand+0.3 ? (age-T.reachBand)/0.3 : age<T.cardCool ? 1 : Math.max(0,1-(age-T.cardCool)/1.5), hr = age<T.reachBand ? 1 : 12+36*Math.min(1,(age-T.reachBand)/0.4);
+      var ho = age<T.reachBand ? 0 : age<T.reachBand+0.3 ? (age-T.reachBand)/0.3 : age<CC ? 1 : Math.max(0,1-(age-CC)/1.5), hr = age<T.reachBand ? 1 : 12+36*Math.min(1,(age-T.reachBand)/0.4);
       attr(N.holeE,'cx',hx.toFixed(1)); attr(N.holeE,'rx',hr.toFixed(1)); attr(N.holeE,'opacity',(0.9*ho).toFixed(2));
       var wx = hx-(age-tW0)*vW, wo = 0;   /* 블라인드 3차: 왼쪽으로 지나가는 밝은 덩어리가 '닫히는 구멍'으로 읽혀 끔(해가 차례로 줄어드는 것으로 충분) */
       attr(N.wave,'cx',wx.toFixed(1)); attr(N.wave,'opacity',wo.toFixed(2));
@@ -1178,7 +1224,7 @@ var SCENE = (function(){
     if(cv){
       var held=!!document.querySelector('#ovl .ghost use[href="#a-lid"], .ghost use[href="#a-lid"]');   /* 끄는 중·시범 중: 손에 든 뚜껑만 보이게 */
       var lx=HOME[0], ly=HOME[1], sc=1, lo=1, nk=-1;
-      if(G.cap>=0){ var m=MO(G.cap); lx=m[0]; ly=m[1]-8; sc=CAPSC*(age<0.15 && !RM ? 1+0.4*(1-age/0.15) : 1); lo=(held && age<0.3) ? 0 : 1; nk=1-G.card/T.cardCool; }
+      if(G.cap>=0){ var m=MO(G.cap); lx=m[0]; ly=m[1]-8; sc=CAPSC*(age<0.15 && !RM ? 1+0.4*(1-age/0.15) : 1); lo=(held && age<0.3) ? 0 : 1; nk=1-G.card/CC; }
       else if(lf>=0 && t-relT>=0 && t-relT<0.4 && !RM){ var m2=MO(lf), k3=(t-relT)/0.4; lx=m2[0]; ly=m2[1]-8-24*k3; sc=CAPSC; lo=1-k3; }
       if(G.cap<0 && !(lf>=0 && t-relT>=0 && t-relT<0.4 && !RM) && held) lo=0;
       var ready=G.cap<0; if(ready && !wasReady) readyT=t; wasReady=ready;
@@ -1187,7 +1233,7 @@ var SCENE = (function(){
       attr(N.lidG,'transform','translate('+lx.toFixed(1)+' '+ly.toFixed(1)+') scale('+sc.toFixed(3)+')'); attr(N.lidG,'opacity',lo.toFixed(2));
       if(G.cap<0 && lf>=0 && t-relT>=0 && t-relT<0.4 && !RM){ nk=1; }
       show(N.nextG, nk>=0); if(nk>=0){ var k4=Math.max(0,Math.min(1,nk)); attr(N.nextClip,'transform','translate(0 '+(34*(1-k4)).toFixed(1)+')'); }
-      var rk = G.cap>=0 ? Math.max(0,Math.min(1,1-G.card/T.cardCool)) : 1;            /* 고리: 뚜껑을 쓰는 동안 0 → 1, 준비되면 한 바퀴 */
+      var rk = G.cap>=0 ? Math.max(0,Math.min(1,1-G.card/CC)) : 1;            /* 고리: 뚜껑을 쓰는 동안 0 → 1, 준비되면 한 바퀴 */
       attr(N.ring,'stroke-dashoffset',(RC*(1-rk)).toFixed(1)); attr(N.ring,'stroke', rk>=1 ? '#4CAF7A' : '#E8743B');
       show(N.ghost, nk<0);
     }
@@ -1209,6 +1255,7 @@ var SCENE = (function(){
       var person=s.kind==='person';
       attr(g._dry,'opacity', person ? '0' : (dr ? '.92' : (th ? (0.92*Math.max(0,(f-0.3)/0.7)).toFixed(2) : '0')));   /* 마름 = 막대가 30% 넘게 줄면 흐려짐(열기가 줄어 막대가 다시 늘면 밭 색이 돌아온다) */
       attr(g._crk,'opacity', !person && dr ? '1' : '0');
+      attr(g._vx,'opacity', G.ch && dr ? '1' : '0');
       attr(g._art,'opacity', person && dr ? '.4' : '1');
       var w=N.wk[i]; show(w, s.st==='coming');
       if(s.st==='coming'){ var x0=WELL[0]-60, x=x0+(SX[i]-x0)*s.walk, y=422-Math.abs(Math.sin(s.walk*Math.PI*6))*5; attr(w,'transform','translate('+x.toFixed(1)+' '+y.toFixed(1)+')'); }

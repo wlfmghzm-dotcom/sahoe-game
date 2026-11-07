@@ -416,14 +416,43 @@ var CFG = {
     {kinds:['learn','sick'], n:8, wave:2, gap:8, pat:8, t0:2.5}
   ]
 };
-/* 도전 모드(G.ch = 레벨 1~): 주민 기다림을 줄이고, 무리 사이를 좁히고, 동전을 느리게, 한 단계 주민을 늘린다. 시드로 주민 순서가 바뀐다. 일반 판(G.ch 없음)은 CFG 그대로 */
+/* §19 도전(2026-11-07 밤, 모자람 도전) — '살림꾼 마을'.
+   한 줄 설계: "동전이 모자랄 때, 지금 기다리는 주민의 필요에 쓸까 로봇에 먼저 넣어 동전을 늘릴까 — 그리고 누구의 필요(그림)부터 어느 건물에".
+   일반 판에서 해 본 동작(동전 → 로봇 / 동전 → 건물)과 규칙만: c1 rule 'invest'(로봇 = 동전 빨리 + 필요에 맞는 건물), c2 rule 'care'(아픈 사람은 병원, 배우고 싶은 학생은 학교).
+   도전에서는 세 건물이 처음부터 다 열려 있고 필요가 섞여 온다(일반 판 2·3단계와 같은 짝). 로봇은 판 처음에 0대, c1에서 놓은 로봇은 c2까지 간다.
+   점수: 웃은 주민 하나 = 10(빠르기·콤보 없음, 힌트로 넣으면 4). 목표 = 웃게 할 주민 수 × 10 × 비율(레벨마다 오름).
+   레벨이 올리는 것(판단 거리): 처음 동전이 줄고(로봇 투자가 더 급함), 필요 종류 2 → 3, 동시에 기다리는 주민 2 → 3(광장 자리), 무리 사이가 좁아져 동전이 더 모자람.
+   모르면 손해: 필요와 다른 건물에 넣으면 빈 의자(동전 사라짐) → 다음 주민 몫이 없음, 로봇에 안 넣으면 끝까지 동전이 느림, 급한 주민(빨간 고리)을 늦게 주면 돌아감. 수치는 아래 CH 한 곳 */
+var CH = {
+  pts:10, via:4,
+  /* 레벨 1 ~ (마지막 줄이 그 뒤 레벨까지) : coin0 처음 동전, kinds 필요 종류(c1, c2), slots 광장 자리, n 주민 수(c1, c2), gap 무리 사이 초, pat 기다림 초, wave 한 무리 */
+  L: [null,   /* g = 목표(웃게 할 주민 수 × 10에 대한 비율) */
+    {coin0:3, kinds:[['fun','learn'],['learn','sick']],             slots:2, n:[6,7],   gap:7.5, pat:9,   wave:2, g:0.60},
+    {coin0:3, kinds:[['fun','learn','sick'],['fun','learn','sick']], slots:2, n:[7,8],   gap:7.0, pat:9,   wave:2, g:0.62},
+    {coin0:2, kinds:[['fun','learn','sick'],['fun','learn','sick']], slots:2, n:[8,9],   gap:6.8, pat:9,   wave:2, g:0.64},
+    {coin0:2, kinds:[['fun','learn','sick'],['fun','learn','sick']], slots:3, n:[9,10],  gap:7.8, pat:9,   wave:3, g:0.66},
+    {coin0:1, kinds:[['fun','learn','sick'],['fun','learn','sick']], slots:3, n:[9,11],  gap:7.4, pat:8.5, wave:3, g:0.68},
+    {coin0:1, kinds:[['fun','learn','sick'],['fun','learn','sick']], slots:3, n:[10,12], gap:7.0, pat:8.5, wave:3, g:0.70}],
+  goalK:0.02, goalMax:0.9
+};
+function chLvRow(lv){ return CH.L[Math.max(1,Math.min(CH.L.length-1,lv||1))]; }
+function chStages(lv){
+  var P=chLvRow(lv), k=Math.max(0,(lv||1)-(CH.L.length-1));   /* 표 끝 뒤 레벨: 무리 사이가 0.25초씩 좁아짐(최소 5.6) */
+  return [
+    {key:'c1', name:'살림꾼 마을', rule:'invest', open:['hall','school','hosp'], kinds:P.kinds[0], n:P.n[0], wave:P.wave, gap:Math.max(5.6,P.gap-0.25*k), pat:P.pat, t0:2.0, slots:P.slots, coin0:P.coin0},
+    {key:'c2', name:'아픈 사람도 와요', rule:'care', open:['hall','school','hosp'], kinds:P.kinds[1], n:P.n[1], wave:P.wave, gap:Math.max(5.6,P.gap-0.25*k), pat:P.pat, t0:2.0, slots:P.slots}
+  ];
+}
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+function chGoal(lv){ var S=chStages(lv), n=S[0].n+S[1].n, k=Math.max(0,(lv||1)-(CH.L.length-1)); return Math.round(CH.pts*n*Math.min(CH.goalMax, chLvRow(lv).g+CH.goalK*k)); }
+/* 도전 모드(G.ch = 레벨 1~): 도전 단계 표로 바꾼 설정(시드로 주민 차례가 바뀜). 일반 판(G.ch 없음)은 CFG 그대로 */
 function cfgFor(G){
   if(!G || !G.ch) return CFG;
-  var c=cl(CFG), k=Math.max(0,G.ch-1);
-  c.stages.forEach(function(s){ s.pat=Math.max(7, s.pat-0.6*k); s.gap=Math.max(6, s.gap-0.5*k); s.n=s.n+Math.floor(k/2); });
-  c.coinInt=CFG.coinInt.map(function(x){ return x*(1+0.04*k); });
+  var c=cl(CFG); c.stages=chStages(G.ch); c.pts=CH.pts; c.fastPts=0; c.comboStep=0; c.via=CH.via; c.slots=c.stages[0].slots;
   return c;
 }
+function nStages(G){ return G && G.ch ? 2 : STAGES.length; }
+function openOf(G){ return G.ch ? stOf(G).open : STAGES[G.si].open; }
 /* 필요(주민) → 건물 */
 var NEED = { fun:{b:'hall', who:'kid'}, learn:{b:'school', who:'student'}, sick:{b:'hosp', who:'elder'} };
 var CONT = [[2006,13.7],[2008,23.4],[2010,31.9],[2012,46.1],[2014,52.7],[2016,60.1],[2018,96.2],[2020,119.2],[2022,132.4]];   /* 교과서 82쪽(억 달러) */
@@ -451,8 +480,8 @@ var TITLES = [[0,'새내기 이장'],[100,'마을 일꾼'],[290,'마을 설계�
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.rs+0x6D2B79F5)>>>0; G.rs=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function firstName(G,ev,k,at){ if(G.ch && k!=='waste' && k!=='leave') return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
 function live(G){ return G && G.phase==='play' && G.endAt==null; }
 function stOf(G){ return cfgFor(G).stages[G.si]; }
 function rateOf(G){ return cfgFor(G).coinInt[Math.min(CFG.robotMax,G.robots)]; }
@@ -467,7 +496,7 @@ function makeQueue(G,S){
 function startStage(G0,si){
   var G=cl(G0); G.si=si; var S=stOf(G);
   G.phase='play'; G.t=0; G.endAt=null; G.combo=0; G.lastDrop=null; G.anim=[]; G.cd=rateOf(G);
-  if(si===0) G.coins=CFG.coinStart;
+  if(si===0) G.coins=G.ch?S.coin0:CFG.coinStart;
   G.ppl=[]; G.queue=makeQueue(G,S); G.nid=1; G.smile=0;
   G.res={total:S.n, served:0, missed:0};
   return G;
@@ -478,7 +507,7 @@ function newGame(seed){
     res:{total:0, served:0, missed:0}, stats:{coins:0, made:0, served:0, left:0, waste:0, robotAt:[], smiles:[0,0,0], n:[0,0,0]}};
 }
 function start(G){ var g=cl(G); g.score=0; g.t=0; g.robots=0; g.rs=g.seed; g.stats={coins:0, made:0, served:0, left:0, waste:0, robotAt:[], smiles:[0,0,0], n:[0,0,0]}; return startStage(g,0); }
-function freeSlot(G){ for(var s=0;s<CFG.slots;s++) if(!G.ppl.some(function(p){ return p.st==='wait' && p.slot===s; })) return s; return -1; }
+function freeSlot(G){ var N=G.ch?stOf(G).slots:CFG.slots; for(var s=0;s<N;s++) if(!G.ppl.some(function(p){ return p.st==='wait' && p.slot===s; })) return s; return -1; }
 
 function tick(G0,dt){
   var G=cl(G0), ev=[], S=stOf(G);
@@ -519,7 +548,7 @@ function drop(G0,src,dst,via){
     return {G:G, ok:true, ev:ev};
   }
   var b=String(dst).split(':')[1];
-  if(String(dst).split(':')[0]!=='bld' || STAGES[G0.si].open.indexOf(b)<0) return fail('dst');
+  if(String(dst).split(':')[0]!=='bld' || openOf(G0).indexOf(b)<0) return fail('dst');
   G=cl(G0); G.coins--; G.stats.coins++;
   /* 이 건물을 기다리는 주민 중 가장 급한 사람 */
   var p=null; G.ppl.forEach(function(x){ if(x.st==='wait' && NEED[x.need].b===b && (!p || x.pat-x.w < p.pat-p.w)) p=x; });
@@ -536,12 +565,16 @@ function drop(G0,src,dst,via){
   firstName(G,ev,b,dst);
   return {G:G, ok:true, ev:ev};
 }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 /* 성실한 학생의 한 수: 기다리는 주민이 있으면 가장 급한 사람의 건물로. 아무도 없을 때 로봇 자리가 남았으면 로봇에(먼저 투자).
    기다리는 사람이 없고 로봇도 다 찼으면 동전을 모아 둔다(null) */
 function hintMove(G){
   if(!live(G) || !(G.coins>0)) return null;
   var w=waiting(G); w.sort(function(a,b){ return (a.pat-a.w)-(b.pat-b.w); });
+  if(G.ch){   /* 도전: 동전이 모자라므로 로봇(기술 투자)부터, 다 놓으면 가장 급한 주민의 필요 건물에 */
+    if(G.robots<CFG.robotMax) return {src:'coin', dst:'robot'};
+    return w.length ? {src:'coin', dst:'bld:'+NEED[w[0].need].b} : null;
+  }
   if(w.length){
     /* 동전이 남는데 로봇 자리가 있고 가장 급한 사람이 아직 여유 있으면 로봇 먼저 */
     if(G.robots<CFG.robotMax && G.coins>w.length && w[0].pat-w[0].w>4) return {src:'coin', dst:'robot'};
@@ -551,11 +584,12 @@ function hintMove(G){
   return null;
 }
 function sources(G){ return live(G) && G.coins>0 ? ['coin'] : []; }
-function targets(G){ if(!live(G)) return []; var a=STAGES[G.si].open.map(function(b){ return 'bld:'+b; }); if(G.robots<CFG.robotMax) a.unshift('robot'); return a; }
+function targets(G){ if(!live(G)) return []; var a=openOf(G).map(function(b){ return 'bld:'+b; }); if(G.robots<CFG.robotMax) a.unshift('robot'); return a; }
 function itemOf(G,id){ return id==='coin' ? 'coin' : null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
 if(typeof module!=='undefined') module.exports={SEED:SEED,CFG:CFG,cfgFor:cfgFor,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,NEED:NEED,CONT:CONT,LIFE:LIFE,EDU:EDU,
+  CH:CH,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,nStages:nStages,openOf:openOf,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,rateOf:rateOf,waiting:waiting};
 /* LOGIC-END */
 
@@ -602,6 +636,13 @@ var GAME = {
     ],
     idle: '공장이 동전을 버는 중이야'
   },
+  /* §19 도전(logic.js CH 주석): 동전이 모자랄 때 로봇 먼저냐 지금 필요냐, 누구 필요부터 어느 건물에. 동작·짝은 일반 판 그대로 */
+  challenge: {
+    stages: CH_STAGES,
+    goal: chGoal,
+    say: {start: ['동전이 모자라! 로봇부터?', '아픈 사람도 와! 누구부터?']},
+    ruleCards: [[['rBot','로봇 = 동전 빨리']], [['rSick','아픔 → 병원']]]
+  },
   ruleCards: [
     [['rBot','로봇 = 동전 빨리',1],['rFun','심심 → 공연장',0]],
     [['rLearn','배움 → 학교',1]],
@@ -625,7 +666,7 @@ var GAME = {
       full: {line:'로봇 자리가 다 찼어요', why:'로봇 3대를 다 놓았어요. 이제 동전은 건물에!'},
       dst:  {line:'아직 안 열었어요', why:'이번에는 밝은 건물만 열려 있어요'}
     },
-    general: function(G){ return XP6[G.si]||null; }
+    general: function(G){ if(G.ch) return {why:'로봇에 먼저 넣으면 동전이 빨라져요. 말풍선 그림에 맞는 건물에, 고리가 빨간 사람부터!', page:'교과서 81~83쪽 참고'}; return XP6[G.si]||null; }
   },
   toast: {show:'name'},
   tryPts: 0,
@@ -678,7 +719,8 @@ var SCENE = (function(){
   var VB={w:640,h:424}, svg, L={}, sig='', st={}, endSig='', ring=null;
   var FACT={x:6,y:46,w:136,h:136}, RB={x:4,y:192,w:168,h:72}, TRAY={x:4,y:272,w:168,h:62};
   var BLD={hall:{x:182,y:50,w:148,h:150,art:'hall',aw:140,ah:105}, school:{x:336,y:50,w:148,h:150,art:'school',aw:140,ah:94}, hosp:{x:488,y:50,w:148,h:150,art:'hosp',aw:118,ah:98}};
-  var SLOT=[{cx:300,y:214},{cx:520,y:214}], SM={x:182,y:4,w:454,h:40};
+  var SLOT2=[{cx:300,y:214},{cx:520,y:214}], SLOT3=[{cx:222,y:214},{cx:372,y:214},{cx:522,y:214}], SLOT=SLOT2, SM={x:182,y:4,w:454,h:40};
+  function slotsOf(G){ return (G && G.ch && stOf(G) && stOf(G).slots===3) ? SLOT3 : SLOT2; }   /* 도전: 광장 자리 3곳(레벨 3부터) */
   var WHO={fun:'person12', learn:'person12', sick:'elder'}, NART={fun:'nFun', learn:'nLearn', sick:'nSick'};
   function el(tag,attrs,html){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(html!=null) e.innerHTML=html; return e; }
   function txt(x,y,s,size,fill,anchor){ return '<text x="'+x+'" y="'+y+'" text-anchor="'+(anchor||'middle')+'" font-family="Jua,sans-serif" font-size="'+(size||20)+'" fill="'+(fill||'#1E2B3A')+'">'+s+'</text>'; }
@@ -696,7 +738,7 @@ var SCENE = (function(){
     [[20,384],[150,386],[300,384],[460,386],[580,382]].forEach(function(p,i){ h+=useArt(i%2?'houseC':'houseA',p[0],p[1],50,50); });
     /* 광장 */
     h+='<rect x="182" y="206" width="454" height="138" rx="18" class="f-sand" opacity=".7"/>';
-    SLOT.forEach(function(s){ h+='<ellipse cx="'+s.cx+'" cy="'+(s.y+118)+'" rx="56" ry="10" class="f-landd" opacity=".6"/>'; });
+    SLOT=slotsOf(G); SLOT.forEach(function(s){ h+='<ellipse cx="'+s.cx+'" cy="'+(s.y+118)+'" rx="56" ry="10" class="f-landd" opacity=".6"/>'; });
     h+=useArt('factoryK',FACT.x,FACT.y,FACT.w,FACT.h);
     L.bg.innerHTML=h;
   }
@@ -712,9 +754,9 @@ var SCENE = (function(){
     L.smile.innerHTML='<g data-keep="마을 웃음">'+h+'</g>';
   }
   /* ---- 건물 ---- */
-  function bState(G,b){ if(title(G)) return 'on'; if(STAGES[si(G)].open.indexOf(b)>=0) return 'on'; var first=STAGES.findIndex(function(S){ return S.open.indexOf(b)>=0; }); return first<si(G)?'done':'later'; }
+  function bState(G,b){ if(title(G)) return 'on'; if(openOf(G).indexOf(b)>=0) return 'on'; var first=STAGES.findIndex(function(S){ return S.open.indexOf(b)>=0; }); return first<si(G)?'done':'later'; }
   function drawBld(G){
-    var k=si(G)+'|'+G.phase; if(st.b===k) return; st.b=k; var h='';
+    var k=si(G)+'|'+G.phase+'|'+(G.ch||0); if(st.b===k) return; st.b=k; var h='';
     Object.keys(BLD).forEach(function(b){ var B=BLD[b], s=bState(G,b), ax=B.x+(B.w-B.aw)/2, ay=B.y+B.h-B.ah-8;
       if(s==='on') h+='<rect x="'+B.x+'" y="'+B.y+'" width="'+B.w+'" height="'+B.h+'" rx="14" class="f-paper" stroke="#E8743B" stroke-width="2.5"/>'+useArt(B.art,ax,ay,B.aw,B.ah);
       else if(s==='done') h+='<rect x="'+B.x+'" y="'+B.y+'" width="'+B.w+'" height="'+B.h+'" rx="14" class="f-landd" opacity=".55"/>'+useArt(B.art,ax,ay,B.aw,B.ah);   /* 블라인드: 흐리게 하면 사라진 것처럼 보였다 → 그림은 그대로, 주황 테두리(열림)만 없음 */
@@ -745,14 +787,14 @@ var SCENE = (function(){
     (G.ppl||[]).forEach(function(p){ var s=SLOT[p.slot], x=s.cx-26, y=s.y+40, op=1, sc=1, bub=true;
       if(p.st==='in'){ var q=Math.min(1,(G.t-p.t1)/0.8), B=BLD[p.b], tx=B.x+B.w/2-26, ty=B.y+B.h-80; x+= (tx-x)*q; y+=(ty-y)*q; sc=1-0.4*q; op=1-q*q; bub=false; if(q>=1) return; }
       if(p.st==='left'){ var r=Math.min(1,(G.t-p.t1)/1.2); x+=90*r; y+=60*r; op=1-r; }
-      h+='<g opacity="'+op.toFixed(2)+'" transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+sc.toFixed(2)+')">'+useArt(WHO[p.need],0,0,52,78);
+      h+='<g'+(p.st==='left'?' data-verdict="bad"':'')+' opacity="'+op.toFixed(2)+'" transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+sc.toFixed(2)+')">'+useArt(WHO[p.need],0,0,52,78);
       if(bub){ var gray=p.st==='left';
         h+='<path d="M58 -6l-10 28 22-14z" fill="'+(gray?'#C9D1DA':'#FBF8F1')+'"/><circle cx="84" cy="-14" r="32" fill="'+(gray?'#C9D1DA':'#FBF8F1')+'" stroke="#33475C" stroke-width="2"/>'+useArt(NART[p.need],60,-38,48,48);
         if(p.st==='wait'){ var f=1-p.w/p.pat; h+='<path d="'+arc(84,-14,37,f)+'" fill="none" stroke="'+(f<0.35?'#D2483C':'#4CAF7A')+'" stroke-width="6" stroke-linecap="round"/>'; } }
       h+='</g>'; });
     /* 빈 의자: 기다리는 사람이 없는 건물에 넣은 동전 */
     (G.anim||[]).forEach(function(a){ if(a.k!=='waste') return; var q=(G.t-a.t0)/1.4; if(q<0||q>=1) return; var B=BLD[a.b];
-      h+='<g opacity="'+(q<0.7?1:(1-q)/0.3).toFixed(2)+'">'+useArt('chair',B.x+B.w/2-26,B.y+B.h-64,52,58)+'<g opacity="'+(1-q).toFixed(2)+'">'+useArt('coin',B.x+B.w/2+14,B.y+B.h-84-30*q,30,30)+'</g></g>'; });
+      h+='<g data-verdict="bad" opacity="'+(q<0.7?1:(1-q)/0.3).toFixed(2)+'">'+useArt('chair',B.x+B.w/2-26,B.y+B.h-64,52,58)+'<g opacity="'+(1-q).toFixed(2)+'">'+useArt('coin',B.x+B.w/2+14,B.y+B.h-84-30*q,30,30)+'</g></g>'; });
     L.ppl.innerHTML=h;
   }
   /* ---- 동전이 공장에서 쟁반으로 ---- */
@@ -766,7 +808,7 @@ var SCENE = (function(){
   function bars(x,y,w,rows,max,unit){ var h=''; rows.forEach(function(r,i){ var yy=y+i*40, bw=Math.max(4,w*r[1]/max);
     h+=txt(x,yy+20,r[0],20,i?'#C95F2C':'#33475C','start')+'<rect x="'+(x+56)+'" y="'+(yy+4)+'" width="'+bw.toFixed(1)+'" height="22" rx="5" class="'+(i?'f-org':'f-navyl')+'"/>'+txt(x+62+bw,yy+21,r[2],20,i?'#C95F2C':'#33475C','start'); }); return h; }
   function drawCard(G){
-    var k=G.phase==='stageEnd'?'s'+si(G):''; if(k===endSig) return; endSig=k; if(!k){ L.card.innerHTML=''; return; }
+    var k=G.phase==='stageEnd'&&!G.ch?'s'+si(G):''; if(k===endSig) return; endSig=k; if(!k){ L.card.innerHTML=''; return; }
     var s=si(G), h='<g class="cardIn" data-keep="비교 카드"><rect x="182" y="206" width="454" height="140" rx="16" class="f-paper" stroke="#B9852F" stroke-width="2.5"/>', i;
     if(s===0){
       var n0=Math.floor(30/CFG.coinInt[0]), n3=Math.floor(30/CFG.coinInt[3]);
@@ -783,7 +825,7 @@ var SCENE = (function(){
   }
   function renderScene(G){
     if(!svg) return;
-    var s=si(G)+'|'+title(G); if(s!==sig){ sig=s; buildBg(G); st={}; L.fac.innerHTML=''; }
+    var s=si(G)+'|'+title(G)+'|'+(G.ch?G.seed+'/'+G.ch:0); if(s!==sig){ sig=s; buildBg(G); st={}; L.fac.innerHTML=''; }
     drawSmile(G); drawBld(G); drawFac(G); drawTray(G); drawPpl(G); drawFly(G); drawCard(G);
   }
   function vbRect(G,id){
@@ -804,7 +846,7 @@ var SCENE = (function(){
   function avoid(G){ if(G.phase==='stageEnd') return ['cmp','smile']; return sources(G).concat(targets(G)); }
   function labels(G){ return ['smile']; }
   function keepClear(G){
-    if(G.phase==='stageEnd') return ['cmp','smile','robot'].concat(STAGES[si(G)].open.map(function(b){ return 'bld:'+b; }));
+    if(G.phase==='stageEnd') return ['cmp','smile','robot'].concat(openOf(G).map(function(b){ return 'bld:'+b; }));
     var a=['smile','robot','coin']; (G.ppl||[]).forEach(function(p){ if(p.st==='wait') a.push('slot:'+p.slot); }); return a;
   }
   function idleAt(G){ return 'coin'; }

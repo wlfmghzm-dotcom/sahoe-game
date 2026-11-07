@@ -426,13 +426,58 @@ var CFG = {
     {has:{hand:3, money:3, tech:3}, cards:['light','heavy','chip'], lots:3, S:44, T:34}
   ]
 };
-/* 도전 모드(G.ch = 레벨 1~): 시대 시계를 줄이고 점선을 올리고 모자란 공장을 더 느리게. 시드로 카드 순서가 바뀐다. 일반 판(G.ch 없음)은 CFG 그대로 */
+/* §19 추론형 도전(2026-11-07 밤, GAME.challenge.kind='reason') — '형편에 맞는 공장 고르기'.
+   한 줄 설계: "판마다 바뀌는 나라 형편(일손·돈·기술 칸)을 보고, 잘 도는 공장 중 가장 큰 공장을 빈 땅 3곳에 지어 다 실어 보낸다 — 그 레벨 형편을 모두 맞히면 통과".
+   일반 판과 같은 동작(카드 → 빈 땅, 물건 → 배)·같은 규칙(rule 'build': 2칸 이상 가진 것을 쓰는 공장이 잘 돈다, 동전이 많은 물건일수록 소득이 크다).
+   형편은 연표(우리나라 1960~2023) 대신 시드로 고른 '형편 1·2·3'이라 연표·실제 소득 값은 쓰지 않는다(역사를 바꾸지 않으려고 연도 글을 지움).
+   시간 압박·빠르기·콤보 없음: 공장 하나는 물건 3개를 만들고 멈추며, 모두 실으면 그 형편이 끝난다(시대 시계 없음). 모자란 공장은 하나도 못 만든다.
+   점수: 실은 물건 하나 = 5 × (그 물건 동전 ÷ 그 형편의 가장 큰 잘 도는 공장 동전). 힌트로 지은 공장의 물건은 0. 목표 = 만점(3형편 × 9개 × 5 = 135).
+   점선 = 가장 큰 공장 셋의 물건 9개 → 점선에 닿음 ⇔ 그 형편을 맞힘('점선까지 못 갔어요' 리본 = 틀림).
+   레벨이 올리는 것 = 함께 따질 개념 요소:
+     1 맞는 공장(필요 ↔ 가진 것), 카드 2(옷·철강), 한쪽만 잘 도는 형편   2 + 둘 다 잘 돌면 큰 공장(옷도 도는 철강 형편)
+     3 + 반도체 카드(기술)   4 + 1칸·2칸을 가려 봄(2칸부터 잘 돎, 촘촘한 형편 2개)   5 + 카드의 '필요한 것' 그림을 지움(옷 = 일손, 철강 = 돈, 반도체 = 기술을 알아야)
+   함정(반쪽만 알면 틀림, 시드가 바뀌어도 판마다): 레벨 1부터 '옷만 잘 도는 형편'(큰 공장만 고르면 틀림)과 '철강만 도는 형편'(옷만 고르면 틀림),
+     레벨 2부터 '옷도 도는 철강 형편'에서 옷 카드를 철강보다 앞에(맞기만 하면 고르면 틀림), 레벨 3부터 반도체 형편에서 철강 카드를 반도체보다 앞에(반도체를 모르면 틀림). */
+var CH = { maxLv:5, pts:5, per:3, lots:3, rateFit:7, rateMis:999, endHold:1.0,
+  P: { /* 형편 [일손, 돈, 기술] 칸 0~3 (2칸 이상 = 잘 돎) */
+    clear: { light:[[3,1,0],[3,0,1],[3,1,1]], heavy:[[1,3,0],[0,3,1],[1,3,1]], heavy2:[[3,3,0],[3,3,1]], chip:[[1,3,3],[3,3,3],[0,3,3]] },
+    close: { light:[[2,1,0],[2,1,1],[2,0,1]], heavy:[[1,2,1],[1,2,0]],          heavy2:[[2,2,1],[2,2,0]], chip:[[1,2,2],[2,2,2]] } },
+  L: [null, /* kinds = 세 형편 각각 고를 수 있는 종류(시드로 하나, 순서도 섞음), cards = 카드 수, close = 촘촘한 형편 수, hide = 카드의 필요한 것 그림 지움 */
+    {kinds:[['light'],['heavy'],['light','heavy']],          cards:2, close:0, hide:0},
+    {kinds:[['light'],['heavy2'],['light','heavy','heavy2']],cards:2, close:0, hide:0},
+    {kinds:[['light','heavy'],['heavy2'],['chip']],          cards:3, close:0, hide:0},
+    {kinds:[['light','heavy'],['heavy2'],['chip']],          cards:3, close:2, hide:0},
+    {kinds:[['light','heavy'],['heavy2'],['chip']],          cards:3, close:2, hide:1}] };
+var CH_PARTIALS = ['큰 공장만 고름', '사람 손 공장(옷)만 고름', '잘 돌기만 하면 고름(더 큰 공장을 안 봄)', '반도체(기술)를 모름'];
+var CH_STAGES = [{name:'형편 1', rule:'build'}, {name:'형편 2', rule:'build'}, {name:'형편 3', rule:'build'}];
+function chGoal(lv){ return CH.pts*CH.per*CH.lots*CH_STAGES.length; }
+function chLvOf(G){ return Math.max(1,Math.min(CH.maxLv,G.ch|0)); }
+function chRng(s){ return function(){ s=(s+0x6D2B79F5)>>>0; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+/* 시드·레벨 → 세 형편(has, 카드 순서). 같은 시드면 늘 같다 */
+function chEras(seed,lv){
+  var P=CH.L[lv], R=chRng((seed^(lv*0x9E3779B1))>>>0), pick=function(a){ return a[Math.floor(R()*a.length)]; }, i, j;
+  var kinds=P.kinds.map(pick), ord=[0,1,2];
+  for(i=2;i>0;i--){ j=Math.floor(R()*(i+1)); var x=ord[i]; ord[i]=ord[j]; ord[j]=x; }
+  var closeAt=ord.slice(0,P.close);   /* 촘촘한 형편이 되는 자리 */
+  var all=['light','heavy','chip'].slice(0,P.cards), eras=[];
+  ord.forEach(function(oi,si){
+    var k=kinds[oi], pool=CH.P[closeAt.indexOf(oi)>=0?'close':'clear'][k], has=pick(pool), cards=all.slice();
+    for(i=cards.length-1;i>0;i--){ j=Math.floor(R()*(i+1)); var y=cards[i]; cards[i]=cards[j]; cards[j]=y; }
+    /* 함정: 잘 도는 작은 공장 카드를 정답 카드보다 앞에 */
+    var best=k==='heavy2'?'heavy':k, small=k==='heavy2'?'light':k==='chip'?'heavy':null;
+    if(small && cards.indexOf(small)>cards.indexOf(best)){ var a=cards.indexOf(small), b=cards.indexOf(best); cards[a]=best; cards[b]=small; }
+    eras[si]={has:{hand:has[0], money:has[1], tech:has[2]}, cards:cards, lots:CH.lots, S:0, T:9999, kind:k, close:closeAt.indexOf(oi)>=0?1:0};
+  });
+  eras.forEach(function(e){ var bv=0; e.cards.forEach(function(c){ if(e.has[FT[c].need]>=CFG.fitAt && FT[c].val>bv) bv=FT[c].val; }); e.S=bv*CH.per*CH.lots; });
+  return eras;
+}
+var CH_MEMO = {k:null, c:null};
+/* 도전 모드(G.ch = 레벨 1~): 위 형편 표로 바꾼 설정. 일반 판(G.ch 없음)은 CFG 그대로 */
 function cfgFor(G){
   if(!G || !G.ch) return CFG;
-  var c=cl(CFG), k=Math.max(0,G.ch-1), s=(G.seed>>>0);
-  c.eras.forEach(function(e,i){ e.T=Math.max(20, e.T-1.5*k); e.S=Math.round(e.S*(1+0.04*k)); var n=e.cards.length, r=(s>>> (i*3))%n; e.cards=e.cards.slice(r).concat(e.cards.slice(0,r)); });
-  c.rateMis=CFG.rateMis*(1+0.1*k); c.shipCap=CFG.shipCap+(k>=3?1:0);
-  return c;
+  var lv=chLvOf(G), key=(G.seed>>>0)+'|'+lv; if(CH_MEMO.k===key) return CH_MEMO.c;
+  var c=cl(CFG); c.eras=chEras(G.seed>>>0,lv); c.rateFit=CH.rateFit; c.rateMis=CH.rateMis; c.comboStep=0; c.goalPts=0; c.hide=CH.L[lv].hide;
+  CH_MEMO.k=key; CH_MEMO.c=c; return c;
 }
 var GNI = [[1960,120],[1970,280],[1980,1870],[1990,6450],[2000,11030],[2010,22290],[2023,35490]];
 var OTHER = [[1960,230],[1970,240],[1980,770],[1990,830],[2000,1180],[2010,2360],[2023,4230]];   /* ○○ 나라(교과서 79쪽 그래프, 화면 이름은 '다른 나라') */
@@ -455,6 +500,10 @@ var NAMES = {
   mHand: '일손이 모자라 느려요',
   mMoney:'돈이 모자라 느려요',
   mTech: '기술이 모자라 느려요',
+  xHand: '일손이 모자라 못 만들어요',
+  xMoney:'돈이 모자라 못 만들어요',
+  xTech: '기술이 모자라 못 만들어요',
+  small: '더 큰 공장도 잘 돌아요',
   exp:   '<em>수출</em>! 소득이 올라요',
   big:   '큰 공장 물건은 소득이 더 커요',
   grow:  '소득이 늘면 <em>경제성장</em>',
@@ -465,8 +514,8 @@ var NAMES = {
 var TITLES = [[0,'새내기 일꾼'],[190,'공장 일꾼'],[480,'수출 대장'],[610,'한강의 기적']];   /* full 제안 0/130/720/770 → 힌트 연타(182)는 첫 칭호, 무작위 중앙(422)은 둘째, 2초 성실(595)~사람 끌기(650)는 맨 위가 되게 낮춤 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function firstName(G,ev,k,at){ if(G.ch && !/^x[HMT]|^small$/.test(k)) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
 function eraOf(G){ return cfgFor(G).eras[G.si]; }
 function fitOf(G,type){ return eraOf(G).has[FT[type].need] >= cfgFor(G).fitAt; }
 /* 그 시대의 가장 좋은 공장: 잘 도는 공장 중 소득이 가장 큰 것 */
@@ -482,7 +531,7 @@ function docked(G){ return G.ship && G.ship.st==='dock'; }
 function startStage(G0,si){
   var G=cl(G0), C=cfgFor(G);
   G.si=si; G.phase='play'; G.t=0; G.steps=0; G.endAt=null; G.combo=0; G.lastDrop=null; G.fly=[]; G.fac={}; G.mile=null;
-  G.ship={st:'come', n:0, cd:C.firstShip, deck:[], k:0}; G.goalAt=null;
+  G.ship={st:'come', n:0, cd:C.firstShip, deck:[], k:0}; G.goalAt=null; if(G.ch) G.doneAt=null;
   G.res={total:unitsOf(G), served:0, missed:0};
   return G;
 }
@@ -497,6 +546,7 @@ function endStage(G,ev){
   G.phase='stageEnd'; G.endAt=null;
   G.res.missed=Math.max(0,G.res.total-G.res.served); G.stats.short+=G.res.missed;
   G.reached[G.si]=G.steps>=E.S?1:0;
+  if(G.ch && !G.reached[G.si]) ev.push({t:'short', ok:false, si:G.si});   /* 도전: 그 형편을 못 맞힘(점선 못 닿음) */
   award(G,ev,['grow','heavy','miracle'][G.si]);
   ev.push({t:'stageEnd', si:G.si});
 }
@@ -507,10 +557,14 @@ function tick(G0,dt){
   if(G.endAt==null){
     Object.keys(G.fac).forEach(function(l){ var f=G.fac[l];
       if(f.yard>=C.yardMax){ f.cd=Math.max(f.cd,0); return; }
-      f.cd-=dt; if(f.cd<=0){ f.yard++; f.cd=f.fit?C.rateFit:C.rateMis; ev.push({t:'made', lot:+l}); } });
+      if(G.ch && (f.made||0)>=CH.per) return;   /* 도전: 공장 하나는 물건 3개 */
+      f.cd-=dt; if(f.cd<=0){ f.yard++; f.made=(f.made||0)+1; f.cd=f.fit?C.rateFit:C.rateMis; ev.push({t:'made', lot:+l}); } });
     var s=G.ship;
     if(s.st!=='dock'){ s.cd-=dt; if(s.cd<=0){ if(s.st==='sail'){ s.st='come'; s.cd=0.5; } else { s.st='dock'; s.n=0; s.deck=[]; s.k++; } } }
-    if(G.t>=E.T) endStage(G,ev);
+    if(G.ch){   /* 도전: 땅을 다 짓고, 잘 도는 공장이 3개씩 다 만들고, 마당이 비면 끝(모자란 공장은 못 만듦) */
+      var done=emptyLots(G).length===0 && Object.keys(G.fac).every(function(l){ var f=G.fac[l]; return f.yard===0 && (!f.fit || (f.made||0)>=CH.per); });
+      if(done){ if(G.doneAt==null) G.doneAt=G.t; if(G.t-G.doneAt>=CH.endHold) endStage(G,ev); } else G.doneAt=null;
+    } else if(G.t>=E.T) endStage(G,ev);
   }
   G.fly=G.fly.filter(function(c){ return G.t-c.t0<1.3; });
   return {G:G, ev:ev};
@@ -526,10 +580,11 @@ function drop(G0,src,dst,via){
     var l=+dp[1]; if(!(l>=0 && l<E.lots) || G0.fac[l]) return fail('lot');
     G=cl(G0); var fit=fitOf(G,type);
     G.fac[l]={type:type, fit:fit, yard:0, cd:fit?C.firstFit:C.rateMis, at:G.t};
+    if(G.ch){ G.fac[l].made=0; G.fac[l].hint=via?1:0; G.fac[l].bv=unitV(G); if(fit && FT[type].val<unitV(G)) firstName(G,ev,'small','lot:'+l); }
     G.stats.built++; if(fit) G.stats.fit++;
     ev.push({t:'built', lot:l, type:type, fit:fit, need:FT[type].need});
     if(fit) firstName(G,ev,type,'lot:'+l);
-    else firstName(G,ev,{hand:'mHand', money:'mMoney', tech:'mTech'}[FT[type].need],'lot:'+l);
+    else firstName(G,ev,(G.ch?{hand:'xHand', money:'xMoney', tech:'xTech'}:{hand:'mHand', money:'mMoney', tech:'mTech'})[FT[type].need],'lot:'+l);
     return {G:G, ok:true, ev:ev};
   }
   if(sp[0]!=='yard') return fail('src');
@@ -540,7 +595,9 @@ function drop(G0,src,dst,via){
   var v=FT[f.type].val, before=G.steps;
   G.steps+=v; G.stats.sent++; G.stats.steps+=v; G.res.served=Math.min(G.res.total,Math.floor(G.steps/unitV(G)));
   G.combo=(G.lastDrop!=null && G.t-G.lastDrop<=C.comboWin)?G.combo+1:1; G.lastDrop=G.t;
-  var pts=via?C.via*v:C.pts*v+C.comboStep*Math.min(G.combo-1,C.comboCap); G.score+=pts;
+  var pts=via?C.via*v:C.pts*v+C.comboStep*Math.min(G.combo-1,C.comboCap);
+  if(G.ch){ pts=f.hint?0:Math.round(CH.pts*v/unitV(G)); G.combo=0; }   /* 도전: 실은 손 빠르기·힌트 싣기와 무관, 지을 때 고른 것만 */
+  G.score+=pts;
   var s=G.ship; s.n++; s.deck.push(FT[f.type].good);
   G.fly.push({k:FT[f.type].good, v:v, t0:G.t, from:before, to:G.steps});
   ev.push({t:'send', lot:lot, k:FT[f.type].good, v:v, pts:pts, combo:via?0:G.combo});
@@ -548,9 +605,9 @@ function drop(G0,src,dst,via){
   if(v>=2) firstName(G,ev,'big','bar');
   if(G.si===0 && G.steps>=Math.ceil(E.S/3)) firstName(G,ev,'grow','bar');
   var S=STAGES[G.si];
-  [S.mile,S.mile2].forEach(function(m){ if(m && !G.miles[m.k] && G.steps>=m.at*E.S){ G.miles[m.k]=G.t; ev.push({t:'name', k:m.k, at:'mile'}); } });
+  if(!G.ch) [S.mile,S.mile2].forEach(function(m){ if(m && !G.miles[m.k] && G.steps>=m.at*E.S){ G.miles[m.k]=G.t; ev.push({t:'name', k:m.k, at:'mile'}); } });
   if(s.n>=C.shipCap){ s.st='sail'; s.cd=C.sail; }
-  if(before<E.S && G.steps>=E.S){ G.score+=C.goalPts; G.goalAt=G.t; ev.push({t:'goal', pts:C.goalPts}); }
+  if(before<E.S && G.steps>=E.S && !G.ch){ G.score+=C.goalPts; G.goalAt=G.t; ev.push({t:'goal', pts:C.goalPts}); }
   return {G:G, ok:true, ev:ev};
 }
 function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
@@ -564,6 +621,20 @@ function hintMove(G){
   Object.keys(G.fac).forEach(function(l){ var f=G.fac[l]; if(f.yard>0){ var v=FT[f.type].val*10+f.yard; if(v>bv){ bv=v; best=l; } } });
   return best!=null ? {src:'yard:'+best, dst:'ship'} : null;
 }
+/* §19 추론형 측정: k번째 '반쪽만 아는 봇'(CH_PARTIALS). 짓기만 다르게 고르고 싣기는 hintMove와 같다 */
+function partialMove(G,k){
+  if(!live(G)) return null;
+  var e=emptyLots(G), E=eraOf(G), c=null;
+  if(e.length){
+    var fits=E.cards.filter(function(x){ return fitOf(G,x); });
+    if(k===0) c=E.cards.reduce(function(a,x){ return FT[x].val>FT[a].val?x:a; });
+    else if(k===1) c=E.cards.indexOf('light')>=0?'light':E.cards[0];
+    else if(k===2) c=fits.length?fits[0]:E.cards[0];
+    else { var nf=fits.filter(function(x){ return x!=='chip'; }); c=nf.length?nf.reduce(function(a,x){ return FT[x].val>FT[a].val?x:a; }):E.cards.filter(function(x){ return x!=='chip'; })[0]; }
+    return {src:'card:'+c, dst:'lot:'+e[0]};
+  }
+  var h=hintMove(G); return h;
+}
 function sources(G){ if(!live(G)) return []; var a=[];
   if(emptyLots(G).length) eraOf(G).cards.forEach(function(k){ a.push('card:'+k); });
   Object.keys(G.fac).forEach(function(l){ if(G.fac[l].yard>0) a.push('yard:'+l); }); return a; }
@@ -572,6 +643,7 @@ function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='yard'){ var f=G.f
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
 if(typeof module!=='undefined') module.exports={SEED:SEED,CFG:CFG,cfgFor:cfgFor,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,GNI:GNI,OTHER:OTHER,FT:FT,
+  CH:CH,CH_STAGES:CH_STAGES,CH_PARTIALS:CH_PARTIALS,chGoal:chGoal,chEras:chEras,partialMove:partialMove,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,valOf:valOf,fitOf:fitOf,bestCard:bestCard,eraOf:eraOf};
 /* LOGIC-END */
 
@@ -622,6 +694,17 @@ var GAME = {
     ],
     idle: '공장이 만드는 중이야'
   },
+  /* §19 추론형 도전(logic.js CH 주석): 판마다 바뀌는 형편 셋을 보고 잘 도는 공장 중 가장 큰 공장 — 그 레벨 형편을 모두 맞히면 통과(시간 무관).
+     동작은 일반 판 그대로(카드 → 빈 땅, 물건 → 배), 규칙도 1단계 '형편에 맞는 공장'(rule 'build') 하나 */
+  challenge: {
+    kind: 'reason',
+    maxLevel: CH.maxLv,
+    stages: CH_STAGES,
+    goal: chGoal,
+    partials: CH_PARTIALS,
+    say: {start: ['가진 것을 보고 골라!', '형편이 바뀌었어!', '마지막 형편!']},
+    ruleCards: [[['rBig','잘 도는 공장 중 큰 것']], [['rBig','잘 도는 공장 중 큰 것']], [['rBig','잘 도는 공장 중 큰 것']]]   /* 도전 5는 카드의 필요한 것 그림을 지우므로, 규칙 칸도 '일손 → 옷' 짝을 보이지 않는 그림으로 */
+  },
   ruleCards: [
     [['rBuild2','형편에 맞는 공장',1],['rSend','배에 싣기',0]],
     [['rMoney','돈이 생기면',1]],
@@ -653,10 +736,10 @@ var GAME = {
       dst:  {line:'물건은 배로', why:'만든 물건은 수출 배에 실어요'},
       sail: {line:'배가 오면 실어요', why:'배가 꽉 차면 떠나요. 다음 배가 오면 실어요'}
     },
-    general: function(G){ return XP5[G.si]||null; }
+    general: function(G){ if(G.ch) return {why:'2칸 이상 가진 것을 쓰는 공장이 잘 돌아요. 그중 동전이 가장 많은 공장!', page:'교과서 80쪽 참고'}; return XP5[G.si]||null; }
   },
   /* 점선까지 못 가면 그 사실을 리본으로(놓친 칸은 '남은 일'에 회색) */
-  stageRibbon: function(G){ return (G.reached&&G.reached[G.si]) ? null : {text:(G.si+1)+'단계 끝! 점선까지 못 갔어요', confetti:false}; },
+  stageRibbon: function(G){ return (G.reached&&G.reached[G.si]) ? null : {text:G.ch ? '점선까지 못 갔어요' : (G.si+1)+'단계 끝! 점선까지 못 갔어요', confetti:false}; },
   toast: {show:'off'},   /* 블라인드 v3: 배지 이름 알림이 카드 위에서 버튼처럼 보였다 → 배지는 HUD 배지 버튼 통통 + 결과 선반에서 */
   tryPts: 0,
   /* 해 보기: 1단계만 = 옷·신발 공장 짓기 → 배에 싣기. 2·3단계는 같은 동작이라 해 보지 않는다(고르기가 곧 도전) */
@@ -735,6 +818,7 @@ var SCENE = (function(){
     h+='<g id="barp"><rect x="490" y="44" width="146" height="252" rx="14" class="f-paper"/>'+txt(563,66,'1인당 소득',20)+txt(563,90,'(달러)',20,'#55657A')+'</g>';
     L.bg.innerHTML=h;
     /* 연표 띠 */
+    if(G.ch){ L.tl.innerHTML=''; clockEl=null; return; }   /* 도전: 연표(우리나라 연도)·시대 시계 없음 — 형편은 시드로 고른 것이라 연도를 붙이지 않는다 */
     var t='<g id="tl"><rect x="2" y="4" width="484" height="34" rx="12" class="f-paper"/>', i0=YEARS.indexOf(S.y0), i1=YEARS.indexOf(S.y1);
     t+='<rect x="'+(YX(i0)-30)+'" y="7" width="'+(YX(i1)-YX(i0)+60)+'" height="28" rx="10" class="f-org" opacity=".45"/>';
     t+='<rect id="clk" x="'+(YX(i0)-30)+'" y="7" width="1" height="28" rx="10" class="f-org"/>';
@@ -771,8 +855,13 @@ var SCENE = (function(){
     var good=FT[f.type].good;
     h+='<g'+(f.fit?'':' opacity=".5"')+'>'+useArt('fac_'+f.type,x,y+8,96,96)+'</g>';
     var r=RES.filter(function(q){ return q[0]===FT[f.type].need; })[0];
-    if(!f.fit) h+='<g data-keep="모자람"><circle cx="'+(x+30)+'" cy="'+(y+30)+'" r="24" class="f-paper"/>'+useArt(r[1],x+10,y+10,40,40)+useArt('noX',x+6,y+6,48,48)+'</g>';
+    if(!f.fit) h+='<g data-keep="모자람" data-verdict="bad"><circle cx="'+(x+30)+'" cy="'+(y+30)+'" r="24" class="f-paper"/>'+useArt(r[1],x+10,y+10,40,40)+useArt('noX',x+6,y+6,48,48)+'</g>';
     else h+='<g data-keep="맞음"><circle cx="'+(x+26)+'" cy="'+(y+26)+'" r="21" class="f-paper" stroke="#4CAF7A" stroke-width="5"/>'+useArt(r[1],x+9,y+9,34,34)+'</g>';
+    /* 도전: 지은 공장의 소득 동전(이 형편의 가장 큰 잘 도는 공장과 견줌). 모자라는 동전은 빨간 점선 = 더 큰 공장이 있었음 */
+    if(G.ch && f.fit && f.bv){ var v=FT[f.type].val, n=f.bv, cw=n>2?22:30, x0=x+48-(n*cw)/2;
+      h+='<g'+(v<n?' data-verdict="bad"':'')+'><rect x="'+(x0-4)+'" y="'+(y+80)+'" width="'+(n*cw+8)+'" height="30" rx="9" class="f-paper"'+(v<n?' stroke="#D2483C" stroke-width="3"':'')+'/>';
+      for(var q=0;q<n;q++) h+= q<v ? useArt('coin',x0+q*cw+(cw-26)/2,y+82,26,26) : '<circle cx="'+(x0+q*cw+cw/2)+'" cy="'+(y+95)+'" r="10" fill="none" stroke="#D2483C" stroke-width="3" stroke-dasharray="4 3"/>';
+      h+='</g>'; }
     /* 마당(물건 자리 2칸) */
     h+='<rect x="'+(x+98)+'" y="'+(y+6)+'" width="54" height="98" rx="9" class="f-sand"/>';
     for(var n=0;n<2;n++){ var yy=y+56-n*46;
@@ -782,12 +871,12 @@ var SCENE = (function(){
   function arc(cx,cy,r,p){ p=Math.max(0,Math.min(0.999,p)); var a=-Math.PI/2+2*Math.PI*p, x=cx+r*Math.cos(a), y=cy+r*Math.sin(a); return 'M'+cx+' '+(cy-r)+'A'+r+' '+r+' 0 '+(p>0.5?1:0)+' 1 '+x.toFixed(1)+' '+y.toFixed(1); }
   function drawFac(G){
     for(var l=0;l<3;l++){
-      var f=G.fac[l], st=si(G)+'|'+(G.phase==='title')+'|'+(f?f.type+f.yard+(f.fit?1:0):'-'+era(G).lots);
+      var f=G.fac[l], st=si(G)+'|'+(G.phase==='title')+'|'+(f?f.type+f.yard+(f.fit?1:0)+'|'+(f.bv||0):'-'+era(G).lots)+'|'+(G.ch?G.seed:0);
       var e=facEl[l]; if(!e){ e=facEl[l]=el('g',{}); L.fac.appendChild(e); e._st=''; ringEl[l]=el('path',{fill:'none','stroke-width':'5','stroke-linecap':'round'}); L.fac.appendChild(ringEl[l]); }
       if(e._st!==st){ e.innerHTML=facSvg(G,l); e._st=st; var fresh=f && G.t-f.at<0.5 && G.phase==='play'; if(fresh && !RM && f.yard===0) e.setAttribute('class','built'); else e.removeAttribute('class'); }
       /* 만드는 고리: 공장 아래 오른쪽, 맞는 공장은 빨리 찬다 */
       var rg=ringEl[l];
-      if(f && G.phase==='play' && f.yard<CFG.yardMax){ var C=cfgFor(G), rate=f.fit?(f.yard===0&&G.t-f.at<C.firstFit+0.01?C.firstFit:C.rateFit):C.rateMis, c=CELL[l];
+      if(f && G.phase==='play' && f.yard<CFG.yardMax && !(G.ch && (!f.fit || (f.made||0)>=CH.per))){ var C=cfgFor(G), rate=f.fit?(f.yard===0&&G.t-f.at<C.firstFit+0.01?C.firstFit:C.rateFit):C.rateMis, c=CELL[l];
         rg.setAttribute('d',arc(c[0]+125,c[1]+79-f.yard*46,25,1-f.cd/rate)); rg.setAttribute('stroke',f.fit?'#E8743B':'#9AA5B1'); rg.style.display=''; }
       else rg.style.display='none';
     }
@@ -795,13 +884,14 @@ var SCENE = (function(){
   /* ---- 공장 카드 ---- */
   function cardRect(G,k){ var i=era(G).cards.indexOf(k); if(i<0) return null; return {x:CARD.x+i*(CARD.w+CARD.gap), y:CARD.y, w:CARD.w, h:CARD.h}; }
   function drawTray(G){
-    var open=G.phase==='play' && emptyLots(G).length>0, k=si(G)+'|'+open+'|'+G.phase;
+    var open=G.phase==='play' && emptyLots(G).length>0, k=si(G)+'|'+open+'|'+G.phase+'|'+(G.ch?G.seed+'/'+G.ch:0);
     if(k===cardSig) return; cardSig=k; var h='';
     if(G.phase!=='title'){
       era(G).cards.forEach(function(c){ var r=cardRect(G,c);
         h+='<g'+(open?'':' opacity=".35"')+'><rect x="'+r.x+'" y="'+(r.y+3)+'" width="'+r.w+'" height="'+r.h+'" rx="10" class="f-woodd"/><rect x="'+r.x+'" y="'+r.y+'" width="'+r.w+'" height="'+r.h+'" rx="10" class="f-paper" stroke="#E8743B" stroke-width="2.5"/>';
         var nd=RES.filter(function(q){ return q[0]===FT[c].need; })[0], v=FT[c].val, glow=G.phase==='play'&&G.t<4&&si(G)>0;
-        h+='<circle cx="'+(r.x+19)+'" cy="'+(r.y+20)+'" r="17" fill="none" stroke="#E8743B" stroke-width="0"'+(glow?' class="chg"':'')+'/>'+useArt(nd[1],r.x+3,r.y+4,32,32)+'<path d="M36 22h6m-3-3l3 3-3 3" transform="translate('+r.x+' '+r.y+')" fill="none" stroke="#E8743B" stroke-width="2.6" stroke-linecap="round"/>'+useArt(FT[c].good,r.x+42,r.y+4,30,30);
+        var hide=G.ch && cfgFor(G).hide;   /* 도전 5: 카드의 '필요한 것' 그림을 지움(물건을 보고 알아야) */
+        h+='<circle cx="'+(r.x+19)+'" cy="'+(r.y+20)+'" r="17" '+(hide?'class="f-paperd" stroke="#9AA5B1" stroke-width="2" stroke-dasharray="4 3"':'fill="none" stroke="#E8743B" stroke-width="0"'+(glow?' class="chg"':''))+'/>'+(hide?txt(r.x+19,r.y+28,'?',22,'#55657A'):useArt(nd[1],r.x+3,r.y+4,32,32))+'<path d="M36 22h6m-3-3l3 3-3 3" transform="translate('+r.x+' '+r.y+')" fill="none" stroke="#E8743B" stroke-width="2.6" stroke-linecap="round"/>'+useArt(FT[c].good,r.x+42,r.y+4,30,30);
         h+=useArt('fac_'+c,r.x+11,r.y+36,52,46);
         /* 블라인드 v3: 소득 동전을 키움(24px, 4개도 카드 안) */
         var cs=v>2?16.5:26; for(var j=0;j<v;j++) h+=useArt('coin',r.x+37-((v-1)*cs+24)/2+j*cs,r.y+83,24,24);
@@ -826,18 +916,19 @@ var SCENE = (function(){
     var p=G.phase==='title'?{dx:0,op:1}:shipPos(G); shipG.setAttribute('transform','translate('+p.dx.toFixed(1)+' 0)'); shipG.setAttribute('opacity',p.op.toFixed(2));
   }
   /* ---- 막대 ---- */
-  function barGeom(G){ var S=STAGES[si(G)]; return function(v){ return BAR.bot-(BAR.bot-BAR.top)*v/S.v1; }; }
+  function barGeom(G){ var S=STAGES[si(G)]; if(G.ch) return function(v){ return BAR.bot-(BAR.bot-BAR.top)*v; }; return function(v){ return BAR.bot-(BAR.bot-BAR.top)*v/S.v1; }; }
+  function barVal(G,steps){ if(G.ch){ var S=era(G).S||1; return Math.min(steps,S)/S; } return valOf(si(G),steps,G); }   /* 도전: 0 ~ 점선(가장 큰 공장 물건 9개) */
   function shownSteps(G){ var s=G.steps||0; (G.fly||[]).forEach(function(c){ var p=(G.t-c.t0-0.25)/0.7; if(p<1) s-=(c.to-c.from)*Math.max(0,1-Math.max(0,p)); }); return Math.max(0,s); }
   function drawBar(G){
     var S=STAGES[si(G)], Y=barGeom(G), E=era(G);
     if(!bar.g){ bar.g=el('g',{'data-keep':'소득 막대'}); L.sky.appendChild(bar.g); }
-    var k=si(G)+'|'+G.phase;
+    var k=si(G)+'|'+G.phase+'|'+(G.ch||0);
     if(bar.k!==k){ bar.k=k; var h='<rect x="'+BAR.x+'" y="'+BAR.top+'" width="'+BAR.w+'" height="'+(BAR.bot-BAR.top)+'" rx="5" class="f-paper"/>';
       h+='<rect id="barF" x="'+BAR.x+'" y="0" width="'+BAR.w+'" height="1" rx="5" class="f-org"/>';
       h+='<rect x="'+(BAR.x-3)+'" y="'+(BAR.top-3)+'" width="'+(BAR.w+6)+'" height="'+(BAR.bot-BAR.top+6)+'" rx="7" fill="none" stroke="#8C603F" stroke-width="3" stroke-dasharray="7 5"/>';
-      [S.ticks[0],S.ticks[S.ticks.length-1]].forEach(function(ti){ var y=Y(GNI[ti][1]); h+='<path d="M'+(BAR.x-4)+' '+y+'h'+(BAR.w+8)+'" stroke="#1E2B3A" stroke-width="2.4"/>'+txt(BAR.x-6,y+7,'<tspan fill="#55657A">'+GNI[ti][0]+'</tspan> '+fmt(GNI[ti][1]),20,'#C95F2C','end'); });
+      if(!G.ch) [S.ticks[0],S.ticks[S.ticks.length-1]].forEach(function(ti){ var y=Y(GNI[ti][1]); h+='<path d="M'+(BAR.x-4)+' '+y+'h'+(BAR.w+8)+'" stroke="#1E2B3A" stroke-width="2.4"/>'+txt(BAR.x-6,y+7,'<tspan fill="#55657A">'+GNI[ti][0]+'</tspan> '+fmt(GNI[ti][1]),20,'#C95F2C','end'); });
       bar.g.innerHTML=h; bar.f=bar.g.querySelector('#barF'); }
-    var v=G.phase==='title'?S.v0:valOf(si(G),shownSteps(G),G), y=Y(v);
+    var v=G.phase==='title'?S.v0:barVal(G,shownSteps(G)), y=Y(v);
     bar.f.setAttribute('y',y.toFixed(1)); bar.f.setAttribute('height',Math.max(2,BAR.bot-y).toFixed(1));
     bar.f.setAttribute('class',(G.steps||0)>=E.S && shownSteps(G)>=E.S?'f-grn':'f-org');
   }
@@ -846,7 +937,7 @@ var SCENE = (function(){
     var h='', Y=barGeom(G);
     if(G.phase!=='play'){ L.fly.innerHTML=''; return; }
     (G.fly||[]).forEach(function(c){ for(var j=0;j<c.v;j++){ var p=(G.t-c.t0-0.25-0.12*j)/0.7; if(p<0||p>=1||RM) continue;
-      var a=[SHIP.x+SHIP.w/2, SHIP.y], b=[BAR.x+BAR.w/2, Y(valOf(si(G),Math.min(c.to,c.from+j+1),G))];
+      var a=[SHIP.x+SHIP.w/2, SHIP.y], b=[BAR.x+BAR.w/2, Y(barVal(G,Math.min(c.to,c.from+j+1)))];
       var q=p*p*(3-2*p), x=a[0]+(b[0]-a[0])*q, y=a[1]+(b[1]-a[1])*q-70*Math.sin(Math.PI*p);
       h+=useArt('coin',x-11,y-11,22,22); } });
     L.fly.innerHTML=h;
@@ -856,7 +947,7 @@ var SCENE = (function(){
   /* ---- 단계 끝 비교 카드: 1인당 국민 총소득(교과서 79쪽 값). 아래(카드·강) 자리에 놓아 공장 칸·가진 것·막대는 보인다 ---- */
   /* 블라인드 v3: 카드는 강·카드 자리(아래 160)에만, 숫자는 단계마다 2개(출발·이번 시대). 3단계 선 끝은 선 색 이름표 */
   function drawCard(G){
-    var k=G.phase==='stageEnd'?'s'+si(G):'';
+    var k=G.phase==='stageEnd'&&!G.ch?'s'+si(G):'';
     if(k===endSig) return; endSig=k; if(!k){ L.card.innerHTML=''; return; }
     var s=si(G), y0=258, h='<g class="cardIn" data-keep="비교 카드"><rect x="4" y="'+y0+'" width="482" height="162" rx="16" class="f-paper" stroke="#B9852F" stroke-width="2.5"/>';
     if(s<2){
@@ -880,7 +971,7 @@ var SCENE = (function(){
   }
   function renderScene(G){
     if(!svg) return;
-    var s=si(G)+'|'+(G.phase==='title');
+    var s=si(G)+'|'+(G.phase==='title')+'|'+(G.ch?G.seed+'/'+G.ch:0);
     if(s!==sig){ sig=s; buildBg(G); facEl={}; ringEl={}; L.fac.innerHTML=''; bar={}; L.sky.innerHTML=''; skySig=''; cardSig=''; shipSig=''; shipG=null; L.river.innerHTML=''; }
     var E=era(G), ss=(G.phase==='play'?0:1)+'|'+JSON.stringify(G.miles||{})+'|'+((G.miles&&G.miles.olymp!=null&&G.t>=G.miles.olymp)?1:0)+G.phase;
     if(ss!==skySig){ skySig=ss; var sk=L.sky.querySelector('#skyl'); if(!sk){ sk=el('g',{id:'skyl'}); L.sky.insertBefore(sk,L.sky.firstChild); } sk.innerHTML=skyline(G)+'<g id="mile">'+mileSvg(G)+'</g>'; }

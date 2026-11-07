@@ -412,20 +412,48 @@ var NAMES = {
 var TITLES = [[0,'새내기 어부'],[270,'마을 어부'],[330,'바다 지킴이'],[365,'모두의 선장']];   /* 성실 봇 390 만점. 힌트 연타 265 < 270, 무작위 p97 약 300 < 330 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function firstName(G,ev,k,at){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
 function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-/* 도전 모드(엔진이 G.ch = 레벨 1.. 을 줄 때만): 레벨이 오를수록 바다 회복이 느려지고(1.5배까지), 이웃 수↑(최대 3), 주 수↑,
-   3단계 이웃이 약속을 가끔 어김(레벨×5%, 시드로). 일반 판(G.ch 없음)은 CFG.stages 그대로. */
+/* §19 도전 = 추론형('세 바다', kind:'reason'). 한 줄 설계: 바다 크기(물고기 자리)·어부 수·약속 표지판을 보고, 이번 주 몇 번 나갈지(약속은 몇 번으로 할지) 정한다.
+   최선 = 바다의 절반을 어부 수로 나눈 만큼(그래야 남은 절반이 두 배로 늘어 다시 가득). 단서는 다 보인다(시간 압박 없음, 운 없음).
+   레벨이 올리는 것 = 함께 따질 개념 요소: 1 절반만(혼자, 바다 크기가 바다마다 다름) / 2 + 이웃 수(따라 하는 이웃) / 3 + 약속 횟수 고르기
+   / 4~6 셋이 섞임(바다마다 3주: 2주로는 욕심의 손해가 덜 드러나 무작위가 성실의 75%였음). 통과 = 모든 주를 최선 횟수로(목표 = 만점 물고기).
+   만점이 시드와 상관없이 같도록: 바다마다 최선 횟수 k의 묶음(레벨마다 고정)을 섞어 나눠 주고, 같은 k가 나오는 (바다 크기, 어부 수) 짝 중 하나를 고른다
+   (k=2 = 혼자·4칸 / 이웃 1·8칸 / 이웃 2·12칸). 바다 만점 = k × (주 수 + 2)마리(남은 바다 몫 2k 포함).
+   함정(시드와 상관없이): 레벨 1 혼자 바다에 k≠2가 늘 있음('늘 두 번' 막힘), 레벨 2부터 이웃 바다('이웃을 안 셈' 막힘), 레벨 3 약속 바다는 1번이나 3번이 최선('약속은 늘 두 번' 막힘).
+   일반 판(G.ch 없음)은 CFG.stages 그대로(이웃이 약속을 가끔 어기던 운 요소는 뺐다). */
+var CH = { maxLv:6,
+  lv: [null,
+    {types:['solo','solo','solo'], K:[2,3,4], W:3},
+    {types:['solo','copy','copy'], K:[3,2,1], W:3},
+    {types:['copy','copy','sign'], K:[2,3,1], W:3, signNot2:1},
+    {types:['solo','copy','sign'], K:[4,2,1], W:3},
+    {types:['copy','sign','sign'], K:[1,2,3], W:3},
+    {types:['sign','copy','sign'], K:[3,1,2], W:3}],
+  /* [어부 수(나 포함), 바다 크기] → k = 크기 / (2 × 어부 수). 이웃은 화면에 둘까지 */
+  combos: {solo:{2:[[1,4]], 3:[[1,6]], 4:[[1,8]]}, copy:{1:[[2,4],[3,6]], 2:[[2,8],[3,12]], 3:[[2,12]]}}
+};
+CH.combos.sign = CH.combos.copy;   /* 약속 표지판은 1·2·3번 */
+var CH_PARTIALS = ['이웃을 안 셈', '약속은 늘 두 번', '늘 두 번씩'];
+var CH_NAMES = ['첫째 바다','둘째 바다','셋째 바다'];
 function rndOf(G){ var s=(G.rs=(G.rs|0)+0x6D2B79F5|0), t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }
+function shuf(G,a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(rndOf(G)*(i+1)), x=a[i]; a[i]=a[j]; a[j]=x; } return a; }
+function chLv(lv){ return CH.lv[Math.max(1,Math.min(CH.maxLv,lv|0||1))]; }
+function chStages(lv){ var C=chLv(lv); return C.types.map(function(t,i){ return {key:'c'+(i+1), name:CH_NAMES[i], rule:t}; }); }
+var CH_STAGES = chStages(1);
+function chGoal(lv){ var C=chLv(lv); return CFG.fishPts*C.K.reduce(function(a,k){ return a+k*(C.W+2); },0); }
+function nStages(G){ return G && G.ch ? CH_STAGES.length : STAGES.length; }
+/* 판 시작에 세 바다를 한 번에 만든다(판 시드로): k 묶음을 바다 종류에 맞게 섞어 나누고 짝을 고른다 */
+function chPlan(G){
+  var C=chLv(G.ch), ks, ok, tr;
+  for(tr=0;tr<200;tr++){ ks=shuf(G,C.K.slice()); ok=C.types.every(function(t,i){ return CH.combos[t][ks[i]] && !(C.signNot2 && t==='sign' && ks[i]===2); }); if(ok) break; }
+  return C.types.map(function(t,i){ var cs=CH.combos[t][ks[i]], c=cs[Math.floor(rndOf(G)*cs.length)];
+    return {name:CH_NAMES[i], rule:t, weeks:C.W, cap:c[1], nb:c[0]-1, sign:t==='sign', k:ks[i]}; });
+}
 function cfgFor(G,si){
-  var S=cl(STAGES[si]); S.grow=CFG.grow; S.slip=0;
-  if(!G || !G.ch) return S;
-  var lv=Math.max(1,G.ch|0);
-  S.weeks+=Math.min(2,Math.floor(lv/2));
-  if(S.nb>0) S.nb=Math.min(3,S.nb+Math.floor((lv-1)/3));
-  if(lv>=3) S.grow=Math.max(1.5, CFG.grow-0.1*(lv-2));
-  if(S.sign) S.slip=Math.min(0.3,0.05*lv);
+  var S=G && G.ch && G.chPlan ? cl(G.chPlan[si]) : cl(STAGES[si]); S.grow=CFG.grow; S.slip=0;
+  if(G && G.ch && S.sign) S.p=signBest(S);   /* 만점 계산은 알맞은 약속으로 */
   return S;
 }
 function nF(S){ return 1+S.nb; }
@@ -458,17 +486,17 @@ function canSail(G){ return live(G) && signReady(G) && boatHome(G) && G.cnt[0]<C
 function startWeek(G,ev){
   var S=G.S;
   G.cnt=[0,0,0,0]; G.got=[[],[],[],[]]; G.trips=[]; G.queue=[]; G.st='fish'; G.holdAt=null; G.regAt=null; G.reg=null; G.homeAt=null;
-  G.F0=fishN(G); G.weekCaught=0; G.boatAt=Math.min(G.boatAt,G.t);
+  G.F0=fishN(G); G.weekCaught=0; G.viaW=false; G.boatAt=Math.min(G.boatAt,G.t);
   G.nbCap = S.rule==='sign' ? G.nbPlan : (S.rule==='copy' ? 0 : 0);
   ev.push({t:'week', wk:G.wk, empty:G.F0===0});
 }
 function startStage(G0,si){
   var G=cl(G0);
-  if(G.ch && G.rs==null) G.rs=G.seed|0;
+  if(G.ch && G.rs==null){ G.rs=(G.seed^0x51ED270B)>>>0; G.chPlan=chPlan(G); }
   var S=cfgFor(G,si);
   G.si=si; G.S=S; G.phase='play'; G.combo=0; G.lastAct=null; G.wk=0; G.ready=G.t+CFG.ready; G.boatAt=0; G.signed=false; G.signAt=-9; G.copyAt=-9;
   G.spots=[]; for(var i=0;i<S.cap;i++) G.spots.push(1);
-  G.nbPlan=2; G.promise=0; G.sc=0; G.best=stageBest(S)*CFG.fishPts; G.goal=Math.round(G.best*CFG.goalRate); G.shareAt=null; G.share=0;
+  G.nbPlan=2; G.promise=0; G.sc=0; G.best=stageBest(S)*CFG.fishPts; G.goal=G.ch ? G.best : Math.round(G.best*CFG.goalRate); G.verd=null; G.shareAt=null; G.share=0;   /* 도전: 창고 목표 줄 = 만점 */
   G.rec[si]={hist:[], me:0, all:0, share:0};
   var ev=[]; startWeek(G,ev); G.pend=ev;
   G.res={total:S.weeks, served:0, missed:0};
@@ -499,12 +527,15 @@ function endWeek(G,ev){
   for(var i=0;i<S.cap && add>0;i++) if(!G.spots[i]){ G.spots[i]=1; born.push(i); add--; }
   G.reg={t0:G.t, born:born, before:before, after:after};
   G.rec[G.si].hist.push({k:G.cnt[0], left:before, next:after, me:G.got[0].reduce(function(a,b){ return a+b; },0)});
-  G.res.served++; if(G.cnt[0]!==keepK(S,G.F0)) G.res.missed++;
-  ev.push({t:'regrow', before:before, after:after});
+  var wOk=G.cnt[0]===keepK(S,G.F0) && !(G.ch && G.viaW);
+  if(G.ch){ if(wOk) G.res.served++; else G.res.missed++; }   /* 도전: 남은 일 칸 = 맞힌 주 초록, 틀린 주 회색 */
+  else { G.res.served++; if(!wOk) G.res.missed++; }
+  if(G.ch) G.verd={t:G.t, ok:wOk, at:'hut'};   /* 도전: 한 주 판정을 집 옆에(공리 5) */
+  ev.push({t:'regrow', before:before, after:after, ok:wOk});
   if(after>=S.cap) firstName(G,ev, S.sign?'full':'regrow', 'sea');
   else if(after>0) firstName(G,ev,'shrink','sea');
   else firstName(G,ev,'empty','sea');
-  if(S.rule==='sign'){ var pp=G.promise||2, nx=G.cnt[0]>pp?G.cnt[0]:pp; if(G.S.slip && rndOf(G)<G.S.slip) nx=pp+1; if(nx>pp) firstName(G,ev,'broke','nb:1'); G.nbPlan=nx; }
+  if(S.rule==='sign'){ var pp=G.promise||2, nx=G.cnt[0]>pp?G.cnt[0]:pp; if(nx>pp) firstName(G,ev,'broke','nb:1'); G.nbPlan=nx; }
   if(after>=S.cap && G.weekCaught<before) firstName(G,ev,'tooFew','crate:0');
   G.regAt=G.t+CFG.regrow;
 }
@@ -540,7 +571,9 @@ function drop(G0,src,dst,via){
     if(!S.sign || G0.signed || !(+spp[1]>=1)) return fail('src');
     if(dst!=='post') return fail('signWhere');
     var g=cl(G0), e=[]; g.signed=true; g.signAt=g.t; g.promise=+spp[1]; g.nbPlan=g.promise; g.nbCap=g.promise;
-    e.push({t:'sign', p:g.promise}); firstName(g,e,'sign','post');
+    var sOk=g.promise===signBest(S);
+    if(g.ch) g.verd={t:g.t, ok:sOk, at:'post'};   /* 도전: 약속 판정을 기둥에 */
+    e.push({t:'sign', p:g.promise, ok:sOk}); firstName(g,e,'sign','post');
     return {G:g, ok:true, ev:e};
   }
   if(src!=='boat') return fail('src');
@@ -557,7 +590,7 @@ function drop(G0,src,dst,via){
   if(dst!=='sea') return fail('boatWhere');
   if(G0.cnt[0]>=CFG.maxTrips) return fail('basket');
   if(S.sign && G0.cnt[0]>=G0.promise) return fail('promise');   /* 약속은 나에게도: 약속한 횟수를 넘기면 튕김 */
-  var G=cl(G0), ev=[], got=sail(G,0,ev,via);
+  var G=cl(G0), ev=[], got=sail(G,0,ev,via); if(via) G.viaW=true;
   G.boatAt=G.t+CFG.back+0.05;
   if(got) firstName(G,ev,'catch1','boat');
   /* 이웃: 2단계는 내가 나갈 때마다 따라 나감, 3단계는 약속한 횟수까지 함께 나감 */
@@ -567,13 +600,27 @@ function drop(G0,src,dst,via){
   return {G:G, ok:true, ev:ev};
 }
 function T_NB(f){ return CFG.nbGap[(f-1)%2]+(f>2?0.3:0); }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 function hintMove(G){
   if(!live(G)) return null;
-  if(G.S.sign && !G.signed) return {src:'sign:2', dst:'post'};
+  if(G.S.sign && !G.signed) return {src:'sign:'+signBest(G.S), dst:'post'};
   if(!boatHome(G)) return null;
   var kk=keepK(G.S,G.F0); if(G.S.sign) kk=Math.min(kk,G.promise||2);
   return G.cnt[0]<kk ? {src:'boat', dst:'sea'} : {src:'boat', dst:'hut'};
+}
+/* 약속 표지판의 최선: 바다의 절반을 어부 수로(1~3번). 일반 판 3단계(12칸·3명) = 2 */
+function signBest(S){ return clamp(Math.floor(S.cap/(2*nF(S))),1,3); }
+/* §19 추론형 측정: k번째 '반쪽만 아는 봇'. 0 = 이웃을 안 셈(혼자인 줄 알고 바다의 절반), 1 = 약속 표지판은 늘 2번, 2 = 어디서나 두 번씩(교과서 예만 외움) */
+function partialMove(G,k){
+  if(!live(G)) return null;
+  var S=G.S, half=clamp(Math.floor(G.F0/2),1,CFG.maxTrips), want=keepK(S,G.F0), sg=signBest(S);
+  if(k===0){ want=half; sg=clamp(Math.floor(S.cap/2),1,3); }
+  if(k===1) sg=2;
+  if(k===2){ want=2; sg=2; }
+  if(S.sign && !G.signed) return {src:'sign:'+sg, dst:'post'};
+  if(!boatHome(G)) return null;
+  if(S.sign) want=Math.min(want,G.promise||2);
+  return G.cnt[0]<want ? {src:'boat', dst:'sea'} : {src:'boat', dst:'hut'};
 }
 function sources(G){ if(!live(G)) return []; if(G.S.sign && !G.signed) return ['sign:1','sign:2','sign:3']; return boatHome(G) ? ['boat'] : []; }
 function targets(G){ if(!live(G)) return []; if(G.S.sign && !G.signed) return ['post']; return ['sea','hut']; }
@@ -583,6 +630,7 @@ function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0])
 function recSim(G,si){ var R=G.rec[si]; return {hist:R.hist, me:R.me, all:R.all, share:R.share, total:R.me+R.share}; }
 function greedy(R,S){ var lim=Math.floor(S.cap/(2*nF(S))); return R.hist.some(function(h){ return h.k>lim; }); }
 function cardOf(G,si){
+  if(G.ch) return null;   /* 도전: 비교 카드 없음 */
   var R=G.rec[si]; if(!R || !R.hist.length) return null;
   var S=G.S, act=recSim(G,si), greedK=S.nb?3:CFG.maxTrips;
   var greedHyp=function(SS){ return simStage(SS,function(){ return greedK; }); };
@@ -600,7 +648,7 @@ function cardOf(G,si){
 
 if(typeof module!=='undefined') module.exports={SEED:SEED,CFG:CFG,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,
-  fishN:fishN,simStage:simStage,stageBest:stageBest,keepK:keepK,cardOf:cardOf,cfgFor:cfgFor};
+  fishN:fishN,simStage:simStage,stageBest:stageBest,keepK:keepK,cardOf:cardOf,cfgFor:cfgFor,CH:CH,CH_STAGES:CH_STAGES,CH_PARTIALS:CH_PARTIALS,chStages:chStages,chGoal:chGoal,chPlan:chPlan,nStages:nStages,partialMove:partialMove,signBest:signBest};
 /* LOGIC-END */
 
 /* ===== ① GAME-START: 게임 설정 (games/<이름>/game.js) ===== */
@@ -613,6 +661,8 @@ var XP = [
   {why:'내가 더 나가면 이웃도 손해 보기 싫어 따라 나가요. 바다가 세 배로 빨리 비어요', def:NOPG(BADGES[1].def), page:'교과서 92쪽 참고'},
   {why:'세 어부가 두 번씩이면 바다의 절반만 잡아 바다가 그대로예요. 한 번은 너무 적고, 세 번이면 바다가 비어요', def:NOPG(BADGES[2].def)+' 문제를 해결해야 경제가 계속 발전할 수 있어요.', page:'교과서 88·92쪽 참고'}
 ];
+/* 도전 '왜?': 바다 크기·어부 수가 바다마다 달라 일반 판 문장('두 번', '세 배')이 맞지 않음 → 일반 문장 */
+var XP_CH = {why:'바다 물고기의 절반만 잡아요. 절반을 어부 수로 나눈 만큼 나가면 남은 절반이 두 배로 늘어 다시 가득해요', def:NOPG(BADGES[2].def), page:'교과서 91~92쪽 참고'};
 var GAME = {
   title: '모두의 바다',
   subtitle: '6학년 2학기 사회 · 빠른 경제성장으로 발생한 문제 해결',
@@ -646,6 +696,16 @@ var GAME = {
     ],
     idle: '잠깐! 배가 돌아오는 중이야'
   },
+  /* §19 도전 = 추론형(logic.js CH): 세 바다, 레벨마다 함께 따질 단서(바다 크기 → 이웃 수 → 약속 횟수)가 는다. 모든 주를 최선 횟수로 = 만점 */
+  challenge: {
+    kind: 'reason',
+    maxLevel: CH.maxLv,
+    stages: CH_STAGES,
+    goal: chGoal,
+    partials: CH_PARTIALS,
+    say: {start: ['바다를 보고 몇 번 나갈까?', '새 바다야. 다시 세어 봐!', '마지막 바다야!']},
+    ruleCards: [[['rFish','배를 바다로'],['rWeek','남은 물고기 두 배'],['rMore','이웃도 따라']], [['rFish','배를 바다로'],['rWeek','남은 물고기 두 배'],['rMore','이웃도 따라']], [['rFish','배를 바다로'],['rWeek','남은 물고기 두 배'],['rMore','이웃도 따라']]]
+  },
   ruleCards: [
     [['rFish','배를 바다로',1],['rRest','집에서 쉬기',0]],
     [['rMore','이웃도 따라',1]],
@@ -673,13 +733,13 @@ var GAME = {
       promise:   {line:'약속!', why:'마을 약속: 모두 표지판에 적은 횟수까지만 잡아요'},
       basket:    {line:'바구니가 가득', why:'한 주에 네 번까지 나갈 수 있어요. 집으로 끌면 한 주가 끝나요'}
     },
-    general: function(G){ return XP[G.si]||null; }
+    general: function(G){ if(G.ch) return XP_CH; return XP[G.si]||null; }
   },
   toast: {show:'off'},   /* 블라인드: 배지 이름('공유지의 비극')이 플레이 중 이웃 칸을 가림 → 배지는 결과·배지 창에서만 */
   tryPts: 0,
   /* 해 보기: 1단계 첫 주 = 배를 바다로 → 두 번 나간 뒤 '집에서 쉬기'. 2단계 = 보이는 상태(이웃이 따라 나감) → 가리키기. 3단계 = 표지판을 기둥에 */
   tryIt: function(G){
-    if(G.phase!=='play') return null;
+    if(G.ch || G.phase!=='play') return null;
     if(G.si===0){ if(G.wk!==0) return null;
       var a=(G.t<G.ready)?{wait:true}:{src:'boat', dst:'sea', label:'배를 바다로'};
       var b=(G.st==='fish' && G.cnt[0]>=3 && G.t>=G.boatAt+1.2) ? {src:'boat', dst:'hut', label:'집에서 쉬기'} : {later:true};
@@ -687,7 +747,7 @@ var GAME = {
     if(G.si===2) return null;   /* 약속 횟수 고르기가 이 단계의 판단이라 정답 표지판을 대신 보여 주지 않는다(가리키기만) */
     return null;
   },
-  demo: function(G){ if(G.si===1) return {point:(G.st==='fish'&&G.t>=G.ready)?'nb:1':null, text:'이웃도 같은 바다'};
+  demo: function(G){ if(G.ch) return {}; if(G.si===1) return {point:(G.st==='fish'&&G.t>=G.ready)?'nb:1':null, text:'이웃도 같은 바다'};
     if(G.si===2) return {point:(G.st==='fish'&&G.t>=G.ready&&!G.signed)?'post':null, text:'표지판 하나를 기둥에'}; return {}; },
   onEvent: function(e,FX){
     if(e.t==='catch'){ if(e.pts) FX.score('store', e.pts, false, 0); if(e.got) FX.burst('crate:0', 5); }
@@ -744,7 +804,7 @@ var SCENE = (function(){
   function signStage(G){ return G.phase!=='title' && !!SS(G).sign; }
   function mount(host){
     svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
-    ['bg','week','fish','crate','store','boats','fly','sign','bub','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
+    ['bg','week','fish','crate','store','boats','fly','sign','bub','verd','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
     host.insertBefore(svg, host.firstChild);
   }
   function buildBg(G){
@@ -880,13 +940,21 @@ var SCENE = (function(){
   }
   function renderScene(G){
     if(!svg) return;
-    var bs=(G.si||0)+'|'+(G.phase==='title');
+    var bs=(G.si||0)+'|'+(G.phase==='title')+'|'+nbOf(G)+'|'+(G.ch||0);
     if(bs!==L._bs){ L._bs=bs; buildBg(G); sig=''; }
     var s=G.si+'|'+G.phase+'|'+G.st+'|'+G.wk+'|'+(G.spots||[]).join('')+'|'+(G.trips||[]).map(function(t){ return (G.t<t.t0+0.25?0:1)+''+(G.t>=t.t0+CFG.back?1:0)+(G.t-t.t0-CFG.back<0.3?1:0); }).join('')
       +'|'+(G.reg?Math.min(12,Math.floor((G.t-G.reg.t0)/0.08)):'')+'|'+G.signed+(G.t-G.signAt<0.35)+'|'+(G.t-G.copyAt<1.6)+'|'+G.sc+'|'+(G.rec&&G.rec[G.si]?G.rec[G.si].hist.length:'')
       +'|'+(G.phase==='play'?fishN(G):'');
     if(s!==sig){ sig=s; drawWeek(G); drawFish(G); drawCrates(G); drawSign(G); drawStore(G); }
-    drawBoats(G); drawFly(G); drawCard(G);
+    drawBoats(G); drawFly(G); drawVerd(G); drawCard(G);
+  }
+  /* 도전: 한 주(집)·약속(기둥) 판정 표시 1.8초 — 틀림 = 빨간 원 X(data-verdict="bad"), 맞음 = 초록 체크(공리 5) */
+  function drawVerd(G){
+    var v=G.ch && G.phase==='play' ? G.verd : null, on=v && G.t>=v.t && G.t-v.t<1.8, k=on?v.t+'|'+v.ok+'|'+v.at:'';
+    if(L.verd._k===k) return; L.verd._k=k; if(!on){ L.verd.innerHTML=''; return; }
+    var x=v.at==='post'?516:538, y=v.at==='post'?366:58;
+    L.verd.innerHTML='<g class="a8pop" data-verdict="'+(v.ok?'ok':'bad')+'"><circle cx="'+x+'" cy="'+y+'" r="22" fill="'+(v.ok?'#3E9B5F':'#D9534F')+'" stroke="#FBF8F1" stroke-width="3"/>'
+      +(v.ok?'<path d="M'+(x-10)+' '+y+'l7 7 13-14" fill="none" stroke="#FBF8F1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M'+(x-9)+' '+(y-9)+'l18 18M'+(x+9)+' '+(y-9)+'l-18 18" stroke="#FBF8F1" stroke-width="5" stroke-linecap="round"/>')+'</g>';
   }
   function vbRect(G,id){
     var p=String(id).split(':');

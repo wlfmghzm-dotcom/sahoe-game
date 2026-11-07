@@ -434,6 +434,31 @@ var STAGES = [
   {name:'숲을 밀까?',    rule:'farm', boards:4, rival:5.5},   /* 개념 도달 점검(11-04): 힌트·성실 학생은 숲을 안 밀어서 '생태계 파괴' 장면을 한 번도 못 봄 → 학생이 아직 숲을 안 밀었으면 5.5초에 옆 마을이 숲 한 칸을 밀고 여우가 떠난다(141쪽 열대 우림 파괴 원인: 농사) */
   {name:'떠나온 사람들', rule:'tent', boats:[0.8,4.8,9.0]}   /* 블라인드 4차(11-05, 4단계 1점): 석유·스위치·텐트가 한 화면에 겹쳐 '볼 것이 너무 많음' → 4단계는 텐트 하나만. 석유 요청 없음(집·우물은 흐리게), 배는 모두 잠긴 바닷가 마을에서 온다(얼음이 녹음 → 마을이 잠김 → 떠난 사람 = 핵심 대비 하나). 배는 기다려 주므로 시간 요구 0 */
 ];
+/* §19 도전 '아껴 쓰는 밤' → '숲을 지켜요'. 한 줄 설계: 석유통이 요청보다 조금만 많고(다시 차지 않음) 빈 집이 석유를 태울 때 어느 집을 먼저 끌지,
+   빈 땅이 모자라 논밭 판이 기다릴 때 숲을 밀지(바로 점수, 여우가 떠남) 빈 땅이 날 때까지 기다릴지를 고른다.
+   일반 판에서 한 동작·규칙만: 1 = 2단계 'off'(석유 주기 + 빈 집 스위치), 2 = 3단계 'farm'(논밭 판 → 빈 땅/숲). 새 규칙 0, 수치만 다름.
+   판마다 시드로: 요청·빈 집이 생기는 때와 집, 우물마다 통 수, 숲·빈 땅 자리. 레벨이 오르면: 남는 통(여유) ↓, 빈 집 ↑·겹침 ↑(동시 2 → 3),
+   빈 땅 3 → 1(숲은 3 → 5), 논밭 판이 기다려 주는 시간 ↓. 손 빠르기 점수(콤보·빨리 켜기 덤)는 없다. 도전용 수치는 이 CFG와 cfgFor(G)에만 */
+var CFG = {
+  pts: {lit:10, off:8, keep:3, farm:10, cut:4, fox:14},     /* 불 켜기 10, 빈 집 끄기 8, 1단계 끝 남은 통 하나 3 / 논밭 10, 숲 밀기 4(바로), 2단계 끝 남은 여우 하나 14 */
+ c1: {asks:[9,0.5,12], leaves:[3,0.75,8], slack:[2,-0.5,0], conc3At:2, gap:[3.6,-0.15,2.8], pat:7, d0:3.0, dEvery:2.5},
+  c2: {boards:[6,1,12], lots:[3,-0.5,1], bpat:[9,-0.8,4.5]},
+  goal: {f:[0.66, 0.035, 0.95]}                            /* 목표 = 판의 어림 최고점 × (f0 + f1×(레벨-1)) */
+};
+function cv(a,k){ var v=a[0]+a[1]*k; return a[1]<0 ? Math.max(a[2],v) : Math.min(a[2],v); }
+function cfgFor(G){ var k=Math.max(0,(G&&G.ch||1)-1), A=CFG.c1, B=CFG.c2;
+  return { c1:{asks:Math.floor(cv(A.asks,k)), leaves:Math.floor(cv(A.leaves,k)), slack:Math.round(cv(A.slack,k)), conc:k+1>=A.conc3At?3:2, gap:cv(A.gap,k), pat:A.pat, d0:A.d0, dEvery:A.dEvery},
+           c2:{boards:Math.floor(cv(B.boards,k)), lots:Math.round(cv(B.lots,k)), bpat:cv(B.bpat,k)} }; }
+function chStages(lv){ var c=cfgFor({ch:lv});
+  return [ {key:'c1', name:'아껴 쓰는 밤', rule:'off', pat:c.c1.pat, gen:c.c1},
+           {key:'c2', name:'숲을 지켜요', rule:'farm', boards:c.c2.boards, gen:c.c2} ]; }
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+function chMax(lv){ var c=cfgFor({ch:lv}), P=CFG.pts; return c.c1.asks*P.lit+c.c1.leaves*P.off+c.c1.slack*P.keep + c.c2.boards*P.farm+(6-c.c2.lots)*P.fox; }
+function chGoal(lv){ return Math.round(chMax(lv)*cv(CFG.goal.f,lv-1)/5)*5; }
+function stOf(G,si){ var i=si==null?G.si:si; return G.ch ? chStages(G.ch)[i] : STAGES[i]; }
+function nStages(G){ return G.ch ? CH_STAGES.length : STAGES.length; }
+var TILE_IDS = ['f0','f1','f2','f3','l0','l1'];   /* 자리 이름(장면 좌표). 도전 2단계는 판마다 숲·빈 땅 자리가 섞인다 */
+
 var BADGES = [
   {k:'dry',   name:'고갈',        art:'pbResource',   def:'쓸 수 있는 돈이나 물자가 다 떨어져 없어지는 것.(교과서 142쪽 참고)'},
   {k:'melt',  name:'기후변화',    art:'pbClimate',  def:'석유·석탄 같은 화석 연료를 너무 많이 써서 기후변화가 점점 심해지고 있어요.(교과서 142쪽 참고)'},
@@ -459,8 +484,8 @@ var TITLES = [[0,'새내기 탐험가'],[260,'지구촌 탐험가'],[340,'지구
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function firstName(G,ev,k,at){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
 function openWell(G){ var w=-1; for(var i=0;i<3;i++) if(G.wells[i]>0 && (w<0||G.wells[i]<G.wells[w])) w=i; return w; }
 function barrels(G){ return G.wells.reduce(function(a,b){ return a+b; },0); }
 function freshHouses(){ var a=[],i; for(i=0;i<4;i++) a.push({id:i, occ:true, st:'dark', wait:0, pat:0, lt:0, dr:0, back:0, aw:0}); return a; }
@@ -469,6 +494,7 @@ function freshTiles(){ return [{id:'f0',kind:'forest',st:'tree',deer:true,out:0}
   {id:'l0',kind:'lot',st:'empty',g:0},{id:'l1',kind:'lot',st:'empty',g:0}]; }
 function gain(G,via,bonus){
   if(via){ G.combo=0; return T.hintPts; }
+  if(G.ch){ G.combo=0; G.lastDel=G.t; return CFG.pts.lit; }   /* 도전: 콤보·빨리 덤 없음 */
   G.combo=(G.t-G.lastDel<=T.comboWin)?G.combo+1:1; G.lastDel=G.t;
   return T.base+Math.min(G.combo-1,T.comboCap)*T.comboStep+(bonus||0);
 }
@@ -481,17 +507,33 @@ function useBarrel(G,ev,w){
   if(G.wells[w]===0){ ev.push({t:'dry', w:w}); firstName(G,ev,'dry','well:'+w); award(G,ev,'dry'); }
 }
 
+/* 도전 판 만들기(시드): 1단계 = 요청·빈 집 시각표와 우물 통, 2단계 = 숲·빈 땅 자리 */
+function chGen(G,S){
+  var g=S.gen, i, t;
+  if(S.rule==='off'){
+    var B=g.asks+g.slack, w=[1,1,1]; for(i=3;i<B;i++){ var c=[0,1,2].filter(function(j){ return w[j]<6; }); w[c[Math.floor(rnd(G)*c.length)]]++; }
+    G.wells=w; G.asks=[]; t=0.8; for(i=0;i<g.asks;i++){ G.asks.push(+t.toFixed(2)); t+=g.gap*(0.6+0.8*rnd(G)); }
+    var span=t; G.leaves=[]; for(i=0;i<g.leaves;i++) G.leaves.push(+(2+rnd(G)*(span-2)).toFixed(2)); G.leaves.sort(function(a,b){ return a-b; });
+    G.tEnd=span+14;
+  } else {
+    var kinds=[], ids=TILE_IDS.slice(); for(i=0;i<6;i++) kinds.push(i<g.lots?'lot':'forest');
+    for(i=5;i>0;i--){ var j=Math.floor(rnd(G)*(i+1)), x=kinds[i]; kinds[i]=kinds[j]; kinds[j]=x; }
+    G.tiles=ids.map(function(id,k){ return kinds[k]==='lot' ? {id:id,kind:'lot',st:'empty',g:0} : {id:id,kind:'forest',st:'tree',deer:true,out:0}; });
+    G.bpat=g.bpat;
+  }
+}
 function startStage(G0,si){
-  var G=cl(G0), S=STAGES[si], i;
+  var G=cl(G0), S=stOf(G0,si), i;
   G.si=si; G.phase='play'; G.t=0; G.combo=0; G.lastDel=-99;
   G.houses=freshHouses(); G.asks=(S.asks||[]).slice(); G.leaves=(S.leaves||[]).slice();
   G.board=null; G.boardsLeft=S.boards||0; G.boardCool=0.6; G.rivalAt=S.rival||0; G.boats=[]; G.tents=[{id:0,n:0},{id:1,n:0}];
+  if(G.ch) chGen(G,S);
   if(S.rule==='tent'){
     G.ice=T.melt.length; G.smoke=Math.max(G.smoke,0.9); G.flood=1;
     G.tiles.forEach(function(x){ if(x.kind==='lot'){ x.st='empty'; x.g=0; } });
     (S.boats||[]).forEach(function(at,k){ G.boats.push({id:k, at:at, st:'wait', pos:0, slot:-1, ppl:[PEOPLE[k*2],PEOPLE[k*2+1]]}); });
   }
-  G.res={total:(S.asks||[]).length+(S.boards||0)+(S.boats?S.boats.length*2:0), served:0, missed:0};
+  G.res={total:G.asks.length+(S.boards||0)+(S.boats?S.boats.length*2:0), served:0, missed:0};
   return G;
 }
 function newGame(seed){
@@ -502,43 +544,44 @@ function newGame(seed){
   G.houses[1].st='lit'; G.houses[1].lt=99; G.houses[2].st='ask';
   return G;
 }
-function start(G){ var g=newGame(G.seed); g.score=0; g.smoke=0; return startStage(g,0); }
+function start(G){ var g=newGame(G.seed); g.score=0; g.smoke=0; if(G.ch){ g.ch=G.ch; if(G.cfg) g.cfg=G.cfg; } return startStage(g,0); }
 
 function tick(G0,dt){
-  var G=cl(G0), ev=[], S=STAGES[G.si]; if(G.phase!=='play') return {G:G, ev:ev};
+  var G=cl(G0), ev=[], S=stOf(G0); if(G.phase!=='play') return {G:G, ev:ev};
   G.t+=dt;
   /* 집: 켜진 불은 잠시 뒤 스스로 꺼짐, 기다림, 빈 집 낭비, 돌아옴 */
   G.houses.forEach(function(h){
     if(h.aw>0) h.aw=Math.max(0,h.aw-dt);
     if(h.nb>0) h.nb=Math.max(0,h.nb-dt);
     if(h.st==='lit'){ h.lt-=dt; if(h.lt<=0) h.st='dark'; }
-    else if(h.st==='ask'){ h.wait+=dt; if(h.pat>0 && h.wait>=h.pat){ h.st='dark'; G.res.missed++; G.stats.miss++; G.combo=0; ev.push({t:'miss', at:'house:'+h.id});
+    else if(h.st==='ask'){ h.wait+=dt; if(h.pat>0 && h.wait>=h.pat){ h.st='dark'; G.res.missed++; G.stats.miss++; G.combo=0; if(G.ch) h.nb=T.noAskAfter; ev.push({t:'miss', at:'house:'+h.id});   /* 도전: 놓친 집(가위표)에 곧바로 새 말풍선이 뜨지 않게 */
       if(barrels(G)===0) firstName(G,ev,'noOil','house:'+h.id); } }
-    else if(h.st==='waste'){ h.wt+=dt; h.dr-=dt; if(h.dr<=0){ h.dr=T.drainEvery; var w=-1,i; for(i=0;i<3;i++) if(G.wells[i]>0 && (w<0||G.wells[i]>G.wells[w])) w=i;
+    else if(h.st==='waste'){ h.wt+=dt; h.dr-=dt; if(h.dr<=0){ h.dr=G.ch?S.gen.dEvery:T.drainEvery; var w=-1,i; for(i=0;i<3;i++) if(G.wells[i]>0 && (w<0||G.wells[i]>G.wells[w])) w=i;
       if(w>=0){ G.stats.wasted++; ev.push({t:'drain', h:h.id, w:w}); useBarrel(G,ev,w); } } }
     if(!h.occ && h.st==='dark' && h.back>0){ h.back-=dt; if(h.back<=0){ h.occ=true; h.aw=1.0; } }
   });
   /* 새 요청(불 켜 달라는 집) */
   /* 동시 요구 ≤2(과부하 점검 11-04): 기다림 막대 있는 요청 + 빈 집을 합쳐 2개 미만일 때만 새 요구가 나온다. 빈 집은 한 번에 하나 */
   var busy=G.houses.filter(function(h){ return (h.st==='ask' && h.pat>0) || h.st==='waste'; }).length;
-  if(G.asks.length && G.t>=G.asks[0] && (!S.pat || busy<2)){
+  var conc=G.ch && S.gen ? S.gen.conc||2 : 2;
+  if(G.asks.length && G.t>=G.asks[0] && (!S.pat || busy<conc)){
     var free=G.houses.filter(function(h){ return h.occ && h.st==='dark' && h.aw<=0 && !(h.nb>0); });
     if(free.length){ var h=free[Math.floor(rnd(G)*free.length)]; G.asks.shift(); h.st='ask'; h.wait=0; h.pat=S.pat||0; ev.push({t:'ask', h:h.id}); }
   }
   /* 사람이 불을 켠 채 나감(2단계) */
-  if(G.leaves.length && G.t>=30) G.leaves=[];   /* 끄지 않고 버티는 학생도 단계가 끝나게 */
-  if(G.leaves.length && G.t>=G.leaves[0] && busy<2 && !G.houses.some(function(h){ return h.st==='waste'; })){
+  if(G.leaves.length && G.t>=(G.ch?G.tEnd:30)) G.leaves=[];   /* 끄지 않고 버티는 학생도 단계가 끝나게 */
+  if(G.leaves.length && G.t>=G.leaves[0] && busy<conc && (G.ch ? G.houses.filter(function(h){ return h.st==='waste'; }).length<conc-1 : !G.houses.some(function(h){ return h.st==='waste'; }))){
     var cand=G.houses.filter(function(h){ return h.occ && h.st==='dark' && h.aw<=0; });
-    if(cand.length){ var q=cand[Math.floor(rnd(G)*cand.length)]; G.leaves.shift(); q.occ=false; q.st='waste'; q.dr=T.drainFirst; q.wt=0; q.aw=1.6; ev.push({t:'leave', h:q.id}); }
+    if(cand.length){ var q=cand[Math.floor(rnd(G)*cand.length)]; G.leaves.shift(); q.occ=false; q.st='waste'; q.dr=G.ch?S.gen.d0:T.drainFirst; q.wt=0; q.aw=1.6; ev.push({t:'leave', h:q.id}); }
   }
   /* 논밭 판(3단계) */
   if(S.rule==='farm'){
     if(G.board){ G.board.wait+=dt; if(G.board.wait>=G.board.pat){ G.board=null; G.boardCool=T.boardGap; G.res.missed++; G.stats.miss++; G.combo=0; ev.push({t:'miss', at:'tool:farm'}); } }
-    else if(G.boardsLeft>0){ G.boardCool-=dt; if(G.boardCool<=0){ G.boardsLeft--; G.board={wait:0, pat:T.boardPat}; } }
+    else if(G.boardsLeft>0){ G.boardCool-=dt; if(G.boardCool<=0){ G.boardsLeft--; G.board={wait:0, pat:G.ch?+(G.bpat*(0.75+0.5*rnd(G))).toFixed(2):T.boardPat}; } }
     G.tiles.forEach(function(x){
       if(x.out>0) x.out=Math.max(0,x.out-dt);
       if(x.st==='grow'){ x.g+=dt/T.grow; if(x.g>=1){ x.g=1; x.st='done'; x.dt=1.0;
-        var pts=x.via?T.hintPts:T.base+x.cb+Math.round(T.farmBonus*Math.max(0,1-(x.bw+T.grow)/T.boardPat));
+        var pts=x.via?T.hintPts:G.ch?CFG.pts.farm:T.base+x.cb+Math.round(T.farmBonus*Math.max(0,1-(x.bw+T.grow)/T.boardPat));
         G.score+=pts; G.stats.farm++; G.res.served++; ev.push({t:'harvest', at:'tile:'+x.id, pts:pts}); firstName(G,ev,'grow','tile:'+x.id); } }
       else if(x.st==='done'){ x.dt-=dt; if(x.dt<=0){ x.st='empty'; x.g=0; } }
     });
@@ -562,9 +605,15 @@ function tick(G0,dt){
   var housesQuiet=!G.asks.length && !G.houses.some(function(h){ return h.st==='ask'; });
   var end=false;
   if(S.rule==='oil') end=housesQuiet;
-  else if(S.rule==='off') end=housesQuiet && !G.leaves.length && (!G.houses.some(function(h){ return h.st==='waste'; }) || G.t>=24);
+  else if(S.rule==='off') end=housesQuiet && !G.leaves.length && (!G.houses.some(function(h){ return h.st==='waste'; }) || G.t>=(G.ch?G.tEnd:24));
   else if(S.rule==='farm') end=!G.board && G.boardsLeft===0 && !G.tiles.some(function(x){ return x.st==='grow'; });
   else end=housesQuiet && G.boats.every(function(b){ return b.st==='gone'; });
+  if(end && G.ch){   /* 도전: 1단계 끝 남은 통마다 +3(우물 자리), 2단계 끝 남은 여우마다 +14(숲 자리). 이름표·배지 없음 */
+    if(S.rule==='off'){ G.houses.forEach(function(h){ if(h.st==='waste'){ h.st='dark'; h.occ=true; } });
+      G.wells.forEach(function(c,w){ if(c>0){ var p=c*CFG.pts.keep; G.score+=p; ev.push({t:'bonus', at:'well:'+w, pts:p}); } }); }
+    if(S.rule==='farm'){ var nf=0; G.tiles.forEach(function(x){ if(x.deer){ nf++; G.score+=CFG.pts.fox; ev.push({t:'bonus', at:'tile:'+x.id, pts:CFG.pts.fox}); } }); G.stats.deer=nf; }
+    G.phase='stageEnd'; ev.push({t:'stageEnd', si:G.si}); return {G:G, ev:ev};
+  }
   if(end){
     if(S.rule==='oil' && !G.first.dry){ var lo=0; [1,2].forEach(function(i){ if(G.wells[i]<G.wells[lo]) lo=i; }); firstName(G,ev,'dry','well:'+lo); award(G,ev,'dry'); }
     if(S.rule==='off'){ G.houses.forEach(function(h){ if(h.st==='waste'){ h.st='dark'; h.occ=true; } });
@@ -595,7 +644,7 @@ function drop(G0,src,dst,via){
   if(src==='tool:switch'){
     if(dp[0]!=='house') return fail('dst');
     h=G.houses[+dp[1]]; if(!h) return fail('dst'); if(h.st!=='waste') return fail(h.occ?'wOffIn':'wOff');
-    pts=via?T.hintPts:gain(G,false,0)-T.base+T.offPts+Math.round(T.patBonus*Math.max(0,1-h.wt/T.quick)); h.st='dark'; h.back=T.backAfter; G.stats.off++; G.score+=pts;
+    pts=via?T.hintPts:G.ch?(gain(G,false,0),CFG.pts.off):gain(G,false,0)-T.base+T.offPts+Math.round(T.patBonus*Math.max(0,1-h.wt/T.quick)); h.st='dark'; h.back=T.backAfter; G.stats.off++; G.score+=pts;
     ev.push({t:'off', at:'house:'+h.id, pts:pts, combo:via?0:G.combo}); if(G.stats.off>=2) firstName(G,ev,'off','house:'+h.id);   /* 블라인드 3차: 해 보기 이름표('빈 집에 스위치')와 겹쳐 글이 둘 → 말풍선은 둘째 끄기에서 */
     return {G:G, ok:true, ev:ev};
   }
@@ -605,7 +654,7 @@ function drop(G0,src,dst,via){
     var bw=G.board.wait, bp=G.board.pat;
     if(x.kind==='forest'){
       if(x.st!=='tree') return fail('wTile');
-      pts=gain(G,via,Math.round(T.farmBonus*Math.max(0,1-bw/bp)));
+      pts=G.ch&&!via?(gain(G,false,0),CFG.pts.cut):gain(G,via,Math.round(T.farmBonus*Math.max(0,1-bw/bp)));
       x.st='field'; x.deer=false; x.out=2.4; G.stats.cut++; G.stats.farm++; G.res.served++; G.score+=pts; G.board=null; G.boardCool=T.boardGap;
       ev.push({t:'cut', at:'tile:'+x.id, pts:pts, combo:via?0:G.combo});
       firstName(G,ev,'cut','tile:'+x.id); award(G,ev,'eco'); smokeUp(G,ev,T.smokePerCut);
@@ -627,12 +676,12 @@ function drop(G0,src,dst,via){
   }
   return fail('src');
 }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 
 /* 지금 할 만한 한 수(힌트·손가락 시범·자동 플레이 공용). 늘 '덜 쓰는' 쪽: 빈 집 끄기가 먼저, 논밭은 빈 땅에만(없으면 기다림) */
 function hintMove(G){
   if(!G || G.phase!=='play') return null;
-  var rule=STAGES[G.si].rule, i;
+  var rule=stOf(G).rule, i;
   if(rule==='farm'){
     if(!G.board) return null;
     var lot=G.tiles.find(function(z){ return z.kind==='lot' && z.st==='empty'; });
@@ -651,7 +700,7 @@ function hintMove(G){
 }
 function sources(G){
   if(!G || G.phase!=='play') return [];
-  var rule=STAGES[G.si].rule, a=[];
+  var rule=stOf(G).rule, a=[];
   if(rule==='farm') return G.board?['tool:farm']:[];
   if(rule==='tent'){ G.boats.forEach(function(b){ if(b.st==='dock') b.ppl.forEach(function(p,k){ if(p) a.push('pp:'+b.id+':'+k); }); }); return a; }   /* 4단계는 사람 → 텐트 하나만(석유 없음) */
   var ow=openWell(G); if(ow>=0) a.push('well:'+ow);   /* 개념 도달 점검(11-04): 우물은 하나씩(가장 적게 남은 것부터) 쓴다 → 1단계 안에 우물 하나가 반드시 비어 '고갈'이 화면에 보인다 */
@@ -660,7 +709,7 @@ function sources(G){
 }
 function targets(G){
   if(!G || G.phase!=='play') return [];
-  var rule=STAGES[G.si].rule;
+  var rule=stOf(G).rule;
   if(rule==='farm') return G.tiles.map(function(x){ return 'tile:'+x.id; });
   if(rule==='tent') return ['tent:0','tent:1'];
   return G.houses.map(function(h){ return 'house:'+h.id; });
@@ -675,7 +724,7 @@ function itemOf(G,id){
 }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,
+if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,CFG:CFG,cfgFor:cfgFor,chStages:chStages,chGoal:chGoal,CH_STAGES:CH_STAGES,stOf:stOf,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf};
 /* LOGIC-END */
 
@@ -718,6 +767,13 @@ var GAME = {
     ],
     idle: '잠깐! 기다려요'
   },
+  /* §19 도전(logic.js CFG·chStages): 무엇을 거나 = 다시 안 차는 석유통이 빠듯하고 빈 땅이 모자람, 무엇을 고르나 = 빈 집을 먼저 꺼 석유를 아낄지, 숲을 밀지 빈 땅을 기다릴지 */
+  challenge: {
+    stages: CH_STAGES,
+    goal: chGoal,
+    say: {start: ['석유통이 빠듯해!', '빈 땅이 모자라!']},
+    ruleCards: [[['rOil','석유 주기'],['rSwitch','빈 집에 스위치']], [['rLot','빈 땅: 천천히'],['rForest','숲: 여우가 떠나요']]]
+  },
   ruleCards: [
     [['rOil','석유 주기']],
     [['rOil','석유 주기'],['rSwitch','빈 집에 스위치',1]],
@@ -749,6 +805,9 @@ var GAME = {
     },
     of: function(G){
       if(G.phase!=='play') return null;
+      if(G.ch) return stOf(G).rule==='off'
+        ? {why:'우물은 다시 안 차요. 빈 집이 태운 통만큼 뒤 집이 깜깜해요', def:'고갈: 쓸 수 있는 돈이나 물자가 다 떨어져 없어지는 것.', page:'교과서 142쪽 참고'}
+        : {why:'숲을 밀면 바로 논밭이 되지만 여우가 떠나요. 끝에 남은 여우가 점수예요', def:'자연이 망가져서 동물과 식물이 살 곳을 잃고 있어요.', page:'교과서 142쪽 참고'};
       return [
         {why:'다 쓴 우물은 다시 안 차요', def:'고갈: 쓸 수 있는 돈이나 물자가 다 떨어져 없어지는 것.', page:'교과서 142쪽 참고'},
         {why:'석유를 많이 태우면 얼음이 녹아요', def:'석유·석탄 같은 화석 연료를 너무 많이 써서 기후변화가 점점 심해지고 있어요.', page:'교과서 142쪽 참고'},
@@ -761,12 +820,14 @@ var GAME = {
   /* '해 보기'(engine §12, 2026-11-05 통합 점검): 2단계 = 스위치를 빈 집에(빈 집이 생길 때까지 기다림), 4단계 = 배의 사람을 텐트로(배가 닿을 때까지 기다림).
      기본 수(hintMove)는 석유 주문을 먼저 골라 4단계에 '텐트로' 이름표가 석유 주기에 붙었다 */
   tryIt: function(G){
+    if(G.ch) return null;   /* 도전: 해 보기 없음 */
     if(G.si===1){ var h=G.houses.find(function(x){ return x.st==='waste' && x.aw<=0; }); return h ? {src:'tool:switch', dst:'house:'+h.id} : {wait:true}; }   /* 블라인드 2차(11-05): 사람이 다 걸어 나가 문 앞에 점선 빈자리만 남은 뒤에(사람이 서 있으면 빈 집으로 안 보임) */
     if(G.si===3){ var tn=G.tents.find(function(t){ return t.n<T.tentCap; }), bt=G.boats.find(function(b){ return b.st==='dock' && b.ppl.some(function(p){ return p; }); });
       return tn && bt ? {src:'pp:'+bt.id+':'+(bt.ppl[0]?0:1), dst:'tent:'+tn.id} : {wait:true}; }
     return {};
   },
   demo: function(G){
+    if(G.ch) return null;
     var rule=STAGES[G.si].rule;
     if(G.si===0 && !G.first.light) return {repeat:true};
     if(rule==='off'){ var h=G.houses.find(function(x){ return x.st==='waste'; }); return {move: h?{src:'tool:switch', dst:'house:'+h.id}:null}; }
@@ -781,7 +842,7 @@ var GAME = {
     else if(e.t==='harvest'){ FX.score(e.at, e.pts, false, 0); FX.burst(e.at,8); FX.progress(); }
     else if(e.t==='bonus'){ FX.score(e.at, e.pts, false, 0); }
     else if(e.t==='plant'){ FX.burst(e.at,5); }
-    else if(e.t==='miss'){ FX.progress(); FX.comboOff(); }
+    else if(e.t==='miss'){ FX.progress(); FX.comboOff(); if(SCENE.missFx) SCENE.missFx(e.at); }   /* 도전에서만 그 자리 가위표(장면이 G.ch를 봄) */
     else if(e.t==='rival'){ if(SCENE.rival) SCENE.rival(e.id); FX.burst(e.at,6);
       FX.explain({why:'옆 마을이 논밭을 만들려고 숲을 밀었어요', def:'열대 우림이 사라지는 가장 큰 까닭은 농사, 에너지 사용, 가축 기르기, 여러 산업 같은 사람의 활동이에요.', page:'교과서 141쪽 참고'}); }
   }
@@ -821,14 +882,15 @@ var SCENE = (function(){
   var TOOL=[242,336], TENT=[[482,292],[402,292]], DOCK=[[566,262],[566,338]], VILLAGE=[566,168], ICE=[566,62];
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
   function g(parent){ var e=el('g',{}); parent.appendChild(e); return e; }
-  function rule(G){ return (STAGES[G.si]||STAGES[0]).rule; }
+  var chOn=false;
+  function rule(G){ return (stOf(G)||STAGES[0]).rule; }   /* 도전이면 도전 단계(logic stOf) */
   function play(G){ return G.phase!=='title'; }
   function label(x,y,t,cls){ return '<text x="'+x+'" y="'+y+'" font-size="20" text-anchor="middle" class="a5lb'+(cls?' '+cls:'')+'">'+t+'</text>'; }
 
   function mount(host){
     svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
     svg.innerHTML='<defs><radialGradient id="a5glow"><stop offset="0" stop-color="#F7E2A0" stop-opacity=".95"/><stop offset=".55" stop-color="#EBD9B4" stop-opacity=".5"/><stop offset="1" stop-color="#EBD9B4" stop-opacity="0"/></radialGradient>'
-      +'<filter id="a5dark" x="-5%" y="-5%" width="110%" height="110%"><feColorMatrix type="matrix" values=".30 0 0 0 .03  0 .33 0 0 .05  0 0 .45 0 .10  0 0 0 1 0"/></filter><clipPath id="a5grow0"><rect id="a5gr0" x="-40" y="-36" width="80" height="72"/></clipPath><clipPath id="a5grow1"><rect id="a5gr1" x="-40" y="-36" width="80" height="72"/></clipPath></defs>';
+      +'<filter id="a5dark" x="-5%" y="-5%" width="110%" height="110%"><feColorMatrix type="matrix" values=".30 0 0 0 .03  0 .33 0 0 .05  0 0 .45 0 .10  0 0 0 1 0"/></filter>'+Object.keys(TILE).map(function(id){ return '<clipPath id="a5grow'+id+'"><rect id="a5gr'+id+'" x="-40" y="-36" width="80" height="72"/></clipPath>'; }).join('')+'</defs>';   /* 도전 2단계는 빈 땅 자리가 판마다 달라 자리마다 자람 가림판 */
     gBack=g(svg); gSky=g(svg); gSea=g(svg); gWells=g(svg); nodes.gFlow=g(svg); gTiles=g(svg); gHouses=g(svg); gTool=g(svg); gTent=g(svg); gFx=g(svg);
     host.insertBefore(svg, host.firstChild);
     var h='<rect x="-700" y="-600" width="2000" height="1640" class="f-landd"/><rect x="-700" y="-600" width="2000" height="1640" class="f-navy" opacity=".16"/>'
@@ -927,23 +989,31 @@ var SCENE = (function(){
     setTimeout(function(){ if(n._swGen===my) n._sw.setAttribute('opacity',0); }, 1500);
   }
 
+  /* 도전: 놓친 요청(말풍선 막대가 다 줄어 깜깜해진 집)·놓친 논밭 판 자리에 빨간 가위표 1.4초(공리 5, data-verdict) */
+  function missFx(at){
+    if(!chOn || !gFx) return; var p=String(at).split(':'), c=p[0]==='house'?HOUSE[+p[1]]:at==='tool:farm'?TOOL:null; if(!c) return;
+    var e=el('g',{'data-verdict':'bad', transform:'translate('+c[0]+' '+(c[1]-6)+')'});
+    e.innerHTML='<circle r="22" fill="#FBF8F1" opacity=".92"/><circle r="22" fill="none" stroke="#C8423B" stroke-width="5"/><path d="M-10 -10L10 10M10 -10L-10 10" stroke="#C8423B" stroke-width="6" stroke-linecap="round"/>';
+    gFx.appendChild(e); setTimeout(function(){ e.remove(); }, 1400);
+  }
+
   /* ---------- 숲·빈 땅 ---------- */
   function tileNode(id){
     var k='t'+id, n=nodes[k]; if(n) return n;
     var p=TILE[id]; n=nodes[k]=g(gTiles); n.setAttribute('transform','translate('+p[0]+' '+p[1]+')'); n._key='';
     n._a=g(n); n._b=g(n); n._d=g(n); n._c=g(n); n._c.innerHTML=useArt('clock',14,-40,28,28)+'<circle cx="28" cy="-26" r="17" fill="none" stroke="#1E2B3A" stroke-width="5" opacity=".35"/><circle class="rg" cx="28" cy="-26" r="17" fill="none" stroke="#4CAF7A" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 28 -26)"/>'; n._rg=n._c.querySelector('.rg'); n._c.setAttribute('opacity',0);   /* 블라인드 4차: 시계가 무엇을 기다리는지 모름 → 시계 둘레가 초록으로 차오르고 논밭도 함께 자람(다 차면 수확) */   /* 빈 땅에서 자라는 동안 시계(규칙 칸 rLot과 같은 그림) */
-    if(id[0]==='l'){ n._b.setAttribute('clip-path','url(#a5grow'+id[1]+')'); n._clip=svg.querySelector('#a5gr'+id[1]); }
+    n._b.setAttribute('clip-path','url(#a5grow'+id+')'); n._clip=svg.querySelector('#a5gr'+id);
     n._d.innerHTML=useArt('fox',-2,-24,44,34); return n;
   }
   function drawTiles(G){
     G.tiles.forEach(function(x){
-      var n=tileNode(x.id), key=x.st;
-      if(key!==n._key){ if(x.kind==='forest' && n._key==='tree' && key==='field') puff(TILE[x.id]); n._key=key;
+      var n=tileNode(x.id), key=x.kind+x.st;
+      if(key!==n._key){ if(x.kind!==n._kind){ n._kind=x.kind; n._key=''; n._b.innerHTML=''; } if(x.kind==='forest' && n._key==='foresttree' && key==='forestfield') puff(TILE[x.id]); n._key=key;
         if(x.kind==='forest') n._a.innerHTML=useArt(x.st==='tree'?'envForest':'tileCut',-38,-34,76,68);
         else { n._a.innerHTML=useArt('lot',-38,-34,76,68); n._b.innerHTML=(x.st==='empty')?'':useArt('envFarm',-38,-34,76,68); }
       }
       n._c.setAttribute('opacity',x.st==='grow'?1:0); if(x.st==='grow') n._rg.setAttribute('stroke-dasharray',(100*x.g).toFixed(1)+' 100');
-      if(n._clip){ var gg=x.st==='grow'?x.g:(x.st==='done'?1:0); n._clip.setAttribute('y',(36-72*gg).toFixed(1)); }
+      if(n._clip && x.kind==='lot'){ var gg=x.st==='grow'?x.g:(x.st==='done'?1:0); n._clip.setAttribute('y',(36-72*gg).toFixed(1)); }
       if(x.kind==='forest'){
         if(x.deer){ n._d.setAttribute('opacity',1); n._d.setAttribute('transform',''); }
         else if(x.out>0){ var a=1-x.out/2.4; n._d.setAttribute('opacity',(a<.75?1:(1-a)/.25).toFixed(2)); n._d.setAttribute('transform','translate('+(160*a).toFixed(1)+' '+(30*a+(RM?0:-4*Math.abs(Math.sin(a*18)))).toFixed(1)+') translate(40 0) scale(-1 1)'); }   /* 여우가 뛰어서 숲 밖(바다 쪽)으로 떠남 */
@@ -1010,7 +1080,8 @@ var SCENE = (function(){
   }
 
   function renderScene(G){
-    var s2=G.si+'|'+G.phase; if(s2!==sig){ sig=s2; prevWells=null; }
+    var s2=G.si+'|'+G.phase+'|'+(G.ch||0); if(s2!==sig){ sig=s2; prevWells=null; }
+    chOn=!!G.ch; var tl0=gBack.querySelector('#a5tlab'); if(tl0) tl0.style.display=chOn?'none':'';   /* 도전: 숲·빈 땅 자리가 판마다 섞여 줄 이름표를 숨김(그림으로 구별) */
     drawWells(G); drawHouses(G); drawTiles(G); drawTool(G); drawSea(G); drawDrain(G);
     /* 블라인드 2차: 3단계는 우물·집을 쓰지 않는다 → 흐리게(할 일이 논밭 하나로 보이게) */
     var idle=play(G) && (rule(G)==='farm'||rule(G)==='tent') ? '.3' : '1'; if(nodes.idle!==idle){ nodes.idle=idle; gWells.setAttribute('opacity',idle); gHouses.setAttribute('opacity',idle); nodes.gFlow.setAttribute('opacity',idle); }
@@ -1051,7 +1122,7 @@ var SCENE = (function(){
     return a;
   }
   /* 블라인드 4차: 이름표('석유 주기' 등)·말풍선이 우물·얼음·마을 그림을 가림 → 엔진에 '가리면 안 되는 그림'으로 알린다(§16-1 SCENE.labels) */
-  function labels(G){ if(!play(G)) return []; var a=['well:0','well:1','well:2','ice','vil']; if(rule(G)==='farm') a.push('lotlab'); return a; }
+  function labels(G){ if(!play(G)) return []; var a=['well:0','well:1','well:2','ice','vil']; if(rule(G)==='farm' && !G.ch) a.push('lotlab'); return a; }
   function idleAt(G){ return rule(G)==='farm' ? 'tile:l0' : 'house:0'; }
   /* 블라인드 2차: 클래스 이름 .lb가 엔진 HUD 버튼(.ib.lb)과 겹쳐 배지 아이콘에 굵은 테두리가 붙어 '폭탄'처럼 보였다 → .a5lb */
   var css='.a5et{font-family:var(--game);fill:#1E2B3A}.a5lb{font-family:var(--game);font-size:20px;fill:#FBF8F1;paint-order:stroke;stroke:#1E2B3A;stroke-width:4px;stroke-linejoin:round}'
@@ -1072,7 +1143,7 @@ var SCENE = (function(){
     var b=TILE[id]; if(!b || !gFx || RM) return; var a=[600,b[1]-40], e=el('g',{}); e.innerHTML=useArt('envFarm',-22,-22,44,44); gFx.appendChild(e);
     e.animate([{transform:'translate('+a[0]+'px,'+a[1]+'px)'},{transform:'translate('+((a[0]+b[0])/2)+'px,'+(Math.min(a[1],b[1])-40)+'px)'},{transform:'translate('+b[0]+'px,'+b[1]+'px) scale(.6)',opacity:.3}],{duration:800,easing:'ease-in-out'}).onfinish=function(){ e.remove(); };
   }
-  return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, labels:labels, idleAt:idleAt, css:css, aspect:'600/400', rival:rival, offFx:offFx};
+  return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, labels:labels, idleAt:idleAt, css:css, aspect:'600/400', rival:rival, offFx:offFx, missFx:missFx};
 })();
 /* ===== SCENE-END ===== */
 

@@ -405,22 +405,51 @@ var CFG = {
   ]
 };
 var STAGES = CFG.stages;
-/* 도전 모드(엔진이 G.ch = 레벨 1.. 을 줄 때만): 판 시드로 날마다 손님 수를 새로 뽑고, 레벨이 오를수록
-   손님 수 변동 폭↑(2~4+레벨), 2단계 날씨 예고가 빗나갈 확률↑(레벨×8%, ±1명), 3단계 옆 가게 값↓·좋은 사과 확률↑, 하루 수↑.
-   일반 판(G.ch 없음)은 위 CFG.stages 그대로. */
+/* §19 도전 = 추론형('장날 셋', kind:'reason'). 한 줄 설계: 손님 줄·날씨 카드·옆 가게 값표를 보고(단서가 다 보임) 가져갈 상자 수를 정한다.
+   레벨이 올리는 것 = 함께 따질 개념 요소: 1 손님 수만큼 / 2 + 날씨로 손님 짐작 / 3 + 옆 가게보다 하나 싸게 / 4 + 좋은 사과(값이 같으면 손님을 다 뺏김)
+   / 5·6 세 가지가 사흘씩 섞임. 시간 압박 없음. 통과 = 그 레벨의 모든 날을 가장 많이 번 상자 수로(목표 = 만점 동전).
+   만점이 시드와 상관없이 같도록 날마다 '최선 동전'이 같은 짝에서 고른다: 손님 보기·날씨 날은 손님 합이 같고, 옆 가게 날은
+   최선 동전이 같은 (손님, 옆 가게 값) 짝 둘 중 하나(예: 20 = 4명·값 6 → 5상자 / 5명·값 5 → 7상자). 날씨 예고는 빗나가지 않는다(운 금지).
+   함정(시드와 상관없이): 날씨 날은 늘 비·명절이 섞임(날씨를 안 보면 막힘), 옆 가게 날은 '같은 값'·'상자 다'가 늘 손해. 일반 판(G.ch 없음)은 CFG.stages 그대로. */
+var CH = { maxLv:6,
+  /* 레벨마다 세 장날의 [종류, 날 수] */
+  lv: [null,
+    [['see',2],['see',2],['see',2]],
+    [['see',2],['sky',2],['sky',2]],
+    [['see',2],['sky',2],['rival',2]],
+    [['sky',2],['rival',2],['rival',2]],
+    [['see',3],['sky',3],['rival',3]],
+    [['sky',3],['rival',3],['rival',3]]],
+  seeSum: {2:8, 3:12},                         /* 손님 보기 날: 손님 수 합(날마다 2~6명, 4·4·4처럼 모두 같은 판은 뺌) */
+  sky: {2:[['rain','fest']], 3:[['rain','sun','fest']]},   /* 날씨 날: 이 날씨들을 섞어서(비 2명·맑음 4명·명절 6명) */
+  rivalV: {2:[20,12], 3:[20,15,12]},           /* 옆 가게 날: 그날 최선 동전(같은 값 짝 중 하나를 고름) */
+  rivalPair: {20:[[4,6],[5,5]], 15:[[3,6],[5,4]], 12:[[3,5],[4,4]]},   /* [손님, 옆 가게 값] → 최선 = 손님 × (옆 가게 값 − 1), 상자 = 손님 + 7 − 옆 가게 값(8 이하) */
+  good: 4                                       /* 이 레벨부터 옆 가게 좋은 사과가 반쯤 섞임(값이 같으면 손님이 옆 가게로) */
+};
+var CH_PARTIALS = ['날씨는 안 봄', '옆 가게와 같은 값', '옆 가게보다 아주 싸게'];
 function rndOf(G){ var s=(G.rs=(G.rs|0)+0x6D2B79F5|0), t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }
-function cfgFor(G,si){
-  if(!G || !G.ch) return {days:cl(STAGES[si].days)};
-  var lv=Math.max(1,G.ch|0), S=STAGES[si], n=S.days.length+Math.min(2,Math.floor((lv-1)/2)), hi=Math.min(6,4+lv), days=[], i, c;
-  var ri=function(a,b){ return a+Math.floor(rndOf(G)*(b-a+1)); };
-  for(i=0;i<n;i++){
-    if(S.rule==='see') days.push({c:ri(2,hi)});
-    else if(S.rule==='sky'){ var k=['rain','sun','fest'][ri(0,2)], base={rain:2,sun:4,fest:6}[k]; c=base;
-      if(rndOf(G)<Math.min(0.5,lv*0.08)) c=clamp(base+(rndOf(G)<0.5?-1:1),1,6); days.push({c:c,fc:base,sky:k}); }
-    else { c=ri(3,Math.min(6,3+lv)); days.push({c:c, pN:clamp(CFG.base-ri(0,Math.min(3,lv)),2,CFG.base), good:rndOf(G)<Math.min(0.6,0.15*lv)?1:0}); }
-  }
-  return {days:days};
+function shuf(G,a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(rndOf(G)*(i+1)), x=a[i]; a[i]=a[j]; a[j]=x; } return a; }
+var CH_NAMES = ['첫째 장날','둘째 장날','셋째 장날'];
+function chStages(lv){ lv=Math.max(1,Math.min(CH.maxLv,lv|0||1)); return CH.lv[lv].map(function(x,i){ return {key:'c'+(i+1), name:CH_NAMES[i], rule:x[0], n:x[1], lv:lv}; }); }
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+function stOf(G,si){ var i=si==null?G.si:si; return G && G.ch ? chStages(G.ch)[i] : STAGES[i]; }
+function ruleOf(G,si){ return stOf(G,si).rule; }
+function nStages(G){ return G && G.ch ? CH_STAGES.length : STAGES.length; }
+/* 그 장날의 날들(판 시드로) */
+function chDays(G,S){
+  var n=S.n, out=[], i;
+  if(S.rule==='see'){ var sum=CH.seeSum[n], c;
+    for(var tr=0;tr<50;tr++){ c=[]; var left=sum; for(i=0;i<n-1;i++){ var lo=Math.max(2,left-6*(n-1-i)), hi=Math.min(6,left-2*(n-1-i)); var v=lo+Math.floor(rndOf(G)*(hi-lo+1)); c.push(v); left-=v; } c.push(left);
+      if(!c.every(function(v){ return v===c[0]; })) break; }
+    c.forEach(function(v){ out.push({c:v}); });
+  } else if(S.rule==='sky'){ var sk=shuf(G,CH.sky[n][0].slice()), num={rain:2,sun:4,fest:6};
+    sk.forEach(function(k){ out.push({c:num[k], fc:num[k], sky:k}); });
+  } else { shuf(G,CH.rivalV[n].slice()).forEach(function(v){ var pr=CH.rivalPair[v][Math.floor(rndOf(G)*2)];
+      out.push({c:pr[0], pN:pr[1], good:(S.lv>=CH.good && rndOf(G)<0.5)?1:0}); }); }
+  return out;
 }
+function chGoal(lv){ return chStages(lv).reduce(function(s,S){ return s + (S.rule==='see' ? 6*CH.seeSum[S.n] : S.rule==='sky' ? 6*CH.sky[S.n][0].reduce(function(a,k){ return a+{rain:2,sun:4,fest:6}[k]; },0) : CH.rivalV[S.n].reduce(function(a,b){ return a+b; },0)); },0); }
+function cfgFor(G,si){ if(!G || !G.ch) return {days:cl(STAGES[si].days)}; return {days:chDays(G,stOf(G,si))}; }
 var BADGES = [
   {k:'market', name:'시장',     art:'bdMarket', def:'물건이나 서비스를 사고파는 곳을 시장이라고 해요. 전통 시장, 대형 할인점, 온라인 쇼핑도 모두 시장이에요. (교과서 61쪽 참고)'},
   {k:'price',  name:'가격',     art:'bdPrice',  def:'사람들이 사려는 양과 기업이 팔려는 양에 따라 시장에서 값이 정해져요. (교과서 62쪽 참고)'},
@@ -444,8 +473,8 @@ var NAMES = {
 var TITLES = [[0,'시장 구경꾼'],[130,'시장 도우미'],[175,'시장 안내원'],[205,'시장 박사']];   /* full 제안 0/140/230/240(성실 봇은 모두 230 만점) → 사람은 2단계 첫 날씨를 짐작하다 놓치므로 위 경계를 낮춤. 힌트 연타 115 < 130 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function firstName(G,ev,k,at){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
 function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 /* 값표: 사려는 사람이 많을수록 오르고, 가판대 상자가 많을수록 내린다 */
 function priceOf(c,q){ return clamp(CFG.base + c - q, CFG.pmin, CFG.pmax); }
@@ -461,7 +490,7 @@ function bestEarn(day){ return dayOut(day,bestQ(day)).earn; }
 function stageBest(si,G){ return (G&&G.days?G.days:STAGES[si].days).reduce(function(s,d){ return s+bestEarn(d); },0); }
 function stageGoal(si,G){ return Math.round(stageBest(si,G)*CFG.goalRate); }
 function dayNow(G){ return G.days[G.d]; }
-function seesLine(G){ return STAGES[G.si].rule!=='sky' || G.st==='sell'; }   /* 2단계는 장을 열어야 손님이 온다 */
+function seesLine(G){ return ruleOf(G)!=='sky' || G.st==='sell'; }   /* 2단계는 장을 열어야 손님이 온다 */
 /* 값표에 보이는 값: 1·3단계 = 지금 값, 2단계 장 열기 전 = 예상 손님(날씨) 기준 '예상 값' */
 function shownPrice(G){ var d=G.days[G.d]; return priceOf(seesLine(G)?d.c:(d.fc!=null?d.fc:d.c), G.q); }
 function notReady(G){ return !G || G.phase!=='play' || G.st!=='load' || G.t<G.readyAt; }
@@ -471,8 +500,8 @@ function startDay(G,d){
   G.lvlAt=-9; G.lvlFrom=0;
 }
 function startStage(G0,si){
-  var G=cl(G0), S=STAGES[si];
-  G.si=si; G.phase='play'; G.t=0; G.readyAt=CFG.ready; G.sc=0; if(G.ch && G.rs==null) G.rs=G.seed|0; G.days=cfgFor(G,si).days; G.goal=stageGoal(si,G); G.best=stageBest(si,G);
+  var G=cl(G0);
+  G.si=si; G.phase='play'; G.t=0; G.readyAt=CFG.ready; G.sc=0; if(G.ch && G.rs==null) G.rs=(G.seed^0x2C1B3C6D)>>>0; G.days=cfgFor(G,si).days; G.best=stageBest(si,G); G.goal=G.ch ? G.best : stageGoal(si,G);   /* 도전: 금고 목표 줄 = 만점 */
   G.rec[si]={days:[]};
   G.rec[si].plan=cl(G.days);
   startDay(G,0);
@@ -487,19 +516,20 @@ function start(G){ var g=cl(G); g.score=0; g.rec=[]; g.stats={sc:[0,0,0]}; g.fir
 
 /* 장 열기: 결과를 정하고 연출 시각을 잡는다(점수는 바로 금고로) */
 function openMarket(G,ev,via){
-  var day=dayNow(G), o=dayOut(day,G.q), arrive=STAGES[G.si].rule==='sky'?CFG.arrive:0;
+  var day=dayNow(G), o=dayOut(day,G.q), arrive=ruleOf(G)==='sky'?CFG.arrive:0;
   var earn=via||G.via ? Math.round(o.earn*CFG.viaCut) : o.earn;
   o.got=earn; o.via=!!(via||G.via); o.best=bestEarn(day);
   G.out=o; G.st='sell'; G.openAt=G.t; G.sellAt=G.t+arrive;
   G.endAt=G.sellAt+CFG.sell0+Math.max(1,o.sold)*CFG.sellGap+CFG.after;
   G.score+=earn; G.sc+=earn; G.stats.sc[G.si]=G.sc;
   G.rec[G.si].days.push(o);
-  G.res.served++; if(o.earn<o.best) G.res.missed++;
-  ev.push({t:'open', earn:earn, sold:o.sold, p:o.p, wither:o.wither, lost:o.lost, toRival:o.toRival, best:o.earn>=o.best});
+  if(G.ch){ if(o.earn>=o.best && !o.via) G.res.served++; else G.res.missed++; }   /* 도전: 남은 일 칸 = 맞힌 날 초록, 틀린 날 회색 */
+  else { G.res.served++; if(o.earn<o.best) G.res.missed++; }
+  ev.push({t:'open', earn:earn, sold:o.sold, p:o.p, wither:o.wither, lost:o.lost, toRival:o.toRival, best:o.earn>=o.best, ok:!o.via && o.earn>=o.best});   /* ok:false = 그날 판정 '최선 아님'(공리 5) */
   award(G,ev,'market');
   firstName(G,ev,'fam','line');
   var at='stall';
-  if(STAGES[G.si].rule==='sky') firstName(G,ev,'sky','line');
+  if(ruleOf(G)==='sky') firstName(G,ev,'sky','line');
   if(day.pN!=null){
     if(o.toMe===0 && o.p===day.pN && day.good) firstName(G,ev,'good','rival');
     else if(o.toMe===0) firstName(G,ev,'pricey','rival');
@@ -556,7 +586,7 @@ function drop(G0,src,dst,via){
   }
   return fail('src');
 }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 function sources(G){ if(notReady(G)) return []; var a=[]; if(G.pile>0) a.push('crate'); if(G.q>0) a.push('back','bell'); return a; }
 function targets(G){ if(notReady(G)) return []; return ['stall','open','orchard']; }
 /* 개념을 아는 학생의 한 수: 번 돈이 가장 많은 상자 수까지 가져가고 장을 연다 */
@@ -567,10 +597,22 @@ function hintMove(G){
   if(G.q>b) return {src:'back', dst:'orchard'};
   return G.q>0 ? {src:'bell', dst:'open'} : null;
 }
+/* §19 추론형 측정: k번째 '반쪽만 아는 봇'. 0 = 날씨 날에도 보통(4상자), 1 = 옆 가게와 같은 값까지만, 2 = 옆 가게 날엔 상자를 다(아주 싸게). 나머지는 개념대로 */
+function partialMove(G,k){
+  if(notReady(G)) return null;
+  var d=dayNow(G), r=ruleOf(G), b=bestQ(d);
+  if(k===0 && r==='sky') b=4;
+  if(k===1 && r==='rival') b=clamp(d.c+CFG.base-d.pN,1,CFG.pile);
+  if(k===2 && r==='rival') b=CFG.pile;
+  if(G.q<b && G.pile>0) return {src:'crate', dst:'stall'};
+  if(G.q>b) return {src:'back', dst:'orchard'};
+  return G.q>0 ? {src:'bell', dst:'open'} : null;
+}
 function itemOf(G,id){ return id==='crate'||id==='back' ? 'crateA' : id==='bell' ? 'bell' : null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 /* 단계 끝 비교 카드: 같은 날을 두 가지로(실제 판 + 같은 계산식의 '만약' 판). 1·2단계 = 너무 많이 / 알맞게, 3단계 = 옆 가게 없을 때 / 겨룰 때 */
 function cardOf(G,si){
+  if(G.ch) return null;   /* 도전: 비교 카드 없음 */
   var R=G.rec[si]; if(!R || !R.days.length) return null;
   var S=STAGES[si], days=R.days, SD=R.plan||G.days;
   if(S.rule==='rival'){
@@ -590,7 +632,7 @@ function cardOf(G,si){
 
 if(typeof module!=='undefined') module.exports={SEED:SEED,CFG:CFG,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,
-  priceOf:priceOf,dayOut:dayOut,bestQ:bestQ,bestEarn:bestEarn,stageBest:stageBest,stageGoal:stageGoal,cardOf:cardOf,cfgFor:cfgFor,shownPrice:shownPrice,seesLine:seesLine};
+  priceOf:priceOf,dayOut:dayOut,bestQ:bestQ,bestEarn:bestEarn,stageBest:stageBest,stageGoal:stageGoal,cardOf:cardOf,cfgFor:cfgFor,CH:CH,CH_STAGES:CH_STAGES,CH_PARTIALS:CH_PARTIALS,chStages:chStages,chGoal:chGoal,chDays:chDays,stOf:stOf,ruleOf:ruleOf,nStages:nStages,partialMove:partialMove,shownPrice:shownPrice,seesLine:seesLine};
 /* LOGIC-END */
 
 /* ===== ① GAME-START: 게임 설정 (games/<이름>/game.js) ===== */
@@ -636,6 +678,16 @@ var GAME = {
     ],
     idle: '잠깐! 장이 열리는 중이야'
   },
+  /* §19 도전 = 추론형(logic.js CH): 세 장날, 레벨마다 함께 따질 단서(손님 줄 → 날씨 → 옆 가게 값 → 좋은 사과)가 는다. 모든 날을 최선 상자 수로 = 만점 */
+  challenge: {
+    kind: 'reason',
+    maxLevel: CH.maxLv,
+    stages: CH_STAGES,
+    goal: chGoal,
+    partials: CH_PARTIALS,
+    say: {start: ['날마다 금고를 가득!', '손님 수를 잘 따져 봐!', '마지막 장날이야!']},
+    ruleCards: [[['rCrate','상자를 가판대에'],['rSky','날씨 보고'],['rShop','싼 가게로']], [['rCrate','상자를 가판대에'],['rSky','날씨 보고'],['rShop','싼 가게로']], [['rCrate','상자를 가판대에'],['rSky','날씨 보고'],['rShop','싼 가게로']]]
+  },
   ruleCards: [
     [['rCrate','상자를 가판대에',1],['rBell','종 걸면 장 열기',0]],
     [['rSky','날씨 보고',1]],
@@ -660,13 +712,13 @@ var GAME = {
       bellWhere: {line:'종은 종 걸이에', why:'종을 가판대 옆 종 걸이에 걸면 장이 열려요'},
       backWhere: {line:'과수원으로', why:'가판대 상자를 과수원으로 되돌리면 값표가 다시 올라요'}
     },
-    general: function(G){ return XP[G.si]||null; }
+    general: function(G){ if(G.ch){ var r=ruleOf(G); return r==='sky'?XP[1]:r==='rival'?XP[2]:XP[0]; } return XP[G.si]||null; }
   },
   toast: {show:'name'},
   tryPts: 0,
   /* 해 보기: 1단계 첫날 '상자를 가판대에' → 손님 수만큼 놓였을 때 '종 걸면 장 열기'. 2·3단계는 보이는 상태 규칙(날씨, 옆 가게 값표) → 가리키기만 */
   tryIt: function(G){
-    if(G.phase!=='play' || G.d!==0) return null;
+    if(G.ch || G.phase!=='play' || G.d!==0) return null;
     if(G.si===1 || G.si===2){ if(G.t<G.readyAt || G.st!=='load') return {wait:true};
       return {src:'crate', dst:'stall', label:G.si===1?'예상 손님만큼':'옆 가게보다 싸게', force:true}; }
     if(G.si!==0) return null;
@@ -675,6 +727,7 @@ var GAME = {
     return [first, second];
   },
   demo: function(G){
+    if(G.ch) return {};
     if(G.si===1) return {point:(G.st==='load' && G.t>=G.readyAt)?'sky':null, text:'날씨를 봐요'};
     if(G.si===2) return {point:(G.st==='load' && G.t>=G.readyAt)?'rboard':null, text:'옆 가게 값'};
     return {};
@@ -736,7 +789,7 @@ var SCENE = (function(){
   function el(tag,attrs,html){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(html!=null) e.innerHTML=html; return e; }
   function txt(x,y,s,size,fill,anchor){ return '<text x="'+x+'" y="'+y+'" text-anchor="'+(anchor||'middle')+'" font-family="Jua,sans-serif" font-size="'+(size||20)+'" fill="'+(fill||'#1E2B3A')+'">'+s+'</text>'; }
   function pill(x,y,w,s,cls,tc){ return '<rect x="'+(x-w/2)+'" y="'+(y-15)+'" width="'+w+'" height="30" rx="10" class="'+(cls||'f-navy')+'"/>'+txt(x,y+7,s,20,tc||'#FBF8F1'); }
-  function rule(G){ return STAGES[G.si||0].rule; }
+  function rule(G){ return G.phase==='title' ? STAGES[0].rule : ruleOf(G,G.si||0); }   /* 도전이면 그 레벨의 장날 종류 */
   function riv(G){ return G.phase!=='title' && rule(G)==='rival'; }
   function lay(G){ return riv(G)?B3:B1; }
   function mount(host){
@@ -819,6 +872,10 @@ var SCENE = (function(){
     if(riv(G) && !title){ var d=G.days[G.d]; for(var r=0;r<5;r++) h+=useArt(d.good?'crateS':'crateA',B.rslots[r][0],B.rslots[r][1],40,34); }
     var bl=B.bell, hk=B.hook, open=!title && G.st==='sell';
     if(open) h+='<g class="ring" style="transform-origin:'+(hk.x+hk.w/2)+'px '+(hk.y+18)+'px">'+useArt('bell',hk.x+hk.w/2-24,hk.y+18,48,52)+'</g>';
+    /* 도전: 장을 연 순간 종 걸이에 그날 판정(최선 상자 수였나) — 공리 5. 틀림 = 빨간 원 X(data-verdict="bad"), 맞음 = 초록 체크 */
+    if(open && G.ch && o){ var vx=hk.x+hk.w/2+(riv(G)?0:30), vy=hk.y+(riv(G)?112:92), okD=o.earn>=o.best && !o.via;
+      h+='<g class="pop"'+(okD?' data-verdict="ok"':' data-verdict="bad"')+'><circle cx="'+vx+'" cy="'+vy+'" r="22" fill="'+(okD?'#3E9B5F':'#D9534F')+'" stroke="#FBF8F1" stroke-width="3"/>'
+        +(okD?'<path d="M'+(vx-10)+' '+vy+'l7 7 13-14" fill="none" stroke="#FBF8F1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M'+(vx-9)+' '+(vy-9)+'l18 18M'+(vx+9)+' '+(vy-9)+'l-18 18" stroke="#FBF8F1" stroke-width="5" stroke-linecap="round"/>')+'</g>'; }
     else { h+='<rect x="'+(hk.x+hk.w/2-26)+'" y="'+(hk.y+18)+'" width="52" height="56" rx="12" fill="none" stroke="#8C603F" stroke-width="3" stroke-dasharray="6 5" opacity=".7"/>';
       h+='<g opacity="'+(!title&&G.q>0?1:.45)+'">'+useArt('bell',bl.x,bl.y,bl.w,bl.h)+'</g>'; }
     setH(L.stall,h);
@@ -907,7 +964,7 @@ var SCENE = (function(){
   var CUST=['person05','person12','person02','person07','person08','person01'];
   function renderScene(G){
     if(!svg) return;
-    var s=(G.si||0)+'|'+(G.phase==='title');
+    var s=(G.si||0)+'|'+(G.phase==='title')+'|'+rule(G);
     if(s!==sig){ sig=s; buildBg(G); ['vault','board','stall','line','pile'].forEach(function(n){ L[n]._k=''; }); }
     drawVault(G); drawBoard(G); drawStall(G); drawLine(G); drawPile(G); drawCard(G);
     L.line.style.opacity = G.phase==='stageEnd' ? 0.2 : 1;
