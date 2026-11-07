@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>저작권 안내 · 사회 게임실</title>
-<meta name="description" content="사회 게임실 저작권·출처 안내: 교과서 문장을 옮기지 않고 바꿔 쓴, 출판사와 관계없는 비영리 개인 수업 자료입니다.">
+<title>저작권 안내 · 차게임의 게임공장</title>
+<meta name="description" content="차게임의 게임공장 저작권·출처 안내: 교과서 문장을 옮기지 않고 바꿔 쓴, 출판사와 관계없는 비영리 개인 수업 자료입니다.">
 
 <link rel="canonical" href="https://wlfmghzm-dotcom.github.io/sahoe-game/about.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
-/* 사회 게임실 공용 스타일: 색 토큰(라이트/다크), 글꼴, 버튼. index·about·404가 함께 씁니다. */
+/* 차게임의 게임공장 공용 스타일: 색 토큰(라이트/다크), 글꼴, 버튼, 머리띠(.bar). index·lesson·about·404가 함께 씁니다. */
 :root{
   --bg:#E6F1F3; --surface:#FFFFFF; --ink:#12324A; --muted:#5A7584; --line:#C7DBE0;
   --sea:#9FD3DE; --accent:#E0532B; --accent-ink:#FFFFFF; --banana:#E3A400; --banana-soft:#FFF0BF;
@@ -31,13 +31,13 @@
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 img{max-width:100%}
 [hidden]{display:none!important}
 .wrap{max-width:900px;margin:0 auto;padding-block:20px 80px;display:flex;flex-direction:column;gap:24px}
-h1,h2,h3{font-family:var(--game);font-weight:400;margin:0;line-height:1.2;text-wrap:balance}
+h1,h2,h3{font-family:var(--game);font-weight:400;margin:0;line-height:1.2;text-wrap:balance;word-break:keep-all}
 a{color:var(--fish)}
 button,.btn{font-family:var(--game)}
 button{cursor:pointer;color:var(--ink)}
@@ -57,6 +57,18 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 .foot{color:var(--muted);font-size:.9rem;display:flex;gap:6px 16px;flex-wrap:wrap;border-top:1.5px solid var(--line);padding-top:14px}
 .foot a{color:var(--muted)}
 
+/* 머리띠: 왼쪽 사이트 이름(+부제), 오른쪽 도구 버튼. 모든 페이지 공통 */
+.bar{display:flex;align-items:center;gap:10px 14px;min-height:64px;padding:8px 0;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);min-width:0;flex:1 1 auto}
+.brand .logo{width:42px;height:42px;flex:none}
+.bt{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.bt b{font-family:var(--game);font-weight:400;font-size:1.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt small{font-size:.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btools{display:flex;gap:8px;align-items:center;flex:none}
+.chipbtn.ghost{border-color:var(--line);background:transparent}
+.chipbtn[aria-expanded="true"]{background:var(--ink);color:var(--bg)}
+@media (max-width:560px){.bt b{font-size:1.15rem;white-space:normal;word-break:keep-all;line-height:1.1}.bt small{display:none}.brand .logo{width:36px;height:36px}.chipbtn .lb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.btools{gap:6px}.btools .chipbtn{padding:6px 10px;min-width:44px;justify-content:center}}
+
 /* Layout: masthead → stacked notice blocks → credits table (cards on phones) → per-game credit list. */
 .mast h1{font-size:clamp(1.9rem,6vw,2.6rem)}
 .blk{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:16px 18px;display:grid;gap:8px}
@@ -68,15 +80,16 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 .cr li:first-child{border-top:none;padding-top:0}
 .cr b{font-family:var(--game);font-weight:400;font-size:1.1rem}
 .cr .m{font-size:.9rem;color:var(--muted)}
+.wrap{padding-top:4px}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <header class="bar"><a class="brand" href="./"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="var(--accent)"/><path d="M8 31V19l7 4v-4l7 4v-4l7 4V10h4v21z" fill="var(--accent-ink)"/></svg><span class="bt"><b>차게임의 게임공장</b><small>6학년 사회 개념 체험 게임</small></span></a><nav class="btools" aria-label="사이트 메뉴"><a class="chipbtn" href="./">🎮 게임 고르기</a></nav></header>
   <header class="mast">
-    <div class="eyebrow">사회 게임실</div>
-    <h1>저작권·출처 안내</h1>
-    <p>초등 교사 한 명이 수업용으로 직접 만들어 올리는 비영리 게임 모음입니다. 교과서 출판사와 관계없습니다.입니다.</p>
-    <div><a class="chipbtn" href="./">← 게임 찾기로</a></div>
+    <div class="eyebrow">차게임의 게임공장</div>
+    <h1>소개 · 저작권·출처 안내</h1>
+    <p>초등 교사 한 명이 수업용으로 직접 만들어 올리는 비영리 게임 모음입니다. 교과서 출판사와 관계없습니다.</p>
   </header>
 
   <section class="blk">
@@ -149,7 +162,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
   </section>
 
   
-  <footer class="foot"><a href="./">게임 찾기</a><span>비영리 수업용</span></footer>
+  <footer class="foot"><a href="./">게임 고르기</a><span>교사 개인 제작 · 출판사와 관계없음 · 비영리 수업용</span></footer>
 </div>
 </body>
 </html>

@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>페이지를 찾지 못했어요 · 사회 게임실</title>
+<title>페이지를 찾지 못했어요 · 차게임의 게임공장</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
-/* 사회 게임실 공용 스타일: 색 토큰(라이트/다크), 글꼴, 버튼. index·about·404가 함께 씁니다. */
+/* 차게임의 게임공장 공용 스타일: 색 토큰(라이트/다크), 글꼴, 버튼, 머리띠(.bar). index·lesson·about·404가 함께 씁니다. */
 :root{
   --bg:#E6F1F3; --surface:#FFFFFF; --ink:#12324A; --muted:#5A7584; --line:#C7DBE0;
   --sea:#9FD3DE; --accent:#E0532B; --accent-ink:#FFFFFF; --banana:#E3A400; --banana-soft:#FFF0BF;
@@ -29,13 +29,13 @@
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 img{max-width:100%}
 [hidden]{display:none!important}
 .wrap{max-width:900px;margin:0 auto;padding-block:20px 80px;display:flex;flex-direction:column;gap:24px}
-h1,h2,h3{font-family:var(--game);font-weight:400;margin:0;line-height:1.2;text-wrap:balance}
+h1,h2,h3{font-family:var(--game);font-weight:400;margin:0;line-height:1.2;text-wrap:balance;word-break:keep-all}
 a{color:var(--fish)}
 button,.btn{font-family:var(--game)}
 button{cursor:pointer;color:var(--ink)}
@@ -55,6 +55,18 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 .foot{color:var(--muted);font-size:.9rem;display:flex;gap:6px 16px;flex-wrap:wrap;border-top:1.5px solid var(--line);padding-top:14px}
 .foot a{color:var(--muted)}
 
+/* 머리띠: 왼쪽 사이트 이름(+부제), 오른쪽 도구 버튼. 모든 페이지 공통 */
+.bar{display:flex;align-items:center;gap:10px 14px;min-height:64px;padding:8px 0;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);min-width:0;flex:1 1 auto}
+.brand .logo{width:42px;height:42px;flex:none}
+.bt{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.bt b{font-family:var(--game);font-weight:400;font-size:1.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt small{font-size:.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btools{display:flex;gap:8px;align-items:center;flex:none}
+.chipbtn.ghost{border-color:var(--line);background:transparent}
+.chipbtn[aria-expanded="true"]{background:var(--ink);color:var(--bg)}
+@media (max-width:560px){.bt b{font-size:1.15rem;white-space:normal;word-break:keep-all;line-height:1.1}.bt small{display:none}.brand .logo{width:36px;height:36px}.chipbtn .lb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.btools{gap:6px}.btools .chipbtn{padding:6px 10px;min-width:44px;justify-content:center}}
+
 /* Layout: one centered card with a big home button. */
 .wrap{min-height:100vh;min-height:100dvh;justify-content:center}
 .box{background:var(--surface);border:1.5px solid var(--line);border-radius:24px;padding:28px 22px;display:grid;gap:12px;justify-items:center;text-align:center}
@@ -65,11 +77,12 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 </head>
 <body>
 <div class="wrap">
+  <header class="bar"><a class="brand" href="https://wlfmghzm-dotcom.github.io/sahoe-game/"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="var(--accent)"/><path d="M8 31V19l7 4v-4l7 4v-4l7 4V10h4v21z" fill="var(--accent-ink)"/></svg><span class="bt"><b>차게임의 게임공장</b><small>6학년 사회 개념 체험 게임</small></span></a><nav class="btools" aria-label="사이트 메뉴"></nav></header>
   <div class="box">
     <div class="big" aria-hidden="true">🧭</div>
     <h1>이 주소에는 게임이 없어요</h1>
-    <p>주소가 바뀌었거나 잘못 적혔을 수 있어요. 게임실 첫 화면에서 차시를 다시 찾아 주세요.</p>
-    <a class="btn" id="home" href="https://wlfmghzm-dotcom.github.io/sahoe-game/">🏠 게임실 첫 화면으로</a>
+    <p>주소가 바뀌었거나 잘못 적혔을 수 있어요. 게임공장 첫 화면에서 차시를 다시 찾아 주세요.</p>
+    <a class="btn" id="home" href="https://wlfmghzm-dotcom.github.io/sahoe-game/">🏠 게임공장 첫 화면으로</a>
   </div>
 </div>
 <script>
@@ -81,6 +94,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
     var seg=location.pathname.split('/').filter(Boolean)[0];
     var user=/\.github\.io$/i.test(location.hostname) && seg && location.hostname.split('.')[0].toLowerCase()!==seg.toLowerCase();
     a.href = location.origin + '/' + (user && !/\.html?$/i.test(seg) ? seg + '/' : '');
+    var b=document.querySelector('.brand'); if(b) b.href=a.href;
   }catch(e){}
 })();
 </script>
