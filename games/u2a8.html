@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>모두의 바다 – 6-2 사회 25~26차시 수업용 게임</title>
-<meta name="description" content="6-2 사회 25~26차시 「빠른 경제성장으로 발생한 문제를 해결해 볼까요」 수업용 게임. 어부가 되어 한 번 더 잡고 싶은 유혹을 겪고, 다 같이 욕심내면 바다가 비고 약속하면 지켜지는 공유지의 비극을 체험해요.">
+<meta name="description" content="6-2 사회 25~26차시 「빠른 경제성장으로 발생한 문제를 해결해 볼까요」 수업용 게임. 매주 몇 번 바다에 나갈까? 욕심내면 바다가 비고, 마을 약속을 정하면 모두의 물고기가 많아져요.">
+<meta name="eng-pair" content="u2b8.html">
 <link rel="canonical" href="https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a8.html">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
@@ -220,7 +221,6 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 .rcard .ttl{font-family:var(--game);font-size:30px;background:var(--a-navy);color:var(--a-paper);border-radius:14px;padding:4px 18px}
 .rcard .rec{font-size:18px;color:var(--muted);min-height:1.4em}
 .rcard .btns{width:100%;margin-top:4px}
-.rcard .btns+.btns{margin-top:0}   /* '마지막 단계 다시' 줄(GAME.replayLast) */
 .bars{display:grid;grid-template-columns:auto minmax(0,1fr) 2.4em;gap:4px 10px;align-items:center;font-size:18px}
 .bars .bar{height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
 .bars .bar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .9s}
@@ -266,6 +266,40 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
   .rcard{padding:10px 14px;gap:6px}
   .rcard .ttl{font-size:26px}
 }
+/* §19 도전 모드: HUD 작은 표시, 타이틀·결과의 '도전' 버튼(남색 + 작은 번개 그림), 새 기록 효과 */
+.eng-chtag{display:inline-flex;align-items:center;gap:3px;font-family:var(--game);font-size:18px;line-height:1;background:var(--a-navy);color:var(--a-paper);border-radius:999px;padding:4px 10px 4px 6px;flex:none}
+.eng-chi{width:20px;height:20px;flex:none;display:block}
+#pbtn.eng-p2{display:flex;flex-direction:column;gap:8px}
+.big.eng-ch{background:var(--a-navy);color:var(--a-paper);box-shadow:inset 0 -5px 0 rgba(0,0,0,.35)}
+.big.eng-ch .eng-chi{width:24px;height:24px;color:var(--a-org)}
+.big.eng-ch small{font-size:18px;opacity:.85;margin-left:4px}
+.big.eng-sec{min-height:52px;font-size:22px;text-decoration:none}   /* 첫 화면 둘째 버튼(도전·연습에서 도전): 주 버튼 '시작'보다 작게 */
+.rcard .btns .btn2{white-space:nowrap}
+/* 결과 '도전'은 '다시 하기'와 같은 너비, 남색으로 구분(도전 결과에서는 주황 = 주 버튼) */
+.eng-pair{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn2.eng-ch.pri{background:var(--accent);color:var(--accent-ink)}.btn2.eng-ch.pri .eng-chi{color:var(--accent-ink)}
+.btn2.eng-ch{flex:1;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--a-navy);color:var(--a-paper)}
+.btn2.eng-ch .eng-chi{color:var(--a-org)}
+.btn2.eng-ch.new{animation:engChPop .5s ease-out 3}
+@keyframes engChPop{45%{transform:scale(1.08);box-shadow:0 0 0 4px var(--accent)}}
+.eng-chrec .eng-lad{flex:1;align-content:center}
+.eng-lad{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}   /* 도전 결과 오른쪽: 레벨 사다리(깬 레벨 = 채운 칸 + 별 수, 아직 = 점선 빈칸, 이번 = 주황 테두리) */
+.eng-lv{width:56px;height:80px;border-radius:14px;border:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--game);font-size:24px;color:var(--muted)}
+.eng-lv.done{border:2px solid transparent;background:var(--bg);color:var(--ink)}.eng-lv .eng-ls{display:flex;gap:0}.eng-lv .eng-star{width:16px;height:16px;animation:none}
+.eng-lv.cur{border:2px solid transparent;color:var(--ink);box-shadow:0 0 0 4px var(--accent)}
+.rcard .ttl.eng-new{background:var(--accent);color:var(--accent-ink);animation:engChPop .6s ease-out 3}
+.eng-chres{gap:6px}
+.rcard .ttl.eng-big{font-size:34px;padding:4px 22px}
+.eng-stars{display:flex;gap:6px}
+.eng-star{width:40px;height:40px;fill:var(--line)}
+.eng-star.on{fill:var(--accent);animation:engStar .5s ease-out both}
+.eng-star.on:nth-child(2){animation-delay:.25s}.eng-star.on:nth-child(3){animation-delay:.5s}
+@keyframes engStar{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.3);opacity:1}100%{transform:scale(1)}}
+.eng-goal{width:100%;display:flex;align-items:center;gap:10px;font-size:18px;color:var(--muted)}
+.eng-gbar{flex:1;height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
+.eng-gbar i{display:block;height:100%;background:var(--a-navy-l);transform-origin:left}
+.eng-chres.pass .eng-gbar i{background:var(--good)}
+.rcard .lab .eng-chi{display:inline-block;vertical-align:-3px;color:var(--accent)}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -274,7 +308,7 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 <div class="app" id="app">
   <header class="hud">
     <button class="ib" id="bReset" aria-label="처음으로"></button>
-    <div class="stg"><span id="stgName">모두의 바다</span><span class="pips" id="stgPips"></span></div>
+    <div class="stg"><span id="stgName">모두의 바다</span><span class="pips" id="stgPips"></span><span class="eng-chtag hide" id="engChTag"></span></div>
     <div class="sp"></div>
     <div class="combo" id="combo"></div>
     <div class="score"><small>점수</small><b id="score">0</b></div>
@@ -323,7 +357,8 @@ Object.assign(ASSETS, {
   bdPromise: {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-grn"/><rect x="21" y="24" width="6" height="16" rx="2" class="f-woodd"/><rect x="9" y="10" width="30" height="18" rx="4" class="f-wood"/><path d="M16 19l5 5 10-10" fill="none" stroke="#FBF8F1" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'},
   /* 규칙 그림 칸 120×60 */
   rFish: {vb:[0,0,120,60], svg:'<use href="#a-boat" x="0" y="8" width="44" height="44"/><path d="M48 30h16M58 24l7 6-7 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="70" y="6" width="48" height="48" rx="10" class="f-sea"/><use href="#a-fish" x="76" y="12" width="36" height="36"/>'},
-  rMore: {vb:[0,0,120,60], svg:'<rect x="4" y="12" width="34" height="34" rx="7" class="f-paper" stroke="#8A6A2A" stroke-width="2"/><use href="#a-fish" x="7" y="15" width="28" height="28"/><rect x="43" y="12" width="34" height="34" rx="7" class="f-paper" stroke="#8A6A2A" stroke-width="2"/><use href="#a-fish" x="46" y="15" width="28" height="28"/><rect x="82" y="12" width="34" height="34" rx="7" class="f-paper" stroke="#E8743B" stroke-width="3" stroke-dasharray="5 4"/><path d="M99 21v16M91 29h16" stroke="#E8743B" stroke-width="4" stroke-linecap="round"/>'},
+  rMore: {vb:[0,0,120,60], svg:'<use href="#a-boat" x="2" y="10" width="40" height="40"/><path d="M44 30h12M51 25l6 5-6 5" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-boat" x="60" y="2" width="30" height="30" opacity=".8"/><use href="#a-boat" x="86" y="26" width="30" height="30" opacity=".8"/><text x="104" y="20" font-family="Jua,sans-serif" font-size="20" fill="#E8743B" text-anchor="middle">!</text>'},
+  rRest: {vb:[0,0,120,60], svg:'<use href="#a-boat" x="2" y="10" width="40" height="40"/><path d="M46 30h16m-6-6l6 6-6 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-hut" x="66" y="4" width="54" height="48"/>'},
   rSign: {vb:[0,0,120,60], svg:'<use href="#a-signB" x="0" y="8" width="50" height="44"/><path d="M54 30h16M64 24l7 6-7 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="78" y="6" width="38" height="48" rx="8" fill="none" stroke="#8A6A2A" stroke-width="2.5" stroke-dasharray="6 4"/>'},
   rWeek: {vb:[0,0,120,60], svg:'<rect x="4" y="8" width="48" height="44" rx="10" class="f-sea"/><use href="#a-fish" x="12" y="16" width="30" height="30"/><path d="M58 30h14M66 24l7 6-7 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="78" y="8" width="40" height="44" rx="10" class="f-sea"/><use href="#a-fish" x="80" y="10" width="22" height="22"/><use href="#a-fish" x="94" y="28" width="22" height="22"/>'}
 });
@@ -335,161 +370,237 @@ Object.assign(ASSETS, KENNEY_SEA);
 /* ===== ASSETS-END ===== */
 </script>
 <script>
-/* LOGIC-START *//* ② LOGIC — 「모두의 바다」 (6-2 사회 2단원 2주제 8차시 '빠른 경제성장으로 발생한 문제를 해결해 볼까요', 교과서 88~92쪽, 공유지의 비극 91~92쪽). 순수 함수만. 시간 단위 = 초.
-   학생은 마을 어부('나'). 동작은 하나: 내 배(boat)를 끌어 바다(sea)에 놓으면 물고기를 한 마리 잡아 온다(3단계 첫 수만 약속 표지판 sign → 포구 기둥 post).
-   이웃 어부 둘은 학생이 나갈 때마다 따라 나간다(학생의 선택에 반응). 한 주가 끝나면 바다의 물고기가 남은 수의 두 배로 다시 는다(최대 12).
-     1단계 모두 일주일에 두 번 → 6마리 잡고 6마리 남음 → 다시 12(그대로).
-     2단계 '한 번 더': 내 바구니 칸이 셋. 내가 세 번째로 나가면 이웃도 보고 세 번씩 나간다 → 1주 9마리(남 3 → 6), 2주 6마리 뒤 텅 빔, 3주 빈손(공유지의 비극).
-     3단계 마을 약속 표지판 → 모두 두 번 → 3주 내내 바다 가득. 단계 끝 카드: '욕심낸 바다 / 약속한 바다'(주마다 남은 물고기, 모두가 잡은 물고기 15 vs 18).
-   시간 제한 없음. 추적할 숫자는 점수 하나. */
+/* LOGIC-START *//* ② LOGIC — 「모두의 바다」 (6-2 사회 2단원 2주제 8차시 '빠른 경제성장으로 발생한 문제를 해결해 볼까요', 교과서 88~92쪽, 공동 어장 91~92쪽). 순수 함수만. 시간 단위 = 초.
+   도전 다시 설계(2026-11-07): 학생이 매주 '몇 번 나갈지'를 직접 정한다. 동작은 끌기 하나:
+     내 배(boat) → 바다(sea) = 한 번 나가 물고기 한 마리(바다에 남아 있으면), 내 배 → 집(hut) = 이번 주는 그만(주가 끝남).
+     주가 끝나면 바다의 물고기가 남은 수의 두 배로 다시 는다(최대 바다 크기). 단계 끝에는 바다에 남은 물고기 중 내 몫(어부 수로 나눔)도 창고에 들어온다
+     (마지막 주에 다 잡아 버리는 꾀가 이득이 되지 않게: 남은 바다 = 다음 달의 물고기).
+   목표 = 창고(내 물고기)가 목표 줄을 넘기. 많이 나가면 그 주는 많지만 다음 주에 덜 잡힌다. 바다의 절반만 잡으면(주 두 번) 합계가 가장 크다.
+   1단계 나 혼자 바다(4마리) / 2단계 이웃 둘이 내가 나갈 때마다 따라 나간다(욕심이 세 배로 바다를 비움)
+   3단계 마을 약속: 1·2·3번 표지판 중 하나를 포구 기둥에 세운다(sign:n → post). 약속은 모두에게(나도 그 횟수를 넘기면 '약속!'으로 튕김). 1번은 너무 적고 3번은 바다를 비워 2번이 가장 많다.
+   시간 제한 없음. 추적할 숫자는 점수 하나. 수치·난이도는 CFG 한 곳(cfgFor: 도전 모드 레벨). */
 var SEED = 20261108;
-var CAP = 12, NF = 3;   /* 바다 물고기 최대, 어부 수(0 = 나) */
-var T = { ready:1.0, out:0.35, back:1.0, nbGap:[0.4,0.55], weekHold:0.6, regrow:1.5, pts:10, via:5, comboStep:2, comboCap:3, comboWin:6, full:10 };
-var STAGES = [
-  {name:'두 번씩',   rule:'two',  weeks:2, me:2, nb:2},
-  {name:'한 번 더?', rule:'more', weeks:3, me:3, nb:2, copy:true},
-  {name:'마을 약속', rule:'sign', weeks:3, me:2, nb:2, sign:true}
-];
+var CFG = {
+  fishPts: 10, viaPts: 5, maxTrips: 4, grow: 2,     /* 한 마리 점수, 힌트 3단계가 대신 잡은 한 마리, 한 주 최대 횟수, 주말 회복 배수 */
+  goalRate: 0.8,
+  ready: 1.0, back: 1.0, nbGap: [0.4, 0.55], homeT: 0.6, weekHold: 0.4, regrow: 1.5, endHold: 1.2,
+  stages: [
+    {name:'나 혼자 바다',   rule:'solo', weeks:3, cap:6,  nb:0},
+    {name:'따라 하는 이웃', rule:'copy', weeks:4, cap:12, nb:2},
+    {name:'마을 약속',      rule:'sign', weeks:4, cap:12, nb:2, sign:true}
+  ]
+};
+var STAGES = CFG.stages;
 var BADGES = [
   {k:'share',   name:'함께 쓰는 자원', art:'bdShare', def:'땅, 물, 공기, 지하자원처럼 모두가 함께 써야 하는 자원이 있어요. 마을의 공동 어장도 그래요. (교과서 91~92쪽 참고)'},
   {k:'tragedy', name:'공유지의 비극', art:'bdTragedy', def:'모두가 함께 쓰는 자원을 저마다 자기 이익만 생각하며 쓰다가 결국 공동체 전체가 손해를 보는 일을 공유지의 비극이라고 해요. (교과서 92쪽 참고)'},
   {k:'promise', name:'공동의 이익', art:'bdPromise', def:'함께 쓰는 자원을 마구 쓰지 못하게 막고, 자원을 아끼며 모두의 이익을 생각하는 태도가 있어야 공유지의 비극을 막을 수 있어요. (교과서 92쪽 참고)'}
 ];
 var NAMES = {
-  catch1: '<em>공동 어장</em>: 모두 함께 써요',
-  regrow: '두 번씩이면 다시 가득!',
+  catch1: '배를 보내면 한 마리!',
+  rest:   '쉬면 물고기가 다시 늘어요',
+  regrow: '절반이 남으면 다시 가득!',
+  shrink: '많이 잡으면 덜 늘어요',
   copy:   '이웃도 따라 나가요',
-  empty:  '<em>공유지의 비극</em>: 모두 손해',
-  sign:   '<em>마을 약속</em>: 모두 두 번',
-  full:   '약속하니 바다가 그대로!'
+  empty:  '바다가 텅 비었어요',
+  sign:   '<em>마을 약속</em>을 세웠어요',
+  broke:  '약속을 어기면 이웃도 어겨요',
+  full:   '약속하니 바다가 그대로!',
+  tooFew: '너무 적게 잡으면 손해예요',
+  share:  '남은 바다도 마을의 몫'
 };
-var TITLES = [[0,'새내기 어부'],[160,'마을 어부'],[210,'바다 지킴이'],[230,'모두의 선장']];   /* full 제안 0/190/230/240을 조금 낮춤 */
+var TITLES = [[0,'새내기 어부'],[270,'마을 어부'],[330,'바다 지킴이'],[365,'모두의 선장']];   /* 성실 봇 390 만점. 힌트 연타 265 < 270, 무작위 p97 약 300 < 330 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
 function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
-function fishN(G){ return G.spots.filter(function(x){ return x; }).length; }
-/* 물고기 자리 12칸(6열 × 2줄). 어부 f는 바다 앞 2열(f*2, f*2+1) 쪽에서 잡는다: 가장 가까운 칸부터 */
-function takeSpot(G,f){
-  var best=-1, bd=99; for(var i=0;i<CAP;i++){ if(!G.spots[i]) continue; var d=Math.abs((i%6)-(f*2+0.5))+(i<6?0.1:0); if(d<bd){ bd=d; best=i; } }
-  if(best>=0) G.spots[best]=0; return best;
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+/* 도전 모드(엔진이 G.ch = 레벨 1.. 을 줄 때만): 레벨이 오를수록 바다 회복이 느려지고(1.5배까지), 이웃 수↑(최대 3), 주 수↑,
+   3단계 이웃이 약속을 가끔 어김(레벨×5%, 시드로). 일반 판(G.ch 없음)은 CFG.stages 그대로. */
+function rndOf(G){ var s=(G.rs=(G.rs|0)+0x6D2B79F5|0), t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }
+function cfgFor(G,si){
+  var S=cl(STAGES[si]); S.grow=CFG.grow; S.slip=0;
+  if(!G || !G.ch) return S;
+  var lv=Math.max(1,G.ch|0);
+  S.weeks+=Math.min(2,Math.floor(lv/2));
+  if(S.nb>0) S.nb=Math.min(3,S.nb+Math.floor((lv-1)/3));
+  if(lv>=3) S.grow=Math.max(1.5, CFG.grow-0.1*(lv-2));
+  if(S.sign) S.slip=Math.min(0.3,0.05*lv);
+  return S;
 }
+function nF(S){ return 1+S.nb; }
+function fishN(G){ return G.spots.filter(function(x){ return x; }).length; }
+function regrowOf(S,left){ return Math.min(S.cap, Math.floor(left*S.grow)); }
+/* 개념을 아는 어부: 바다의 절반만(어부 수로 나눠) → 12마리·3명 = 두 번, 4마리·혼자 = 두 번 */
+function keepK(S,F){ return clamp(Math.floor(F/(2*nF(S))),1,CFG.maxTrips); }
+
+/* 한 단계를 같은 규칙으로 계산(실제 판과 '만약' 판 모두): kOf(w, F) = 내가 그 주 나갈 횟수 */
+function simStage(S,kOf){
+  var p=S.p||2, F=S.cap, nbPlan=p, hist=[], me=0, all=0, i;
+  for(var w=0;w<S.weeks;w++){
+    var k=kOf(w,F); if(S.rule==='sign') k=Math.min(k,p); var nb=S.rule==='copy'?k:(S.rule==='sign'?nbPlan:0), take=[], got=0;
+    for(i=0;i<Math.max(k,nb);i++){ if(i<k) take.push(0); for(var f=1;f<=S.nb;f++) if(i<nb) take.push(f); }
+    var meW=0; take.forEach(function(f){ if(F>0){ F--; all++; if(f===0) meW++; } });
+    me+=meW; var left=F; F=regrowOf(S,left);
+    hist.push({k:k, left:left, next:F, me:meW});
+    if(S.rule==='sign') nbPlan=k>p?k:p;
+  }
+  var share=Math.floor(F/nF(S));
+  return {hist:hist, me:me, all:all, share:share, total:me+share, F:F};
+}
+function stageBest(S){ return simStage(S,function(w,F){ return keepK(S,F); }).total; }
+
+function live(G){ return G && G.phase==='play' && G.t>=G.ready && G.st==='fish'; }
 function boatHome(G){ return G.t>=G.boatAt; }
-function signReady(G){ return !STAGES[G.si].sign || G.signed; }
-function live(G){ return G && G.phase==='play' && G.t>=G.ready && G.holdAt==null && G.regAt==null; }
-function canSail(G){ return live(G) && signReady(G) && boatHome(G) && G.cnt[0]<G.cap[0]; }
+function signReady(G){ return !G.S.sign || G.signed; }
+function canSail(G){ return live(G) && signReady(G) && boatHome(G) && G.cnt[0]<CFG.maxTrips; }
 
 function startWeek(G,ev){
-  var S=STAGES[G.si], empty=fishN(G)===0;
-  G.cnt=[0,0,0]; G.cap=[S.me, S.nb, S.nb];
-  if(S.copy && G.wk>0) G.cap=[S.me, S.me, S.me];   /* 2단계 2주부터: 이웃도 처음부터 세 번 */
-  if(empty) G.cap=[1,1,1];                          /* 빈 바다: 한 번씩 나가 보고 빈손 */
-  G.got=[[],[],[]]; G.trips=[]; G.queue=[]; G.holdAt=null; G.regAt=null; G.wk0=G.t; G.weekCaught=0;
-  ev.push({t:'week', wk:G.wk, empty:empty});
+  var S=G.S;
+  G.cnt=[0,0,0,0]; G.got=[[],[],[],[]]; G.trips=[]; G.queue=[]; G.st='fish'; G.holdAt=null; G.regAt=null; G.reg=null; G.homeAt=null;
+  G.F0=fishN(G); G.weekCaught=0; G.boatAt=Math.min(G.boatAt,G.t);
+  G.nbCap = S.rule==='sign' ? G.nbPlan : (S.rule==='copy' ? 0 : 0);
+  ev.push({t:'week', wk:G.wk, empty:G.F0===0});
 }
 function startStage(G0,si){
-  var G=cl(G0), S=STAGES[si];
-  G.si=si; G.phase='play'; G.combo=0; G.lastAct=null; G.wk=0; G.ready=G.t+T.ready; G.boatAt=0; G.signed=false;
-  G.spots=[]; for(var i=0;i<CAP;i++) G.spots.push(1);
-  G.rec[si]={hist:[], all:0, me:0};
+  var G=cl(G0);
+  if(G.ch && G.rs==null) G.rs=G.seed|0;
+  var S=cfgFor(G,si);
+  G.si=si; G.S=S; G.phase='play'; G.combo=0; G.lastAct=null; G.wk=0; G.ready=G.t+CFG.ready; G.boatAt=0; G.signed=false; G.signAt=-9; G.copyAt=-9;
+  G.spots=[]; for(var i=0;i<S.cap;i++) G.spots.push(1);
+  G.nbPlan=2; G.promise=0; G.sc=0; G.best=stageBest(S)*CFG.fishPts; G.goal=Math.round(G.best*CFG.goalRate); G.shareAt=null; G.share=0;
+  G.rec[si]={hist:[], me:0, all:0, share:0};
   var ev=[]; startWeek(G,ev); G.pend=ev;
-  var tot=S.sign?1:0; if(si===0) tot+=4; else if(si===1) tot+=7; else tot+=6;
-  G.res={total:tot, served:0, missed:0};
+  G.res={total:S.weeks, served:0, missed:0};
   return G;
 }
 function newGame(seed){
-  var G={seed:(seed||SEED)>>>0, si:0, phase:'title', t:0, score:0, combo:0, first:{}, badges:[], spots:[], wk:0, cnt:[0,0,0], cap:[2,2,2], got:[[],[],[]], trips:[], queue:[],
-    holdAt:null, regAt:null, ready:0, boatAt:0, signed:false, signAt:-9, copyAt:-9, wk0:0, weekCaught:0, lastAct:null, rec:[], reg:null, res:{total:0,served:0,missed:0}, stats:{me:0, all:0}, pend:[]};
-  for(var i=0;i<CAP;i++) G.spots.push(1);
-  return G;
+  var G={seed:(seed||SEED)>>>0, si:0, phase:'title', t:0, score:0, combo:0, first:{}, badges:[], rec:[], stats:{sc:[0,0,0]}, res:{total:0,served:0,missed:0}, pend:[]};
+  var g=startStage(G,0); g.phase='title'; return g;
 }
-function start(G){ var g=cl(G); g.score=0; g.t=0; return startStage(g,0); }
+function start(G){ var g=cl(G); g.score=0; g.t=0; g.rec=[]; g.stats={sc:[0,0,0]}; g.first={}; g.badges=[]; return startStage(g,0); }
 
-/* 어부 f가 한 번 나간다(물고기를 가져가는 순간 = 출발 시각). 결과는 바구니(got)에 1/0 */
-function sail(G,f,ev){
+function takeSpot(G,f){
+  var n=G.spots.length, best=-1, bd=99, want=n<=4?1.5:(f*2+0.5);
+  for(var i=0;i<n;i++){ if(!G.spots[i]) continue; var d=Math.abs((i%6)-want)+(i<6?0:0.1); if(d<bd){ bd=d; best=i; } }
+  if(best>=0) G.spots[best]=0; return best;
+}
+function sail(G,f,ev,via){
   var sp=takeSpot(G,f), got=sp>=0?1:0;
   G.cnt[f]++; G.got[f].push(got); G.trips.push({f:f, t0:G.t, sp:sp, got:got, n:G.got[f].length-1});
-  G.weekCaught+=got; G.rec[G.si].all+=got; G.stats.all+=got;
-  if(f===0){ G.rec[G.si].me+=got; G.stats.me+=got; }
+  G.weekCaught+=got; G.rec[G.si].all+=got;
+  if(f===0 && got){ G.rec[G.si].me+=got; var pts=via?CFG.viaPts:CFG.fishPts; G.score+=pts; G.sc+=pts; G.stats.sc[G.si]=G.sc; ev.push({t:'catch', got:1, pts:pts}); }
+  else if(f===0) ev.push({t:'catch', got:0, pts:0});
   ev.push({t:'sail', f:f, got:got, sp:sp});
   return got;
 }
 function endWeek(G,ev){
-  var S=STAGES[G.si], before=fishN(G), after=Math.min(CAP,before*2), add=after-before, born=[];
-  for(var i=0;i<CAP && add>0;i++) if(!G.spots[i]){ G.spots[i]=1; born.push(i); add--; }
+  var S=G.S, before=fishN(G), after=regrowOf(S,before), add=after-before, born=[];
+  for(var i=0;i<S.cap && add>0;i++) if(!G.spots[i]){ G.spots[i]=1; born.push(i); add--; }
   G.reg={t0:G.t, born:born, before:before, after:after};
-  G.rec[G.si].hist.push({left:before, next:after, caught:G.weekCaught});
+  G.rec[G.si].hist.push({k:G.cnt[0], left:before, next:after, me:G.got[0].reduce(function(a,b){ return a+b; },0)});
+  G.res.served++; if(G.cnt[0]!==keepK(S,G.F0)) G.res.missed++;
   ev.push({t:'regrow', before:before, after:after});
-  if(G.si===0 && after===CAP) firstName(G,ev,'regrow','sea');
-  if(S.sign && after===CAP){ G.score+=T.full; ev.push({t:'full', pts:T.full}); firstName(G,ev,'full','sea'); }
-  if(after===0 && before===0) firstName(G,ev,'empty','sea');
-  G.regAt=G.t+T.regrow;
+  if(after>=S.cap) firstName(G,ev, S.sign?'full':'regrow', 'sea');
+  else if(after>0) firstName(G,ev,'shrink','sea');
+  else firstName(G,ev,'empty','sea');
+  if(S.rule==='sign'){ var pp=G.promise||2, nx=G.cnt[0]>pp?G.cnt[0]:pp; if(G.S.slip && rndOf(G)<G.S.slip) nx=pp+1; if(nx>pp) firstName(G,ev,'broke','nb:1'); G.nbPlan=nx; }
+  if(after>=S.cap && G.weekCaught<before) firstName(G,ev,'tooFew','crate:0');
+  G.regAt=G.t+CFG.regrow;
 }
 function tick(G0,dt){
   var G=cl(G0), ev=G.pend||[]; G.pend=[];
   if(G.phase!=='play') return {G:G, ev:ev};
   G.t+=dt;
-  /* 이웃 출발 */
   G.queue=G.queue.filter(function(q){ if(G.t>=q.at){ sail(G,q.f,ev); return false; } return true; });
-  var busy=G.trips.some(function(tr){ return G.t<tr.t0+T.back+0.15; });
-  if(G.holdAt==null && G.regAt==null && G.cnt.every(function(c,f){ return c>=G.cap[f]; }) && !G.queue.length && !busy && signReady(G)) G.holdAt=G.t+T.weekHold;
-  if(G.holdAt!=null && G.t>=G.holdAt){ G.holdAt=null; endWeek(G,ev); }
-  if(G.regAt!=null && G.t>=G.regAt){
-    G.regAt=null; G.wk++;
-    var S=STAGES[G.si];
-    if(G.wk>=S.weeks){
-      G.phase='stageEnd'; award(G,ev,['share','tragedy','promise'][G.si]); ev.push({t:'stageEnd', si:G.si});
-    } else startWeek(G,ev);
+  if(G.st==='end'){
+    var busy=G.trips.some(function(tr){ return G.t<tr.t0+CFG.back+0.15; });
+    if(G.holdAt==null && G.regAt==null && !G.queue.length && !busy && G.t>=G.homeAt) G.holdAt=G.t+CFG.weekHold;
+    if(G.holdAt!=null && G.regAt==null && G.t>=G.holdAt){ endWeek(G,ev); }
+    if(G.regAt!=null && G.t>=G.regAt){
+      G.regAt=null; G.wk++;
+      if(G.wk>=G.S.weeks){
+        G.st='share'; var sh=Math.floor(fishN(G)/nF(G.S)); G.share=sh; G.shareAt=G.t; G.rec[G.si].share=sh;
+        var p=sh*CFG.fishPts; G.score+=p; G.sc+=p; G.stats.sc[G.si]=G.sc;
+        ev.push({t:'share', n:sh, pts:p}); if(sh>0) firstName(G,ev,'share','sea');
+      } else startWeek(G,ev);
+    }
+  } else if(G.st==='share' && G.t>=G.shareAt+CFG.endHold){
+    G.phase='stageEnd'; award(G,ev,['share','tragedy','promise'][G.si]); ev.push({t:'stageEnd', si:G.si});
   }
   return {G:G, ev:ev};
 }
-function bump(G,via,got){
-  if(!got){ G.combo=0; return 0; }
-  G.combo=(!via && G.lastAct!=null && G.t-G.lastAct<=T.comboWin)?G.combo+1:(via?0:1); if(!via) G.lastAct=G.t;
-  return via?T.via:T.pts+T.comboStep*Math.min(Math.max(G.combo-1,0),T.comboCap);
-}
-/* src: 'boat' | 'sign'   dst: 'sea' | 'post' */
+/* src: 'boat' | 'sign'   dst: 'sea' | 'hut' | 'post' */
 function drop(G0,src,dst,via){
   var fail=function(why){ return {G:G0, ok:false, why:why, ev:[{t:'bounce', why:why, src:src, dst:dst}]}; };
   if(!live(G0)) return fail('phase');
-  var S=STAGES[G0.si];
-  if(src==='sign'){
-    if(!S.sign || G0.signed) return fail('src');
+  var S=G0.S;
+  var spp=String(src).split(':');
+  if(spp[0]==='sign'){
+    if(!S.sign || G0.signed || !(+spp[1]>=1)) return fail('src');
     if(dst!=='post') return fail('signWhere');
-    var g=cl(G0), e=[]; g.signed=true; g.signAt=g.t; g.res.served++; g.cap=[2,2,2];
-    e.push({t:'sign'}); firstName(g,e,'sign','post');
+    var g=cl(G0), e=[]; g.signed=true; g.signAt=g.t; g.promise=+spp[1]; g.nbPlan=g.promise; g.nbCap=g.promise;
+    e.push({t:'sign', p:g.promise}); firstName(g,e,'sign','post');
     return {G:g, ok:true, ev:e};
   }
   if(src!=='boat') return fail('src');
   if(!signReady(G0)) return fail('needSign');
   if(!boatHome(G0)) return fail('away');
-  if(G0.cnt[0]>=G0.cap[0]) return fail(S.sign?'promise':'rest');   /* u2: 3단계는 세 번째로 나가려 하면 '약속!'으로 튕긴다 */
+  if(dst==='hut'){
+    if(G0.cnt[0]<1) return fail('needTrip');
+    var h=cl(G0), he=[]; h.st='end'; h.homeAt=h.t+CFG.homeT; h.boatAt=h.t+CFG.homeT;
+    /* 3단계: 이웃은 약속한 횟수를 채운다 */
+    if(S.rule==='sign') [1,2,3].forEach(function(f,j){ if(f>S.nb) return; for(var c=h.cnt[f]+h.queue.filter(function(q){ return q.f===f; }).length; c<h.nbCap; c++) h.queue.push({f:f, at:h.t+0.3+(c*S.nb+j)*0.35}); });
+    he.push({t:'rest', k:h.cnt[0]}); firstName(h,he,'rest','hut');
+    return {G:h, ok:true, ev:he};
+  }
   if(dst!=='sea') return fail('boatWhere');
-  var G=cl(G0), ev=[], got=sail(G,0,ev);
-  G.boatAt=G.t+T.back+0.05; G.res.served++;
-  var pts=bump(G,via,got); G.score+=pts;
-  ev.push({t:'catch', got:got, pts:pts, combo:via?0:G.combo});
+  if(G0.cnt[0]>=CFG.maxTrips) return fail('basket');
+  if(S.sign && G0.cnt[0]>=G0.promise) return fail('promise');   /* 약속은 나에게도: 약속한 횟수를 넘기면 튕김 */
+  var G=cl(G0), ev=[], got=sail(G,0,ev,via);
+  G.boatAt=G.t+CFG.back+0.05;
   if(got) firstName(G,ev,'catch1','boat');
-  /* 이웃이 따라 나간다. 2단계 1주: 내가 세 번째로 나가면 이웃도 보고 세 번으로 늘린다 */
-  if(S.copy && G.cnt[0]>S.nb){ var grew=false; [1,2].forEach(function(f){ if(G.cap[f]<G.cnt[0]){ G.cap[f]=G.cnt[0]; grew=true; } });
-    if(grew){ G.copyAt=G.t; ev.push({t:'copy'}); firstName(G,ev,'copy','nb:1'); } }
-  [1,2].forEach(function(f,j){ var pending=G.queue.filter(function(q){ return q.f===f; }).length; if(G.cnt[f]+pending<G.cap[f]) G.queue.push({f:f, at:G.t+T.nbGap[j]}); });
-  if(!got && S.copy) firstName(G,ev,'empty','sea');
+  /* 이웃: 2단계는 내가 나갈 때마다 따라 나감, 3단계는 약속한 횟수까지 함께 나감 */
+  var cap=S.rule==='copy'?G.cnt[0]:(S.rule==='sign'?G.nbCap:0);
+  for(var f=1;f<=S.nb;f++){ var pend=G.queue.filter(function(q){ return q.f===f; }).length; if(G.cnt[f]+pend<Math.min(cap,G.cnt[0]+(S.rule==='sign'?0:0))) G.queue.push({f:f, at:G.t+T_NB(f)}); }
+  if(S.rule==='copy'){ G.copyAt=G.t; firstName(G,ev,'copy','nb:1'); }
   return {G:G, ok:true, ev:ev};
 }
+function T_NB(f){ return CFG.nbGap[(f-1)%2]+(f>2?0.3:0); }
 function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 function hintMove(G){
   if(!live(G)) return null;
-  if(STAGES[G.si].sign && !G.signed) return {src:'sign', dst:'post'};
-  return canSail(G) ? {src:'boat', dst:'sea'} : null;
+  if(G.S.sign && !G.signed) return {src:'sign:2', dst:'post'};
+  if(!boatHome(G)) return null;
+  var kk=keepK(G.S,G.F0); if(G.S.sign) kk=Math.min(kk,G.promise||2);
+  return G.cnt[0]<kk ? {src:'boat', dst:'sea'} : {src:'boat', dst:'hut'};
 }
-function sources(G){ if(!live(G)) return []; if(STAGES[G.si].sign && !G.signed) return ['sign']; if(STAGES[G.si].sign && boatHome(G) && G.cnt[0]>=G.cap[0]) return ['boat']; return canSail(G) ? ['boat'] : []; }   /* u2: 약속 뒤 세 번째도 집을 수는 있다(놓으면 '약속!') */
-function targets(G){ if(!live(G)) return []; if(STAGES[G.si].sign && !G.signed) return ['post']; return ['sea']; }
-function itemOf(G,id){ return id==='boat' ? 'boat' : id==='sign' ? 'signB' : null; }
+function sources(G){ if(!live(G)) return []; if(G.S.sign && !G.signed) return ['sign:1','sign:2','sign:3']; return boatHome(G) ? ['boat'] : []; }
+function targets(G){ if(!live(G)) return []; if(G.S.sign && !G.signed) return ['post']; return ['sea','hut']; }
+function itemOf(G,id){ return id==='boat' ? 'boat' : String(id).indexOf('sign')===0 ? 'signB' : null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
+/* 단계 끝 비교 카드: 실제 판 + 같은 계산식의 '만약' 판. 욕심 = 그 주에 바다의 절반보다 많이 나감 */
+function recSim(G,si){ var R=G.rec[si]; return {hist:R.hist, me:R.me, all:R.all, share:R.share, total:R.me+R.share}; }
+function greedy(R,S){ var lim=Math.floor(S.cap/(2*nF(S))); return R.hist.some(function(h){ return h.k>lim; }); }
+function cardOf(G,si){
+  var R=G.rec[si]; if(!R || !R.hist.length) return null;
+  var S=G.S, act=recSim(G,si), greedK=S.nb?3:CFG.maxTrips;
+  var greedHyp=function(SS){ return simStage(SS,function(){ return greedK; }); };
+  var keepHyp=function(SS){ return simStage(SS,function(w,F){ return keepK(SS,F); }); };
+  if(si<2){
+    var gA=greedy(R,S), half=si===0?'절반만 잡은 바다':'두 번씩 잡은 바다';
+    return {L:Object.assign({label:'욕심낸 바다', hyp:!gA, bad:1, k:greedK}, gA?act:greedHyp(S)),
+            R:Object.assign({label:half, hyp:gA, bad:0, k:keepK(S,S.cap)}, !gA?act:keepHyp(S))};
+  }
+  var R2=G.rec[1], S2=cfgFor(G,1), g2=R2&&greedy(R2,S2), kept=G.promise===2 && !R.hist.some(function(h){ return h.k>2; });
+  var S3=cl(S); S3.p=2;
+  return {L:Object.assign({label:'약속 없을 때', hl:'만약 약속이 없었다면', hyp:!g2, bad:1, k:3}, g2?recSim(G,1):greedHyp(S2)),
+          R:Object.assign({label:'두 번 약속했을 때', hl:'만약 두 번 약속했다면', hyp:!kept, bad:0, k:2}, kept?act:keepHyp(S3))};
+}
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,CAP:CAP,
-  newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,fishN:fishN};
+if(typeof module!=='undefined') module.exports={SEED:SEED,CFG:CFG,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,
+  newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,
+  fishN:fishN,simStage:simStage,stageBest:stageBest,keepK:keepK,cardOf:cardOf,cfgFor:cfgFor};
 /* LOGIC-END */
 
 /* ===== ① GAME-START: 게임 설정 (games/<이름>/game.js) ===== */
@@ -498,9 +609,9 @@ if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:B
    학생 손 = 개념 동작: '한 번 더' 나가는 욕심(2단계)과 마을 약속 표지판을 세우는 것(3단계). 비교 카드 '욕심낸 바다 / 약속한 바다'. */
 function NOPG(d){ return String(d).replace(/\s*\((교과서\s*)?[0-9~·쪽\s]+(참고)?\)\s*$/,''); }
 var XP = [
-  {why:'모두 일주일에 두 번씩 잡으면, 남은 물고기가 다시 늘어 바다가 그대로예요', def:NOPG(BADGES[0].def), page:'교과서 91~92쪽 참고'},
-  {why:'나 혼자 한 번 더 나가자 이웃도 손해 보기 싫어 따라 나갔어요. 남은 물고기가 적어 다시 늘지 못했어요', def:NOPG(BADGES[1].def), page:'교과서 92쪽 참고'},
-  {why:'약속을 지키면 바다가 그대로라 모두가 잡은 물고기도 더 많아요', def:NOPG(BADGES[2].def)+' 문제를 해결해야 경제가 계속 발전할 수 있어요.', page:'교과서 88·92쪽 참고'}
+  {why:'한 주가 지나면 남은 물고기가 두 배로 늘어요. 절반만 잡으면 다음 주에도 가득해요', def:NOPG(BADGES[0].def), page:'교과서 91~92쪽 참고'},
+  {why:'내가 더 나가면 이웃도 손해 보기 싫어 따라 나가요. 바다가 세 배로 빨리 비어요', def:NOPG(BADGES[1].def), page:'교과서 92쪽 참고'},
+  {why:'세 어부가 두 번씩이면 바다의 절반만 잡아 바다가 그대로예요. 한 번은 너무 적고, 세 번이면 바다가 비어요', def:NOPG(BADGES[2].def)+' 문제를 해결해야 경제가 계속 발전할 수 있어요.', page:'교과서 88·92쪽 참고'}
 ];
 var GAME = {
   title: '모두의 바다',
@@ -513,7 +624,7 @@ var GAME = {
   names: NAMES,
   titles: TITLES,
   titleOf: titleOf,
-  comboWin: T.comboWin,
+  comboWin: 6,
   progArt: 'progFish',
   credit: '그림: Kenney (CC0)',
   source: ['88쪽 빠른 성장으로 생긴 문제를 해결해야 경제가 지속적으로 발전',
@@ -521,43 +632,36 @@ var GAME = {
            '91~92쪽 세 번 나가면 더 많이 잡겠지 → 남들도 따라 나감 → 몇 달 뒤 물고기가 하나도 남지 않음 / 개인은 잠깐 이익, 공동의 이익은 줄어듦 = 공유지의 비극',
            '92쪽 해결: 함부로 사용하지 못하게 막기 + 자원을 소중히 여기고 공동의 이익을 추구하는 태도'],
   say: {
-    title: '나는 바닷가 마을 어부!',
+    title: '나는 바닷가 마을 어부! 창고를 채워 보자.',
     startBtn: '시작',
     start: [
-      '배를 바다로! 일주일에 두 번!',
-      '바구니가 한 칸 더! 더 잡아 볼까?',
-      '마을 약속 표지판을 세워 봐!'
+      '이번 주 몇 번 나갈까? 다 나가면 집으로!',
+      '이번 주도 몇 번 나갈지 정해!',
+      '몇 번씩 잡기로 약속할까? 표지판을 골라!'
     ],
     end: [
-      ['두 번씩 잡으니 바다가 다시 찼어.'],
-      ['나만 더 잡았더니 모두 따라 했어. 바다가 텅 비었어!'],
+      ['절반만 잡으면 바다가 다시 차. 카드를 견줘 봐!'],
+      ['내가 더 나가면 모두 따라 해서 바다가 비어.'],
       ['약속한 바다는 그대로, 물고기도 더 많아!', '함께 쓰는 자원은 함께 지켜야 해.']
     ],
     idle: '잠깐! 배가 돌아오는 중이야'
   },
   ruleCards: [
-    [['rFish','배를 바다로',1]],
-    [['rMore','한 번 더',1]],
-    [['rSign','약속 표지판',1]]
+    [['rFish','배를 바다로',1],['rRest','집에서 쉬기',0]],
+    [['rMore','이웃도 따라',1]],
+    [['rSign','약속 고르기',1]]
   ],
   rulesModal: {
-    cards: [['rFish','배를 바다로 끌면 한 마리'],['rWeek','한 주 뒤 물고기가 다시 늘어요'],['rSign','표지판: 모두 두 번']],
-    note: '바다 물고기는 마을 모두의 것이에요.'
+    cards: [['rFish','배를 바다로 끌면 한 마리'],['rRest','집으로 끌면 한 주 끝'],['rWeek','남은 물고기가 두 배로']],
+    note: '바다 물고기는 마을 모두의 것이에요. 남은 바다도 마을의 몫이에요.'
   },
-  stageRibbon: function(G){ return [{text:'바다가 다시 찼어!'}, {text:'바다가 텅 비었어', confetti:false}, {text:'약속한 바다 가득!'}][G.si]; },
+  stageRibbon: function(G){ return G.sc>=G.goal ? '창고 목표 달성!' : {text:'목표에 조금 모자라요', confetti:false}; },
   result: {
-    label: '모두의 바다 기록', note: '모두가 잡은 물고기(3주)',
-    rows: function(G){ var a=G.rec[1]||{all:0}, b=G.rec[2]||{all:0}; return [['욕심낸 바다', a.all], ['약속한 바다', b.all]]; },
-    formula: '함께 쓰는 자원 → 함께 약속하고 아끼기',
+    label: '내 물고기(잡은 것 + 남은 바다 몫, 3단계)', note: '',
+    rows: function(G){ var C=G.rec&&G.rec[2]&&G.rec[2].hist.length?cardOf(G,2):null; if(!C) return []; return [['약속 없을 때', C.L.total], ['두 번 약속했을 때', C.R.total]]; },
+    formula: '함께 쓰는 자원 → 절반만, 약속하고 아끼기',
     next: '다음 시간: 우리 주변의 공유지는?',
-    say: '친구 점수와 비교해 봐!',
-    art: function(G){
-      var h='', a=G.rec[1], b=G.rec[2]; if(!a||!b) return null;
-      [[a,0],[b,190]].forEach(function(p){ var r=p[0], x0=p[1], n=r.hist.length?r.hist[r.hist.length-1].next:12;
-        h+='<rect x="'+x0+'" y="0" width="170" height="70" rx="12" class="f-sea"/>';
-        for(var i=0;i<12;i++){ var x=x0+8+(i%6)*26, y=6+Math.floor(i/6)*30; h+= i<n ? useArt('fish',x,y,28,28) : '<rect x="'+(x+4)+'" y="'+(y+4)+'" width="20" height="20" rx="6" fill="none" stroke="#DDE8F2" stroke-width="2" stroke-dasharray="4 3" opacity=".7"/>'; } });
-      return {vb:[0,0,360,70], svg:h};
-    }
+    say: '친구 점수와 비교해 봐!'
   },
   explain: {
     bounce: '다시!',
@@ -565,26 +669,33 @@ var GAME = {
       boatWhere: {line:'배는 바다로', why:'배를 위쪽 파란 바다에 놓으면 물고기를 잡아요'},
       signWhere: {line:'포구 기둥에', why:'표지판은 점선으로 된 포구 기둥 자리에 세워요'},
       needSign:  {line:'약속 먼저', why:'마을 약속 표지판을 먼저 세워요'},
-      promise:   {line:'약속!', why:'마을 약속: 모두 한 주에 두 번만 잡아요'}
+      needTrip:  {line:'먼저 바다로', why:'이번 주에 한 번은 나가야 집에서 쉴 수 있어요'},
+      promise:   {line:'약속!', why:'마을 약속: 모두 표지판에 적은 횟수까지만 잡아요'},
+      basket:    {line:'바구니가 가득', why:'한 주에 네 번까지 나갈 수 있어요. 집으로 끌면 한 주가 끝나요'}
     },
     general: function(G){ return XP[G.si]||null; }
   },
-  toast: {show:'name'},
+  toast: {show:'off'},   /* 블라인드: 배지 이름('공유지의 비극')이 플레이 중 이웃 칸을 가림 → 배지는 결과·배지 창에서만 */
   tryPts: 0,
-  /* '해 보기': 1단계 = 배를 바다로. 2단계 = 1주에 두 번 나간 뒤 '한 번 더'(같은 동작이지만 이 단계의 핵심 선택이라 force). 3단계 = 표지판을 기둥에 */
+  /* 해 보기: 1단계 첫 주 = 배를 바다로 → 두 번 나간 뒤 '집에서 쉬기'. 2단계 = 보이는 상태(이웃이 따라 나감) → 가리키기. 3단계 = 표지판을 기둥에 */
   tryIt: function(G){
-    if(G.t<G.ready) return {wait:true};
-    if(G.si===0) return {src:'boat', dst:'sea', label:'배를 바다로'};
-    if(G.si===1){ if(G.wk!==0) return null; if(G.cnt[0]<2) return {later:true};
-      return (G.cnt[0]===2 && G.t>=G.boatAt) ? {src:'boat', dst:'sea', label:'한 번 더', force:true} : {later:true}; }
-    if(G.si===2) return G.signed ? null : {src:'sign', dst:'post', label:'약속 표지판'};
+    if(G.phase!=='play') return null;
+    if(G.si===0){ if(G.wk!==0) return null;
+      var a=(G.t<G.ready)?{wait:true}:{src:'boat', dst:'sea', label:'배를 바다로'};
+      var b=(G.st==='fish' && G.cnt[0]>=3 && G.t>=G.boatAt+1.2) ? {src:'boat', dst:'hut', label:'집에서 쉬기'} : {later:true};
+      return [a,b]; }
+    if(G.si===2) return null;   /* 약속 횟수 고르기가 이 단계의 판단이라 정답 표지판을 대신 보여 주지 않는다(가리키기만) */
     return null;
   },
+  demo: function(G){ if(G.si===1) return {point:(G.st==='fish'&&G.t>=G.ready)?'nb:1':null, text:'이웃도 같은 바다'};
+    if(G.si===2) return {point:(G.st==='fish'&&G.t>=G.ready&&!G.signed)?'post':null, text:'표지판 하나를 기둥에'}; return {}; },
   onEvent: function(e,FX){
-    if(e.t==='catch'){ if(e.pts) FX.score('boat', e.pts, false, e.combo); if(e.got) FX.burst('crate:0', 5); else FX.comboOff(); FX.progress(); }
-    else if(e.t==='sign'){ FX.burst('post', 10); FX.progress(); }
-    else if(e.t==='full'){ FX.score('sea', e.pts, true, 0); FX.burst('sea', 10); }
-    else if(e.t==='bounce') FX.comboOff();
+    if(e.t==='catch'){ if(e.pts) FX.score('store', e.pts, false, 0); if(e.got) FX.burst('crate:0', 5); }
+    else if(e.t==='sign'){ FX.burst('post', 10); }
+    else if(e.t==='rest'){ FX.burst('hut', 6); FX.progress(); }
+    else if(e.t==='share'){ if(e.pts) FX.score('store', e.pts, true, 0); FX.burst('sea', 8);
+      FX.explain({why:'남은 물고기 '+e.n+'마리는 다음 달에 잡을 내 몫이에요', def:NOPG(BADGES[0].def), page:'교과서 91~92쪽 참고'}); }
+    else if(e.t==='regrow'){ FX.explain({why:'남은 '+e.before+'마리가 '+e.after+'마리로 늘었어요', def:NOPG(BADGES[0].def), page:'교과서 91쪽 참고'}); }
   }
 };
 /* ===== GAME-END ===== */
@@ -611,32 +722,40 @@ function itemSvg(item){ return iconSvg(item,'it'); }
 /* ===== ③-a SCENE-START: 렌더 계층 (games/<이름>/scene.js) =====
    var SCENE = {mount(host), renderScene(G), rectOf(G,id), avoid(G), [idleAt(G)], [css], [aspect]} */
 /* ③ 렌더 계층 — 「모두의 바다」 2D SVG 장면(viewBox 0 0 640 420). 엔진은 SCENE의 함수만 부른다.
-   위: 주(週) 띠(주마다 남은 물고기 막대) │ 가운데: 공동 어장(물고기 자리 12칸, 빈자리는 점선) │ 아래: 포구 세 칸(나·이웃·이웃: 배 + 이번 주 바구니 칸)
-   오른쪽 뭍: 마을, 3단계의 약속 표지판(sign)과 포구 기둥 자리(post).
-   배를 바다에 놓으면 0.25초 만에 배가 고기 자리 앞에 닿고, 물고기가 배로 뛰어오른다(바다의 그 자리는 빈 점선) → 배가 돌아오면 바구니 칸이 찬다.
-   이웃 배도 뒤따라 나간다. 단계 끝 카드(2·3단계): 두 바다의 주별 막대 나란히. */
+   위: 주(週) 띠(주마다 남은 물고기 막대) │ 가운데: 공동 어장(물고기 자리, 1단계 4칸 · 2·3단계 12칸, 빈자리는 점선)
+   아래: 포구(나·이웃·이웃: 배 + 이번 주 바구니 4칸). 1단계는 이웃 포구가 비어 있다.
+   오른쪽 뭍: 집(이번 주는 그만 = 배를 끌어다 놓는 곳) · 창고(목표 줄 + 채워지는 물고기, 늘 보임) · 3단계 포구 기둥(post).
+   배를 바다에 놓으면 0.25초 만에 배가 고기 자리 앞에 닿고 물고기가 배로 뛰어오른다(그 자리는 빈 점선). 집에 놓으면 배가 집으로 가고 한 주가 끝나
+   남은 물고기가 두 배로 다시 생긴다. 단계 끝 카드: '욕심낸 바다 / 두 번씩(약속한) 바다'(실제 판 또는 같은 계산식의 '만약' 판). */
 var SCENE = (function(){
-  var VB={w:640, h:420}, svg, L={}, sig='', cardKey='', boatEl={}, fishEl={}, flyEl={};
-  var DOCK=[115,279,443], SPOTY=[70,148], SEAY=226, BOATY=262, CRY=346, CS=44;
+  var VB={w:640, h:420}, svg, L={}, sig='', cardKey='', boatEl={}, flyEl={};
+  var DOCK=[115,279,443], SPOTY=[70,148], SEAY=226, BOATY=262, CRY=350, CS=34;
+  var HUT={x:548,y:50,w:80,h:70}, STORE={x:540,y:150,w:92,h:128}, POST={x:542,y:292,w:92,h:100}, SIGN0={x:456,y:2,w:72,h:62};
   function el(tag,attrs,html){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(html!=null) e.innerHTML=html; return e; }
   function txt(x,y,s,size,fill,anchor){ return '<text x="'+x+'" y="'+y+'" text-anchor="'+(anchor||'middle')+'" font-family="Jua,sans-serif" font-size="'+(size||20)+'" fill="'+(fill||'#1E2B3A')+'">'+s+'</text>'; }
   function pill(x,y,w,s,cls,tc){ return '<rect x="'+(x-w/2)+'" y="'+(y-15)+'" width="'+w+'" height="30" rx="10" class="'+cls+'"/>'+txt(x,y+7,s,20,tc||'#FBF8F1'); }
-  function spotXY(i){ return {x:46+(i%6)*82, y:SPOTY[Math.floor(i/6)]}; }
-  function stg(G){ return STAGES[G.si||0]; }
-  function signStage(G){ return G.phase!=='title' && !!stg(G).sign; }
+  function SS(G){ return G.S||STAGES[G.si||0]; }
+  function cap(G){ return SS(G).cap; }
+  function nbOf(G){ return Math.min(2,SS(G).nb); }
+  function spotXY(G,i){ if(cap(G)<=6) return {x:46+(i+(6-cap(G))/2)*82, y:109}; return {x:46+(i%6)*82, y:SPOTY[Math.floor(i/6)]}; }
+  var SIGNS={1:{x:110,y:190,w:84,h:72},2:{x:222,y:190,w:84,h:72},3:{x:334,y:190,w:84,h:72}};
+  /* 빈 바다: 물결만 있고 물고기 없음(빨간 X는 '틀림'으로 읽힘) */
+  function emptySea(x,y,w,hh){ var h='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="6" class="f-sea" opacity=".55"/>', n=Math.max(1,Math.floor(hh/18)); for(var i=0;i<n;i++){ var yy=y+hh*(i+0.6)/n; h+='<path d="M'+(x+4)+' '+yy.toFixed(1)+'q'+(w/8).toFixed(1)+' -5 '+(w/4).toFixed(1)+' 0t'+(w/4).toFixed(1)+' 0t'+(w/4).toFixed(1)+' 0" fill="none" stroke="#DDE8F2" stroke-width="2.5" stroke-linecap="round"/>'; } return h; }
+  function signStage(G){ return G.phase!=='title' && !!SS(G).sign; }
   function mount(host){
     svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
-    ['bg','week','fish','crate','boats','fly','sign','bub','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
+    ['bg','week','fish','crate','store','boats','fly','sign','bub','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
     host.insertBefore(svg, host.firstChild);
   }
   function buildBg(G){
-    var h='<rect x="-700" y="-600" width="2040" height="1620" class="f-sea"/>';
+    var h='<rect x="-700" y="-600" width="2040" height="1620" class="f-sea"/>', nb=nbOf(G);
     [[60,232],[200,250],[360,236],[480,252],[300,60]].forEach(function(p){ h+=useArt('wave',p[0]-16,p[1]-4,32,8); });
     h+='<rect x="528" y="-600" width="800" height="1620" class="f-sand"/><path d="M528 -600V1020" stroke="#C9B48A" stroke-width="6"/>';
-    h+=useArt('hut',548,64,80,70);
+    h+='<g id="hutG">'+useArt('hut',HUT.x,HUT.y,HUT.w,HUT.h)+'</g><g id="tagHut">'+pill(588,136,44,'집','f-navy')+'</g>';
     h+='<rect x="-700" y="286" width="1228" height="800" class="f-woodd"/><rect x="-700" y="282" width="1228" height="6" class="f-wood"/>';
     for(var x=-40;x<528;x+=34) h+='<path d="M'+x+' 290V1020" stroke="#8A6A2A" stroke-width="2" opacity=".35"/>';
     DOCK.forEach(function(cx,f){
+      if(f>nb){ h+='<rect x="'+(cx-80)+'" y="296" width="160" height="118" rx="14" class="f-wood" opacity=".25"/>'; return; }
       h+='<rect x="'+(cx-80)+'" y="296" width="160" height="118" rx="14" class="'+(f?'f-wood':'f-paper')+'" opacity="'+(f?'.55':'.9')+'"'+(f?'':' stroke="#E8743B" stroke-width="4"')+'/>';
       h+=pill(cx-50, 316, f?54:38, f?'이웃':'나', f?'f-navy':'f-org');
     });
@@ -644,68 +763,83 @@ var SCENE = (function(){
   }
   /* ---- 주 띠 ---- */
   function drawWeek(G){
-    var S=stg(G), n=S.weeks, w=104, x0=264-(n*w+(n-1)*8)/2, R=(G.rec&&G.rec[G.si])||{hist:[]}, h='';
+    var S=SS(G), n=S.weeks, w=90, x0=264-(n*w+(n-1)*8)/2, R=(G.rec&&G.rec[G.si])||{hist:[]}, h='', cp=S.cap;
     if(G.phase==='title'){ L.week.innerHTML=''; return; }
     for(var i=0;i<n;i++){ var x=x0+i*(w+8), cur=i===G.wk && G.phase==='play', past=i<R.hist.length, v=past?R.hist[i].next:(cur?fishN(G):null);
       h+='<rect x="'+x+'" y="6" width="'+w+'" height="38" rx="10" class="f-paper" opacity="'+(cur||past?1:.55)+'"'+(cur?' stroke="#E8743B" stroke-width="3.5"':'')+'/>';
-      h+=txt(x+26,32,(i+1)+'주',20,'#1E2B3A');
-      h+='<rect x="'+(x+50)+'" y="16" width="44" height="18" rx="5" class="f-paperd"/>';
-      if(v!=null) h+='<rect x="'+(x+50)+'" y="16" width="'+(44*v/12).toFixed(1)+'" height="18" rx="5" class="'+(v>=12?'f-grn':v>0?'f-org':'f-red')+'"/>';
-      if(v===0) h+='<path d="M'+(x+64)+' 17l16 16M'+(x+80)+' 17l-16 16" stroke="#D9534F" stroke-width="3.5" stroke-linecap="round"/>';
+      h+=txt(x+22,32,(i+1)+'주',20,'#1E2B3A');
+      h+='<rect x="'+(x+42)+'" y="16" width="40" height="18" rx="5" class="f-paperd"/>';
+      if(v!=null) h+='<rect x="'+(x+42)+'" y="16" width="'+(40*v/cp).toFixed(1)+'" height="18" rx="5" class="'+(v>=cp?'f-grn':v>0?'f-org':'f-red')+'"/>';
+      if(v===0) h+=emptySea(x+42,16,40,18);
     }
     L.week.innerHTML=h;
   }
   /* ---- 물고기 자리 ---- */
   function drawFish(G){
-    var reg=G.reg, h='';
-    for(var i=0;i<12;i++){ var p=spotXY(i), on=G.spots[i], tk=G.trips.find(function(tr){ return tr.sp===i && G.t<tr.t0+0.25; });
+    var reg=G.reg, h='', n=cap(G), glow=G.st==='share';
+    for(var i=0;i<n;i++){ var p=spotXY(G,i), on=G.spots[i], tk=(G.trips||[]).find(function(tr){ return tr.sp===i && G.t<tr.t0+0.25; });
       if(on && reg && reg.born.indexOf(i)>=0){ var k=reg.born.indexOf(i), at=reg.t0+0.35+k*0.08; if(G.t<at && G.t>=reg.t0) on=0; }
-      if(tk) on=1;   /* 잡혀 가기 직전 0.25초는 제자리 */
+      if(tk) on=1;
       if(on){ var pop=reg && reg.born.indexOf(i)>=0 && G.t-reg.t0<1.1 && !RM;
-        h+='<g'+(pop?' class="a8pop"':' class="a8swim s'+(i%3)+'"')+'>'+useArt('fish',p.x,p.y,56,56)+'</g>'; }
+        h+=(glow?'<circle cx="'+(p.x+28)+'" cy="'+(p.y+28)+'" r="30" fill="#FFF6C8" opacity=".55"/>':'')+'<g'+(pop?' class="a8pop"':' class="a8swim s'+(i%3)+'"')+'>'+useArt('fish',p.x,p.y,56,56)+'</g>'; }
       else h+='<rect x="'+(p.x+8)+'" y="'+(p.y+8)+'" width="40" height="40" rx="12" fill="none" stroke="#DDE8F2" stroke-width="2.5" stroke-dasharray="6 5" opacity=".75"/>';
     }
     L.fish.innerHTML=h;
   }
-  /* ---- 바구니 칸 ---- */
+  /* ---- 바구니 칸(이번 주) ---- */
   function drawCrates(G){
-    var h='';
+    var h='', nb=nbOf(G);
     if(G.phase!=='title') DOCK.forEach(function(cx,f){
-      var cap=G.cap[f], got=G.got[f]||[];
-      for(var j=0;j<cap;j++){ var x=cx-74+j*50, tr=G.trips.find(function(t){ return t.f===f && t.n===j; }), done=tr && G.t>=tr.t0+T.back;
-        var extra=j>=2 && stg(G).copy, fresh=done && G.t-tr.t0-T.back<0.3 && !RM, grow=extra && f>0 && G.t-G.copyAt<0.6 && !RM;
-        h+='<g'+(grow?' class="a8pop"':'')+'><rect x="'+x+'" y="'+CRY+'" width="'+CS+'" height="'+CS+'" rx="9" class="f-paper" '+(done?'':'opacity=".6" ')+'stroke="'+(extra?'#E8743B':'#8A6A2A')+'" stroke-width="2.5"'+(done?'':' stroke-dasharray="6 4"')+'/>';
-        if(done) h+=(fresh?'<g class="a8pop">':'')+(got[j]?useArt('fish',x+3,CRY+3,38,38):'<path d="M'+(x+12)+' '+(CRY+12)+'l20 20M'+(x+32)+' '+(CRY+12)+'l-20 20" stroke="#D9534F" stroke-width="4" stroke-linecap="round"/>')+(fresh?'</g>':'');
+      if(f>nb) return;
+      var got=G.got[f]||[], n=f===0?CFG.maxTrips:Math.max(got.length,0);
+      for(var j=0;j<CFG.maxTrips;j++){ var x=cx-74+j*38, tr=(G.trips||[]).find(function(t){ return t.f===f && t.n===j; }), done=tr && G.t>=tr.t0+CFG.back;
+        var fresh=done && G.t-tr.t0-CFG.back<0.3 && !RM, show=f===0 || tr;
+        if(!show){ h+='<rect x="'+x+'" y="'+CRY+'" width="'+CS+'" height="'+CS+'" rx="8" class="f-paper" opacity=".25"/>'; continue; }
+        h+='<g><rect x="'+x+'" y="'+CRY+'" width="'+CS+'" height="'+CS+'" rx="8" class="f-paper" '+(done?'':'opacity=".6" ')+'stroke="#8A6A2A" stroke-width="2.5"'+(done?'':' stroke-dasharray="6 4"')+'/>';
+        if(done) h+=(fresh?'<g class="a8pop">':'')+(got[j]?useArt('fish',x+2,CRY+2,30,30):'<path d="M'+(x+9)+' '+(CRY+9)+'l16 16M'+(x+25)+' '+(CRY+9)+'l-16 16" stroke="#D9534F" stroke-width="4" stroke-linecap="round"/>')+(fresh?'</g>':'');
         h+='</g>'; }
     });
     L.crate.innerHTML=h;
   }
+  /* ---- 창고(목표 그림) ---- */
+  function drawStore(G){
+    var S=STORE, best=G.best||1, goal=G.goal||1, sc=G.phase==='title'?0:(G.sc||0), f=Math.min(1,sc/best), ih=S.h-20, fh=ih*f, gy=S.y+10+ih-ih*goal/best, ok=sc>=goal;
+    var h='<g data-keep="창고"><rect x="'+S.x+'" y="'+S.y+'" width="'+S.w+'" height="'+S.h+'" rx="12" class="f-woodd"/><rect x="'+(S.x+8)+'" y="'+(S.y+10)+'" width="'+(S.w-16)+'" height="'+ih+'" rx="8" class="f-paperd"/>';
+    if(fh>0.5){ h+='<rect x="'+(S.x+8)+'" y="'+(S.y+10+ih-fh).toFixed(1)+'" width="'+(S.w-16)+'" height="'+fh.toFixed(1)+'" rx="8" class="f-shal"/>';
+      if(fh<ih-12) h+=useArt('fish',S.x+18,S.y+10+ih-fh-20,28,28)+useArt('fish',S.x+46,S.y+10+ih-fh-18,28,28); }
+    h+='<path d="M'+(S.x+2)+' '+gy.toFixed(1)+'H'+(S.x+S.w-2)+'" stroke="'+(ok?'#3E9B5F':'#E8743B')+'" stroke-width="4" stroke-dasharray="8 5"/>';
+    h+='<path transform="translate('+(S.x+S.w-10)+' '+gy.toFixed(1)+')" d="M0 -11l3.2 7 7.4 1-5.5 5 1.5 7.4-6.6-3.7-6.6 3.7 1.5-7.4-5.5-5 7.4-1z" fill="'+(ok?'#3E9B5F':'#FBF8F1')+'" stroke="'+(ok?'#2E7A48':'#E8743B')+'" stroke-width="2"/></g>';
+    h+=pill(586,STORE.y+STORE.h+2,58,'창고','f-navy');
+    L.store.innerHTML=h;
+  }
   /* ---- 배(매 프레임) ---- */
   function boatPos(G,f){
-    var cx=DOCK[f], home={x:cx+6, y:BOATY+36}, sea={x:cx, y:SEAY};
-    var tr=(G.trips||[]).filter(function(t){ return t.f===f && G.t>=t.t0 && G.t<t.t0+T.back; })[0];
+    var cx=DOCK[f], home={x:cx+18, y:BOATY+36}, sea={x:cx, y:SEAY}, hut={x:492, y:118};
+    if(f===0 && G.phase==='play' && G.st!=='fish' && G.homeAt!=null){ var a0=Math.min(1,Math.max(0,1-(G.homeAt-G.t)/CFG.homeT)); a0=1-Math.pow(1-a0,2); return {x:home.x+(hut.x-home.x)*a0, y:home.y+(hut.y-home.y)*a0, tr:null}; }
+    var tr=(G.trips||[]).filter(function(t){ return t.f===f && G.t>=t.t0 && G.t<t.t0+CFG.back; })[0];
     if(!tr) return {x:home.x, y:home.y, tr:null};
     var p=G.t-tr.t0, a;
     if(p<0.25){ a=p/0.25; a=1-Math.pow(1-a,2); return {x:home.x+(sea.x-home.x)*a, y:home.y+(sea.y-home.y)*a, tr:tr, ph:'out'}; }
     if(p<0.6) return {x:sea.x, y:sea.y, tr:tr, ph:'fish', p:(p-0.25)/0.35};
-    a=(p-0.6)/(T.back-0.6); return {x:sea.x+(home.x-sea.x)*a, y:sea.y+(home.y-sea.y)*a, tr:tr, ph:'back'};
+    a=(p-0.6)/(CFG.back-0.6); return {x:sea.x+(home.x-sea.x)*a, y:sea.y+(home.y-sea.y)*a, tr:tr, ph:'back'};
   }
   function drawBoats(G){
+    var nb=nbOf(G);
     [0,1,2].forEach(function(f){
       var e=boatEl[f]; if(!e){ e=boatEl[f]=el('g',{}, '<g class="a8bob">'+useArt('boat',-38,-46,76,76)+'</g><g class="a8it"></g><circle class="a8splash" r="30" fill="none" stroke="#FBF8F1" stroke-width="3" opacity="0"/>'); L.boats.appendChild(e); e._it=e.querySelector('.a8it'); e._sp=e.querySelector('.a8splash'); e._k=''; }
+      if(f>nb){ e.style.display='none'; return; } e.style.display='';
       var b=boatPos(G,f); e.setAttribute('transform','translate('+b.x.toFixed(1)+' '+b.y.toFixed(1)+')');
-      var away=f===0 && G.phase==='play' && G.t<G.boatAt; e.style.opacity=(f===0 && G.phase==='play' && !away && G.cnt[0]>=G.cap[0] && !(stg(G).sign&&!G.signed))?.6:1;
+      e.style.opacity=(f===0 && G.phase==='play' && (G.t<G.boatAt || G.st!=='fish') && G.st==='fish')?.6:1;
       var k=''; if(b.tr && (b.ph==='fish'||b.ph==='back')) k=b.tr.got?'f':'x';
       if(e._k!==k){ e._k=k; e._it.innerHTML=k==='f'?useArt('fish',-18,-44,36,36):k==='x'?'<path d="M-10 -38l20 20M10 -38l-20 20" stroke="#D9534F" stroke-width="4" stroke-linecap="round"/>':''; }
       if(b.ph==='fish' && !RM){ var q=b.p; e._sp.setAttribute('opacity',(0.9*(1-q)).toFixed(2)); e._sp.setAttribute('r',(18+24*q).toFixed(1)); } else e._sp.setAttribute('opacity','0');
     });
   }
-  /* 잡힌 물고기가 자리에서 배로 뛰어오름(0.25~0.5초) */
   function drawFly(G){
     var seen={};
-    (G.trips||[]).forEach(function(tr,ix){ if(tr.sp<0 || RM) return; var p=(G.t-tr.t0-0.2)/0.3; if(p<0||p>=1) return;
+    (G.trips||[]).forEach(function(tr){ if(tr.sp<0 || RM || tr.f>2) return; var p=(G.t-tr.t0-0.2)/0.3; if(p<0||p>=1) return;
       var k='k'+tr.t0+':'+tr.f, e=flyEl[k]; seen[k]=1; if(!e){ e=flyEl[k]=el('g',{}, useArt('fish',-24,-24,48,48)); L.fly.appendChild(e); }
-      var s=spotXY(tr.sp), ax=s.x+28, ay=s.y+28, bx=DOCK[tr.f], by=SEAY-24, x=ax+(bx-ax)*p, y=ay+(by-ay)*p-40*Math.sin(Math.PI*p);
+      var s=spotXY(G,tr.sp), ax=s.x+28, ay=s.y+28, bx=DOCK[tr.f], by=SEAY-24, x=ax+(bx-ax)*p, y=ay+(by-ay)*p-40*Math.sin(Math.PI*p);
       e.setAttribute('transform','translate('+x.toFixed(1)+' '+y.toFixed(1)+')'); });
     Object.keys(flyEl).forEach(function(k){ if(!seen[k]){ flyEl[k].remove(); delete flyEl[k]; } });
   }
@@ -713,52 +847,61 @@ var SCENE = (function(){
   function drawSign(G){
     var h='', ss=signStage(G);
     if(ss && !G.signed && G.phase==='play'){
-      h+='<g data-keep="기둥 자리"><rect x="542" y="292" width="92" height="100" rx="12" fill="none" stroke="#8A6A2A" stroke-width="3" stroke-dasharray="7 5" opacity=".8"/></g>';
-      h+='<g>'+useArt('signB',540,150,96,84)+txt(588,184,'모두 2번',20,'#1E2B3A')+'</g>';
+      h+='<g data-keep="기둥 자리"><rect x="'+POST.x+'" y="'+POST.y+'" width="'+POST.w+'" height="'+POST.h+'" rx="12" fill="none" stroke="#8A6A2A" stroke-width="3" stroke-dasharray="7 5" opacity=".8"/></g>';
+      [1,2,3].forEach(function(n){ var q=SIGNS[n]; h+='<g>'+useArt('signB',q.x,q.y,q.w,q.h)+txt(q.x+42,q.y+34,n+'번',24,'#1E2B3A')+'</g>'; });
     }
     if(ss && G.signed){ var pop=G.t-G.signAt<0.35 && !RM;
-      h+='<g'+(pop?' class="a8pop"':'')+'>'+useArt('signB',540,300,96,84)+txt(588,334,'모두 2번',20,'#1E2B3A')+'</g>'; }
+      h+='<g'+(pop?' class="a8pop"':'')+'>'+useArt('signB',540,300,96,84)+txt(588,334,'모두 '+(G.promise||2)+'번',20,'#1E2B3A')+'</g>'; }
     L.sign.innerHTML=h;
-    var b=''; if(G.phase==='play' && G.t-G.copyAt<2.2 && G.copyAt>0){ [1,2].forEach(function(f){ var x=DOCK[f]+56, y=312;
+    var b=''; if(G.phase==='play' && G.copyAt>0 && G.t-G.copyAt<1.6){ [1,2].forEach(function(f){ if(f>nbOf(G)) return; var x=DOCK[f]+64, y=312;   /* 배가 이름표를 피해 오른쪽(cx+18)에 머무니 말풍선도 오른쪽으로 */
       b+='<g class="a8fade"><rect x="'+(x-22)+'" y="'+(y-24)+'" width="44" height="44" rx="12" class="f-paper" stroke="#E8743B" stroke-width="3"/><path d="M'+(x-14)+' '+(y+18)+'l-6 10 14-8z" class="f-paper"/>'+txt(x,y+10,'!',32,'#E8743B')+'</g>'; }); }
     L.bub.innerHTML=b;
   }
-  /* ---- 단계 끝 카드: 두 바다 나란히(2단계: 두 번씩 / 욕심낸, 3단계: 욕심낸 / 약속한) ---- */
-  function panel(x,title,R,tot,col){
-    var h='<rect x="'+x+'" y="52" width="240" height="'+(tot?190:162)+'" rx="16" class="f-paper" stroke="'+col+'" stroke-width="3.5"/>'+txt(x+120,82,title,22,col);
-    R.hist.forEach(function(w,i){ var bx=x+30+i*66, hh=Math.max(3,70*w.next/12);
-      h+='<rect x="'+bx+'" y="92" width="46" height="70" rx="6" class="f-paperd"/><rect x="'+bx+'" y="'+(162-hh)+'" width="46" height="'+hh.toFixed(1)+'" rx="6" class="'+(w.next>=12?'f-grn':w.next>0?'f-org':'f-red')+'"/>';
-      if(w.next===0) h+='<path d="M'+(bx+12)+' 115l22 22M'+(bx+34)+' 115l-22 22" stroke="#D9534F" stroke-width="4" stroke-linecap="round"/>';
-      h+=txt(bx+23,188,(i+1)+'주',20,'#55657A'); });
-    if(tot) h+=useArt('fish',x+30,200,34,34)+txt(x+72,226,'모두 '+R.all+'마리',22,'#1E2B3A','start');
-    return h;
+  /* ---- 단계 끝 카드 ---- */
+  function panel(x,P,cp){
+    var col=P.bad?'#D9534F':'#3E9C5A', lab=P.hyp?(P.hl||('만약 '+P.k+'번씩이었다면')):P.label;
+    var h='<rect x="'+x+'" y="52" width="250" height="196" rx="16" class="f-paper" stroke="'+(P.hyp?'#55657A':col)+'" stroke-width="3.5"'+(P.hyp?' stroke-dasharray="9 6"':'')+'/>'+txt(x+125,80,lab,lab.length>8?19:22,P.hyp?'#55657A':col);
+    h+='<g'+(P.hyp?' opacity=".5"':'')+'>';
+    var n=P.hist.length, sp=Math.min(56,220/n);
+    P.hist.forEach(function(w,i){ var bx=x+16+i*sp, bw=sp-12, hh=Math.max(3,64*w.next/cp);
+      h+='<rect x="'+bx+'" y="92" width="'+bw+'" height="64" rx="6" class="f-paperd"/><rect x="'+bx+'" y="'+(156-hh).toFixed(1)+'" width="'+bw+'" height="'+hh.toFixed(1)+'" rx="6" class="'+(w.next>=cp?'f-grn':w.next>0?'f-org':'f-red')+'"/>';
+      if(w.next===0) h+=emptySea(bx,92,bw,64);
+      h+=txt(bx+bw/2,182,(i+1)+'주',21,'#55657A'); });
+    /* 아래 줄: 두 덩이 — [바구니 칸 + 내가 잡은 물고기 수] [작은 바다 + 남은 바다 몫] */
+    h+='<rect x="'+(x+12)+'" y="196" width="40" height="40" rx="8" class="f-paper" stroke="#8A6A2A" stroke-width="2.5"/>'+useArt('fish',x+14,198,36,36)+txt(x+60,228,P.me,30,'#1E2B3A','start');
+    h+='<rect x="'+(x+132)+'" y="196" width="40" height="40" rx="8" class="f-sea"/>'+(P.share>0?useArt('fish',x+136,200,32,32):emptySea(x+132,196,40,40))+txt(x+180,228,P.share,30,'#1E2B3A','start');
+    return h+'</g>';
   }
   function drawCard(G){
-    var k=G.phase==='stageEnd' && G.si>0 ? 's'+G.si : ''; if(k===cardKey) return; cardKey=k; L.card.innerHTML=''; if(!k) return;
-    var A=G.rec[G.si-1], B=G.rec[G.si], three=G.si===2;
-    var h='<g class="a8card" id="a8card">'+panel(16,three?'욕심낸 바다':'두 번씩 바다',A,three,three?'#D9534F':'#3E9C5A')+panel(272,three?'약속한 바다':'욕심낸 바다',B,three,three?'#3E9C5A':'#D9534F')+'</g>';
-    L.card.innerHTML=h;
+    var k=G.phase==='stageEnd' ? 's'+G.si : ''; if(k===cardKey) return; cardKey=k; L.card.innerHTML=''; if(!k) return;
+    var C=cardOf(G,G.si); if(!C) return;
+    var cpL=G.si===2?cfgFor(G,1).cap:cap(G);
+    L.card.innerHTML='<g class="a8card" id="a8card">'+panel(10,C.L,cpL)+panel(270,C.R,cap(G))+'</g>';
   }
   function renderScene(G){
     if(!svg) return;
-    if(!sig) buildBg(G);
-    var s=G.si+'|'+G.phase+'|'+G.wk+'|'+(G.spots||[]).join('')+'|'+(G.trips||[]).map(function(t){ return (G.t<t.t0+0.25?0:1)+''+(G.t>=t.t0+T.back?1:0)+(G.t-t.t0-T.back<0.3?1:0); }).join('')
-      +'|'+(G.reg?Math.min(12,Math.floor((G.t-G.reg.t0)/0.08)):'')+'|'+G.signed+(G.t-G.signAt<0.35)+'|'+(G.t-G.copyAt<0.6)+(G.t-G.copyAt<2.2)+'|'+(G.cap||[]).join('')+(G.rec&&G.rec[G.si]?G.rec[G.si].hist.length:'')
+    var bs=(G.si||0)+'|'+(G.phase==='title');
+    if(bs!==L._bs){ L._bs=bs; buildBg(G); sig=''; }
+    var s=G.si+'|'+G.phase+'|'+G.st+'|'+G.wk+'|'+(G.spots||[]).join('')+'|'+(G.trips||[]).map(function(t){ return (G.t<t.t0+0.25?0:1)+''+(G.t>=t.t0+CFG.back?1:0)+(G.t-t.t0-CFG.back<0.3?1:0); }).join('')
+      +'|'+(G.reg?Math.min(12,Math.floor((G.t-G.reg.t0)/0.08)):'')+'|'+G.signed+(G.t-G.signAt<0.35)+'|'+(G.t-G.copyAt<1.6)+'|'+G.sc+'|'+(G.rec&&G.rec[G.si]?G.rec[G.si].hist.length:'')
       +'|'+(G.phase==='play'?fishN(G):'');
-    if(s!==sig){ sig=s; drawWeek(G); drawFish(G); drawCrates(G); drawSign(G); }
+    if(s!==sig){ sig=s; drawWeek(G); drawFish(G); drawCrates(G); drawSign(G); drawStore(G); }
     drawBoats(G); drawFly(G); drawCard(G);
   }
   function vbRect(G,id){
     var p=String(id).split(':');
     if(id==='boat'){ var b=boatPos(G,0); return {x:b.x-42, y:b.y-48, w:84, h:84}; }
     if(id==='sea') return {x:6, y:52, w:516, h:224};
-    if(id==='sign') return signStage(G) && !G.signed ? {x:540, y:146, w:96, h:92} : null;
-    if(id==='post') return signStage(G) ? {x:542, y:292, w:92, h:100} : null;
-    if(p[0]==='crate'){ var cx=DOCK[+p[1]]; return {x:cx-76, y:CRY-2, w:152, h:CS+4}; }
-    if(p[0]==='nb'){ var c2=DOCK[+p[1]]; return {x:c2-40, y:BOATY-10, w:90, h:80}; }
-    if(id==='week') return {x:100, y:4, w:330, h:42};
-    if(id==='card') return G.phase==='stageEnd' && G.si>0 ? {x:16, y:52, w:496, h:G.si===2?190:162} : null;
-    if(p[0]==='tag'){ var c3=DOCK[+p[1]]; return {x:c3-78, y:300, w:56, h:32}; }
+    if(id==='hut') return {x:HUT.x-6, y:HUT.y-6, w:HUT.w+12, h:HUT.h+12};
+    if(id==='store') return {x:STORE.x, y:STORE.y, w:STORE.w, h:STORE.h};
+    if(p[0]==='sign'){ var sq=SIGNS[+p[1]]; return signStage(G) && !G.signed && sq ? {x:sq.x, y:sq.y, w:sq.w, h:sq.h} : null; }
+    if(id==='post') return signStage(G) ? {x:POST.x, y:POST.y, w:POST.w, h:POST.h} : null;
+    if(p[0]==='crate'){ var cx=DOCK[+p[1]]; return {x:cx-76, y:CRY-2, w:154, h:CS+4}; }
+    if(p[0]==='nb'){ if(+p[1]>nbOf(G)) return null; var c2=DOCK[+p[1]]; return {x:c2-24, y:BOATY-10, w:84, h:80}; }
+    if(id==='week') return {x:40, y:4, w:430, h:42};
+    if(id==='card') return G.phase==='stageEnd' ? {x:10, y:52, w:510, h:196} : null;
+    if(p[0]==='tag'){ var c3=DOCK[+p[1]]; return +p[1]>nbOf(G)?null:{x:c3-78, y:300, w:56, h:32}; }
+    if(id==='tag:hut') return {x:566, y:121, w:44, h:30};
     return null;
   }
   function rectOf(G,id){
@@ -766,15 +909,16 @@ var SCENE = (function(){
     var x1=m.a*b.x+m.e, y1=m.d*b.y+m.f, x2=m.a*(b.x+b.w)+m.e, y2=m.d*(b.y+b.h)+m.f;
     return {left:x1, top:y1, right:x2, bottom:y2, width:x2-x1, height:y2-y1, cx:(x1+x2)/2, cy:(y1+y2)/2};
   }
-  function avoid(G){ if(G.phase==='stageEnd') return G.si>0?['card']:['week']; var a=['boat']; if(signStage(G)&&!G.signed) a.push('sign','post'); return a; }
-  function labels(G){ return ['week','tag:0','tag:1','tag:2']; }
-  function keepClear(G){ var a=['crate:0','crate:1','crate:2','week']; if(G.phase==='stageEnd' && G.si>0) a.push('card'); if(signStage(G)) a.push('post'); return a; }
+  function avoid(G){ if(G.phase==='stageEnd') return ['card']; var a=['boat','hut','store']; if(signStage(G)&&!G.signed) a.push('sign:1','sign:2','sign:3','post'); return a; }
+  function labels(G){ return ['week','tag:0','tag:1','tag:2','tag:hut'].filter(function(k){ return vbRect(G,k); }); }
+  function keepClear(G){ if(G.phase==='stageEnd') return ['card','store']; var a=['crate:0','week','store']; if(nbOf(G)>0) a.push('crate:1','crate:2','nb:1','nb:2','tag:1','tag:2'); if(signStage(G)) a.push('post'); return a; }
   function idleAt(G){ return 'crate:0'; }
   var css=".a8pop{transform-box:fill-box;transform-origin:50% 60%;animation:a8pop .3s ease-out}@keyframes a8pop{0%{transform:scale(.3);opacity:.2}70%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}"
     +".a8fade{animation:a8fd .3s ease-out}@keyframes a8fd{from{opacity:0}to{opacity:1}}"
     +".a8swim{animation:a8sw 2.8s ease-in-out infinite}.s1{animation-delay:-.9s}.s2{animation-delay:-1.8s}@keyframes a8sw{50%{transform:translateX(5px)}}"
     +".a8bob{animation:a8bb 2.4s ease-in-out infinite}@keyframes a8bb{50%{transform:translateY(3px)}}"
     +".a8card{animation:a8cin .3s ease-out .7s both}@keyframes a8cin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}"
+    +".callout{border:2px solid #1E2B3A}"
     +"@media (prefers-reduced-motion: reduce){.a8fade,.a8pop,.a8swim,.a8bob,.a8card{animation:none}}";
   return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, labels:labels, keepClear:keepClear, idleAt:idleAt, css:css, aspect:'640/420'};
 })();
@@ -803,27 +947,68 @@ if(XPC){ var hb0=$('#bHint'), row0=document.createElement('div'); row0.className
   row0.insertAdjacentHTML('beforeend','<button class="xp-btn off" id="xpBtn" aria-expanded="false">'+(XPC.label||'왜?')+'</button>'); }
 
 function freshU(){ return {mode:'title', paused:false, drag:null, sel:null, hint:0, hintMv:null, bounces:0, lastAct:0, demo:null, demoDone:{}, callQ:[], callBusy:false, shown:0, busy:false, comboT:0,
-     toastQ:[], callNow:null, xpCur:null, xpKey:'', lastSnap:null, okAt:-1e9, okN:0, hf:null, tr:null, trPts:null,
-     labQ:[], txtAt:-1e9, callN:0, trKinds:{}, didKinds:{}, trSkip:{}, keepDemo:{}, lastKinds:null, dropPt:null, downAt:-1e9, autoH:{}, toastW:{}, actAt:-1e9}; }   /* r5: 마지막 학생 행동 시각(actAt): 그 뒤 0.6초는 직접 결과만 */   /* r4: 마지막 누름(downAt), 단계별 자동 힌트 1회(autoH), 미룬 토스트(toastW) */   /* r3: 글 줄(labQ·txtAt), 해 본 동작 종류(trKinds), 놓친 이유 기록(trSkip) */
-/* '마지막 단계 다시'(GAME.replayLast, 기본 켜짐): 마지막 단계가 시작될 때 G를 통째로 복사해 두었다가(점수·배지·기록 그대로) 결과 화면에서 그 단계만 다시 한다 */
-var REPLAY = GAME.replayLast!==false && NSTAGE>1;
-function deepCopy(v){
-  if(v===null||typeof v!=='object') return v;
-  if(Array.isArray(v)) return v.map(deepCopy);
-  if(v instanceof Map){ var m=new Map(); v.forEach(function(x,k){ m.set(k,deepCopy(x)); }); return m; }
-  if(v instanceof Set){ var t=new Set(); v.forEach(function(x){ t.add(deepCopy(x)); }); return t; }
-  var o={}; for(var k in v) if(Object.prototype.hasOwnProperty.call(v,k)) o[k]=deepCopy(v[k]); return o;
+     toastQ:[], callNow:null, xpCur:null, xpKey:'', okAt:-1e9, okN:0, hf:null, tr:null, trPts:null,
+     labQ:[], txtAt:-1e9, callN:0, trKinds:{}, didKinds:{}, trSkip:{}, keepDemo:{}, dropPt:null, downAt:-1e9, autoH:{}, toastW:{}, actAt:-1e9}; }   /* r5: 마지막 학생 행동 시각(actAt): 그 뒤 0.6초는 직접 결과만 */   /* r4: 마지막 누름(downAt), 단계별 자동 힌트 1회(autoH), 미룬 토스트(toastW) */   /* r3: 글 줄(labQ·txtAt), 해 본 동작 종류(trKinds), 놓친 이유 기록(trSkip) */
+/* '마지막 단계 다시'(§10)는 2026-11-07 폐지(§19 도전 모드로 대체). GAME.replayLast가 있어도 읽지 않는다 */
+/* §19 도전 모드 = 레벨 사다리. 엔진은 틀만(잠금 해제·레벨·판마다 새 시드·목표 점수·통과/아깝다/다시·별·기록·결과 화면).
+   도전 '내용'은 게임이 정의한다: GAME.challenge = {stages:[{name}…], goal(lv), say:{start:[…]}, ruleCards?:[…], speed?(lv), cfg?(lv)}.
+   LOGIC은 G.ch(레벨, 1부터)가 있으면 자기 도전 단계 표를 쓴다. GAME.challenge가 없으면 도전 버튼도 없다(잘못된 도전을 내보내지 않음).
+   아래 ENG-CHRULE 구역은 규칙(순수 함수)만: check.js가 잘라 Node에서 같은 규칙으로 봇 세션을 돌린다 */
+/* ENG-CHRULE-START */
+var CHC = GAME.challenge && typeof GAME.challenge==='object' && Array.isArray(GAME.challenge.stages) && GAME.challenge.stages.length ? GAME.challenge : null;
+var ENG_CHNEAR = 0.9;   /* 목표의 90% 이상이면 '아깝다' */
+var ENG_CHR = {
+  spd: function(lv){ return typeof CHC.speed==='function' ? (+CHC.speed(lv)||1) : 1; },   /* 시간 배속: 기본 1(시간만 줄인 도전 금지). 게임이 원하면 */
+  cfg: function(lv){ return typeof CHC.cfg==='function' ? CHC.cfg(lv) : (CHC.cfg||null); },   /* G.cfg로 LOGIC에 넘길 레벨별 값(선택) */
+  goal: function(lv){ return Math.max(1, Math.round(+CHC.goal(lv)||1)); },
+  stars: function(sc,g){ if(CHC.kind==='reason') return sc<g ? 0 : 3;   /* 추론형: 목표 = 모두 맞힘(만점)이라 통과면 별 셋 */
+    return sc<g ? 0 : sc>=g*1.3 ? 3 : sc>=g*1.15 ? 2 : 1; },
+  seed: function(n){ return ((GAME.seed||1)+7919*(n+1))>>>0; },
+  max: function(){ var m=Math.floor(+CHC.maxLevel||0); return m>0 ? m : 0; },   /* §19-추론형(2026-11-07): 최고 레벨(0 = 끝없음). 다 깨면 '모든 도전 완주!' */
+  kind: function(){ return CHC.kind==='reason' ? 'reason' : 'score'; }          /* 'reason' = 추론형 도전(시간 무관, 그 레벨 예측을 모두 맞혀야 통과). check.js 공리 판정이 달라짐 */
+};
+/* ENG-CHRULE-END */
+var ENG_CH_GAP = 900, ENG_CHON = false, ENG_CHLV = 1, ENG_CHSPD = 1, ENG_CHCFG = null, ENG_CHGOAL = 0, ENG_CHRS = Math.floor(Math.random()*100000);
+var ENG_CHM = {open:false, lv:1, top:0, best:{}, n:0};   /* lv = 열린 레벨(다음에 할 것), top = 깬 최고 레벨, best = 레벨별 최고 점수, n = 판 수 */
+function engHash(s){ var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return (h>>>0).toString(36); }
+var ENG_CHK = 'engch:'+(GAME.id ? String(GAME.id) : engHash(String(GAME.title)+'|'+String(GAME.subtitle)));
+/* ENG-STORE-START: 엔진이 브라우저 저장을 쓰는 곳은 이 두 함수뿐(check.js가 이 구역 밖의 사용과 try 없는 사용을 막는다). 막혀 있으면 ENG_CHM(메모리)만으로 이 접속 동안 동작 */
+function engChLoad(){ try{ var s=window.localStorage.getItem(ENG_CHK); if(s) engChMerge(JSON.parse(s)); }catch(e){} }
+function engChSave(){ try{ window.localStorage.setItem(ENG_CHK, JSON.stringify(ENG_CHM)); }catch(e){} }
+/* ENG-STORE-END */
+function engChMerge(o){ if(!o||typeof o!=='object') return; var M=ENG_CHM; if(o.open) M.open=true; if(o.all) M.all=1; ['lv','top','n'].forEach(function(k){ if(+o[k]>M[k]) M[k]=+o[k]; });
+  if(o.best&&typeof o.best==='object') for(var k in o.best) if(+o.best[k]>(M.best[k]||0)) M.best[k]=+o.best[k]; }
+function engChMark(g){ if(ENG_CHON && g && typeof g==='object' && g.ch!==ENG_CHLV){ g.ch=ENG_CHLV; if(ENG_CHCFG) g.cfg=ENG_CHCFG; } return g; }
+/* 지금 판의 단계 표·규칙 칸·시작 대사(도전이면 GAME.challenge 것) */
+function engStg(){ return ENG_CHON ? CHC.stages : GAME.stages; }
+function engRC(si){ return (ENG_CHON ? (CHC.ruleCards||[])[si] : GAME.ruleCards[si]) || []; }
+function engSay0(si){ return ENG_CHON ? ((CHC.say||{}).start||[])[si] || '' : SAY.start[si]; }   /* LOGIC이 새 G를 만들며 빠뜨려도 다시 붙인다 */
+function engChLab(lv){ return '도전 '+lv+(CHC && ENG_CHR.max() ? ' / '+ENG_CHR.max() : ''); }   /* 블라인드(11-07): '도전 5'가 무엇인지 모름 → GAME.challenge.maxLevel이 있으면 '도전 5 / 8'(HUD 알약·첫 리본·결과 큰 글). 없으면 '도전 5' */
+function engChIcon(){ return '<svg class="eng-chi" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 2.2 4.8 13.6h6.1L9.4 21.8l9.8-12.2h-6.3z" fill="currentColor"/></svg>'; }
+function engStar(on){ return '<svg class="eng-star'+(on?' on':'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.2l-5.8 3.2 1.2-6.5L2.6 9.4l6.5-.8z"/></svg>'; }
+function engChStart(lv){
+  if(!CHC) return; lv=Math.max(1, +lv||ENG_CHM.lv); if(ENG_CHR.max()) lv=Math.min(lv, ENG_CHR.max()); reset();
+  ENG_CHON=true; ENG_CHLV=lv; ENG_CHSPD=ENG_CHR.spd(lv); ENG_CHCFG=ENG_CHR.cfg(lv); ENG_CHGOAL=ENG_CHR.goal(lv);
+  G=engChMark(newGame(ENG_CHR.seed(ENG_CHM.n+ENG_CHRS))); ENG_CHM.n++; engChSave();   /* 판마다 새 시드 */
+  G=engChMark(start(G));
+  var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage();
 }
-function replayLast(){
-  if(!U.lastSnap) return; var snap=U.lastSnap;
-  var kinds=U.lastKinds; GEN++; ovl.innerHTML=''; engDockClear(); U=freshU(); U.lastSnap=snap; U.lastKinds=kinds; U.trKinds=deepCopy(kinds||{}); U.mode='play'; $('#app').classList.remove('trying');
-  if(XPC){ xpClose(); $('#xpBtn').classList.add('off'); }
-  $('#combo').classList.remove('on'); closeModal(); var r=$('.res'); if(r) r.remove(); $('#main').classList.remove('showres');
-  G=deepCopy(snap); U.shown=G.score; $('#score').textContent=G.score;
-  beginStage();
+/* §19-짝(2026-11-07, 교사 승인): 도전이 없는 체험 게임은 같은 차시 '떠올리기 연습'의 도전으로 이어 준다.
+   주소는 배포 때 넣는다: <meta name="eng-pair" content="주소"> 또는 GAME.pairUrl. 주소가 없으면 버튼도 없다. */
+function engPairUrl(){ try{ var m=document.querySelector('meta[name="eng-pair"]'); var u=(m&&m.getAttribute('content'))||GAME.pairUrl||''; return /^(https:\/\/|\.{0,2}\/|[\w-]+\.html)/.test(u)?u:''; }catch(e){ return ''; } }
+function engPairBtn(){ var u=engPairUrl(); if(!u) return ''; return '<a class="btn2 eng-ch eng-pair" id="engPair" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>'; }
+/* 2026-11-07 교사 결정: 잠금 폐지 — 도전은 첫 화면부터 늘 열려 있다(중간에 나갔다 들어오는 학생·복습하는 학생). 레벨 = 기기 기록(없으면 1).
+   시각 위계: 개념 판 '시작'이 주 버튼(주황, 60px, 먼저), 도전은 둘째 버튼(남색, 52px). 도전이 없는 체험 게임은 eng-pair 주소가 있을 때만 '연습에서 도전'을 둘째로 */
+function engChTitleBtn(){
+  var p=$('#pbtn'); if(!p.children.length) return;
+  if(CHC){ var lv=ENG_CHR.max()?Math.min(ENG_CHM.lv,ENG_CHR.max()):ENG_CHM.lv; p.classList.add('eng-p2');
+    p.insertAdjacentHTML('beforeend','<button class="big eng-ch eng-sec" id="engChGo">'+engChIcon()+'도전 '+lv+'</button>');
+    $('#engChGo').onclick=function(){ if(U.busy) return; engChStart(lv); }; return; }
+  var u=engPairUrl(); if(!u) return; p.classList.add('eng-p2');
+  p.insertAdjacentHTML('beforeend','<a class="big eng-ch eng-sec eng-pair" id="engPairGo" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>');
 }
 function reset(){
-  GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
+  ENG_CHON=false; GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
   U=freshU(); $('#app').classList.remove('trying');
   if(XPC){ xpClose(); $('#xpBtn').classList.add('off'); }
   $('#combo').classList.remove('on'); closeModal(); var r=$('.res'); if(r) r.remove(); $('#main').classList.remove('showres');
@@ -832,13 +1017,14 @@ function reset(){
 }
 function stageHud(){
   var on=U.mode!=='title', si=G.si;
-  $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+GAME.stages[si].name+'</span>' : GAME.title;
-  $('#stgPips').innerHTML = on ? GAME.stages.map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
+  $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+engStg()[si].name+'</span>' : GAME.title;
+  $('#stgPips').innerHTML = on ? engStg().map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
+  var ct=$('#engChTag'); if(ct){ if(ENG_CHON) ct.innerHTML=engChIcon()+engChLab(ENG_CHLV); ct.classList.toggle('hide', !ENG_CHON); }   /* §19 도전 중 표시 */
 }
 function say(html,who){ $('#say').innerHTML='<b>'+(who||GAME.guide)+'</b>'+html; }
-function setBtn(label,fn){ var p=$('#pbtn'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
+function setBtn(label,fn){ var p=$('#pbtn'); p.classList.remove('eng-p2'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
 function ruleCard(c){ return '<div class="rc'+(c[2]?' new':'')+'"><svg viewBox="0 0 120 60">'+useArt(c[0],0,0,120,60)+'</svg><span>'+c[1]+'</span></div>'; }
-function rulesPanel(){ var h=''; if(U.mode==='play'||U.mode==='stageEnd'){ GAME.ruleCards[G.si].forEach(function(c){ h+=ruleCard(c); }); } $('#rules').innerHTML=h; }
+function rulesPanel(){ var h=''; if(U.mode==='play'||U.mode==='stageEnd'){ engRC(G.si).forEach(function(c){ h+=ruleCard(c); }); } $('#rules').innerHTML=h; }
 /* 진행 표시: 끝낸 일(G.res.served) 초록, 놓친 일(G.res.missed) 회색, 남은 일 흐리게 */
 function progPanel(){
   var p=$('#prog'); if(U.mode!=='play'&&U.mode!=='stageEnd'){ p.classList.add('hide'); return; } p.classList.remove('hide');
@@ -873,13 +1059,14 @@ function title(){
   U.mode='title'; panelAll();
   say(SAY.title);
   setBtn(SAY.startBtn||'시작',function(){ G=start(G); beginStage(); });
+  engChTitleBtn();   /* §19: 도전(또는 '연습에서 도전')은 첫 화면부터 둘째 버튼으로(2026-11-07 잠금 폐지) */
   ribbon(GAME.title,GAME.subtitle,0);
 }
 function beginStage(){
-  if(REPLAY && G.si===NSTAGE-1){ U.lastSnap=deepCopy(G); U.lastKinds=deepCopy(U.trKinds); }   /* 마지막 단계 시작 순간(r3: 그때까지 해 본 동작 종류도) */
   U.mode='play'; U.hint=0; U.hintMv=null; U.bounces=0; U.okN=0; U.lastAct=performance.now(); U.demo=null; U.demoAt=performance.now()+(G.si===0?2200:2400);
-  var tq=clearOvl(); setBtn(null); say(SAY.start[G.si]); panelAll(); U.xpCur=null;
-  ribbon((G.si+1)+'단계', GAME.stages[G.si].name, 1500);
+  var tq=clearOvl(); setBtn(null); say(engSay0(G.si)); panelAll(); U.xpCur=null;
+  if(ENG_CHON && G.si===0) ribbon(engChLab(ENG_CHLV), ENG_CHR.kind()==='reason' ? '모두 맞히기' : '목표 '+ENG_CHGOAL, 1400);   /* §19: 첫 단계는 레벨과 목표 점수(추론형은 '모두 맞히기') */
+  else ribbon((G.si+1)+'단계', engStg()[G.si].name, ENG_CHON?ENG_CH_GAP:1500);
   tryBegin();   /* §12 '해 보기': 새 규칙이 나오는 단계면 시간을 멈추고 한 번 직접 해 보게 한다 */
   tq.forEach(toast);
 }
@@ -901,7 +1088,12 @@ function engEndSweep(){
 }
 function onStageEnd(){
   U.mode='stageEnd'; U.busy=true; tryClear(); engEndSweep(); stopDemo(); if(XPC){ U.xpCur=null; xpSync(); } clearRings(); hintBtn(); progPanel(); $('#combo').classList.remove('on'); U.comboT=0;
-  var sr=stageRibbon(); ribbon(sr.text, '', 1700); if(sr.ok) confetti();
+  var sr=stageRibbon();
+  if(ENG_CHON){   /* §19 도전: 단계 끝 대사·'다음'·비교 카드 없이 짧은 리본 뒤 바로 다음 단계(LOGIC next를 곧바로 불러 비교 카드 장면을 건너뜀) */
+    ribbon(sr.text, '', ENG_CH_GAP); if(sr.ok) confetti(); setBtn(null);
+    G=engChMark(next(G));
+    later(ENG_CH_GAP+100,function(){ U.busy=false; if(G.phase==='end') results(); else beginStage(); }); return; }
+  ribbon(sr.text, '', 1700); if(sr.ok) confetti();
   later(700,function(){ U.busy=false; var lines=SAY.end[G.si], k=0;
     var show=function(){ say(lines[k]); setBtn(k<lines.length-1?'다음':(G.si<NSTAGE-1?'다음 단계':'결과 보기'), function(){ k++; if(k<lines.length) show(); else { G=next(G); if(G.phase==='end') results(); else beginStage(); } }); };
     show(); });
@@ -1164,6 +1356,7 @@ function engDemoTap(id){
      {point:id, text, at}     손가락이 id를 가리키고 말풍선 text(at 위치). point가 null이면 아직 기다림
      {move:{src,dst}}         시작 시범을 이 수로. move가 null이면 아직 기다림 */
 function maybeDemo(now){
+  if(ENG_CHON) return;   /* §19 도전: 저절로 뜨는 손가락 시범 없음(답을 보여 주지 않음). 힌트 버튼은 그대로 */
   if(U.mode!=='play'||U.demo||U.drag||U.sel||U.busy||U.hint||tryHold()) return;   /* '해 보기' 중에는 시범 없음(§12) */   /* 힌트가 켜져 있으면 시범 없음(힌트가 보여 주는 수와 다른 곳을 가리키지 않게) */
   if(now-U.okAt<2000) return;   /* 바르게 놓은 직후 2초는 시범 없음(맞혔는데 틀린 줄 알게 됨, §11) */
   if(now-U.downAt<2500) return;   /* r4: 장면을 누른 직후 2.5초도 시범 없음(3차 블라인드: 버튼을 누르자 손가락이 '저절로' 나옴) */
@@ -1190,8 +1383,9 @@ function maybeDemo(now){
 var FX = {
   score:function(at,pts,fast,combo){ if(U.trPts!=null){ pts=U.trPts; if(!pts) return; }
     /* r5: +점수·HUD 튐·콤보는 행동 0.6초 뒤(그 사이 또 행동하면 그만큼 더 뒤). 자리는 지금 잡아 둔다(대상이 그새 떠나도 그 자리에) */
-    var r0=SCENE.rectOf(G,at), go=function(){ if(engHeld()){ later(ENG_ACT_HOLD-(performance.now()-U.actAt)+10,go); return; }
-      fxText(at,'+'+pts,fast,r0); bumpScore(); if(combo>=2){ var c=$('#combo'); c.textContent='콤보 '+combo; c.classList.add('on'); U.comboT=performance.now(); } };
+    var r0=SCENE.rectOf(G,at), t0=performance.now(), go=function(){ if(engHeld()){ later(ENG_ACT_HOLD-(performance.now()-U.actAt)+10,go); return; }
+      engScoreSeen(); var got=engScoreTake(pts); if(!(got>0)) return;   /* 블라인드(11-07): +n은 점수가 실제로 오른 만큼만. 오르지 않았으면 +n·점수 튐·콤보 모두 없음 */
+      if(!(U.badAt>t0)) fxText(at,'+'+got,fast,r0);   /* 블라인드(11-07): 맞힌 수의 +n이 그 뒤 틀린 수 직후에 떠 '틀려도 점수'로 읽힘 → 그 사이 틀린 놓기가 있었으면 +n 글은 띄우지 않는다(점수 칸만 튐) */ bumpScore(); if(combo>=2){ var c=$('#combo'); c.textContent='콤보 '+combo; c.classList.add('on'); U.comboT=performance.now(); } };
     go(); },
   burst:function(at,n){ burst(at,n); },
   progress:function(){ progPanel(); },
@@ -1227,8 +1421,8 @@ function xpToggle(){
 /* r4: 이 단계의 일반 '왜?' — GAME.explain.general(G)(글 | {why, def, page}) → 없으면 단계 시작 대사 + 이번 규칙 칸 글 */
 function engXpGeneral(){
   if(typeof XPC.general==='function'){ var g=XPC.general(G); if(g) return xpHtml(g); }
-  var rc=(GAME.ruleCards[G.si]||[]).map(function(c){ return c[1]; }).filter(Boolean).join(' · ');
-  return xpHtml({why:SAY.start[G.si]||GAME.stages[G.si].name, def:rc?'이번 규칙: '+rc:''});
+  var rc=engRC(G.si).map(function(c){ return c[1]; }).filter(Boolean).join(' · ');
+  return xpHtml({why:engSay0(G.si)||engStg()[G.si].name, def:rc?'이번 규칙: '+rc:''});
 }
 /* 틀린 놓기 기본 동작: reasons[why 코드]가 있으면 대상 옆에 짧은 한 줄(bounce, 기본 '다시!')만 띄우고 이유는 '왜?'에 둔다 */
 function xpBounce(r,src,dst){
@@ -1249,6 +1443,12 @@ function handle(evs){
     else if(GAME.onEvent) GAME.onEvent(e, FX);
   });
 }
+/* 점수 장부(블라인드 11-07): G.score가 실제로 오른 양을 시각과 함께 적어 두고, FX.score가 +n을 띄울 때 최근 2.5초 안에 오른 만큼에서만 꺼내 쓴다.
+   게임이 점수 안 오른 수(틀린 짐작 등)에 FX.score를 불러도 +n이 뜨지 않는다. U가 새로 만들어지면(reset) 장부도 비워진다 */
+function engScoreSeen(){ var s=G.score, L=U.scLast; U.scLast=s; if(L==null||!(s>L)) return; (U.scLog||(U.scLog=[])).push({t:performance.now(), n:s-L}); }
+function engScoreTake(pts){ var now=performance.now(), L=U.scLog||[], got=0; pts=+pts||0;
+  for(var i=0;i<L.length && got<pts;i++){ if(now-L[i].t>2500){ L[i].n=0; continue; } var k=Math.min(L[i].n, pts-got); L[i].n-=k; got+=k; }
+  U.scLog=L.filter(function(x){ return x.n>0 && now-x.t<=2500; }); return got; }
 function bumpScore(){ var b=$('#score'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
 
 function commit(src,dst,via,gh){
@@ -1259,16 +1459,16 @@ function commit(src,dst,via,gh){
   if(T && r.ok && U.trPts!=null){ r.G.score=s0+U.trPts; }
   if(XPC){ xpClose(); U.xpCur=null; }   /* 넘겨 둔 설명은 다음 놓기까지만 */
   if(r.ok){
-    G=r.G; U.lastAct=U.okAt=performance.now(); U.okN++; U.bounces=0; U.didKinds[engTryKind({src:src,dst:dst})]=1;
+    G=r.G; engScoreSeen(); U.lastAct=U.okAt=performance.now(); U.okN++; U.bounces=0; U.didKinds[engTryKind({src:src,dst:dst})]=1;
     if(!via){ U.hint=0; U.hintMv=null; clearRings(); hintFingerStop(); hintBtn(); }
     var to=SCENE.rectOf(G,dst); if(gh&&to) flyGhost(gh,to,220); else if(gh) gh.remove();
     handle(r.ev); U.trPts=null;
     if(XPC) xpSync();
     if(T && U.tr===T) tryAfter(T,dst);
   } else {
-    U.trPts=null; if(T && U.tr===T) tryEnd(T);   /* 보여 준 수를 LOGIC이 받지 않으면(있으면 안 됨) 멈춤을 풀고 그냥 이어 간다 */
+    U.trPts=null; U.badAt=performance.now(); if(T && U.tr===T) tryEnd(T);   /* 보여 준 수를 LOGIC이 받지 않으면(있으면 안 됨) 멈춤을 풀고 그냥 이어 간다 */
     /* 틀린 놓기도 LOGIC이 새 G를 돌려주면 받는다(B형: 틀린 카드 기록). bounce 말고 다른 이벤트는 onEvent로(B형: 이유 말풍선) */
-    if(r.G && r.G!==G){ var cOff=r.G.combo!==G.combo; G=r.G; if(cOff) $('#combo').classList.remove('on'); }
+    if(r.G && r.G!==G){ var cOff=r.G.combo!==G.combo; G=r.G; if(cOff) $('#combo').classList.remove('on'); } engScoreSeen();
     var back=SCENE.rectOf(G,src);
     if(gh&&back) flyGhost(gh,back,260); else if(gh) gh.remove();
     if(dst) badRing(dst);
@@ -1438,7 +1638,8 @@ function tryClear(){
   var d=document.getElementById('tDim'); if(d) d.remove();
 }
 function tryBegin(){
-  tryClear(); if(GAME.tryIt===false) return;
+  tryClear(); if(ENG_CHON){ U.demoDone[G.si]=1; return; }   /* §19 도전: 해 보기·시작 시범 없음 */
+  if(GAME.tryIt===false) return;
   if(typeof GAME.tryIt!=='function' && !tryNewRule(G.si)) return;
   U.tr={phase:'pre', t0:performance.now(), seek:0, si:G.si, again:0, k:0};
 }
@@ -1639,17 +1840,37 @@ function resultArt(R){
 function results(){
   U.mode='result'; tryClear(); stopDemo(); clearOvl(); panelAll(); $('#combo').classList.remove('on'); U.comboT=0;
   $('#stgName').textContent='결과'; $('#stgPips').innerHTML='';
-  var R=GAME.result, sc=G.score, prev=BEST, rec=sc>prev&&prev>0; BEST=Math.max(BEST,sc);
+  var R=GAME.result, sc=G.score, CH=ENG_CHON, prev=BEST, rec=sc>prev&&prev>0, fresh=false, left;
+  if(CH){   /* §19 도전 결과: 큰 글 하나('도전 3 성공!' / '아깝다!' / '도전 3') + 별 + 점수와 목표 막대. 버튼 [다시 하기 | 도전 n+1 또는 다시] */
+    var lv=ENG_CHLV, goal=ENG_CHGOAL, pass=sc>=goal, near=!pass&&sc>=goal*ENG_CHNEAR, st=ENG_CHR.stars(sc,goal), pb=ENG_CHM.best[lv]||0;
+    var mx=ENG_CHR.max(), all=pass&&mx>0&&lv>=mx;   /* §19-추론형: 최고 레벨을 깨면 완주(다음 레벨 없음, 버튼은 '다시') */
+    ENG_CHM.best[lv]=Math.max(pb,sc); ENG_CHM.open=true; if(pass){ ENG_CHM.top=Math.max(ENG_CHM.top,lv); ENG_CHM.lv=Math.max(ENG_CHM.lv,mx?Math.min(mx,lv+1):lv+1); } if(all) ENG_CHM.all=1; engChSave();
+    U.chRes={lv:lv, goal:goal, pass:pass, near:near, stars:st, score:sc, next:pass&&!all?lv+1:lv, all:all};
+    left='<div class="rcard l eng-chres'+(pass?' pass':'')+'"><div class="ttl eng-big'+(pass||near?' eng-new':'')+'">'+(all?'모든 도전 완주!':pass?engChLab(lv)+' 성공!':near?'아깝다!':engChLab(lv))+'</div>'
+      +(pass?'<div class="eng-stars">'+[1,2,3].map(function(i){ return engStar(i<=st); }).join('')+'</div>':'')
+      +'<div class="num" id="rnum">0</div><div class="eng-goal"><div class="eng-gbar"><i style="transform:scaleX('+Math.min(1,sc/goal).toFixed(3)+')"></i></div><span>목표 '+goal+'</span></div>'
+      +'<div class="btns"><button class="btn2" id="again">다시 하기</button><button class="btn2 eng-ch pri'+(near?' new':'')+'" id="engCh">'+engChIcon()+(pass&&!all?'도전 '+(lv+1):'다시')+'</button></div></div>';
+  } else {
+    BEST=Math.max(BEST,sc); if(CHC){ ENG_CHM.open=true; engChSave(); }   /* §19: 도전은 처음부터 열려 있음(2026-11-07 잠금 폐지) → '열렸다' 효과 없음 */
+    left='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div>'
+      +'<div class="btns"><button class="btn2 pri" id="again">다시 하기</button>'+(CHC?'<button class="btn2 eng-ch'+(fresh?' new':'')+'" id="engCh">'+engChIcon()+'도전 '+ENG_CHM.lv+'</button>':engPairBtn())+'</div></div>';   /* 결과 버튼은 [다시 하기 | 도전] 둘만. 처음으로는 HUD ⟲ */
+  }
   var rows=R.rows(G), mx=Math.max.apply(null,[1].concat(rows.map(function(r){ return r[1]; })));
   var d=document.createElement('div'); d.className='res';
-  d.innerHTML='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div><div class="btns"><button class="btn2 pri" id="again">다시 하기</button><button class="btn2" id="home">처음으로</button></div>'+(REPLAY&&U.lastSnap?'<div class="btns"><button class="btn2" id="againLast">마지막 단계 다시</button></div>':'')+'</div>'
+  if(CH){   /* 블라인드(11-07): 도전 결과 오른쪽에 일반 판 막대·회색 배지가 나와 '못 얻음'처럼 보임 → 도전 기록(레벨 사다리 1~최고 레벨)만, 배지 칸 숨김.
+       깬 레벨 = 그 레벨 최고 점수의 별 수, 이번 레벨 = 주황 테두리. maxLevel이 없으면 지금까지 깬 레벨 + 다음 하나 */
+    var cr=U.chRes, N=ENG_CHR.max()||Math.max(ENG_CHM.top+1, cr.lv), lad='';
+    for(var li=1; li<=N; li++){ var dn=li<=ENG_CHM.top, ns=dn?Math.max(1,ENG_CHR.stars(ENG_CHM.best[li]||0, ENG_CHR.goal(li))):0;
+      lad+='<div class="eng-lv'+(dn?' done':'')+(li===cr.lv?' cur':'')+'"><b>'+li+'</b>'+(dn?'<span class="eng-ls">'+[1,2,3].map(function(i){ return engStar(i<=ns); }).join('')+'</span>':'')+'</div>'; }
+    d.innerHTML=left+'<div class="rcard eng-chrec"><div class="rh">도전 기록<small>깬 도전 '+ENG_CHM.top+(ENG_CHR.max()?' / '+ENG_CHR.max():'')+'</small></div><div class="eng-lad">'+lad+'</div></div>';
+  } else
+  d.innerHTML=left
    +'<div class="rcard"><div class="rh">'+R.label+'<small>'+R.note+'</small></div><div class="bars">'+rows.map(function(r){ return '<span>'+r[0]+'</span><div class="bar"><i data-v="'+(r[1]/mx)+'"></i></div><b>'+r[1]+'</b>'; }).join('')+'</div>'
    +resultArt(R)+'<div class="formula">'+R.formula+'</div>'+shelfHtml(null)+'<div class="nextq">배지를 누르면 뜻이 나와요.<br>'+R.next+'</div></div>';
   $('#main').appendChild(d); $('#main').classList.add('showres');
   d.querySelectorAll('[data-bd]').forEach(function(x){ x.onclick=function(){ badgeModal(x.dataset.bd); }; });
   $('#again').onclick=function(){ reset(); G=start(G); var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage(); };
-  $('#home').onclick=reset;
-  if($('#againLast')) $('#againLast').onclick=replayLast;
+  if($('#engCh')) $('#engCh').onclick=function(){ engChStart(CH ? U.chRes.next : ENG_CHM.lv); };
   say(R.say); setBtn(null);
   requestAnimationFrame(function(){ d.querySelectorAll('.bar i').forEach(function(i){ i.style.transform='scaleX('+i.dataset.v+')'; }); });
   var t0=performance.now(), g=GEN; (function roll(){ if(g!==GEN) return; var p=Math.min(1,(performance.now()-t0)/(RM?1:900)); var n=$('#rnum'); if(n) n.textContent=Math.round(sc*p); if(p<1) requestAnimationFrame(roll); })();
@@ -1667,7 +1888,8 @@ var LAST=performance.now(), RAF=0;
 function frame(now){
   var dt=Math.min(0.1,(now-LAST)/1000); LAST=now;
   var frz = U.mode==='play' && tryFrame(now,dt);   /* '해 보기' 동안 게임 시간은 멈춘다 */
-  if(U.mode==='play' && !U.paused && !frz){ var r=tick(G,dt); G=r.G; if(r.ev.length) handle(r.ev); }
+  if(U.mode==='play' && !U.paused && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G; engScoreSeen();   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
+    if(r.ev.length) handle(r.ev); }
   SCENE.renderScene(G);
   syncRings(); if(U.mode==='play'){ unblockOverlays(now); hintCheck(now); hintFingerStep(now); hintArrowSync(); }
   if(U.shown!==G.score && !engHeld(now)){ U.shown += Math.ceil((G.score-U.shown)/4); if(U.shown>G.score) U.shown=G.score; $('#score').textContent=U.shown; }
@@ -1679,6 +1901,7 @@ function frame(now){
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ cancelAnimationFrame(RAF); RAF=0; } else if(!RAF){ LAST=performance.now(); RAF=requestAnimationFrame(frame); } });
 window.addEventListener('resize',function(){ clearRings('.ring:not(.bad)'); if(U.hint&&U.hintMv) hintShow(U.hintMv,U.hint,false); if(U.tr&&U.tr.phase==='wait') trySpot(U.tr,false); });
 
+engChLoad();
 reset();
 RAF=requestAnimationFrame(frame);
 </script>

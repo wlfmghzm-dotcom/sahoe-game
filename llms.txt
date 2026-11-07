@@ -10,7 +10,7 @@
 ## 6-2 사회 (아이스크림미디어) 2. 시장경제와 국가 간 거래 › 1. 우리나라 시장경제의 특징
 
 - [16차시 시장경제가 무엇인지 알아볼까요 (교과서 60~62쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-16.html): 사과 값은 누가 정할까, 가계·기업·시장
-  - [사과 값은 누가 정할까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a1.html): A 개념 체험. 시장에 손님과 사과를 옮기며 사려는 양과 팔려는 양에 따라 값이 바뀌고, 가게끼리 경쟁하면 더 싸고 좋아지는 걸 겪어요.
+  - [사과 값은 누가 정할까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a1.html): A 개념 체험. 손님과 날씨를 보고 사과 상자를 몇 개 가져갈까? 너무 많으면 값이 떨어지고, 옆 가게보다 비싸면 손님이 떠나요.
   - [가계·기업·시장](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b1.html): B 떠올리기 연습. 카드를 가계·기업·시장 칸에 나눠 담아요.
 - [17~18차시 가계와 기업의 역할을 알아볼까요 (교과서 63~68쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-17-18.html): 돈이 도는 마을, 가계가 할까, 기업이 할까
   - [돈이 도는 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a2.html): A 개념 체험. 일하러 가서 소득을 받고, 그 돈으로 사면 기업에 이윤이 생겨요. 가계와 기업 사이를 도는 돈과 합리적 선택을 겪어요.
@@ -25,7 +25,7 @@
 ## 6-2 사회 (아이스크림미디어) 2. 시장경제와 국가 간 거래 › 2. 경제성장과 우리 생활
 
 - [22차시 경제성장이 무엇인지 알아볼까요 (교과서 78~80쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-22.html): 한강의 기적 연표, 경제성장의 발자취
-  - [한강의 기적 연표](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a5.html): A 개념 체험. 시대마다 공장을 짓고 수출하면 1인당 소득 막대가 교과서 그래프대로 자라요. 우리나라 경제성장 과정을 겪어요.
+  - [한강의 기적 연표](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a5.html): A 개념 체험. 시대마다 가진 것(일손·돈·기술)에 맞는 공장을 골라 지어요. 형편에 맞으면 소득 막대가 쑥쑥 자라요.
   - [경제성장의 발자취](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b5.html): B 떠올리기 연습. 카드를 1960년대부터 오늘날까지 시대 칸에 나눠 담아요.
 - [23차시 경제성장이 우리 생활에 미치는 영향을 알아볼까요 (교과서 81~84쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-23.html): 풍요로운 마을 만들기, 경제성장이 바꾼 생활
   - [풍요로운 마을 만들기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a6.html): A 개념 체험. 한정된 동전을 주민이 바라는 공연장·학교·병원에 쓸까, 로봇 공장에 먼저 투자할까? 성장한 소득을 어디에 쓰는지 골라요.
@@ -34,7 +34,7 @@
   - [빨리 크는 도시](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a7.html): A 개념 체험. 도시를 빨리 키울수록 생기는 환경 문제·빈부 격차·과소비·노사 갈등을 찾아 목록에 모아요.
   - [어떤 문제일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b7.html): B 떠올리기 연습. 카드를 환경 문제·빈부 격차·과소비·노사 갈등 칸에 나눠 담아요.
 - [25~26차시 빠른 경제성장으로 발생한 문제를 해결해 볼까요 (교과서 88~93쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-2-25-26.html): 모두의 바다, 누가 해결할까
-  - [모두의 바다](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a8.html): A 개념 체험. 어부가 되어 한 번 더 잡고 싶은 유혹을 겪고, 다 같이 욕심내면 바다가 비고 약속하면 지켜지는 공유지의 비극을 체험해요.
+  - [모두의 바다](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2a8.html): A 개념 체험. 매주 몇 번 바다에 나갈까? 욕심내면 바다가 비고, 마을 약속을 정하면 모두의 물고기가 많아져요.
   - [누가 해결할까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u2b8.html): B 떠올리기 연습. 카드를 정부·시민 단체와 개인·기업과 근로자 칸에 나눠 담아요.
 
 ## 6-2 사회 (아이스크림미디어) 2. 시장경제와 국가 간 거래 › 3. 세계 속의 무역
@@ -57,10 +57,10 @@
   - [떠나는 사람, 오는 사람](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3a2.html): A 개념 체험. 아기가 태어나고 일자리를 찾아 사람이 오가며 나라마다 인구수가 달라지는 까닭을 겪어요.
   - [어느 나라 이야기일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3b2.html): B 떠올리기 연습. 인구수 이야기 카드를 알맞은 나라 칸에 나눠 담아요.
 - [3차시 세계 여러 나라의 인구 밀도를 알아볼까요 (교과서 132~134쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-3-3.html): 한 칸에 몇 명?, 밀도 높을까 낮을까
-  - [한 칸에 몇 명?](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3a3.html): A 개념 체험. 같은 넓이에 몇 명이 사는지 견주어 빽빽한 땅부터 줄 세우며 인구 밀도를 익혀요.
+  - [한 칸에 몇 명?](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3a3.html): A 개념 체험. 빽빽한 땅부터 줄 세우고, 사람이 숨은 땅은 땅 모습만 보고 밀도를 짐작해요.
   - [밀도 높을까 낮을까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3b3.html): B 떠올리기 연습. 카드를 인구 밀도 높음·낮음 칸에 나눠 담아요.
 - [4차시 세계 여러 나라의 인구 구조를 알아볼까요 (교과서 135~139쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/6-2-3-4.html): 나이 탑 모양 맞추기, 어느 나이층일까
-  - [나이 탑 모양 맞추기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3a4.html): A 개념 체험. 해마다 아기를 넣고 노인이 남는 정도를 바꾸며 인구 피라미드 모양을 직접 만들어요.
+  - [나이 탑 모양 맞추기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3a4.html): A 개념 체험. 아기 수와 오래 사는 사람을 바꾸며 나이 탑을 만들고, 조건을 보고 몇 해 뒤 모양을 짐작해요.
   - [어느 나이층일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3b4.html): B 떠올리기 연습. 카드를 유소년층·청장년층·노년층 칸에 나눠 담아요.
 
 ## 6-2 사회 (아이스크림미디어) 3. 지구촌 사람들 › 2. 지구촌의 문제와 지속가능한 미래

@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>한 칸에 몇 명? – 6-2 사회 3차시 수업용 게임</title>
-<meta name="description" content="6-2 사회 3차시 「세계 여러 나라의 인구 밀도를 알아볼까요」 수업용 게임. 같은 넓이에 몇 명이 사는지 견주어 빽빽한 땅부터 줄 세우며 인구 밀도를 익혀요.">
+<meta name="description" content="6-2 사회 3차시 「세계 여러 나라의 인구 밀도를 알아볼까요」 수업용 게임. 빽빽한 땅부터 줄 세우고, 사람이 숨은 땅은 땅 모습만 보고 밀도를 짐작해요.">
+<meta name="eng-pair" content="u3b3.html">
 <link rel="canonical" href="https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3a3.html">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
@@ -220,7 +221,6 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 .rcard .ttl{font-family:var(--game);font-size:30px;background:var(--a-navy);color:var(--a-paper);border-radius:14px;padding:4px 18px}
 .rcard .rec{font-size:18px;color:var(--muted);min-height:1.4em}
 .rcard .btns{width:100%;margin-top:4px}
-.rcard .btns+.btns{margin-top:0}   /* '마지막 단계 다시' 줄(GAME.replayLast) */
 .bars{display:grid;grid-template-columns:auto minmax(0,1fr) 2.4em;gap:4px 10px;align-items:center;font-size:18px}
 .bars .bar{height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
 .bars .bar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .9s}
@@ -266,6 +266,40 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
   .rcard{padding:10px 14px;gap:6px}
   .rcard .ttl{font-size:26px}
 }
+/* §19 도전 모드: HUD 작은 표시, 타이틀·결과의 '도전' 버튼(남색 + 작은 번개 그림), 새 기록 효과 */
+.eng-chtag{display:inline-flex;align-items:center;gap:3px;font-family:var(--game);font-size:18px;line-height:1;background:var(--a-navy);color:var(--a-paper);border-radius:999px;padding:4px 10px 4px 6px;flex:none}
+.eng-chi{width:20px;height:20px;flex:none;display:block}
+#pbtn.eng-p2{display:flex;flex-direction:column;gap:8px}
+.big.eng-ch{background:var(--a-navy);color:var(--a-paper);box-shadow:inset 0 -5px 0 rgba(0,0,0,.35)}
+.big.eng-ch .eng-chi{width:24px;height:24px;color:var(--a-org)}
+.big.eng-ch small{font-size:18px;opacity:.85;margin-left:4px}
+.big.eng-sec{min-height:52px;font-size:22px;text-decoration:none}   /* 첫 화면 둘째 버튼(도전·연습에서 도전): 주 버튼 '시작'보다 작게 */
+.rcard .btns .btn2{white-space:nowrap}
+/* 결과 '도전'은 '다시 하기'와 같은 너비, 남색으로 구분(도전 결과에서는 주황 = 주 버튼) */
+.eng-pair{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn2.eng-ch.pri{background:var(--accent);color:var(--accent-ink)}.btn2.eng-ch.pri .eng-chi{color:var(--accent-ink)}
+.btn2.eng-ch{flex:1;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--a-navy);color:var(--a-paper)}
+.btn2.eng-ch .eng-chi{color:var(--a-org)}
+.btn2.eng-ch.new{animation:engChPop .5s ease-out 3}
+@keyframes engChPop{45%{transform:scale(1.08);box-shadow:0 0 0 4px var(--accent)}}
+.eng-chrec .eng-lad{flex:1;align-content:center}
+.eng-lad{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}   /* 도전 결과 오른쪽: 레벨 사다리(깬 레벨 = 채운 칸 + 별 수, 아직 = 점선 빈칸, 이번 = 주황 테두리) */
+.eng-lv{width:56px;height:80px;border-radius:14px;border:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--game);font-size:24px;color:var(--muted)}
+.eng-lv.done{border:2px solid transparent;background:var(--bg);color:var(--ink)}.eng-lv .eng-ls{display:flex;gap:0}.eng-lv .eng-star{width:16px;height:16px;animation:none}
+.eng-lv.cur{border:2px solid transparent;color:var(--ink);box-shadow:0 0 0 4px var(--accent)}
+.rcard .ttl.eng-new{background:var(--accent);color:var(--accent-ink);animation:engChPop .6s ease-out 3}
+.eng-chres{gap:6px}
+.rcard .ttl.eng-big{font-size:34px;padding:4px 22px}
+.eng-stars{display:flex;gap:6px}
+.eng-star{width:40px;height:40px;fill:var(--line)}
+.eng-star.on{fill:var(--accent);animation:engStar .5s ease-out both}
+.eng-star.on:nth-child(2){animation-delay:.25s}.eng-star.on:nth-child(3){animation-delay:.5s}
+@keyframes engStar{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.3);opacity:1}100%{transform:scale(1)}}
+.eng-goal{width:100%;display:flex;align-items:center;gap:10px;font-size:18px;color:var(--muted)}
+.eng-gbar{flex:1;height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
+.eng-gbar i{display:block;height:100%;background:var(--a-navy-l);transform-origin:left}
+.eng-chres.pass .eng-gbar i{background:var(--good)}
+.rcard .lab .eng-chi{display:inline-block;vertical-align:-3px;color:var(--accent)}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -274,7 +308,7 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 <div class="app" id="app">
   <header class="hud">
     <button class="ib" id="bReset" aria-label="처음으로"></button>
-    <div class="stg"><span id="stgName">한 칸에 몇 명?</span><span class="pips" id="stgPips"></span></div>
+    <div class="stg"><span id="stgName">한 칸에 몇 명?</span><span class="pips" id="stgPips"></span><span class="eng-chtag hide" id="engChTag"></span></div>
     <div class="sp"></div>
     <div class="combo" id="combo"></div>
     <div class="score"><small>점수</small><b id="score">0</b></div>
@@ -346,6 +380,22 @@ Object.assign(ASSETS, {
   cardGhost: {vb:[-44,-38,88,76], svg:'<rect x="-42" y="-35" width="84" height="72" rx="10" class="f-paperd"/><rect x="-42" y="-37" width="84" height="72" rx="10" class="f-paper"/><rect x="-24" y="-20" width="48" height="40" rx="5" class="f-land"/><circle cx="-12" cy="-8" r="4" class="f-org"/><circle cx="6" cy="-4" r="4" class="f-org"/><circle cx="-4" cy="10" r="4" class="f-org"/><circle cx="14" cy="10" r="4" class="f-org"/>'},
   progCard: {vb:[0,0,28,18], svg:'<rect x="1" y="1" width="26" height="16" rx="3" fill="#FBF8F1" stroke="#1E2B3A" stroke-width="1.2"/><rect x="7" y="4" width="14" height="10" rx="2" class="f-land"/><circle cx="11" cy="8" r="1.8" class="f-org"/><circle cx="17" cy="10" r="1.8" class="f-org"/>'}
 });
+
+/* 3단계 예측(2026-11-07): 규칙 칸 '살기 좋은 칸' — 왼쪽 땅(논밭·도시 칸, 사람 많음) / 오른쪽 땅(사막·추운 칸, 사람 거의 없음) + 빽빽 ← 화살표 */
+(function(){
+  function cell(t,x,y){ var s=18, h='';
+    if(t==='f'){ h+='<rect x="'+x+'" y="'+y+'" width="18" height="18" rx="3" class="f-land"/><path d="M'+(x+5)+' '+(y+8)+'l-2 -4M'+(x+5)+' '+(y+8)+'v-5M'+(x+5)+' '+(y+8)+'l2 -4M'+(x+13)+' '+(y+15)+'l-2 -4M'+(x+13)+' '+(y+15)+'v-5M'+(x+13)+' '+(y+15)+'l2 -4" stroke="#3C9064" stroke-width="1.6" stroke-linecap="round" fill="none"/>'; }
+    else if(t==='u'){ h+='<rect x="'+x+'" y="'+y+'" width="18" height="18" rx="3" fill="#CBD1D8"/><path d="M'+(x+2)+' '+(y+16)+'V'+(y+10)+'l3 -3v3l3 -3v3l3 -3V'+(y+16)+'Z" fill="#5B6B7D"/><rect x="'+(x+12)+'" y="'+(y+3)+'" width="5" height="13" fill="#5B6B7D"/>'; }
+    else if(t==='d'){ h+='<rect x="'+x+'" y="'+y+'" width="18" height="18" rx="3" fill="#F3D28E"/><rect x="'+(x+10)+'" y="'+(y+4)+'" width="3" height="11" rx="1.5" fill="#3C9064"/><path d="M'+(x+10)+' '+(y+10)+'h-3v-4" stroke="#3C9064" stroke-width="2" fill="none" stroke-linecap="round"/>'; }
+    else { h+='<rect x="'+x+'" y="'+y+'" width="18" height="18" rx="3" fill="#DCE8EC"/><path d="M'+(x+4)+' '+(y+15)+'L'+(x+9)+' '+(y+5)+'L'+(x+14)+' '+(y+15)+'Z" class="f-grnd"/>'; }
+    return h; }
+  function card(x,ts,dots){ var h='<rect x="'+x+'" y="2" width="41" height="41" rx="4" class="f-sand"/>';
+    ts.forEach(function(t,i){ h+=cell(t, x+2+(i%2)*19, 4+Math.floor(i/2)*19); });
+    dots.forEach(function(d){ h+='<circle cx="'+(x+d[0])+'" cy="'+d[1]+'" r="2.6" class="f-org" stroke="#1E2B3A" stroke-width=".8"/>'; });
+    return h; }
+  var L=card(8,['f','u','u','f'],[[6,9],[14,15],[25,8],[33,15],[7,27],[15,34],[26,28],[33,36]]), R=card(71,['d','c','c','d'],[[33,13]]);
+  ASSETS.rGood={vb:[0,0,120,60], svg:'<rect width="120" height="60" rx="10" class="f-sea"/>'+L+R+'<path d="M106 52H14M24 46l-10 6 10 6" fill="none" stroke="#FBF8F1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'};
+})();
 /* ===== ASSETS-END ===== */
 </script>
 <script>
@@ -366,9 +416,12 @@ Object.assign(ASSETS, {
    (1,317 : 515 ≈ 20 : 8. 캐나다는 0.06이 되어 점 1개로 그림). */
 var SEED = 20261117;
 var T = { base:10, hintPts:4, comboWin:4.0, comboStep:2, comboCap:5, cleanPts:6, retryPts:4, fastPts:6, roundGap:2.8, lag:0.6, endDelay:0.6, maxCell:9 };
-/* 카드: cells = 칸 종류(p 땅, f 논·밭(농사지을 땅), c 추운 숲·언 땅(농사짓기 어려운 땅)), cols = 한 줄 칸 수,
+/* 카드: cells = 칸 종류(p 땅, f 논·밭(평야, 농사지을 땅), u 도시·공장(산업·일자리), c 추운 숲·언 땅, d 건조한 사막), cols = 한 줄 칸 수,
+   살기 좋은 칸(f·u) = 사람 4명, 살기 어려운 칸(c·d) = 두 칸에 1명. 숨은 땅의 밀도는 이 단서(칸 종류)만으로 정해진다(예측 = 단서 읽기, 운이 아님).
+   근거: 125·127쪽 기후가 온화한 평야·해안, 산업이 발달해 일자리가 많은 곳에 사람이 모임 / 130쪽 건조한 사막 → 면적에 비해 인구 적음 / 133쪽 냉대 기후 캐나다.
+   132쪽 활동 '지형과 기후를 살펴보며 인구 밀도를 예상해 봐요' = 3단계 '땅 보고 짐작'.
    n = 사람 수(칸에 고르지 않게 흩음) 또는 per = 칸마다 사람 수(정해 둠), hide = 놓기 전엔 사람을 안 보여 줌, land = 나라 키 */
-var FARM = 4;                                                      /* 3단계 땅 카드: 논·밭 칸 4명, 추운 칸은 두 칸에 1명 */
+var FARM = 4, GOOD = /[fu]/;                                       /* 3·4단계 땅 카드: 살기 좋은 칸(논밭·도시) 4명, 살기 어려운 칸(추운 땅·사막)은 두 칸에 1명 */
 var STAGES = [
   {name:'빽빽 줄',   rule:'line', rounds:[
     [{cells:'pppp', cols:2, n:12}, {cells:'pppp', cols:2, n:3}],
@@ -376,15 +429,68 @@ var STAGES = [
   {name:'넓이가 달라', rule:'size', rounds:[   /* 블라인드 2~4차 반복('점 개수와 칸 개수를 둘 다 세야'): 2단계는 칸마다 사람 수를 고르게(even) → 칸 하나만 보면 견줄 수 있다 */
     [{cells:'pp', cols:2, n:8, even:1}, {cells:'pppppppp', cols:4, n:16, even:1}],
     [{cells:'p', cols:1, n:5, even:1}, {cells:'pppppp', cols:3, n:18, even:1}, {cells:'pppp', cols:2, n:4, even:1}]]},
-  {name:'논밭 보기',  rule:'land', rounds:[
-    [{cells:'fffc', cols:2, farm:1}, {cells:'fccc', cols:2, farm:1}],   /* 블라인드 4차: 첫 판은 사람이 보인다(논밭 칸에 사람이 많다는 것을 먼저 봄) */
-    [{cells:'ffcc', cols:2, hide:1}, {cells:'ffff', cols:2, hide:1}, {cells:'cccc', cols:2, hide:1}]]},   /* 둘째 판: 사람이 숨음('이제 사람이 숨었어요') → 논밭 칸으로 예상 */   /* 블라인드 3차(11-05): '무엇을 세는지' 몰랐음 → 같은 크기(2×2) 카드, 사람은 놓을 때 나타남, 견줄 것은 '논밭 칸 수' 하나 */
+  /* 3단계 '땅 보고 짐작'(2026-11-07 예측 단계): 첫 판은 사람이 보인다(논밭·도시 칸에 많고 사막·추운 칸엔 거의 없음을 먼저 봄).
+     둘째·셋째 판은 사람이 숨는다 → 칸 그림(단서)만 보고 빽빽한 순서를 짐작해 놓는다. 놓는 순간 그 자리에서 사람이 나타난다.
+     틀리게 짐작하면 그 자리에서 사람이 드러난 채 '다시!'로 튕긴다(드러난 카드는 고쳐 놓아도 4점).
+     함정(모르면 손해): '논밭만 세기'(도시를 빼먹음)·'추운 칸만 빼기'(사막을 셈)로는 순서가 뒤집히게 판을 짰다. 판마다 살기 좋은 칸 수는 서로 다르다(같으면 운) */
+  {name:'땅 보고 짐작', rule:'guess', rounds:[
+    [{cells:'ufcf', cols:2, farm:1}, {cells:'dcdu', cols:2, farm:1}],
+    [{cells:'ffdd', cols:2, hide:1}, {cells:'uufc', cols:2, hide:1}, {cells:'fdcd', cols:2, hide:1}],
+    [{cells:'uudc', cols:2, hide:1}, {cells:'cccf', cols:2, hide:1}, {cells:'ffff', cols:2, hide:1}]]},
   {name:'시간 막대',  rule:'fast', rounds:[
     [{cells:'pp', cols:2, n:9}, {cells:'pppppp', cols:3, n:18, even:1}, {cells:'pppp', cols:2, n:6}],
-    [{cells:'fffc', cols:2, hide:1}, {cells:'ffcc', cols:2, hide:1}, {cells:'fccc', cols:2, hide:1}],   /* 3단계 규칙(논밭 칸 수)이 그대로 통하게 같은 크기 */
+    [{cells:'fudc', cols:2, hide:1}, {cells:'uuff', cols:2, hide:1}, {cells:'dcdc', cols:2, hide:1}],   /* 3단계 규칙(살기 좋은 칸 수)이 그대로 통하게 같은 크기 */
     [{cells:'ffff', cols:2, per:[6,4,5,5], land:'BGD'}, {cells:'pppp', cols:2, per:[2,3,1,2], land:'KOR'}, {cells:'cfcc', cols:2, per:[0,1,0,0], land:'CAN'}]],
    bar:[15, 13, 11], intro:5.0}   /* 블라인드 2차(11-05): 시간 막대가 해 보기 없이 나옴 → 단계 시작에 막대가 혼자 다 줄고 카드가 회색이 되는 모습을 한 번(5초: 리본 동안 가득 → 2.4초에 다 줄고 → 1초 회색, 놓을 수 없음). 그다음 막대가 다시 차고 시작 */
 ];
+/* §19 추론형 도전(2026-11-07, 교사 승인: "예측을 할 수 있다는 것 자체가 도전이다", GAME.challenge.kind='reason').
+   한 줄 설계: "사람이 숨은 땅 카드를 칸 그림(논밭·도시·추운 땅·사막)만 보고 빽빽한 순서로 짐작해 놓는다 — 그 레벨 짐작을 모두 맞히면 통과".
+   일반 판 3단계 '땅 보고 짐작'(rule 'guess')과 같은 동작·같은 규칙(살기 좋은 칸 = 논밭·도시 4명, 살기 어려운 칸 = 추운 땅·사막 두 칸에 1명). 시간 막대·빠르기 점수·콤보 없음.
+   레벨이 올리는 것 = 함께 따질 개념 요소:
+     1 논밭 vs 추운 땅(하나만 견줌)  2 + 도시(일자리)  3 + 사막(4종 모두)  4 4종, 살기 좋은 칸 수가 1씩 차이(촘촘)
+     5 3×2 큰 땅(6칸을 함께 셈)  6 큰 땅 촘촘  7 큰 땅 촘촘, 카드마다 3종 이상 섞임  8 7 + 판 수 늘림
+   함정(반쪽만 알면 틀림): 레벨 2부터 판마다 '논밭만 세면' 순서가 뒤집히는 카드, 레벨 3부터 판마다 '사막도 살기 좋다고 보면' 뒤집히는 카드가 있다.
+   점수: 처음 놓아 맞힌 카드 10, 틀려서(사람이 드러남) 다시 놓은 카드·힌트로 놓은 카드 0. 목표 = 10 × 카드 수(한 번이라도 틀리면 못 넘음). 판마다 시드로 새 카드 */
+var CH = { pts:10, maxLv:8, n:3,
+  rounds:[0, 4,5,5,6, 6,6,7,7],                         /* 레벨별 판 수(완벽한 봇 완주 누적 5~10분이 되게: 판 수 = 짐작 수) */
+  types:[0, 'fc','fcu','fcud','fcud', 'fcud','fcud','fcud','fcud'],
+  size:[0, 4,4,4,4, 6,6,6,6], close:[0, 0,0,0,1, 0,1,1,1], mix3:[0, 0,0,0,0, 0,0,1,1],
+  trapCity:2, trapDesert:3 };
+var CH_PARTIALS = ['논밭만 봄(도시를 빠뜨림)', '사막도 살기 좋다고 봄'];
+function chLv(lv){ lv=Math.max(1,Math.min(CH.maxLv,lv||1)); return {lv:lv, n:CH.n, R:CH.rounds[lv], types:CH.types[lv], size:CH.size[lv], close:!!CH.close[lv], mix3:!!CH.mix3[lv], city:lv>=CH.trapCity, desert:lv>=CH.trapDesert}; }
+function chStages(lv){ return [{key:'g', name:'땅 보고 짐작', rule:'guess', P:chLv(lv)}]; }
+function cfgFor(G){ return G && G.ch ? chStages(G.ch) : null; }
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+function chTotal(lv){ var P=chLv(lv); return P.R*P.n; }
+function chGoal(lv){ return CH.pts*chTotal(lv); }
+function stOf(G,si){ var i=si==null?G.si:si; return G && G.ch ? cfgFor(G)[i] : STAGES[i]; }
+function nStages(G){ return G && G.ch ? 1 : STAGES.length; }
+function roundsOf(G){ return G.ch ? G.chR : STAGES[G.si].rounds; }
+function rpick(G,a){ return a[Math.floor(rnd(G)*a.length)]; }
+/* 칸 그림으로 정해지는 사람 수(spread의 hide 규칙과 같음). good = 살기 좋다고 보는 칸 종류(반쪽 봇은 다르게 봄) */
+function clueSum(cells,good){ var g=0, b=0; cells.split('').forEach(function(t){ if(good.test(t)) g++; else b++; }); return FARM*g+Math.ceil(b/2); }
+var PART_GOOD = [/f/, /[fud]/];                                   /* 반쪽 봇 0: 논밭만 살기 좋다고 봄, 1: 사막도 살기 좋다고 봄 */
+/* 순서가 뒤집히는 쌍이 있나(진짜로 더 빽빽한데 good으로 보면 더 듬성) */
+function inverts(cards,good){ for(var a=0;a<cards.length;a++) for(var b=0;b<cards.length;b++){ if(clueSum(cards[a],GOOD)>clueSum(cards[b],GOOD) && clueSum(cards[a],good)<clueSum(cards[b],good)) return true; } return false; }
+function chCard(G,P,g){ var m=P.size, gt=P.types.replace(/[cd]/g,''), bt=P.types.replace(/[fu]/g,''), c=[], i;
+  for(i=0;i<m;i++) c.push(i<g ? rpick(G,gt.split('')) : rpick(G,bt.split('')));
+  for(i=m-1;i>0;i--){ var j=Math.floor(rnd(G)*(i+1)), t=c[i]; c[i]=c[j]; c[j]=t; } return c.join(''); }
+function chRound(G,P){
+  var m=P.size, cols=m===6?3:2;
+  for(var tr=0; tr<400; tr++){
+    var gs=[], i;
+    if(P.close){ var lo=Math.floor(rnd(G)*(m-P.n+2)); for(i=0;i<P.n;i++) gs.push(lo+i); }
+    else { var pool=[]; for(i=0;i<=m;i++) pool.push(i); while(gs.length<P.n){ var v=rpick(G,pool); if(gs.indexOf(v)<0) gs.push(v); } }
+    if(gs.some(function(v){ return v>m; })) continue;
+    var cards=gs.map(function(g){ return chCard(G,P,g); });
+    if(P.mix3 && cards.some(function(c){ return new Set(c.split('')).size<3; })) continue;
+    if(P.city && !inverts(cards,PART_GOOD[0])) continue;      /* 함정: 논밭만 세면 틀림 */
+    if(P.desert && !inverts(cards,PART_GOOD[1])) continue;    /* 함정: 사막을 살기 좋다고 보면 틀림 */
+    return cards.map(function(c){ return {cells:c, cols:cols, hide:1}; });
+  }
+  return [{cells:'uufc',cols:2,hide:1},{cells:'fddd',cols:2,hide:1},{cells:'cccc',cols:2,hide:1}];   /* 거의 안 옴: 두 함정을 다 가진 판 */
+}
+function chMake(G,si){ var S=stOf(G,si), r=[]; for(var i=0;i<S.P.R;i++) r.push(chRound(G,S.P)); return r; }
 var LANDS = { BGD:{name:'방글라데시', val:'1,317'}, KOR:{name:'대한민국', val:'515'}, CAN:{name:'캐나다', val:'4'} };   /* 133쪽 교과서 값 */
 var BADGES = [
   {k:'density', name:'인구 밀도', art:'bdDensity', def:'인구 밀도: 1 km² 넓이에 사람이 몇 명 사는지 나타낸 수로, 사람이 얼마나 모여 사는지 알려 줘요.(교과서 132쪽 참고)'},
@@ -397,27 +503,28 @@ var NAMES = {
   same:    '사람이 많을수록 빽빽해요',
   density: '같은 넓이에 몇 명: <em>인구 밀도</em>',
   cold:    '<em>냉대 기후</em>: 농사지을 땅이 적어요',
-  hide:    '이제 사람이 숨었어요',
+  good:    '논밭·도시 칸에 사람이 많아요',
+  hide:    '사람이 숨었어요! 땅 보고 짐작',
   fast:    '막대가 줄기 전에!',
   leave:   '시간 끝! 제자리로 가요',
   areaPop: '<em>면적</em>과 <em>인구수</em>로 정해져요'
 };
-var TITLES = [[0,'새내기 탐험가'],[230,'지구촌 탐험가'],[340,'지구촌 기자'],[410,'지구촌 박사'],[455,'세계시민 대표']];   /* full 제안 0/230/340/460/470을 사람 학생 속도에 맞춰 낮춤 */
+var TITLES = [[0,'새내기 탐험가'],[240,'지구촌 탐험가'],[385,'지구촌 기자'],[455,'지구촌 박사'],[505,'세계시민 대표']];   /* 2026-11-07 예측 단계 뒤 full 제안 0/240/390/480/530을 사람 학생 속도에 맞춰 낮춤(힌트 연타 108) */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function firstName(G,ev,k,at){ if(G.ch && k!=='leave') return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
 /* 블라인드 4차(공통 원인 3): 놓은 직후 0.3초에는 놓은 카드 자리의 결과(+점수·반짝)만. 판 보너스·이름 말풍선은 그 뒤 */
 function lateEv(G,d,e){ G.later.push({d:d, e:e}); }
-function lateName(G,k,at,d){ if(!G.first[k]){ G.first[k]=1; lateEv(G,d||T.lag+0.4,{t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(k && G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+function lateName(G,k,at,d){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; lateEv(G,d||T.lag+0.4,{t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(k && G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
 
 /* 칸마다 사람 수: per가 있으면 그대로, 3단계형은 논·밭 4명 + 추운 칸 두 칸에 1명, 나머지는 n명을 고르지 않게 흩는다 */
 function spread(G,d){
   var k=d.cells.length, per, i, c=0;
   if(d.per) return d.per.slice();
   if(d.even){ per=[]; for(i=0;i<k;i++) per.push(Math.floor(d.n/k)+(i<d.n%k?1:0)); return per; }
-  if(d.hide||d.farm){ return d.cells.split('').map(function(t){ if(t==='f') return FARM; c++; return c%2; }); }
+  if(d.hide||d.farm){ return d.cells.split('').map(function(t){ if(GOOD.test(t)) return FARM; c++; return c%2; }); }
   per=[]; for(i=0;i<k;i++) per.push(Math.floor(d.n/k));
   for(i=0;i<d.n%k;i++) per[Math.floor(rnd(G)*k)]++;
   for(i=0;i<k*2 && k>1;i++){ var a=Math.floor(rnd(G)*k), b=Math.floor(rnd(G)*k); if(a!==b && per[a]>0 && per[b]<T.maxCell-1){ per[a]--; per[b]++; } }
@@ -425,20 +532,21 @@ function spread(G,d){
 }
 function sum(a){ var s=0; a.forEach(function(v){ s+=v; }); return s; }
 function setupRound(G){
-  var R=STAGES[G.si].rounds[G.ri], cards=[], order=[], i;
-  R.forEach(function(d,j){ var per=spread(G,d); cards.push({id:G.nid++, cells:d.cells, cols:d.cols, per:per, dens:sum(per)/d.cells.length, hide:d.hide?1:0, land:d.land||null, at:-1, miss:0, bad:0, tp:0}); });
+  var R=roundsOf(G)[G.ri], cards=[], order=[], i;
+  R.forEach(function(d,j){ var per=spread(G,d); cards.push({id:G.nid++, cells:d.cells, cols:d.cols, per:per, dens:sum(per)/d.cells.length, hide:d.hide?1:0, seen:0, land:d.land||null, at:-1, miss:0, bad:0, tp:0}); });
   var byD=cards.slice().sort(function(a,b){ return b.dens-a.dens; }); byD.forEach(function(c,r){ c.rank=r; });
   for(i=0;i<cards.length;i++) order.push(i);
   for(i=order.length-1;i>0;i--){ var j=Math.floor(rnd(G)*(i+1)), t=order[i]; order[i]=order[j]; order[j]=t; }
   if(order.every(function(v,q){ return cards[v].rank===q; })) order.push(order.shift());   /* 줄 순서 그대로 놓이지 않게 */
   order.forEach(function(ci,p){ cards[ci].tp=p; });
-  G.cards=cards; G.bounced=0; G.gapT=-1; G.pop=-1; G.later=G.later||[];
-  var bar=STAGES[G.si].bar; G.bar = bar ? {dur:bar[G.ri], left:bar[G.ri]} : null;
+  G.cards=cards; G.bounced=0; G.gapT=-1; G.pop=-1; G.peek=null; G.later=G.later||[];
+  var bar=stOf(G).bar; G.bar = bar ? (G.ch ? {dur:bar, left:bar} : {dur:bar[G.ri], left:bar[G.ri]}) : null;
 }
 function setupStage(G,si){
-  var S=STAGES[si], total=0;
+  var S=stOf(G,si), total=0;
   G.si=si; G.ri=0; G.t=0; G.combo=0; G.lastDel=-99; G.endT=-1; G.later=[];
-  S.rounds.forEach(function(r){ total+=r.length; });
+  if(G.ch) G.chR=chMake(G,si);   /* 도전: 판마다 시드로 새 마을 */
+  (G.ch ? G.chR : S.rounds).forEach(function(r){ total+=G.ch?1:r.length; });
   G.res={total:total, served:0, missed:0};
   G.pre = S.intro || 0;   /* 시간 막대 보여 주기(남은 초). 이 동안은 놓을 수 없고 점수·놓침도 없다 */
   setupRound(G);
@@ -450,17 +558,19 @@ function newGame(seed){
   var c=G.cards.find(function(x){ return x.rank===0; }); c.at=0;           /* 타이틀 정지 장면: 한 장이 먼저 놓인 모습 */
   return G;
 }
-function start(G0){ var G=cl(G0); G.score=0; G.phase='play'; G.badges=[]; G.first={}; G.nid=1; G.seed=(SEED)>>>0; G.stats={wrong:0, hint:0, clean:0, left:0}; return setupStage(G,0); }
+function start(G0){ var G=cl(G0); G.score=0; G.phase='play'; G.badges=[]; G.first={}; G.nid=1; if(!G0.ch) G.seed=(SEED)>>>0;   /* 도전은 newGame의 시드 그대로 */
+  G.stats={wrong:0, hint:0, clean:0, left:0}; return setupStage(G,0); }
 function cardOf(G,id){ return G.cards.find(function(c){ return c.id===+id; }) || null; }
 function slotFree(G,j){ return j>=0 && j<G.cards.length && !G.cards.some(function(c){ return c.at===j; }); }
 function roundOpen(G){ return G.phase==='play' && G.gapT<0 && G.endT<0 && !(G.pre>0); }
 
 function finishRound(G,ev){
-  var S=STAGES[G.si];
+  if(G.ch){ if(G.bounced){ G.res.missed++; ev.push({t:'roundBad', bad:1}); } else G.res.served++; }   /* 도전 남은 일 = 판(블라인드 11-07: 점 18개가 너무 길어 보임). 틀린 짐작이 있던 판은 회색 점 + 판정 이벤트(공리 5, 틀린 카드는 놓은 자리에서 이미 빨간 테두리) */
   lateEv(G,T.lag,{t:'round', n:G.cards.length});
   if(G.si===0 && G.ri===0) lateName(G,'same','slot:0');
   if(G.si===1 && G.ri===0) lateName(G,'density','slot:0');
-  if(G.si===3 && G.ri===S.rounds.length-1) lateName(G,'areaPop','slot:1');
+  if(G.si===2 && !G.ch && G.ri===0) lateName(G,'good','slot:0');
+  if(G.si===3 && !G.ch && G.ri===STAGES[3].rounds.length-1) lateName(G,'areaPop','slot:1');
   G.gapT=T.roundGap;
 }
 function tick(G0,dt){
@@ -475,7 +585,7 @@ function tick(G0,dt){
   if(G.gapT>=0){
     G.gapT-=dt;
     if(G.gapT<=0){
-      if(G.ri<STAGES[G.si].rounds.length-1){ G.ri++; setupRound(G); ev.push({t:'newRound'}); if(G.si===2 && G.ri===1) firstName(G,ev,'hide','line'); }
+      if(G.ri<roundsOf(G).length-1){ G.ri++; setupRound(G); ev.push({t:'newRound'}); if(G.si===2 && G.ri===1) firstName(G,ev,'hide','line'); }
       else { G.gapT=-1; G.endT=G.t; }
     }
     return {G:G, ev:ev};
@@ -495,7 +605,9 @@ function tick(G0,dt){
 /* src: 'card:<id>'  dst: 'slot:<번호>' */
 function drop(G0,src,dst,via){
   var fail=function(why){
-    if(why==='wLine'||why==='wSize'||why==='wFarm'){ var g=cl(G0), e=[{t:'bounce', why:why, src:src, dst:dst}]; g.combo=0; g.stats.wrong++; g.bounced++; var bc=cardOf(g,String(src).split(':')[1]); if(bc) bc.bad=1; return {G:g, ok:false, why:why, ev:e}; }
+    if(why==='wLine'||why==='wSize'||why==='wGood'){ var g=cl(G0), e=[{t:'bounce', why:why, src:src, dst:dst}]; g.combo=0; g.stats.wrong++; g.bounced++; var bc=cardOf(g,String(src).split(':')[1]);
+      if(bc){ bc.bad=1; if(bc.hide && !bc.seen){ bc.seen=1; g.peek={id:bc.id, slot:+String(dst).split(':')[1], t:g.t}; e.push({t:'peek', slot:g.peek.slot}); } }   /* 짐작이 틀림: 놓은 자리에서 사람이 드러난 뒤 튕김(장면이 0.9초 그 자리에 그림) */
+      return {G:g, ok:false, why:why, ev:e}; }
     return {G:G0, ok:false, why:why, ev:[{t:'bounce', why:why, src:src, dst:dst}]};
   };
   if(!G0 || !roundOpen(G0)) return fail('phase');
@@ -504,27 +616,28 @@ function drop(G0,src,dst,via){
   var c0=cardOf(G0,sp[1]); if(!c0 || c0.at>=0) return fail('src');
   if(dp[0]!=='slot') return fail('dst');
   var j=+dp[1]; if(!slotFree(G0,j)) return fail('full');
-  if(c0.rank!==j) return fail(/[fc]/.test(c0.cells) ? 'wFarm' : (G0.si===0 ? 'wLine' : 'wSize'));   /* 틀린 이유 코드 → GAME.explain.reasons */
+  if(c0.rank!==j) return fail(/[fcud]/.test(c0.cells) ? 'wGood' : (G0.si===0 && !G0.ch ? 'wLine' : 'wSize'));   /* 틀린 이유 코드 → GAME.explain.reasons */
   var G=cl(G0), ev=[], c=cardOf(G,sp[1]), pts, fast=false;
-  c.at=j; G.pop=c.id;
-  if(via){ pts=T.hintPts; G.stats.hint++; G.bounced++; }
+  c.at=j; G.pop=c.id; c.okT=G.t;   /* 장면: 맞게 놓은 자리에 초록 체크(블라인드 11-07) */
+  if(G.ch){ pts=(via||c.bad)?0:CH.pts; if(via){ G.stats.hint++; G.bounced++; } }   /* 추론형 도전: 처음에 맞힌 짐작만 10(시간·콤보 없음) */
+  else if(via){ pts=T.hintPts; G.stats.hint++; G.bounced++; }
   else {
     G.combo=(G.t-G.lastDel<=T.comboWin)?G.combo+1:1; G.lastDel=G.t;
     pts=(c.bad?T.retryPts:T.base)+Math.min(G.combo-1,T.comboCap)*T.comboStep;   /* 처음에 맞히면 10, 한 번 튕긴 카드는 4 */
-    if(G.bar){ var f=Math.round(T.fastPts*G.bar.left/G.bar.dur); pts+=f; fast=f>=T.fastPts/2; }
+    if(G.bar){ var fp=T.fastPts, f=Math.round(fp*G.bar.left/G.bar.dur); pts+=f; fast=f>=fp/2; }
   }
-  G.score+=pts; G.res.served++;
+  G.score+=pts; if(!G.ch) G.res.served++;   /* 도전: 남은 일은 판 단위(finishRound) */
   ev.push({t:'place', slot:j, pts:pts, fast:fast, combo:via?0:G.combo, hide:c.hide});
   if(G.si===2 && c.cells.indexOf('c')>=0 && c.rank===G.cards.length-1) lateName(G,'cold','slot:'+j);
   if(G.cards.every(function(x){ return x.at>=0; })){
-    if(!G.bounced){ G.score+=T.cleanPts; G.stats.clean++; lateEv(G,T.lag,{t:'clean', pts:T.cleanPts}); }
+    if(!G.bounced && !G.ch){ G.score+=T.cleanPts; G.stats.clean++; lateEv(G,T.lag,{t:'clean', pts:T.cleanPts}); }
     finishRound(G,ev);
   }
   return {G:G, ok:true, ev:ev};
 }
 function next(G0){
   var G=cl(G0); if(G.phase!=='stageEnd') return G;
-  if(G.si>=STAGES.length-1){ G.phase='end'; return G; }
+  if(G.si>=nStages(G)-1){ G.phase='end'; return G; }
   G.phase='play'; return setupStage(G,G.si+1);
 }
 /* 지금 할 만한 한 수: 아래 줄 왼쪽 카드부터 → 그 카드의 자리 */
@@ -533,12 +646,22 @@ function hintMove(G){
   var cs=G.cards.filter(function(c){ return c.at<0; }).sort(function(a,b){ return a.rank-b.rank; });   /* 블라인드 4차: 힌트가 가운데 칸부터 보여 줘 '왜 가운데?' → 가장 빽빽한 카드부터 왼쪽 칸으로 */
   return cs.length ? {src:'card:'+cs[0].id, dst:'slot:'+cs[0].rank} : null;
 }
+/* §19 추론형 측정: k번째 '반쪽만 아는 봇'. 숨은 카드는 PART_GOOD[k]로 본 칸 그림으로 짐작하고(드러난 카드는 진짜), 가장 빽빽해 보이는 카드를 맨 왼쪽 빈자리에 */
+function partialMove(G,k){
+  if(!G || !roundOpen(G)) return null;
+  var good=PART_GOOD[k]||GOOD, fs=G.cards.filter(function(c){ return c.at<0; }), j;
+  if(!fs.length) return null;
+  for(j=0;j<G.cards.length && !slotFree(G,j);j++);
+  var est=function(c){ return (c.hide && !c.seen) ? clueSum(c.cells,good)/c.cells.length : c.dens; };
+  fs.sort(function(a,b){ return est(b)-est(a) || a.tp-b.tp; });
+  return {src:'card:'+fs[0].id, dst:'slot:'+j};
+}
 function sources(G){ if(!G || !roundOpen(G)) return []; return G.cards.filter(function(c){ return c.at<0; }).map(function(c){ return 'card:'+c.id; }); }
 function targets(G){ if(!G || !roundOpen(G)) return []; var r=[]; for(var j=0;j<G.cards.length;j++) if(slotFree(G,j)) r.push('slot:'+j); return r; }
 function itemOf(G,id){ var p=String(id).split(':'); return p[0]==='card' ? 'cardGhost' : null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,LANDS:LANDS,
+if(typeof module!=='undefined') module.exports={SEED:SEED,CH:CH,CH_PARTIALS:CH_PARTIALS,chRound:chRound,clueSum:clueSum,partialMove:partialMove,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,cfgFor:cfgFor,stOf:stOf,nStages:nStages,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,LANDS:LANDS,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf};
 /* LOGIC-END */
 
@@ -569,27 +692,42 @@ var GAME = {
            '133쪽 캐나다: 냉대 기후, 농사지을 땅 적음 → 인구 밀도 매우 낮음',
            '133쪽 꼭 기억해요 1: 면적과 인구수에 따라 나라마다 인구 밀도가 다름',
            '133쪽 우리나라 약 515 명/km2(남한 통계, 국가 데이터처, 2024.)',
-           '125~126쪽 세계 인구는 고르게 분포하지 않는다 → 사람 점은 칸마다 고르지 않게 흩어 그림'],
+           '125~126쪽 세계 인구는 고르게 분포하지 않는다 → 사람 점은 칸마다 고르지 않게 흩어 그림',
+           '125·127쪽 기후가 온화한 평야·해안, 산업이 발달해 일자리가 많은 곳에 사람이 모여 삶(자연환경·인문환경) → 3단계 살기 좋은 칸(논밭·도시)',
+           '130쪽 리비아: 국토 대부분이 건조한 사막 → 면적에 비해 인구가 매우 적음 → 사막 칸',
+           '132쪽 활동: 지형과 기후를 살펴보며 인구 밀도를 예상 → 3단계 예측(사람이 숨은 땅을 칸 그림만 보고 짐작)'],
   say: {
     title: '같은 넓이에 몇 명이 살까?',
     startBtn: '시작',
     start: ['빽빽한 땅을 왼쪽에!',
             '이번엔 땅 넓이가 달라!',
-            '논밭 칸을 세어 봐!',
+            '이번엔 땅 모습을 잘 봐!',
             '막대가 줄기 전에!'],
     end: [['같은 넓이면 사람이 많을수록 빽빽해.'],   /* 블라인드 4차: '다음'이 글만 바꾸는 화면을 없앰 → 단계 끝 대사 한 화면 */
           ['사람이 더 많아도 땅이 넓으면 듬성해(교과서 132쪽 참고).'],
-          ['논밭이 넓은 방글라데시는 빽빽, 냉대 기후 캐나다는 듬성(교과서 133쪽 참고).'],
+          ['살기 좋은 땅이 많으면 빽빽해. 방글라데시처럼!(교과서 127·133쪽 참고)'],
           ['넓이와 사람 수가 달라 인구 밀도도 달라(교과서 133쪽 참고).']],
     idle: '다음 카드가 와요'
+  },
+  /* §19 추론형 도전(2026-11-07 교사 승인, README §19-공리 '추론형'): 예전 초안(밀도 순위 러시 + 숨은 사람)은 완벽한 봇이 늘 만점이라 공리 3·6을 못 맞춰 뺐다.
+     교사 판단 "예측을 할 수 있다는 것 자체가 도전이다" → 통과 = 그 레벨 짐작을 모두 맞히기(시간 막대·빠르기 점수 없음), 막힘은 '반쪽만 아는 학생'(partialMove)으로 잰다.
+     레벨 설계·함정은 logic.js CH 주석 */
+  challenge: {
+    kind: 'reason',
+    maxLevel: CH.maxLv,
+    stages: CH_STAGES,
+    goal: chGoal,
+    partials: CH_PARTIALS,
+    say: {start: ['땅만 보고 짐작해 봐!']},
+    ruleCards: [[['rLine','빽빽 왼쪽'],['rGood','살기 좋은 칸']]]
   },
   ruleCards: [
     [['rLine','빽빽 왼쪽']],
     [['rLine','빽빽 왼쪽'],['rSize','한 칸에 몇 명',1]],
-    [['rLine','빽빽 왼쪽'],['rSize','한 칸에 몇 명'],['rFarm','논밭 많은 땅',1]],
-    [['rLine','빽빽 왼쪽'],['rFarm','논밭 많은 땅'],['rFast','시간 막대',1]]
+    [['rLine','빽빽 왼쪽'],['rSize','한 칸에 몇 명'],['rGood','살기 좋은 칸',1]],
+    [['rLine','빽빽 왼쪽'],['rGood','살기 좋은 칸'],['rFast','시간 막대',1]]
   ],
-  rulesModal: { cards: [['rLine','빽빽한 땅을 왼쪽에'],['rSize','칸 하나에 몇 명?'],['rFarm','논밭 칸이 많은 땅이 왼쪽']], note: '땅 카드를 끌어서 줄에 놓아요.' },
+  rulesModal: { cards: [['rLine','빽빽한 땅을 왼쪽에'],['rSize','칸 하나에 몇 명?'],['rGood','논밭·도시 칸이 많으면 빽빽']], note: '땅 카드를 끌어서 줄에 놓아요. 사람이 숨으면 땅을 보고 짐작해요.' },
   result: {
     label: '인구 밀도(약, 명/km²)', note: '133쪽, 2024',
     rows: function(G){ return ['BGD','KOR','CAN'].map(function(k){ return [LANDS[k].name, densVal(+LANDS[k].val.replace(',',''), LANDS[k].val)]; }); },
@@ -602,13 +740,15 @@ var GAME = {
     reasons: {
       wLine: {line:'다시! 빽빽한 땅이 왼쪽', why:'칸 크기는 모두 같아요. 사람이 많은 땅이 더 빽빽해요'},
       wSize: {line:'다시! 칸 하나에 몇 명?', why:'사람 수만 보지 말고 칸 하나에 몇 명인지 견줘요', def:'넓이에 비해 사람이 많은 나라일수록 인구 밀도가 높아요.', page:'교과서 132쪽 참고'},
-      wFarm: {line:'다시! 논밭 칸을 세어 봐', why:'사람은 논밭 칸에 많이 살아요. 논밭 칸이 많은 땅이 빽빽해요', def:BADGES[1].def}
+      wGood: {line:'다시! 살기 좋은 칸을 세어 봐', why:'사람은 논밭(평야)·도시(일자리) 칸에 많이 살고, 사막·추운 칸엔 거의 없어요', def:'기후가 온화한 평야, 산업이 발달해 일자리가 많은 곳에 사람이 모여 살아요.', page:'교과서 125·127쪽 참고'}
     },
     of: function(G){
       if(G.phase!=='play') return null;
+      if(G.ch) return {why:'논밭·도시 칸엔 사람이 많고, 추운 땅·사막 칸엔 거의 없어요. 네 가지를 다 따져요', def:'기후가 온화한 평야, 산업이 발달해 일자리가 많은 곳에 사람이 모여 살아요.', page:'교과서 125·127·130쪽 참고'};
       if(G.si===0) return {why:'칸 크기는 모두 같아요. 사람이 많으면 빽빽해요'};
       if(G.si===1) return {why:'칸 하나만 보고 사람 수를 견줘요', def:BADGES[0].def};
-      if(G.si===2) return {why: G.ri===0 ? '사람이 논밭 칸에 많이 살아요' : '논밭 칸이 많은 땅을 왼쪽에. 놓으면 사람이 보여요', def:BADGES[1].def};
+      if(G.si===2) return G.ri===0 ? {why:'사람은 논밭·도시 칸에 많이 살고, 사막·추운 칸엔 거의 없어요', def:'기후가 온화한 평야, 산업이 발달해 일자리가 많은 곳에 사람이 모여 살아요.', page:'교과서 125·127쪽 참고'}
+        : {why:'사람이 숨었어요. 논밭·도시 칸이 많은 땅을 왼쪽에 짐작해 놓으면 사람이 보여요', def:'지형과 기후를 보면 인구 밀도를 짐작할 수 있어요.', page:'교과서 132쪽 참고'};
       if(G.ri===2) return {why:'같은 크기 창(2×2칸)에 보이는 사람 수로 견줘요', page:'133쪽'};
       return {why:'막대가 다 줄면 남은 카드는 점수 없이 제자리로 가요'};
     }
@@ -622,17 +762,17 @@ var GAME = {
     var c0 = G.cards.find(function(c){ return c.rank===0 && c.at<0; });
     if(!c0) return {wait:true};
     /* 블라인드 2~4차 반복: 4단계 시간 막대에 해 보기가 없어 '막대가 무엇인지' 모름 → 막대가 가득일 때 첫 카드를 직접 놓아 본다(같은 끌기라 force) */
-    return {src:'card:'+c0.id, dst:'slot:0', label:['빽빽 왼쪽','한 칸에 몇 명','논밭 많은 땅','막대 전에 놓기'][G.si], force:G.si>0};
+    return {src:'card:'+c0.id, dst:'slot:0', label:['빽빽 왼쪽','한 칸에 몇 명','살기 좋은 칸','막대 전에 놓기'][G.si], force:G.si>0};
   },
   demo: function(G){
     if(G.si===3 && G.ri===0 && G.res.served<1){ if(G.gapT>=0 || G.endT>=0) return {point:null}; return {point:'bar', text:NAMES.fast, at:'bar'}; }   /* 'barTop'(빈 곳) 빛 테두리가 하얀 알약으로 보였다(블라인드 3차) → 막대 자체 */
     return {move:null};
   },
   onEvent: function(e,FX){
-    if(e.t==='place'){ var at='slot:'+e.slot; FX.score(at, e.pts, e.fast, e.combo); FX.burst(at, e.hide?12:6); FX.progress(); }
+    if(e.t==='place'){ var at='slot:'+e.slot; if(e.pts>0) FX.score(at, e.pts, e.fast, e.combo); FX.burst(at, e.hide?12:6); FX.progress(); }
     else if(e.t==='clean'){ FX.score('line', e.pts, true, 0); }
     else if(e.t==='round'){ FX.burst('line', 10); }
-    else if(e.t==='miss'){ FX.progress(); FX.comboOff(); }
+    else if(e.t==='miss' || e.t==='roundBad'){ FX.progress(); FX.comboOff(); }
     else if(e.t==='bounce' && /^w/.test(e.why)){ FX.comboOff(); }
   }
 };
@@ -960,10 +1100,16 @@ var SCENE = (function(){
     if(G.si===3) h += '<path d="M'+(PKOR[0]+9)+' '+(PKOR[1]+6)+'L'+(LAB.KOR.x-45)+' '+(LAB.KOR.y-2)+'" class="a3-lead"/>';
     return h;
   }
+  /* 도전: 카드 사이를 좁혀 카드를 넓게(176 → 190) — 3×2 땅의 칸 그림을 키운다(블라인드 11-07 '6칸 카드의 칸 그림이 작음') */
+  function dimOf(G){ var c=!!(G&&G.ch); CW=c?190:176; GAP=c?9:22; }
   function xs(n){ var w=n*CW+(n-1)*GAP, x0=(600-w)/2, r=[]; for(var i=0;i<n;i++) r.push(x0+i*(CW+GAP)); return r; }
-  function slotBox(G,j){ var n=G.cards.length; if(!(j>=0&&j<n)) return null; return {x:xs(n)[j], y:SY, w:CW, h:CH}; }
-  function trayBox(G,c){ return {x:xs(G.cards.length)[c.tp], y:TY, w:CW, h:CH}; }
-  function cardBox(G,c){ return c.at>=0 ? slotBox(G,c.at) : trayBox(G,c); }
+  function slotBox(G,j){ dimOf(G); var n=G.cards.length; if(!(j>=0&&j<n)) return null; return {x:xs(n)[j], y:SY, w:CW, h:CH}; }
+  function trayBox(G,c){ dimOf(G); return {x:xs(G.cards.length)[c.tp], y:TY, w:CW, h:CH}; }
+  /* 짐작이 틀린 숨은 카드: 0.9초 동안 놓은 자리에 사람이 드러난 채 머문 뒤 아래 줄로(logic G.peek) */
+  var PEEK = 0.9, OKMARK = 1.6;
+  function okMark(G,c){ return (c.hide || (G.si===2 && !G.ch)) && c.at>=0 && !c.bad && c.okT!=null && G.phase==='play' && G.t-c.okT<OKMARK; }
+  function peekOf(G,c){ var P=G.peek; return (P && P.id===c.id && c.at<0 && G.phase==='play' && G.t-P.t<PEEK && slotBox(G,P.slot)) ? P : null; }
+  function cardBox(G,c){ if(c.at>=0) return slotBox(G,c.at); var P=peekOf(G,c); return P ? slotBox(G,P.slot) : trayBox(G,c); }
   var revT = 0;   /* 단계 끝 리본(1.7초)이 사라진 뒤에 지도를 펼친다 */
   function revealRaw(G){ return (G.si===2 || G.si===3) && G.phase!=='play' && G.phase!=='title'; }
   function reveal(G){ if(!revealRaw(G)){ revT=0; return false; } var now=(typeof performance!=='undefined'?performance.now():0); if(!revT) revT=now; return RM || now-revT>1800; }
@@ -981,7 +1127,7 @@ var SCENE = (function(){
       return v;
     },
     rect: function(G,id){
-      var p = String(id).split(':'), c;
+      var p = String(id).split(':'), c; dimOf(G);
       if(p[0]==='slot') return slotBox(G,+p[1]);
       if(p[0]==='card'){ c=G.cards.find(function(x){ return x.id===+p[1]; }); return c ? cardBox(G,c) : null; }
       if(p[0]==='bar') return G.bar ? {x:BAR[0], y:BAR[1]-8, w:BAR[2], h:BAR[3]+16} : null;
@@ -993,7 +1139,7 @@ var SCENE = (function(){
     avoid: function(G){ var r=[]; G.cards.forEach(function(c,j){ r.push('slot:'+j); if(c.at<0) r.push('card:'+c.id); }); return r; },
     idleAt: function(G){ return 'line'; },
     under: function(G){ return staticSvg(G) + leaders(G); },
-    underSig: function(G){ return G.si+'|'+G.ri+'|'+G.cards.length+'|'+reveal(G); },
+    underSig: function(G){ return (G.ch?'c':'')+G.si+'|'+G.ri+'|'+G.cards.length+'|'+reveal(G); },
     over: function(G, layer){ overDraw(G, layer); },
     css: '.a3-lead{stroke:var(--a-navy);stroke-width:2;fill:none;stroke-linecap:round}.a3-dot{fill:var(--a-org);stroke:var(--a-navy);stroke-width:1.3}'
       + '.a3-lab{font-family:var(--game);fill:var(--a-navy)}.a3-end{font-family:var(--game);fill:var(--a-paper)}'
@@ -1002,6 +1148,9 @@ var SCENE = (function(){
       + '.a3-win{fill:none;stroke:var(--a-navy);stroke-width:2;stroke-dasharray:5 4}'
       + '.a3-rice{stroke:var(--a-grn-d);stroke-width:2;stroke-linecap:round;fill:none}.a3-trunk{fill:var(--a-wood)}'
       + '.a3-tree{fill:var(--a-grn-d)}.a3-cold{fill:#DCE8EC}.a3-miss{opacity:.5}'
+      + '.a3-city{fill:#CBD1D8}.a3-bld{fill:#5B6B7D}.a3-win2{fill:#FBF8F1}.a3-dry{fill:#F3D28E}.a3-dune{stroke:#C98E3E;stroke-width:2;fill:none;stroke-linecap:round}.a3-cac{fill:#3C9064}'
+      + '.a3-peek{fill:none;stroke:var(--bad,#D9534F);stroke-width:5}'
+      + '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .a3-city{fill:#AEB6BF}:root:not([data-theme="light"]) .a3-dry{fill:#DDBB78}}:root[data-theme="dark"] .a3-city{fill:#AEB6BF}:root[data-theme="dark"] .a3-dry{fill:#DDBB78}'
       + '.a3-pop .a3-dot{animation:a3pop .45s cubic-bezier(.3,1.6,.5,1) both}@keyframes a3pop{from{transform:scale(0)}to{transform:scale(1)}}'
       + '.a3-pop .a3-dot{transform-box:fill-box;transform-origin:center}'
       + '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .a3-cold{fill:#B9C9CF}}:root[data-theme="dark"] .a3-cold{fill:#B9C9CF}'
@@ -1032,6 +1181,22 @@ var SCENE = (function(){
         h += '<rect x="'+(cx-1.3).toFixed(1)+'" y="'+(by-3.5).toFixed(1)+'" width="2.6" height="4" class="a3-trunk"/>'
           + '<path d="M'+(cx-w/2).toFixed(1)+' '+(by-3).toFixed(1)+'L'+cx.toFixed(1)+' '+(by-3-w*0.75).toFixed(1)+'L'+(cx+w/2).toFixed(1)+' '+(by-3).toFixed(1)+'Z'
           + 'M'+(cx-w*0.38).toFixed(1)+' '+(by-3-w*0.5).toFixed(1)+'L'+cx.toFixed(1)+' '+(by-3-w*1.15).toFixed(1)+'L'+(cx+w*0.38).toFixed(1)+' '+(by-3-w*0.5).toFixed(1)+'Z" class="a3-tree"/>'; });
+    } else if(t==='u'){                                            /* 도시·공장(산업·일자리): 회색 땅 + 톱니 지붕 공장·굴뚝 + 높은 건물(창) */
+      var fx=x+s*0.06, fy=y+s*0.56, fw=s*0.56, fh=s*0.36, tw=fw/3;
+      h += '<rect x="'+x+'" y="'+y+'" width="'+s+'" height="'+s+'" rx="5" class="a3-city"/>'
+        + '<rect x="'+(x+s*0.42).toFixed(1)+'" y="'+(y+s*0.18).toFixed(1)+'" width="'+(s*0.1).toFixed(1)+'" height="'+(s*0.4).toFixed(1)+'" class="a3-bld"/>'
+        + '<path d="M'+fx.toFixed(1)+' '+(fy+fh).toFixed(1)+'V'+fy.toFixed(1);
+      for(k=0;k<3;k++) h += 'L'+(fx+tw*(k+1)).toFixed(1)+' '+(fy-s*0.14).toFixed(1)+'V'+fy.toFixed(1);
+      h += 'V'+(fy+fh).toFixed(1)+'Z" class="a3-bld"/>'
+        + '<rect x="'+(x+s*0.66).toFixed(1)+'" y="'+(y+s*0.12).toFixed(1)+'" width="'+(s*0.28).toFixed(1)+'" height="'+(s*0.8).toFixed(1)+'" rx="1.5" class="a3-bld"/>';
+      for(k=0;k<3;k++) h += '<rect x="'+(x+s*0.72).toFixed(1)+'" y="'+(y+s*(0.2+0.22*k)).toFixed(1)+'" width="'+(s*0.16).toFixed(1)+'" height="'+(s*0.1).toFixed(1)+'" class="a3-win2"/>';
+    } else if(t==='d'){                                            /* 건조한 사막: 모래 언덕 + 선인장 */
+      var cx=x+s*0.64, cb=y+s*0.8;
+      h += '<rect x="'+x+'" y="'+y+'" width="'+s+'" height="'+s+'" rx="5" class="a3-dry"/>'
+        + '<path d="M'+(x+2)+' '+(y+s*0.84).toFixed(1)+'q'+(s*0.22).toFixed(1)+' '+(-s*0.2).toFixed(1)+' '+(s*0.44).toFixed(1)+' 0M'+(x+s*0.08).toFixed(1)+' '+(y+s*0.5).toFixed(1)+'q'+(s*0.16).toFixed(1)+' '+(-s*0.14).toFixed(1)+' '+(s*0.32).toFixed(1)+' 0" class="a3-dune"/>'
+        + '<rect x="'+(cx-2.5).toFixed(1)+'" y="'+(y+s*0.2).toFixed(1)+'" width="5" height="'+(cb-y-s*0.2).toFixed(1)+'" rx="2.5" class="a3-cac"/>'
+        + '<path d="M'+(cx-2).toFixed(1)+' '+(y+s*0.56).toFixed(1)+'h-5v-8" stroke="#3C9064" stroke-width="3.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+        + '<path d="M'+(cx+2).toFixed(1)+' '+(y+s*0.48).toFixed(1)+'h5v-7" stroke="#3C9064" stroke-width="3.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
     } else {
       h += '<rect x="'+x+'" y="'+y+'" width="'+s+'" height="'+s+'" rx="5" class="f-land"/>';
       if(t==='f') for(k=0;k<9;k++){ var tx=x+s*(0.2+0.3*(k%3)), ty=y+s*(0.3+0.3*Math.floor(k/3));   /* 논: 벼 포기 3줄(블라인드: 가로줄무늬는 '공책'으로 읽힘) */
@@ -1041,10 +1206,15 @@ var SCENE = (function(){
   }
   /* 카드 하나: (0,0) 기준 CW×CH. 사람은 hide가 아니거나 놓였을 때만 */
   function cardSvg(G,c,showVal){
+    dimOf(G);
     var rows=Math.ceil(c.cells.length/c.cols), lw=c.cols*CELL, lh=rows*CELL, top=c.land?34:0;
-    var lx=(CW-lw)/2, ly=top+(CH-top-lh)/2, h='', ppl = !c.hide || c.at>=0;
+    var lx=(CW-lw)/2, ly=top+(CH-top-lh)/2, h='', pk=peekOf(G,c), ppl = !c.hide || c.at>=0 || c.seen;
     h += '<rect x="0" y="3" width="'+CW+'" height="'+CH+'" rx="14" class="f-paperd"/><rect x="0" y="0" width="'+CW+'" height="'+CH+'" rx="14" class="f-paper"/>';
     if(c.land) h += '<text x="'+(CW/2)+'" y="27" font-size="20" text-anchor="middle" class="a3-lab">'+LANDS[c.land].name+'</text>';
+    /* 판의 땅이 모두 2×2면 땅을 1.4배로(칸 그림·사람 점이 1000×480에서 잘 보이게, 같은 판 안에서는 모두 같은 크기) */
+    var K2 = G.ch ? Math.min(1.75,(CW-12)/(lw+8),(CH-12)/(lh+8))   /* 도전: 판단이 칸 그림 읽기뿐이라 칸을 더 크게(2×2 1.75배, 3×2 1.6배) — 블라인드 걱정 '칸 그림 4종 구분' */
+      : G.cards.every(function(x){ return x.cells.length===4; }) ? (c.land?1.15:1.4) : 1, gcx=lx+lw/2, gcy=ly+lh/2;
+    h += '<g'+(K2!==1?' transform="translate('+gcx+' '+gcy+') scale('+K2+') translate('+(-gcx)+' '+(-gcy)+')"':'')+'>';
     h += '<rect x="'+(lx-4)+'" y="'+(ly-4)+'" width="'+(lw+8)+'" height="'+(lh+8)+'" rx="8" class="f-sand"/>';
     c.cells.split('').forEach(function(t,i){ h += cellArt(t, lx+(i%c.cols)*CELL+1, ly+Math.floor(i/c.cols)*CELL+1, CELL-2); });
     if(c.land) h += '<rect x="'+(lx-7)+'" y="'+(ly-7)+'" width="'+(lw+14)+'" height="'+(lh+14)+'" rx="9" class="a3-win"/>';
@@ -1057,8 +1227,11 @@ var SCENE = (function(){
         for(q=0;q<n && q<9;q++){ var s=spots[q], jx=(hash(c.id+i*7,q+50)-.5)*3.4, jy=(hash(c.id+i*7,q+90)-.5)*3.4;
           d += '<circle cx="'+(cx0+7+(s%3)*10+jx).toFixed(1)+'" cy="'+(cy0+7+Math.floor(s/3)*10+jy).toFixed(1)+'" r="3.9" class="a3-dot"/>'; }
       });
-      h += '<g'+(c.hide && G.pop===c.id ? ' class="a3-pop"' : '')+'>'+d+'</g>';
+      h += '<g'+(c.hide && (G.pop===c.id || pk) ? ' class="a3-pop"' : '')+'>'+d+'</g>';
     }
+    h += '</g>';
+    if(pk) h += '<rect x="2" y="2" width="'+(CW-4)+'" height="'+(CH-4)+'" rx="13" class="a3-peek" data-verdict="bad"/>';
+    if(okMark(G,c)) h += '<g data-verdict="ok" transform="translate('+(CW-22)+' 22)"><circle r="19" fill="#3C9064" stroke="#FBF8F1" stroke-width="3.5"/><path d="M-8 1l5 6 11-13" fill="none" stroke="#FBF8F1" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></g>';   /* 숨은 땅을 맞게 짐작: 놓은 자리에 초록 체크 1.6초(블라인드 11-07 '맞았는지 안 보임') */
     if(showVal && c.land){
       var tv=LANDS[c.land].val+' 명/km²', pw=tv.length*11+20;
       h += '<rect x="'+((CW-pw)/2)+'" y="'+(CH-30)+'" width="'+pw+'" height="28" rx="14" class="f-navy"/><text x="'+(CW/2)+'" y="'+(CH-10)+'" font-size="18" text-anchor="middle" class="a3-end">'+tv+'</text>';
@@ -1066,7 +1239,7 @@ var SCENE = (function(){
     return h;
   }
   function staticSvg(G){
-    var n=G.cards.length, a=xs(n), h='', L=a[0], R=a[n-1]+CW;
+    dimOf(G); var n=G.cards.length, a=xs(n), h='', L=a[0], R=a[n-1]+CW;
     h += '<path d="M'+(L+96)+' 20H'+(R-96)+'M'+(L+110)+' 12l-14 8 14 8" class="a3-arrow"/>';
     h += useArt('wmDense', L, 2, 34, 34) + '<text x="'+(L+40)+'" y="27" font-size="19" class="a3-end">빽빽</text>';
     h += useArt('wmSparse', R-34, 2, 34, 34) + '<text x="'+(R-40)+'" y="27" font-size="19" text-anchor="end" class="a3-end">듬성</text>';
@@ -1076,7 +1249,7 @@ var SCENE = (function(){
   function drawCards(G){
     var seen={}, endV = G.si===3 && reveal(G);
     G.cards.forEach(function(c){
-      var gr=preGrey(G) && c.at<0, k='c'+c.id, n=nodes[k], sig=c.at+'|'+(G.pop===c.id)+'|'+c.miss+'|'+endV+'|'+gr; seen[k]=1;
+      var gr=preGrey(G) && c.at<0, k='c'+c.id, n=nodes[k], sig=c.at+'|'+c.cells+'|'+c.tp+'|'+G.cards.length+'|'+(G.pop===c.id)+'|'+c.miss+'|'+endV+'|'+gr+'|'+c.seen+'|'+!!peekOf(G,c)+'|'+okMark(G,c)+'|'+(G.ch||0); seen[k]=1;
       if(!n){ n=nodes[k]=el('g',{}); gCards.appendChild(n); n._s=''; }
       if(n._s!==sig){ n._s=sig; n.innerHTML=cardSvg(G,c,endV); var b=cardBox(G,c); n.setAttribute('transform','translate('+b.x+' '+b.y+')'); n.setAttribute('class', (c.miss||gr)?'a3-miss':''); }
     });
@@ -1110,27 +1283,68 @@ if(XPC){ var hb0=$('#bHint'), row0=document.createElement('div'); row0.className
   row0.insertAdjacentHTML('beforeend','<button class="xp-btn off" id="xpBtn" aria-expanded="false">'+(XPC.label||'왜?')+'</button>'); }
 
 function freshU(){ return {mode:'title', paused:false, drag:null, sel:null, hint:0, hintMv:null, bounces:0, lastAct:0, demo:null, demoDone:{}, callQ:[], callBusy:false, shown:0, busy:false, comboT:0,
-     toastQ:[], callNow:null, xpCur:null, xpKey:'', lastSnap:null, okAt:-1e9, okN:0, hf:null, tr:null, trPts:null,
-     labQ:[], txtAt:-1e9, callN:0, trKinds:{}, didKinds:{}, trSkip:{}, keepDemo:{}, lastKinds:null, dropPt:null, downAt:-1e9, autoH:{}, toastW:{}, actAt:-1e9}; }   /* r5: 마지막 학생 행동 시각(actAt): 그 뒤 0.6초는 직접 결과만 */   /* r4: 마지막 누름(downAt), 단계별 자동 힌트 1회(autoH), 미룬 토스트(toastW) */   /* r3: 글 줄(labQ·txtAt), 해 본 동작 종류(trKinds), 놓친 이유 기록(trSkip) */
-/* '마지막 단계 다시'(GAME.replayLast, 기본 켜짐): 마지막 단계가 시작될 때 G를 통째로 복사해 두었다가(점수·배지·기록 그대로) 결과 화면에서 그 단계만 다시 한다 */
-var REPLAY = GAME.replayLast!==false && NSTAGE>1;
-function deepCopy(v){
-  if(v===null||typeof v!=='object') return v;
-  if(Array.isArray(v)) return v.map(deepCopy);
-  if(v instanceof Map){ var m=new Map(); v.forEach(function(x,k){ m.set(k,deepCopy(x)); }); return m; }
-  if(v instanceof Set){ var t=new Set(); v.forEach(function(x){ t.add(deepCopy(x)); }); return t; }
-  var o={}; for(var k in v) if(Object.prototype.hasOwnProperty.call(v,k)) o[k]=deepCopy(v[k]); return o;
+     toastQ:[], callNow:null, xpCur:null, xpKey:'', okAt:-1e9, okN:0, hf:null, tr:null, trPts:null,
+     labQ:[], txtAt:-1e9, callN:0, trKinds:{}, didKinds:{}, trSkip:{}, keepDemo:{}, dropPt:null, downAt:-1e9, autoH:{}, toastW:{}, actAt:-1e9}; }   /* r5: 마지막 학생 행동 시각(actAt): 그 뒤 0.6초는 직접 결과만 */   /* r4: 마지막 누름(downAt), 단계별 자동 힌트 1회(autoH), 미룬 토스트(toastW) */   /* r3: 글 줄(labQ·txtAt), 해 본 동작 종류(trKinds), 놓친 이유 기록(trSkip) */
+/* '마지막 단계 다시'(§10)는 2026-11-07 폐지(§19 도전 모드로 대체). GAME.replayLast가 있어도 읽지 않는다 */
+/* §19 도전 모드 = 레벨 사다리. 엔진은 틀만(잠금 해제·레벨·판마다 새 시드·목표 점수·통과/아깝다/다시·별·기록·결과 화면).
+   도전 '내용'은 게임이 정의한다: GAME.challenge = {stages:[{name}…], goal(lv), say:{start:[…]}, ruleCards?:[…], speed?(lv), cfg?(lv)}.
+   LOGIC은 G.ch(레벨, 1부터)가 있으면 자기 도전 단계 표를 쓴다. GAME.challenge가 없으면 도전 버튼도 없다(잘못된 도전을 내보내지 않음).
+   아래 ENG-CHRULE 구역은 규칙(순수 함수)만: check.js가 잘라 Node에서 같은 규칙으로 봇 세션을 돌린다 */
+/* ENG-CHRULE-START */
+var CHC = GAME.challenge && typeof GAME.challenge==='object' && Array.isArray(GAME.challenge.stages) && GAME.challenge.stages.length ? GAME.challenge : null;
+var ENG_CHNEAR = 0.9;   /* 목표의 90% 이상이면 '아깝다' */
+var ENG_CHR = {
+  spd: function(lv){ return typeof CHC.speed==='function' ? (+CHC.speed(lv)||1) : 1; },   /* 시간 배속: 기본 1(시간만 줄인 도전 금지). 게임이 원하면 */
+  cfg: function(lv){ return typeof CHC.cfg==='function' ? CHC.cfg(lv) : (CHC.cfg||null); },   /* G.cfg로 LOGIC에 넘길 레벨별 값(선택) */
+  goal: function(lv){ return Math.max(1, Math.round(+CHC.goal(lv)||1)); },
+  stars: function(sc,g){ if(CHC.kind==='reason') return sc<g ? 0 : 3;   /* 추론형: 목표 = 모두 맞힘(만점)이라 통과면 별 셋 */
+    return sc<g ? 0 : sc>=g*1.3 ? 3 : sc>=g*1.15 ? 2 : 1; },
+  seed: function(n){ return ((GAME.seed||1)+7919*(n+1))>>>0; },
+  max: function(){ var m=Math.floor(+CHC.maxLevel||0); return m>0 ? m : 0; },   /* §19-추론형(2026-11-07): 최고 레벨(0 = 끝없음). 다 깨면 '모든 도전 완주!' */
+  kind: function(){ return CHC.kind==='reason' ? 'reason' : 'score'; }          /* 'reason' = 추론형 도전(시간 무관, 그 레벨 예측을 모두 맞혀야 통과). check.js 공리 판정이 달라짐 */
+};
+/* ENG-CHRULE-END */
+var ENG_CH_GAP = 900, ENG_CHON = false, ENG_CHLV = 1, ENG_CHSPD = 1, ENG_CHCFG = null, ENG_CHGOAL = 0, ENG_CHRS = Math.floor(Math.random()*100000);
+var ENG_CHM = {open:false, lv:1, top:0, best:{}, n:0};   /* lv = 열린 레벨(다음에 할 것), top = 깬 최고 레벨, best = 레벨별 최고 점수, n = 판 수 */
+function engHash(s){ var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return (h>>>0).toString(36); }
+var ENG_CHK = 'engch:'+(GAME.id ? String(GAME.id) : engHash(String(GAME.title)+'|'+String(GAME.subtitle)));
+/* ENG-STORE-START: 엔진이 브라우저 저장을 쓰는 곳은 이 두 함수뿐(check.js가 이 구역 밖의 사용과 try 없는 사용을 막는다). 막혀 있으면 ENG_CHM(메모리)만으로 이 접속 동안 동작 */
+function engChLoad(){ try{ var s=window.localStorage.getItem(ENG_CHK); if(s) engChMerge(JSON.parse(s)); }catch(e){} }
+function engChSave(){ try{ window.localStorage.setItem(ENG_CHK, JSON.stringify(ENG_CHM)); }catch(e){} }
+/* ENG-STORE-END */
+function engChMerge(o){ if(!o||typeof o!=='object') return; var M=ENG_CHM; if(o.open) M.open=true; if(o.all) M.all=1; ['lv','top','n'].forEach(function(k){ if(+o[k]>M[k]) M[k]=+o[k]; });
+  if(o.best&&typeof o.best==='object') for(var k in o.best) if(+o.best[k]>(M.best[k]||0)) M.best[k]=+o.best[k]; }
+function engChMark(g){ if(ENG_CHON && g && typeof g==='object' && g.ch!==ENG_CHLV){ g.ch=ENG_CHLV; if(ENG_CHCFG) g.cfg=ENG_CHCFG; } return g; }
+/* 지금 판의 단계 표·규칙 칸·시작 대사(도전이면 GAME.challenge 것) */
+function engStg(){ return ENG_CHON ? CHC.stages : GAME.stages; }
+function engRC(si){ return (ENG_CHON ? (CHC.ruleCards||[])[si] : GAME.ruleCards[si]) || []; }
+function engSay0(si){ return ENG_CHON ? ((CHC.say||{}).start||[])[si] || '' : SAY.start[si]; }   /* LOGIC이 새 G를 만들며 빠뜨려도 다시 붙인다 */
+function engChLab(lv){ return '도전 '+lv+(CHC && ENG_CHR.max() ? ' / '+ENG_CHR.max() : ''); }   /* 블라인드(11-07): '도전 5'가 무엇인지 모름 → GAME.challenge.maxLevel이 있으면 '도전 5 / 8'(HUD 알약·첫 리본·결과 큰 글). 없으면 '도전 5' */
+function engChIcon(){ return '<svg class="eng-chi" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 2.2 4.8 13.6h6.1L9.4 21.8l9.8-12.2h-6.3z" fill="currentColor"/></svg>'; }
+function engStar(on){ return '<svg class="eng-star'+(on?' on':'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.2l-5.8 3.2 1.2-6.5L2.6 9.4l6.5-.8z"/></svg>'; }
+function engChStart(lv){
+  if(!CHC) return; lv=Math.max(1, +lv||ENG_CHM.lv); if(ENG_CHR.max()) lv=Math.min(lv, ENG_CHR.max()); reset();
+  ENG_CHON=true; ENG_CHLV=lv; ENG_CHSPD=ENG_CHR.spd(lv); ENG_CHCFG=ENG_CHR.cfg(lv); ENG_CHGOAL=ENG_CHR.goal(lv);
+  G=engChMark(newGame(ENG_CHR.seed(ENG_CHM.n+ENG_CHRS))); ENG_CHM.n++; engChSave();   /* 판마다 새 시드 */
+  G=engChMark(start(G));
+  var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage();
 }
-function replayLast(){
-  if(!U.lastSnap) return; var snap=U.lastSnap;
-  var kinds=U.lastKinds; GEN++; ovl.innerHTML=''; engDockClear(); U=freshU(); U.lastSnap=snap; U.lastKinds=kinds; U.trKinds=deepCopy(kinds||{}); U.mode='play'; $('#app').classList.remove('trying');
-  if(XPC){ xpClose(); $('#xpBtn').classList.add('off'); }
-  $('#combo').classList.remove('on'); closeModal(); var r=$('.res'); if(r) r.remove(); $('#main').classList.remove('showres');
-  G=deepCopy(snap); U.shown=G.score; $('#score').textContent=G.score;
-  beginStage();
+/* §19-짝(2026-11-07, 교사 승인): 도전이 없는 체험 게임은 같은 차시 '떠올리기 연습'의 도전으로 이어 준다.
+   주소는 배포 때 넣는다: <meta name="eng-pair" content="주소"> 또는 GAME.pairUrl. 주소가 없으면 버튼도 없다. */
+function engPairUrl(){ try{ var m=document.querySelector('meta[name="eng-pair"]'); var u=(m&&m.getAttribute('content'))||GAME.pairUrl||''; return /^(https:\/\/|\.{0,2}\/|[\w-]+\.html)/.test(u)?u:''; }catch(e){ return ''; } }
+function engPairBtn(){ var u=engPairUrl(); if(!u) return ''; return '<a class="btn2 eng-ch eng-pair" id="engPair" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>'; }
+/* 2026-11-07 교사 결정: 잠금 폐지 — 도전은 첫 화면부터 늘 열려 있다(중간에 나갔다 들어오는 학생·복습하는 학생). 레벨 = 기기 기록(없으면 1).
+   시각 위계: 개념 판 '시작'이 주 버튼(주황, 60px, 먼저), 도전은 둘째 버튼(남색, 52px). 도전이 없는 체험 게임은 eng-pair 주소가 있을 때만 '연습에서 도전'을 둘째로 */
+function engChTitleBtn(){
+  var p=$('#pbtn'); if(!p.children.length) return;
+  if(CHC){ var lv=ENG_CHR.max()?Math.min(ENG_CHM.lv,ENG_CHR.max()):ENG_CHM.lv; p.classList.add('eng-p2');
+    p.insertAdjacentHTML('beforeend','<button class="big eng-ch eng-sec" id="engChGo">'+engChIcon()+'도전 '+lv+'</button>');
+    $('#engChGo').onclick=function(){ if(U.busy) return; engChStart(lv); }; return; }
+  var u=engPairUrl(); if(!u) return; p.classList.add('eng-p2');
+  p.insertAdjacentHTML('beforeend','<a class="big eng-ch eng-sec eng-pair" id="engPairGo" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>');
 }
 function reset(){
-  GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
+  ENG_CHON=false; GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
   U=freshU(); $('#app').classList.remove('trying');
   if(XPC){ xpClose(); $('#xpBtn').classList.add('off'); }
   $('#combo').classList.remove('on'); closeModal(); var r=$('.res'); if(r) r.remove(); $('#main').classList.remove('showres');
@@ -1139,13 +1353,14 @@ function reset(){
 }
 function stageHud(){
   var on=U.mode!=='title', si=G.si;
-  $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+GAME.stages[si].name+'</span>' : GAME.title;
-  $('#stgPips').innerHTML = on ? GAME.stages.map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
+  $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+engStg()[si].name+'</span>' : GAME.title;
+  $('#stgPips').innerHTML = on ? engStg().map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
+  var ct=$('#engChTag'); if(ct){ if(ENG_CHON) ct.innerHTML=engChIcon()+engChLab(ENG_CHLV); ct.classList.toggle('hide', !ENG_CHON); }   /* §19 도전 중 표시 */
 }
 function say(html,who){ $('#say').innerHTML='<b>'+(who||GAME.guide)+'</b>'+html; }
-function setBtn(label,fn){ var p=$('#pbtn'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
+function setBtn(label,fn){ var p=$('#pbtn'); p.classList.remove('eng-p2'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
 function ruleCard(c){ return '<div class="rc'+(c[2]?' new':'')+'"><svg viewBox="0 0 120 60">'+useArt(c[0],0,0,120,60)+'</svg><span>'+c[1]+'</span></div>'; }
-function rulesPanel(){ var h=''; if(U.mode==='play'||U.mode==='stageEnd'){ GAME.ruleCards[G.si].forEach(function(c){ h+=ruleCard(c); }); } $('#rules').innerHTML=h; }
+function rulesPanel(){ var h=''; if(U.mode==='play'||U.mode==='stageEnd'){ engRC(G.si).forEach(function(c){ h+=ruleCard(c); }); } $('#rules').innerHTML=h; }
 /* 진행 표시: 끝낸 일(G.res.served) 초록, 놓친 일(G.res.missed) 회색, 남은 일 흐리게 */
 function progPanel(){
   var p=$('#prog'); if(U.mode!=='play'&&U.mode!=='stageEnd'){ p.classList.add('hide'); return; } p.classList.remove('hide');
@@ -1180,13 +1395,14 @@ function title(){
   U.mode='title'; panelAll();
   say(SAY.title);
   setBtn(SAY.startBtn||'시작',function(){ G=start(G); beginStage(); });
+  engChTitleBtn();   /* §19: 도전(또는 '연습에서 도전')은 첫 화면부터 둘째 버튼으로(2026-11-07 잠금 폐지) */
   ribbon(GAME.title,GAME.subtitle,0);
 }
 function beginStage(){
-  if(REPLAY && G.si===NSTAGE-1){ U.lastSnap=deepCopy(G); U.lastKinds=deepCopy(U.trKinds); }   /* 마지막 단계 시작 순간(r3: 그때까지 해 본 동작 종류도) */
   U.mode='play'; U.hint=0; U.hintMv=null; U.bounces=0; U.okN=0; U.lastAct=performance.now(); U.demo=null; U.demoAt=performance.now()+(G.si===0?2200:2400);
-  var tq=clearOvl(); setBtn(null); say(SAY.start[G.si]); panelAll(); U.xpCur=null;
-  ribbon((G.si+1)+'단계', GAME.stages[G.si].name, 1500);
+  var tq=clearOvl(); setBtn(null); say(engSay0(G.si)); panelAll(); U.xpCur=null;
+  if(ENG_CHON && G.si===0) ribbon(engChLab(ENG_CHLV), ENG_CHR.kind()==='reason' ? '모두 맞히기' : '목표 '+ENG_CHGOAL, 1400);   /* §19: 첫 단계는 레벨과 목표 점수(추론형은 '모두 맞히기') */
+  else ribbon((G.si+1)+'단계', engStg()[G.si].name, ENG_CHON?ENG_CH_GAP:1500);
   tryBegin();   /* §12 '해 보기': 새 규칙이 나오는 단계면 시간을 멈추고 한 번 직접 해 보게 한다 */
   tq.forEach(toast);
 }
@@ -1208,7 +1424,12 @@ function engEndSweep(){
 }
 function onStageEnd(){
   U.mode='stageEnd'; U.busy=true; tryClear(); engEndSweep(); stopDemo(); if(XPC){ U.xpCur=null; xpSync(); } clearRings(); hintBtn(); progPanel(); $('#combo').classList.remove('on'); U.comboT=0;
-  var sr=stageRibbon(); ribbon(sr.text, '', 1700); if(sr.ok) confetti();
+  var sr=stageRibbon();
+  if(ENG_CHON){   /* §19 도전: 단계 끝 대사·'다음'·비교 카드 없이 짧은 리본 뒤 바로 다음 단계(LOGIC next를 곧바로 불러 비교 카드 장면을 건너뜀) */
+    ribbon(sr.text, '', ENG_CH_GAP); if(sr.ok) confetti(); setBtn(null);
+    G=engChMark(next(G));
+    later(ENG_CH_GAP+100,function(){ U.busy=false; if(G.phase==='end') results(); else beginStage(); }); return; }
+  ribbon(sr.text, '', 1700); if(sr.ok) confetti();
   later(700,function(){ U.busy=false; var lines=SAY.end[G.si], k=0;
     var show=function(){ say(lines[k]); setBtn(k<lines.length-1?'다음':(G.si<NSTAGE-1?'다음 단계':'결과 보기'), function(){ k++; if(k<lines.length) show(); else { G=next(G); if(G.phase==='end') results(); else beginStage(); } }); };
     show(); });
@@ -1471,6 +1692,7 @@ function engDemoTap(id){
      {point:id, text, at}     손가락이 id를 가리키고 말풍선 text(at 위치). point가 null이면 아직 기다림
      {move:{src,dst}}         시작 시범을 이 수로. move가 null이면 아직 기다림 */
 function maybeDemo(now){
+  if(ENG_CHON) return;   /* §19 도전: 저절로 뜨는 손가락 시범 없음(답을 보여 주지 않음). 힌트 버튼은 그대로 */
   if(U.mode!=='play'||U.demo||U.drag||U.sel||U.busy||U.hint||tryHold()) return;   /* '해 보기' 중에는 시범 없음(§12) */   /* 힌트가 켜져 있으면 시범 없음(힌트가 보여 주는 수와 다른 곳을 가리키지 않게) */
   if(now-U.okAt<2000) return;   /* 바르게 놓은 직후 2초는 시범 없음(맞혔는데 틀린 줄 알게 됨, §11) */
   if(now-U.downAt<2500) return;   /* r4: 장면을 누른 직후 2.5초도 시범 없음(3차 블라인드: 버튼을 누르자 손가락이 '저절로' 나옴) */
@@ -1497,8 +1719,9 @@ function maybeDemo(now){
 var FX = {
   score:function(at,pts,fast,combo){ if(U.trPts!=null){ pts=U.trPts; if(!pts) return; }
     /* r5: +점수·HUD 튐·콤보는 행동 0.6초 뒤(그 사이 또 행동하면 그만큼 더 뒤). 자리는 지금 잡아 둔다(대상이 그새 떠나도 그 자리에) */
-    var r0=SCENE.rectOf(G,at), go=function(){ if(engHeld()){ later(ENG_ACT_HOLD-(performance.now()-U.actAt)+10,go); return; }
-      fxText(at,'+'+pts,fast,r0); bumpScore(); if(combo>=2){ var c=$('#combo'); c.textContent='콤보 '+combo; c.classList.add('on'); U.comboT=performance.now(); } };
+    var r0=SCENE.rectOf(G,at), t0=performance.now(), go=function(){ if(engHeld()){ later(ENG_ACT_HOLD-(performance.now()-U.actAt)+10,go); return; }
+      engScoreSeen(); var got=engScoreTake(pts); if(!(got>0)) return;   /* 블라인드(11-07): +n은 점수가 실제로 오른 만큼만. 오르지 않았으면 +n·점수 튐·콤보 모두 없음 */
+      if(!(U.badAt>t0)) fxText(at,'+'+got,fast,r0);   /* 블라인드(11-07): 맞힌 수의 +n이 그 뒤 틀린 수 직후에 떠 '틀려도 점수'로 읽힘 → 그 사이 틀린 놓기가 있었으면 +n 글은 띄우지 않는다(점수 칸만 튐) */ bumpScore(); if(combo>=2){ var c=$('#combo'); c.textContent='콤보 '+combo; c.classList.add('on'); U.comboT=performance.now(); } };
     go(); },
   burst:function(at,n){ burst(at,n); },
   progress:function(){ progPanel(); },
@@ -1534,8 +1757,8 @@ function xpToggle(){
 /* r4: 이 단계의 일반 '왜?' — GAME.explain.general(G)(글 | {why, def, page}) → 없으면 단계 시작 대사 + 이번 규칙 칸 글 */
 function engXpGeneral(){
   if(typeof XPC.general==='function'){ var g=XPC.general(G); if(g) return xpHtml(g); }
-  var rc=(GAME.ruleCards[G.si]||[]).map(function(c){ return c[1]; }).filter(Boolean).join(' · ');
-  return xpHtml({why:SAY.start[G.si]||GAME.stages[G.si].name, def:rc?'이번 규칙: '+rc:''});
+  var rc=engRC(G.si).map(function(c){ return c[1]; }).filter(Boolean).join(' · ');
+  return xpHtml({why:engSay0(G.si)||engStg()[G.si].name, def:rc?'이번 규칙: '+rc:''});
 }
 /* 틀린 놓기 기본 동작: reasons[why 코드]가 있으면 대상 옆에 짧은 한 줄(bounce, 기본 '다시!')만 띄우고 이유는 '왜?'에 둔다 */
 function xpBounce(r,src,dst){
@@ -1556,6 +1779,12 @@ function handle(evs){
     else if(GAME.onEvent) GAME.onEvent(e, FX);
   });
 }
+/* 점수 장부(블라인드 11-07): G.score가 실제로 오른 양을 시각과 함께 적어 두고, FX.score가 +n을 띄울 때 최근 2.5초 안에 오른 만큼에서만 꺼내 쓴다.
+   게임이 점수 안 오른 수(틀린 짐작 등)에 FX.score를 불러도 +n이 뜨지 않는다. U가 새로 만들어지면(reset) 장부도 비워진다 */
+function engScoreSeen(){ var s=G.score, L=U.scLast; U.scLast=s; if(L==null||!(s>L)) return; (U.scLog||(U.scLog=[])).push({t:performance.now(), n:s-L}); }
+function engScoreTake(pts){ var now=performance.now(), L=U.scLog||[], got=0; pts=+pts||0;
+  for(var i=0;i<L.length && got<pts;i++){ if(now-L[i].t>2500){ L[i].n=0; continue; } var k=Math.min(L[i].n, pts-got); L[i].n-=k; got+=k; }
+  U.scLog=L.filter(function(x){ return x.n>0 && now-x.t<=2500; }); return got; }
 function bumpScore(){ var b=$('#score'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
 
 function commit(src,dst,via,gh){
@@ -1566,16 +1795,16 @@ function commit(src,dst,via,gh){
   if(T && r.ok && U.trPts!=null){ r.G.score=s0+U.trPts; }
   if(XPC){ xpClose(); U.xpCur=null; }   /* 넘겨 둔 설명은 다음 놓기까지만 */
   if(r.ok){
-    G=r.G; U.lastAct=U.okAt=performance.now(); U.okN++; U.bounces=0; U.didKinds[engTryKind({src:src,dst:dst})]=1;
+    G=r.G; engScoreSeen(); U.lastAct=U.okAt=performance.now(); U.okN++; U.bounces=0; U.didKinds[engTryKind({src:src,dst:dst})]=1;
     if(!via){ U.hint=0; U.hintMv=null; clearRings(); hintFingerStop(); hintBtn(); }
     var to=SCENE.rectOf(G,dst); if(gh&&to) flyGhost(gh,to,220); else if(gh) gh.remove();
     handle(r.ev); U.trPts=null;
     if(XPC) xpSync();
     if(T && U.tr===T) tryAfter(T,dst);
   } else {
-    U.trPts=null; if(T && U.tr===T) tryEnd(T);   /* 보여 준 수를 LOGIC이 받지 않으면(있으면 안 됨) 멈춤을 풀고 그냥 이어 간다 */
+    U.trPts=null; U.badAt=performance.now(); if(T && U.tr===T) tryEnd(T);   /* 보여 준 수를 LOGIC이 받지 않으면(있으면 안 됨) 멈춤을 풀고 그냥 이어 간다 */
     /* 틀린 놓기도 LOGIC이 새 G를 돌려주면 받는다(B형: 틀린 카드 기록). bounce 말고 다른 이벤트는 onEvent로(B형: 이유 말풍선) */
-    if(r.G && r.G!==G){ var cOff=r.G.combo!==G.combo; G=r.G; if(cOff) $('#combo').classList.remove('on'); }
+    if(r.G && r.G!==G){ var cOff=r.G.combo!==G.combo; G=r.G; if(cOff) $('#combo').classList.remove('on'); } engScoreSeen();
     var back=SCENE.rectOf(G,src);
     if(gh&&back) flyGhost(gh,back,260); else if(gh) gh.remove();
     if(dst) badRing(dst);
@@ -1745,7 +1974,8 @@ function tryClear(){
   var d=document.getElementById('tDim'); if(d) d.remove();
 }
 function tryBegin(){
-  tryClear(); if(GAME.tryIt===false) return;
+  tryClear(); if(ENG_CHON){ U.demoDone[G.si]=1; return; }   /* §19 도전: 해 보기·시작 시범 없음 */
+  if(GAME.tryIt===false) return;
   if(typeof GAME.tryIt!=='function' && !tryNewRule(G.si)) return;
   U.tr={phase:'pre', t0:performance.now(), seek:0, si:G.si, again:0, k:0};
 }
@@ -1946,17 +2176,37 @@ function resultArt(R){
 function results(){
   U.mode='result'; tryClear(); stopDemo(); clearOvl(); panelAll(); $('#combo').classList.remove('on'); U.comboT=0;
   $('#stgName').textContent='결과'; $('#stgPips').innerHTML='';
-  var R=GAME.result, sc=G.score, prev=BEST, rec=sc>prev&&prev>0; BEST=Math.max(BEST,sc);
+  var R=GAME.result, sc=G.score, CH=ENG_CHON, prev=BEST, rec=sc>prev&&prev>0, fresh=false, left;
+  if(CH){   /* §19 도전 결과: 큰 글 하나('도전 3 성공!' / '아깝다!' / '도전 3') + 별 + 점수와 목표 막대. 버튼 [다시 하기 | 도전 n+1 또는 다시] */
+    var lv=ENG_CHLV, goal=ENG_CHGOAL, pass=sc>=goal, near=!pass&&sc>=goal*ENG_CHNEAR, st=ENG_CHR.stars(sc,goal), pb=ENG_CHM.best[lv]||0;
+    var mx=ENG_CHR.max(), all=pass&&mx>0&&lv>=mx;   /* §19-추론형: 최고 레벨을 깨면 완주(다음 레벨 없음, 버튼은 '다시') */
+    ENG_CHM.best[lv]=Math.max(pb,sc); ENG_CHM.open=true; if(pass){ ENG_CHM.top=Math.max(ENG_CHM.top,lv); ENG_CHM.lv=Math.max(ENG_CHM.lv,mx?Math.min(mx,lv+1):lv+1); } if(all) ENG_CHM.all=1; engChSave();
+    U.chRes={lv:lv, goal:goal, pass:pass, near:near, stars:st, score:sc, next:pass&&!all?lv+1:lv, all:all};
+    left='<div class="rcard l eng-chres'+(pass?' pass':'')+'"><div class="ttl eng-big'+(pass||near?' eng-new':'')+'">'+(all?'모든 도전 완주!':pass?engChLab(lv)+' 성공!':near?'아깝다!':engChLab(lv))+'</div>'
+      +(pass?'<div class="eng-stars">'+[1,2,3].map(function(i){ return engStar(i<=st); }).join('')+'</div>':'')
+      +'<div class="num" id="rnum">0</div><div class="eng-goal"><div class="eng-gbar"><i style="transform:scaleX('+Math.min(1,sc/goal).toFixed(3)+')"></i></div><span>목표 '+goal+'</span></div>'
+      +'<div class="btns"><button class="btn2" id="again">다시 하기</button><button class="btn2 eng-ch pri'+(near?' new':'')+'" id="engCh">'+engChIcon()+(pass&&!all?'도전 '+(lv+1):'다시')+'</button></div></div>';
+  } else {
+    BEST=Math.max(BEST,sc); if(CHC){ ENG_CHM.open=true; engChSave(); }   /* §19: 도전은 처음부터 열려 있음(2026-11-07 잠금 폐지) → '열렸다' 효과 없음 */
+    left='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div>'
+      +'<div class="btns"><button class="btn2 pri" id="again">다시 하기</button>'+(CHC?'<button class="btn2 eng-ch'+(fresh?' new':'')+'" id="engCh">'+engChIcon()+'도전 '+ENG_CHM.lv+'</button>':engPairBtn())+'</div></div>';   /* 결과 버튼은 [다시 하기 | 도전] 둘만. 처음으로는 HUD ⟲ */
+  }
   var rows=R.rows(G), mx=Math.max.apply(null,[1].concat(rows.map(function(r){ return r[1]; })));
   var d=document.createElement('div'); d.className='res';
-  d.innerHTML='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div><div class="btns"><button class="btn2 pri" id="again">다시 하기</button><button class="btn2" id="home">처음으로</button></div>'+(REPLAY&&U.lastSnap?'<div class="btns"><button class="btn2" id="againLast">마지막 단계 다시</button></div>':'')+'</div>'
+  if(CH){   /* 블라인드(11-07): 도전 결과 오른쪽에 일반 판 막대·회색 배지가 나와 '못 얻음'처럼 보임 → 도전 기록(레벨 사다리 1~최고 레벨)만, 배지 칸 숨김.
+       깬 레벨 = 그 레벨 최고 점수의 별 수, 이번 레벨 = 주황 테두리. maxLevel이 없으면 지금까지 깬 레벨 + 다음 하나 */
+    var cr=U.chRes, N=ENG_CHR.max()||Math.max(ENG_CHM.top+1, cr.lv), lad='';
+    for(var li=1; li<=N; li++){ var dn=li<=ENG_CHM.top, ns=dn?Math.max(1,ENG_CHR.stars(ENG_CHM.best[li]||0, ENG_CHR.goal(li))):0;
+      lad+='<div class="eng-lv'+(dn?' done':'')+(li===cr.lv?' cur':'')+'"><b>'+li+'</b>'+(dn?'<span class="eng-ls">'+[1,2,3].map(function(i){ return engStar(i<=ns); }).join('')+'</span>':'')+'</div>'; }
+    d.innerHTML=left+'<div class="rcard eng-chrec"><div class="rh">도전 기록<small>깬 도전 '+ENG_CHM.top+(ENG_CHR.max()?' / '+ENG_CHR.max():'')+'</small></div><div class="eng-lad">'+lad+'</div></div>';
+  } else
+  d.innerHTML=left
    +'<div class="rcard"><div class="rh">'+R.label+'<small>'+R.note+'</small></div><div class="bars">'+rows.map(function(r){ return '<span>'+r[0]+'</span><div class="bar"><i data-v="'+(r[1]/mx)+'"></i></div><b>'+r[1]+'</b>'; }).join('')+'</div>'
    +resultArt(R)+'<div class="formula">'+R.formula+'</div>'+shelfHtml(null)+'<div class="nextq">배지를 누르면 뜻이 나와요.<br>'+R.next+'</div></div>';
   $('#main').appendChild(d); $('#main').classList.add('showres');
   d.querySelectorAll('[data-bd]').forEach(function(x){ x.onclick=function(){ badgeModal(x.dataset.bd); }; });
   $('#again').onclick=function(){ reset(); G=start(G); var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage(); };
-  $('#home').onclick=reset;
-  if($('#againLast')) $('#againLast').onclick=replayLast;
+  if($('#engCh')) $('#engCh').onclick=function(){ engChStart(CH ? U.chRes.next : ENG_CHM.lv); };
   say(R.say); setBtn(null);
   requestAnimationFrame(function(){ d.querySelectorAll('.bar i').forEach(function(i){ i.style.transform='scaleX('+i.dataset.v+')'; }); });
   var t0=performance.now(), g=GEN; (function roll(){ if(g!==GEN) return; var p=Math.min(1,(performance.now()-t0)/(RM?1:900)); var n=$('#rnum'); if(n) n.textContent=Math.round(sc*p); if(p<1) requestAnimationFrame(roll); })();
@@ -1974,7 +2224,8 @@ var LAST=performance.now(), RAF=0;
 function frame(now){
   var dt=Math.min(0.1,(now-LAST)/1000); LAST=now;
   var frz = U.mode==='play' && tryFrame(now,dt);   /* '해 보기' 동안 게임 시간은 멈춘다 */
-  if(U.mode==='play' && !U.paused && !frz){ var r=tick(G,dt); G=r.G; if(r.ev.length) handle(r.ev); }
+  if(U.mode==='play' && !U.paused && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G; engScoreSeen();   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
+    if(r.ev.length) handle(r.ev); }
   SCENE.renderScene(G);
   syncRings(); if(U.mode==='play'){ unblockOverlays(now); hintCheck(now); hintFingerStep(now); hintArrowSync(); }
   if(U.shown!==G.score && !engHeld(now)){ U.shown += Math.ceil((G.score-U.shown)/4); if(U.shown>G.score) U.shown=G.score; $('#score').textContent=U.shown; }
@@ -1986,6 +2237,7 @@ function frame(now){
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ cancelAnimationFrame(RAF); RAF=0; } else if(!RAF){ LAST=performance.now(); RAF=requestAnimationFrame(frame); } });
 window.addEventListener('resize',function(){ clearRings('.ring:not(.bad)'); if(U.hint&&U.hintMv) hintShow(U.hintMv,U.hint,false); if(U.tr&&U.tr.phase==='wait') trySpot(U.tr,false); });
 
+engChLoad();
 reset();
 RAF=requestAnimationFrame(frame);
 </script>

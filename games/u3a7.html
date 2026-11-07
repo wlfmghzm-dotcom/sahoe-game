@@ -273,6 +273,7 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 .big.eng-ch{background:var(--a-navy);color:var(--a-paper);box-shadow:inset 0 -5px 0 rgba(0,0,0,.35)}
 .big.eng-ch .eng-chi{width:24px;height:24px;color:var(--a-org)}
 .big.eng-ch small{font-size:18px;opacity:.85;margin-left:4px}
+.big.eng-sec{min-height:52px;font-size:22px;text-decoration:none}   /* 첫 화면 둘째 버튼(도전·연습에서 도전): 주 버튼 '시작'보다 작게 */
 .rcard .btns .btn2{white-space:nowrap}
 /* 결과 '도전'은 '다시 하기'와 같은 너비, 남색으로 구분(도전 결과에서는 주황 = 주 버튼) */
 .eng-pair{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
@@ -281,6 +282,11 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 .btn2.eng-ch .eng-chi{color:var(--a-org)}
 .btn2.eng-ch.new{animation:engChPop .5s ease-out 3}
 @keyframes engChPop{45%{transform:scale(1.08);box-shadow:0 0 0 4px var(--accent)}}
+.eng-chrec .eng-lad{flex:1;align-content:center}
+.eng-lad{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}   /* 도전 결과 오른쪽: 레벨 사다리(깬 레벨 = 채운 칸 + 별 수, 아직 = 점선 빈칸, 이번 = 주황 테두리) */
+.eng-lv{width:56px;height:80px;border-radius:14px;border:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--game);font-size:24px;color:var(--muted)}
+.eng-lv.done{border:2px solid transparent;background:var(--bg);color:var(--ink)}.eng-lv .eng-ls{display:flex;gap:0}.eng-lv .eng-star{width:16px;height:16px;animation:none}
+.eng-lv.cur{border:2px solid transparent;color:var(--ink);box-shadow:0 0 0 4px var(--accent)}
 .rcard .ttl.eng-new{background:var(--accent);color:var(--accent-ink);animation:engChPop .6s ease-out 3}
 .eng-chres{gap:6px}
 .rcard .ttl.eng-big{font-size:34px;padding:4px 22px}
@@ -882,8 +888,11 @@ var ENG_CHR = {
   spd: function(lv){ return typeof CHC.speed==='function' ? (+CHC.speed(lv)||1) : 1; },   /* 시간 배속: 기본 1(시간만 줄인 도전 금지). 게임이 원하면 */
   cfg: function(lv){ return typeof CHC.cfg==='function' ? CHC.cfg(lv) : (CHC.cfg||null); },   /* G.cfg로 LOGIC에 넘길 레벨별 값(선택) */
   goal: function(lv){ return Math.max(1, Math.round(+CHC.goal(lv)||1)); },
-  stars: function(sc,g){ return sc<g ? 0 : sc>=g*1.3 ? 3 : sc>=g*1.15 ? 2 : 1; },
-  seed: function(n){ return ((GAME.seed||1)+7919*(n+1))>>>0; }
+  stars: function(sc,g){ if(CHC.kind==='reason') return sc<g ? 0 : 3;   /* 추론형: 목표 = 모두 맞힘(만점)이라 통과면 별 셋 */
+    return sc<g ? 0 : sc>=g*1.3 ? 3 : sc>=g*1.15 ? 2 : 1; },
+  seed: function(n){ return ((GAME.seed||1)+7919*(n+1))>>>0; },
+  max: function(){ var m=Math.floor(+CHC.maxLevel||0); return m>0 ? m : 0; },   /* §19-추론형(2026-11-07): 최고 레벨(0 = 끝없음). 다 깨면 '모든 도전 완주!' */
+  kind: function(){ return CHC.kind==='reason' ? 'reason' : 'score'; }          /* 'reason' = 추론형 도전(시간 무관, 그 레벨 예측을 모두 맞혀야 통과). check.js 공리 판정이 달라짐 */
 };
 /* ENG-CHRULE-END */
 var ENG_CH_GAP = 900, ENG_CHON = false, ENG_CHLV = 1, ENG_CHSPD = 1, ENG_CHCFG = null, ENG_CHGOAL = 0, ENG_CHRS = Math.floor(Math.random()*100000);
@@ -894,17 +903,18 @@ var ENG_CHK = 'engch:'+(GAME.id ? String(GAME.id) : engHash(String(GAME.title)+'
 function engChLoad(){ try{ var s=window.localStorage.getItem(ENG_CHK); if(s) engChMerge(JSON.parse(s)); }catch(e){} }
 function engChSave(){ try{ window.localStorage.setItem(ENG_CHK, JSON.stringify(ENG_CHM)); }catch(e){} }
 /* ENG-STORE-END */
-function engChMerge(o){ if(!o||typeof o!=='object') return; var M=ENG_CHM; if(o.open) M.open=true; ['lv','top','n'].forEach(function(k){ if(+o[k]>M[k]) M[k]=+o[k]; });
+function engChMerge(o){ if(!o||typeof o!=='object') return; var M=ENG_CHM; if(o.open) M.open=true; if(o.all) M.all=1; ['lv','top','n'].forEach(function(k){ if(+o[k]>M[k]) M[k]=+o[k]; });
   if(o.best&&typeof o.best==='object') for(var k in o.best) if(+o.best[k]>(M.best[k]||0)) M.best[k]=+o.best[k]; }
 function engChMark(g){ if(ENG_CHON && g && typeof g==='object' && g.ch!==ENG_CHLV){ g.ch=ENG_CHLV; if(ENG_CHCFG) g.cfg=ENG_CHCFG; } return g; }
 /* 지금 판의 단계 표·규칙 칸·시작 대사(도전이면 GAME.challenge 것) */
 function engStg(){ return ENG_CHON ? CHC.stages : GAME.stages; }
 function engRC(si){ return (ENG_CHON ? (CHC.ruleCards||[])[si] : GAME.ruleCards[si]) || []; }
 function engSay0(si){ return ENG_CHON ? ((CHC.say||{}).start||[])[si] || '' : SAY.start[si]; }   /* LOGIC이 새 G를 만들며 빠뜨려도 다시 붙인다 */
+function engChLab(lv){ return '도전 '+lv+(CHC && ENG_CHR.max() ? ' / '+ENG_CHR.max() : ''); }   /* 블라인드(11-07): '도전 5'가 무엇인지 모름 → GAME.challenge.maxLevel이 있으면 '도전 5 / 8'(HUD 알약·첫 리본·결과 큰 글). 없으면 '도전 5' */
 function engChIcon(){ return '<svg class="eng-chi" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 2.2 4.8 13.6h6.1L9.4 21.8l9.8-12.2h-6.3z" fill="currentColor"/></svg>'; }
 function engStar(on){ return '<svg class="eng-star'+(on?' on':'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.2l-5.8 3.2 1.2-6.5L2.6 9.4l6.5-.8z"/></svg>'; }
 function engChStart(lv){
-  if(!CHC) return; lv=Math.max(1, +lv||ENG_CHM.lv); reset();
+  if(!CHC) return; lv=Math.max(1, +lv||ENG_CHM.lv); if(ENG_CHR.max()) lv=Math.min(lv, ENG_CHR.max()); reset();
   ENG_CHON=true; ENG_CHLV=lv; ENG_CHSPD=ENG_CHR.spd(lv); ENG_CHCFG=ENG_CHR.cfg(lv); ENG_CHGOAL=ENG_CHR.goal(lv);
   G=engChMark(newGame(ENG_CHR.seed(ENG_CHM.n+ENG_CHRS))); ENG_CHM.n++; engChSave();   /* 판마다 새 시드 */
   G=engChMark(start(G));
@@ -914,10 +924,15 @@ function engChStart(lv){
    주소는 배포 때 넣는다: <meta name="eng-pair" content="주소"> 또는 GAME.pairUrl. 주소가 없으면 버튼도 없다. */
 function engPairUrl(){ try{ var m=document.querySelector('meta[name="eng-pair"]'); var u=(m&&m.getAttribute('content'))||GAME.pairUrl||''; return /^(https:\/\/|\.{0,2}\/|[\w-]+\.html)/.test(u)?u:''; }catch(e){ return ''; } }
 function engPairBtn(){ var u=engPairUrl(); if(!u) return ''; return '<a class="btn2 eng-ch eng-pair" id="engPair" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>'; }
+/* 2026-11-07 교사 결정: 잠금 폐지 — 도전은 첫 화면부터 늘 열려 있다(중간에 나갔다 들어오는 학생·복습하는 학생). 레벨 = 기기 기록(없으면 1).
+   시각 위계: 개념 판 '시작'이 주 버튼(주황, 60px, 먼저), 도전은 둘째 버튼(남색, 52px). 도전이 없는 체험 게임은 eng-pair 주소가 있을 때만 '연습에서 도전'을 둘째로 */
 function engChTitleBtn(){
-  if(!CHC || !ENG_CHM.open) return; var p=$('#pbtn'); if(!p.children.length) return; p.classList.add('eng-p2');
-  p.insertAdjacentHTML('beforeend','<button class="big eng-ch" id="engChGo">'+engChIcon()+'도전 '+ENG_CHM.lv+'</button>');
-  $('#engChGo').onclick=function(){ if(U.busy) return; engChStart(ENG_CHM.lv); };
+  var p=$('#pbtn'); if(!p.children.length) return;
+  if(CHC){ var lv=ENG_CHR.max()?Math.min(ENG_CHM.lv,ENG_CHR.max()):ENG_CHM.lv; p.classList.add('eng-p2');
+    p.insertAdjacentHTML('beforeend','<button class="big eng-ch eng-sec" id="engChGo">'+engChIcon()+'도전 '+lv+'</button>');
+    $('#engChGo').onclick=function(){ if(U.busy) return; engChStart(lv); }; return; }
+  var u=engPairUrl(); if(!u) return; p.classList.add('eng-p2');
+  p.insertAdjacentHTML('beforeend','<a class="big eng-ch eng-sec eng-pair" id="engPairGo" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>');
 }
 function reset(){
   ENG_CHON=false; GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
@@ -931,7 +946,7 @@ function stageHud(){
   var on=U.mode!=='title', si=G.si;
   $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+engStg()[si].name+'</span>' : GAME.title;
   $('#stgPips').innerHTML = on ? engStg().map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
-  var ct=$('#engChTag'); if(ct){ if(ENG_CHON) ct.innerHTML=engChIcon()+'도전 '+ENG_CHLV; ct.classList.toggle('hide', !ENG_CHON); }   /* §19 도전 중 표시 */
+  var ct=$('#engChTag'); if(ct){ if(ENG_CHON) ct.innerHTML=engChIcon()+engChLab(ENG_CHLV); ct.classList.toggle('hide', !ENG_CHON); }   /* §19 도전 중 표시 */
 }
 function say(html,who){ $('#say').innerHTML='<b>'+(who||GAME.guide)+'</b>'+html; }
 function setBtn(label,fn){ var p=$('#pbtn'); p.classList.remove('eng-p2'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
@@ -971,13 +986,13 @@ function title(){
   U.mode='title'; panelAll();
   say(SAY.title);
   setBtn(SAY.startBtn||'시작',function(){ G=start(G); beginStage(); });
-  engChTitleBtn();   /* §19: 이 기기에서 이미 열렸으면 '도전'도 */
+  engChTitleBtn();   /* §19: 도전(또는 '연습에서 도전')은 첫 화면부터 둘째 버튼으로(2026-11-07 잠금 폐지) */
   ribbon(GAME.title,GAME.subtitle,0);
 }
 function beginStage(){
   U.mode='play'; U.hint=0; U.hintMv=null; U.bounces=0; U.okN=0; U.lastAct=performance.now(); U.demo=null; U.demoAt=performance.now()+(G.si===0?2200:2400);
   var tq=clearOvl(); setBtn(null); say(engSay0(G.si)); panelAll(); U.xpCur=null;
-  if(ENG_CHON && G.si===0) ribbon('도전 '+ENG_CHLV, '목표 '+ENG_CHGOAL, 1400);   /* §19: 첫 단계는 레벨과 목표 점수 */
+  if(ENG_CHON && G.si===0) ribbon(engChLab(ENG_CHLV), ENG_CHR.kind()==='reason' ? '모두 맞히기' : '목표 '+ENG_CHGOAL, 1400);   /* §19: 첫 단계는 레벨과 목표 점수(추론형은 '모두 맞히기') */
   else ribbon((G.si+1)+'단계', engStg()[G.si].name, ENG_CHON?ENG_CH_GAP:1500);
   tryBegin();   /* §12 '해 보기': 새 규칙이 나오는 단계면 시간을 멈추고 한 번 직접 해 보게 한다 */
   tq.forEach(toast);
@@ -1295,8 +1310,9 @@ function maybeDemo(now){
 var FX = {
   score:function(at,pts,fast,combo){ if(U.trPts!=null){ pts=U.trPts; if(!pts) return; }
     /* r5: +점수·HUD 튐·콤보는 행동 0.6초 뒤(그 사이 또 행동하면 그만큼 더 뒤). 자리는 지금 잡아 둔다(대상이 그새 떠나도 그 자리에) */
-    var r0=SCENE.rectOf(G,at), go=function(){ if(engHeld()){ later(ENG_ACT_HOLD-(performance.now()-U.actAt)+10,go); return; }
-      fxText(at,'+'+pts,fast,r0); bumpScore(); if(combo>=2){ var c=$('#combo'); c.textContent='콤보 '+combo; c.classList.add('on'); U.comboT=performance.now(); } };
+    var r0=SCENE.rectOf(G,at), t0=performance.now(), go=function(){ if(engHeld()){ later(ENG_ACT_HOLD-(performance.now()-U.actAt)+10,go); return; }
+      engScoreSeen(); var got=engScoreTake(pts); if(!(got>0)) return;   /* 블라인드(11-07): +n은 점수가 실제로 오른 만큼만. 오르지 않았으면 +n·점수 튐·콤보 모두 없음 */
+      if(!(U.badAt>t0)) fxText(at,'+'+got,fast,r0);   /* 블라인드(11-07): 맞힌 수의 +n이 그 뒤 틀린 수 직후에 떠 '틀려도 점수'로 읽힘 → 그 사이 틀린 놓기가 있었으면 +n 글은 띄우지 않는다(점수 칸만 튐) */ bumpScore(); if(combo>=2){ var c=$('#combo'); c.textContent='콤보 '+combo; c.classList.add('on'); U.comboT=performance.now(); } };
     go(); },
   burst:function(at,n){ burst(at,n); },
   progress:function(){ progPanel(); },
@@ -1354,6 +1370,12 @@ function handle(evs){
     else if(GAME.onEvent) GAME.onEvent(e, FX);
   });
 }
+/* 점수 장부(블라인드 11-07): G.score가 실제로 오른 양을 시각과 함께 적어 두고, FX.score가 +n을 띄울 때 최근 2.5초 안에 오른 만큼에서만 꺼내 쓴다.
+   게임이 점수 안 오른 수(틀린 짐작 등)에 FX.score를 불러도 +n이 뜨지 않는다. U가 새로 만들어지면(reset) 장부도 비워진다 */
+function engScoreSeen(){ var s=G.score, L=U.scLast; U.scLast=s; if(L==null||!(s>L)) return; (U.scLog||(U.scLog=[])).push({t:performance.now(), n:s-L}); }
+function engScoreTake(pts){ var now=performance.now(), L=U.scLog||[], got=0; pts=+pts||0;
+  for(var i=0;i<L.length && got<pts;i++){ if(now-L[i].t>2500){ L[i].n=0; continue; } var k=Math.min(L[i].n, pts-got); L[i].n-=k; got+=k; }
+  U.scLog=L.filter(function(x){ return x.n>0 && now-x.t<=2500; }); return got; }
 function bumpScore(){ var b=$('#score'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
 
 function commit(src,dst,via,gh){
@@ -1364,16 +1386,16 @@ function commit(src,dst,via,gh){
   if(T && r.ok && U.trPts!=null){ r.G.score=s0+U.trPts; }
   if(XPC){ xpClose(); U.xpCur=null; }   /* 넘겨 둔 설명은 다음 놓기까지만 */
   if(r.ok){
-    G=r.G; U.lastAct=U.okAt=performance.now(); U.okN++; U.bounces=0; U.didKinds[engTryKind({src:src,dst:dst})]=1;
+    G=r.G; engScoreSeen(); U.lastAct=U.okAt=performance.now(); U.okN++; U.bounces=0; U.didKinds[engTryKind({src:src,dst:dst})]=1;
     if(!via){ U.hint=0; U.hintMv=null; clearRings(); hintFingerStop(); hintBtn(); }
     var to=SCENE.rectOf(G,dst); if(gh&&to) flyGhost(gh,to,220); else if(gh) gh.remove();
     handle(r.ev); U.trPts=null;
     if(XPC) xpSync();
     if(T && U.tr===T) tryAfter(T,dst);
   } else {
-    U.trPts=null; if(T && U.tr===T) tryEnd(T);   /* 보여 준 수를 LOGIC이 받지 않으면(있으면 안 됨) 멈춤을 풀고 그냥 이어 간다 */
+    U.trPts=null; U.badAt=performance.now(); if(T && U.tr===T) tryEnd(T);   /* 보여 준 수를 LOGIC이 받지 않으면(있으면 안 됨) 멈춤을 풀고 그냥 이어 간다 */
     /* 틀린 놓기도 LOGIC이 새 G를 돌려주면 받는다(B형: 틀린 카드 기록). bounce 말고 다른 이벤트는 onEvent로(B형: 이유 말풍선) */
-    if(r.G && r.G!==G){ var cOff=r.G.combo!==G.combo; G=r.G; if(cOff) $('#combo').classList.remove('on'); }
+    if(r.G && r.G!==G){ var cOff=r.G.combo!==G.combo; G=r.G; if(cOff) $('#combo').classList.remove('on'); } engScoreSeen();
     var back=SCENE.rectOf(G,src);
     if(gh&&back) flyGhost(gh,back,260); else if(gh) gh.remove();
     if(dst) badRing(dst);
@@ -1748,19 +1770,27 @@ function results(){
   var R=GAME.result, sc=G.score, CH=ENG_CHON, prev=BEST, rec=sc>prev&&prev>0, fresh=false, left;
   if(CH){   /* §19 도전 결과: 큰 글 하나('도전 3 성공!' / '아깝다!' / '도전 3') + 별 + 점수와 목표 막대. 버튼 [다시 하기 | 도전 n+1 또는 다시] */
     var lv=ENG_CHLV, goal=ENG_CHGOAL, pass=sc>=goal, near=!pass&&sc>=goal*ENG_CHNEAR, st=ENG_CHR.stars(sc,goal), pb=ENG_CHM.best[lv]||0;
-    ENG_CHM.best[lv]=Math.max(pb,sc); ENG_CHM.open=true; if(pass){ ENG_CHM.top=Math.max(ENG_CHM.top,lv); ENG_CHM.lv=Math.max(ENG_CHM.lv,lv+1); } engChSave();
-    U.chRes={lv:lv, goal:goal, pass:pass, near:near, stars:st, score:sc, next:pass?lv+1:lv};
-    left='<div class="rcard l eng-chres'+(pass?' pass':'')+'"><div class="ttl eng-big'+(pass||near?' eng-new':'')+'">'+(pass?'도전 '+lv+' 성공!':near?'아깝다!':'도전 '+lv)+'</div>'
+    var mx=ENG_CHR.max(), all=pass&&mx>0&&lv>=mx;   /* §19-추론형: 최고 레벨을 깨면 완주(다음 레벨 없음, 버튼은 '다시') */
+    ENG_CHM.best[lv]=Math.max(pb,sc); ENG_CHM.open=true; if(pass){ ENG_CHM.top=Math.max(ENG_CHM.top,lv); ENG_CHM.lv=Math.max(ENG_CHM.lv,mx?Math.min(mx,lv+1):lv+1); } if(all) ENG_CHM.all=1; engChSave();
+    U.chRes={lv:lv, goal:goal, pass:pass, near:near, stars:st, score:sc, next:pass&&!all?lv+1:lv, all:all};
+    left='<div class="rcard l eng-chres'+(pass?' pass':'')+'"><div class="ttl eng-big'+(pass||near?' eng-new':'')+'">'+(all?'모든 도전 완주!':pass?engChLab(lv)+' 성공!':near?'아깝다!':engChLab(lv))+'</div>'
       +(pass?'<div class="eng-stars">'+[1,2,3].map(function(i){ return engStar(i<=st); }).join('')+'</div>':'')
       +'<div class="num" id="rnum">0</div><div class="eng-goal"><div class="eng-gbar"><i style="transform:scaleX('+Math.min(1,sc/goal).toFixed(3)+')"></i></div><span>목표 '+goal+'</span></div>'
-      +'<div class="btns"><button class="btn2" id="again">다시 하기</button><button class="btn2 eng-ch pri'+(near?' new':'')+'" id="engCh">'+engChIcon()+(pass?'도전 '+(lv+1):'다시')+'</button></div></div>';
+      +'<div class="btns"><button class="btn2" id="again">다시 하기</button><button class="btn2 eng-ch pri'+(near?' new':'')+'" id="engCh">'+engChIcon()+(pass&&!all?'도전 '+(lv+1):'다시')+'</button></div></div>';
   } else {
-    BEST=Math.max(BEST,sc); if(CHC){ fresh=!ENG_CHM.open; ENG_CHM.open=true; engChSave(); }   /* §19: 결과 화면에 닿으면 도전이 열린다 */
+    BEST=Math.max(BEST,sc); if(CHC){ ENG_CHM.open=true; engChSave(); }   /* §19: 도전은 처음부터 열려 있음(2026-11-07 잠금 폐지) → '열렸다' 효과 없음 */
     left='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div>'
       +'<div class="btns"><button class="btn2 pri" id="again">다시 하기</button>'+(CHC?'<button class="btn2 eng-ch'+(fresh?' new':'')+'" id="engCh">'+engChIcon()+'도전 '+ENG_CHM.lv+'</button>':engPairBtn())+'</div></div>';   /* 결과 버튼은 [다시 하기 | 도전] 둘만. 처음으로는 HUD ⟲ */
   }
   var rows=R.rows(G), mx=Math.max.apply(null,[1].concat(rows.map(function(r){ return r[1]; })));
   var d=document.createElement('div'); d.className='res';
+  if(CH){   /* 블라인드(11-07): 도전 결과 오른쪽에 일반 판 막대·회색 배지가 나와 '못 얻음'처럼 보임 → 도전 기록(레벨 사다리 1~최고 레벨)만, 배지 칸 숨김.
+       깬 레벨 = 그 레벨 최고 점수의 별 수, 이번 레벨 = 주황 테두리. maxLevel이 없으면 지금까지 깬 레벨 + 다음 하나 */
+    var cr=U.chRes, N=ENG_CHR.max()||Math.max(ENG_CHM.top+1, cr.lv), lad='';
+    for(var li=1; li<=N; li++){ var dn=li<=ENG_CHM.top, ns=dn?Math.max(1,ENG_CHR.stars(ENG_CHM.best[li]||0, ENG_CHR.goal(li))):0;
+      lad+='<div class="eng-lv'+(dn?' done':'')+(li===cr.lv?' cur':'')+'"><b>'+li+'</b>'+(dn?'<span class="eng-ls">'+[1,2,3].map(function(i){ return engStar(i<=ns); }).join('')+'</span>':'')+'</div>'; }
+    d.innerHTML=left+'<div class="rcard eng-chrec"><div class="rh">도전 기록<small>깬 도전 '+ENG_CHM.top+(ENG_CHR.max()?' / '+ENG_CHR.max():'')+'</small></div><div class="eng-lad">'+lad+'</div></div>';
+  } else
   d.innerHTML=left
    +'<div class="rcard"><div class="rh">'+R.label+'<small>'+R.note+'</small></div><div class="bars">'+rows.map(function(r){ return '<span>'+r[0]+'</span><div class="bar"><i data-v="'+(r[1]/mx)+'"></i></div><b>'+r[1]+'</b>'; }).join('')+'</div>'
    +resultArt(R)+'<div class="formula">'+R.formula+'</div>'+shelfHtml(null)+'<div class="nextq">배지를 누르면 뜻이 나와요.<br>'+R.next+'</div></div>';
@@ -1785,7 +1815,7 @@ var LAST=performance.now(), RAF=0;
 function frame(now){
   var dt=Math.min(0.1,(now-LAST)/1000); LAST=now;
   var frz = U.mode==='play' && tryFrame(now,dt);   /* '해 보기' 동안 게임 시간은 멈춘다 */
-  if(U.mode==='play' && !U.paused && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G;   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
+  if(U.mode==='play' && !U.paused && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G; engScoreSeen();   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
     if(r.ev.length) handle(r.ev); }
   SCENE.renderScene(G);
   syncRings(); if(U.mode==='play'){ unblockOverlays(now); hintCheck(now); hintFingerStep(now); hintArrowSync(); }
