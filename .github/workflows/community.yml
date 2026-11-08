@@ -1,0 +1,52 @@
+# 선생님들이 올린 게임 모으기: 설문 응답 시트(웹에 게시한 CSV)에서 '승인'된 줄만 community.json과 그림으로 만든다.
+# 6시간마다 + Actions 탭에서 'Run workflow'로 바로 실행. 바뀐 것이 있을 때만 commit·push.
+# 비용: 공개 저장소의 GitHub Actions는 무료. 외부 유료 서비스 없음.
+name: community games
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: community-games
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Playwright 설치
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.48.2
+          npx playwright install --with-deps chromium
+
+      - name: 승인된 게임 모으기
+        run: node tools/community.mjs
+
+      - name: 바뀐 것만 올리기
+        run: |
+          git add -A community.json community 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "바뀐 것 없음"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "선생님들이 올린 게임 갱신"
+          git push
+          # GITHUB_TOKEN으로 한 push는 Pages를 다시 만들지 않을 수 있어 한 번 요청해 둔다(실패해도 괜찮음).
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" >/dev/null 2>&1 || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
