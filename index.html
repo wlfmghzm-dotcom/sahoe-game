@@ -197,6 +197,16 @@ body{padding:0}
 .pill2[aria-current="true"] .sd{background:rgba(255,255,255,.22);color:#FFFFFF}
 :root[data-theme="dark"] .pill2[aria-current="true"]{color:#0F1120}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pill2[aria-current="true"]{color:#0F1120}}
+.prow{display:flex;align-items:flex-start;gap:10px 14px;min-width:0;scroll-margin-top:68px}
+.prow .pills{flex:1 1 auto;min-width:0}
+.vsw{margin-left:auto;flex:none;display:flex;gap:4px;background:var(--soft);border-radius:999px;padding:3px}
+.vsw button{min-height:44px;min-width:64px;border:none;border-radius:999px;background:transparent;color:var(--muted);font-size:.95rem;font-weight:700;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.vsw button:hover{color:var(--ink)}
+.vsw button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.list-mode #lrow{display:none!important}
+.list-mode .pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+.list-mode .pill2{flex:none}
+.list-mode .pick{gap:10px}
 .lrow{display:flex;align-items:center;gap:8px;min-width:0;background:var(--soft);border-radius:16px;padding:6px 6px 6px 14px}
 .lrow .lbl{font-size:.85rem;font-weight:700;color:var(--muted);white-space:nowrap}
 .lchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;min-width:0;padding:2px}
@@ -243,6 +253,45 @@ body{padding:0}
   .gt b{font-size:1rem}
   .ga .like{display:none}
   .gc.wide{flex-direction:column}.gc.wide .th{flex:none;aspect-ratio:480/230;min-height:0}
+}
+
+/* 목차 보기: 차시 한 줄씩 (제목줄 + 게임 알약줄 | 오른쪽 아이콘 셋). 넓으면 한 줄로 */
+.toc{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:18px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow)}
+.toc .th2{display:flex;align-items:center;gap:8px;padding:2px 6px 2px 14px;background:var(--soft);border-top:1px solid var(--line);min-height:36px}
+.toc .th2:first-child{border-top:none}
+.toc .th2 h3{font-size:1rem;display:flex;align-items:center;gap:8px;min-width:0}
+.toc .th2 .sd{font-size:.72rem;font-weight:700;color:var(--c,var(--brand));background:var(--cs,var(--brand-soft));border-radius:999px;padding:1px 8px;white-space:nowrap}
+.toc .th2 .more{margin-left:auto;min-height:36px;border:none;background:none;color:var(--brand);font-size:.88rem;font-weight:600;display:inline-flex;align-items:center;white-space:nowrap}
+.toc .tp2{padding:5px 14px 0;font-size:.8rem;line-height:1.4;font-weight:700;color:var(--muted);border-top:1px solid var(--line)}
+.tr2{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 10px;padding:2px 8px 3px 14px;border-top:1px solid var(--line);min-height:48px}
+.toc .tp2+.tr2,.toc .th2+.tr2{border-top:none}
+.tr2:hover{background:var(--soft)}
+.tm{display:grid;gap:2px;min-width:0}
+.tl2{border:none;background:none;padding:0;text-align:left;color:var(--ink);font-size:1rem;line-height:1.25;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl2 b{color:var(--brand);font-weight:700;margin-right:6px}
+.tl2 small{color:var(--muted);font-size:.8rem;margin-left:6px}
+.tl2:hover span{text-decoration:underline;text-underline-offset:3px}
+.gps{display:flex;flex-wrap:wrap;gap:4px 6px;min-width:0}
+.gp{display:inline-flex;align-items:center;gap:6px;min-height:26px;max-width:100%;border:1px solid var(--line);border-radius:999px;padding:0 10px 0 4px;background:var(--surface);color:var(--ink);text-decoration:none;font-size:.88rem;font-weight:600;white-space:nowrap}
+.gp>span:last-child{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.gp .tag{padding:0 8px;font-size:.74rem;line-height:1.5;flex:none}
+a.gp:hover{border-color:var(--brand);color:var(--brand)}
+.gp.soon{border-style:dashed;color:var(--muted)}
+.tic{display:flex;gap:2px}
+.tic .ib{border-color:transparent;background:transparent;min-width:42px;padding:0 6px}
+.tic .ib:hover{border-color:var(--line);background:var(--surface)}
+.tic .ib.off{visibility:hidden}
+@container (min-width:860px){
+  .tr2{min-height:50px}
+  .tm{display:flex;align-items:center;gap:12px}
+  .tl2{flex:1 1 auto}
+  .gps{flex:0 1 auto;flex-wrap:nowrap;justify-content:flex-end}
+  .gp{max-width:15em}
+}
+@container (max-width:479px){
+  .tr2{padding-left:10px;gap:4px 4px}
+  .tl2{white-space:normal;word-break:keep-all}
+  .tic .ib{min-width:40px;padding:0 4px}
 }
 
 /* 고른 차시: 게임 2개를 크게 */
@@ -439,6 +488,8 @@ const I={
   book:'<path d="M5 4.5h11.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h11.5"/>',
   chain:'<path d="M9 7H7a5 5 0 0 0 0 10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"/>',
   phone:'<rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 17.5h2"/>',
+  grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/>',
   pen:'<path d="M4 20l1.4-4.6L15.8 5a2.1 2.1 0 0 1 3 0l.2.2a2.1 2.1 0 0 1 0 3L8.6 18.6z"/><path d="M13.6 7.2l3.2 3.2"/>'
 };
 const ic=(n,s)=>`<svg class="i" viewBox="0 0 24 24" width="${s||22}" height="${s||22}" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
@@ -486,6 +537,7 @@ L.forEach(l=>l.txt=lessonText(l));
 
 /* ---------- 선택(scope): #soc 과목 · #soc62 학년 · #soc62-u2 단원 · #soc62-u2-16 차시 (예전 #u2-16도 열림) ---------- */
 let q='', scope=null;
+let vmode=(()=>{ try{ return localStorage.getItem('viewMode')==='list'?'list':'grid'; }catch(e){ return 'grid'; } })(); /* 칸(grid) / 목차(list), 저장 못 하면 칸 */
 function fromHash(){
   const raw=decodeURIComponent(location.hash.slice(1)||''), h=raw.toLowerCase();
   if(!h) return null;
@@ -533,7 +585,8 @@ function shell(){
       <section class="hero" id="hero" aria-roledescription="carousel" aria-label="새로 나온 단원"></section>
       <section class="pick" id="pick" aria-labelledby="pickh">
         <div class="phd"><h2 id="pickh"></h2><span class="cnt" id="found" aria-live="polite"></span><span class="clrq" id="clrq"></span></div>
-        <div class="pills" id="pills" aria-label="단원 고르기"></div>
+        <div class="prow" id="prow"><div class="pills" id="pills" aria-label="단원 고르기"></div>
+          <div class="vsw" id="vsw" role="group" aria-label="게임 목록 보기 방식"><button data-act="vmode" data-v="grid" aria-pressed="false">${ic('grid',18)}칸</button><button data-act="vmode" data-v="list" aria-pressed="false">${ic('list',18)}목차</button></div></div>
         <div class="lrow" id="lrow" hidden><span class="lbl" id="lrowl">차시 바로가기</span><div class="lchips" id="lchips"></div></div>
         <div id="view"></div>
       </section>
@@ -621,6 +674,9 @@ function pillCtx(){ /* 알약 탭이 보여 줄 단원 묶음 */
 function renderPick(){
   const m=mset(), searching=!!q.trim(), u=unitOf(scope);
   document.getElementById('app').firstElementChild.classList.toggle('searching',searching);
+  document.getElementById('app').firstElementChild.classList.toggle('list-mode',vmode==='list');
+  const vsw=document.getElementById('vsw'); vsw.hidden=!!(scope&&scope.lv==='l'&&!searching);
+  vsw.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===vmode)));
   const h=document.getElementById('pickh'), f=document.getElementById('found'), pills=document.getElementById('pills'), lrow=document.getElementById('lrow');
   document.getElementById('clrq').innerHTML=searching?`<button class="btn alt sm" data-act="clearq">찾기 지우기</button>`:'';
   if(searching){
@@ -695,6 +751,7 @@ function renderView(m){
   const base=q.trim()?ROOT:(scope||ROOT), ls=base.lessons.filter(l=>m.has(l));
   if(!ls.length){ box.innerHTML=`<div class="empty">${q.trim()?'맞는 차시가 없어요. 다른 낱말로 찾아 보세요.':'아직 올라온 게임이 없어요.'}</div>`; return; }
   const wide=base.lv!=='u';
+  if(vmode==='list'){ box.innerHTML=tocHtml(ls,wide); return; }
   let h='<div class="cards">', u=null, topic=null;
   for(const l of ls){
     if(wide&&l.u!==u){ u=l.u; topic=null; const s=subjOf(u);
@@ -706,11 +763,33 @@ function renderView(m){
   box.innerHTML=h+'</div>';
 }
 
+/* 목차 보기: 교과서 순서대로 차시 한 줄씩. 줄 오른쪽 QR·수업 화면은 그 차시의 첫 게임(체험 → 끝 화면에서 연습으로 이어짐) */
+function tocHtml(ls,wide){
+  let h='<div class="toc">', u=null, topic=null;
+  for(const l of ls){
+    if(l.u!==u){ u=l.u; topic=null; if(wide){ const s=subjOf(u);
+      h+=`<div class="th2 ${subjCls(s.code)}"><h3><span class="sd">${esc(s.label)}</span>${esc(nodeName(u))}</h3>${q.trim()?'':`<button class="more" data-sc="${esc(u.code)}" data-go="1">이 단원만 ${ic('next',16)}</button>`}</div>`; } }
+    if(!wide&&l.topic&&l.topic!==topic){ topic=l.topic; h+=`<div class="tp2">${esc(unitName(topic))}</div>`; }
+    const gs=lessonGames(l), rg=gs.filter(g=>g.status==='ready'), g0=rg[0], gt=rg.find(g=>g.teach);
+    h+=`<div class="tr2"><div class="tm">
+        <button class="tl2" data-sc="${esc(l.hid)}" data-go="1" title="${esc(labOf(l)+' '+l.lessonTitle)}"><b>${esc(labOf(l))}</b><span>${esc(l.lessonTitle)}</span>${l.pages?`<small>${esc(l.pages)}</small>`:''}</button>
+        <div class="gps">${gs.length?gs.map(g=>{ const t=TYPE[g.type]||TYPE.A; return g.status==='ready'
+          ?`<a class="gp" href="${esc(g.file)}" target="_blank" rel="noopener" title="${esc(g.game)} 열기"><span class="tag ${t[0]}">${t[1]}</span><span>${esc(g.game)}</span></a>`
+          :`<span class="gp soon"><span class="tag soon">준비 중</span><span>${esc(g.game)}</span></span>`; }).join(''):'<span class="gp soon"><span>준비 중</span></span>'}</div></div>
+      <div class="tic">
+        ${g0?`<button class="ib" data-act="qr" data-id="${esc(g0.id)}" data-l="${esc(l.key)}" aria-label="${esc(g0.game)} QR" title="${esc(g0.game)} QR">${ic('qr',20)}</button>`:'<span class="ib off"></span>'}
+        ${gt?`<a class="ib" href="${esc(gt.file)}?teach=1" target="_blank" rel="noopener" aria-label="${esc(gt.game)} 수업 화면(판서)" title="수업 화면(판서): ${esc(gt.game)}">${ic('pen',20)}</a>`:'<span class="ib off" aria-hidden="true"></span>'}
+        <button class="ib" data-sc="${esc(l.hid)}" data-go="1" aria-label="${esc(labOf(l))} 자세히 보기" title="차시 자세히 보기">${ic('next',20)}</button>
+      </div></div>`;
+  }
+  return h+'</div>';
+}
+
 function scrollToPick(instant){
-  const t=scope&&scope.lv==='l'?document.getElementById('lv'):document.getElementById('pick');
+  const t=scope&&scope.lv==='l'?document.getElementById('lv'):document.getElementById(vmode==='list'?'prow':'pick');
   if(!t) return;
   const menuH=(document.querySelector('.menu')||{}).offsetHeight||0;
-  const y=t.getBoundingClientRect().top+scrollY-menuH-10;
+  const y=t.getBoundingClientRect().top+scrollY-menuH-(t.id==='prow'?4:10);
   if(Math.abs(scrollY-y)>4) scrollTo({top:y,behavior:(reduce||instant)?'auto':'smooth'});
 }
 function setScope(n,opts){
@@ -824,6 +903,7 @@ app.addEventListener('click',e=>{
   if(a==='siteqr') return showQR(S.title||'게임공장',S.tagline||'',BASE,'site');
   if(a==='unitqr'){ const u=unitOf(scope); if(!u){ toast('먼저 단원을 골라 주세요'); return; } const s=subjOf(u); return showQR(`${u.label} ${u.name}`,`${gradeLabel(u.up.grade)} ${s.label} · 단원 게임 모음`,BASE+'#'+u.code,u.code); }
   if(a==='mail') return showMail();
+  if(a==='vmode'){ vmode=b.dataset.v==='list'?'list':'grid'; try{ localStorage.setItem('viewMode',vmode); }catch(x){} renderPick(); return; }
   if(a==='news'){ const h=document.getElementById('news'); const on=h.hidden; h.hidden=!on; b.setAttribute('aria-expanded',String(on)); return; }
   if(a==='howto'){ const h=document.getElementById('howto'), t=app.querySelector('.tool[data-act="howto"]'); const on=b.dataset.scroll?true:h.hidden; h.hidden=!on; t.setAttribute('aria-expanded',String(on)); if(b.dataset.scroll) t.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'}); return; }
   if(a==='clearq'){ setQ(''); document.getElementById('q').focus(); return; }
