@@ -299,6 +299,22 @@ button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
 .eng-gbar i{display:block;height:100%;background:var(--a-navy-l);transform-origin:left}
 .eng-chres.pass .eng-gbar i{background:var(--good)}
 .rcard .lab .eng-chi{display:inline-block;vertical-align:-3px;color:var(--accent)}
+/* §21 도전 결과 그림 고리(GAME.challenge.resultArt): 도전 기록 사다리 아래 */
+.eng-chart{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;min-height:0;overflow:hidden;font-size:18px}
+.eng-chart>svg{max-width:100%;max-height:150px;display:block}
+/* §21 해 보기 테두리형(GAME.tryDim:'outline'): 흐린 막 없이 집을 것·놓을 곳 테두리만 굵게 */
+.tdim.ol .tv{fill:transparent}
+.ring.tol{box-shadow:0 0 0 5px var(--a-paper),0 0 0 11px var(--accent),0 0 26px 12px rgba(232,116,59,.55)}
+/* §21 판서(교사용, 주소에 ?teach=1 또는 #…teach…일 때만): 펜 버튼·투명 판서 층·도구 줄 */
+.ib.eng-penbtn{position:relative;z-index:33}
+.ib.eng-penbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.eng-ink{position:fixed;left:0;top:0;width:100%;height:100%;z-index:30;pointer-events:none;touch-action:none;display:block}
+.eng-ink.on{pointer-events:auto;cursor:crosshair}
+.eng-penbar{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:32;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:calc(100% - 16px);background:var(--surface);color:var(--ink);border-radius:16px;padding:6px;box-shadow:0 0 0 2px var(--line),0 6px 16px rgba(0,0,0,.3)}
+.eng-pt{min-width:54px;min-height:50px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:var(--game);font-size:18px;line-height:1;background:var(--bg);color:var(--ink);padding:3px 7px}
+.eng-pt svg{width:22px;height:22px;display:block}
+.eng-pt[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--accent)}
+.eng-pt:active{transform:translateY(1px)}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -856,6 +872,10 @@ function itemSvg(item){ return iconSvg(item,'it'); }
    카드가 빨간 점선(바닥)에 닿으면 놓친 카드. id: 'card:카드id', 'bin:칸id'. */
 var SCENE = (function(){
   var VB={w:600,h:400}, HEAD=36, BIN_Y=290, BIN_H=104, CW=270, CH=90, Y0=HEAD+8, Y1=BIN_Y-CH-14;
+  /* 2026-11-08 엔진 묶음(e): 칸 그림(B.pic)은 화면에서 짧은 변이 48px 아래로 줄지 않는다(전에는 30px 안팎까지, 뜻풀이와 한 줄에 안 들어가면 아예 빠짐).
+     그림의 실제 모양(getBBox)으로 크기를 정하고(짧은 변 PIC=50 = 1000×480에서 약 51px), 칸이 낮으면 이 게임의 칸 높이를 늘린다(BIN_H 104 → 최대 BIN_HMAX).
+     칸 높이는 게임마다 한 번(모든 단계·도전의 칸 수 중 가장 좁은 경우에 맞춰) 정해 단계가 바뀌어도 칸 줄이 움직이지 않는다. 그림이 없는 게임은 전과 같다(104) */
+  var PIC=50, BIN_HMAX=140, LAY=null, ABB={};
   var BCOL=['f-org','f-shal','f-grn','f-wood'];
   var svg, gStatic, gBins, gCards, sig='', nodes={}, binNodes={}, PZ=false, PZH='', PZK='', nCard=0;
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
@@ -875,6 +895,61 @@ var SCENE = (function(){
     var bins=stageOf(G).bins, n=bins.length, i=bins.indexOf(id); if(i<0) return null;
     var gap=8, w=(VB.w-16-gap*(n-1))/n; return {x:8+i*(w+gap), y:BIN_Y, w:w, h:BIN_H};
   }
+  /* 그림 키의 실제 그림 상자(100×100 상자에 그렸을 때). 투명 여백·가로로 긴 viewBox를 걸러 낸다. 못 재면 viewBox 비율 */
+  function artBox(key){
+    if(ABB[key]) return ABB[key]; var a=ASSETS[key]?ASSETS[key].vb:[0,0,100,100], q=Math.max(a[2],a[3]), f={x:50-50*a[2]/q, y:50-50*a[3]/q, w:100*a[2]/q, h:100*a[3]/q};
+    try{ var t=el('svg',{width:'100',height:'100',viewBox:'0 0 100 100','aria-hidden':'true',style:'position:absolute;left:-9999px;top:0'}); t.innerHTML=useArt(key,0,0,100,100); document.body.appendChild(t);
+      var bb=t.firstChild.getBBox(); t.remove(); if(bb && bb.width>2 && bb.height>2) f={x:bb.x, y:bb.y, w:bb.width, h:bb.height}; }catch(e){}
+    var A=ALPHA[key]; if(A){ f={x:f.x+f.w*A.l, y:f.y+f.h*A.t, w:f.w*(A.r-A.l), h:f.h*(A.b-A.t)}; }   /* PNG 스프라이트는 투명 여백을 뺀 보이는 그림 상자 */
+    return (ABB[key]=f);
+  }
+  /* PNG 스프라이트(ASSETS[key].src)의 보이는 픽셀 상자(비율 0~1)를 재어 두고, 다 재면 칸 배치를 다시 한다(불러올 때 한 번, 수십 ms) */
+  var ALPHA={};
+  function alphaScan(done){
+    var keys=BINS.map(function(b){ return b.pic; }).filter(function(k,i,a){ return k && a.indexOf(k)===i && ASSETS[k] && typeof ASSETS[k].src==='string'; }), left=keys.length;
+    if(!left) return; keys.forEach(function(k){ var im=new Image(); im.onload=im.onerror=function(){
+      try{ var W=im.naturalWidth, H=im.naturalHeight; if(W&&H){ var c=document.createElement('canvas'); c.width=W; c.height=H; var x=c.getContext('2d'); x.drawImage(im,0,0); var d=x.getImageData(0,0,W,H).data, l=W, t=H, r=-1, bt=-1;
+        for(var yy=0;yy<H;yy++) for(var xx=0;xx<W;xx++){ if(d[(yy*W+xx)*4+3]>24){ if(xx<l) l=xx; if(xx>r) r=xx; if(yy<t) t=yy; if(yy>bt) bt=yy; } }
+        if(r>=l && bt>=t) ALPHA[k]={l:l/W, t:t/H, r:(r+1)/W, b:(bt+1)/H}; } }catch(e){}
+      if(--left===0) done(); }; im.src=ASSETS[k].src; });
+  }
+  /* 그림 크기: 짧은 변 PIC. 너무 넓으면 maxW, 너무 길면 maxH에 맞춤 */
+  function picFit(key,maxW,maxH){
+    var f=artBox(key), r=f.w/f.h, cw, ch;
+    if(r>=1){ ch=PIC; cw=PIC*r; if(cw>maxW){ cw=maxW; ch=cw/r; } } else { cw=PIC; ch=PIC/r; if(ch>maxH){ ch=maxH; cw=ch*r; } }
+    return {cw:cw, ch:ch, at:function(cx,cy){ var k=cw/f.w; return useArt(key, cx-cw/2-f.x*k, cy-ch/2-f.y*k, 100*k, 100*k); }};
+  }
+  var gUnits=function(t){ var w=0; for(var i=0;i<t.length;i++) w+=(/[ㄱ-힝]/.test(t[i])?1:t[i]===' '?0.4:0.55); return w; };
+  /* 칸 하나의 위쪽(그림·뜻풀이) 배치: side = 그림 옆에 뜻풀이, stack = 그림 아래 뜻풀이, gloss = 뜻풀이만(그림을 둘 자리가 없음), pic = 그림만 */
+  function binPlan(B,w){
+    var LH=40, gl=null;
+    var glossFit=function(room){ var gw=gUnits(B.gloss), fs=Math.max(18,Math.min(22,room/gw)), L=[B.gloss];
+      if(gw*fs>room){ var g0=B.gloss, sp=g0.indexOf(' '), dt=g0.indexOf('·'), hf=Math.ceil(g0.length/2); L=sp>0?[g0.slice(0,sp),g0.slice(sp+1)]:dt>0?[g0.slice(0,dt+1),g0.slice(dt+1)]:[g0.slice(0,hf),g0.slice(hf)]; fs=Math.max(18,Math.min(20,room/Math.max(gUnits(L[0]),gUnits(L[1])))); }
+      return {L:L, fs:fs, h:L.length*fs*1.2}; };
+    if(B.pic && B.gloss){
+      var pf=picFit(B.pic,w*0.45,84), sroom=w-pf.cw-28, gw=gUnits(B.gloss);
+      if(gw*20<=sroom && pf.ch>=PIC-0.5) return {mode:'side', pf:pf, gfs:20, L:[B.gloss], need:Math.max(pf.ch,26)+LH+16};   /* 옆에 두면 그림이 작아지는 아주 넓은 그림은 아래 쌓기로 */
+      var pf2=picFit(B.pic,w-16,84); gl=glossFit(w-16); var need=pf2.ch+6+gl.h+LH+16;
+      if(need<=BIN_HMAX) return {mode:'stack', pf:pf2, gfs:gl.fs, L:gl.L, need:need};
+      return {mode:'gloss', gfs:gl.fs, L:gl.L, need:104};
+    }
+    if(B.pic){ var p3=picFit(B.pic,w-16,84); return {mode:'pic', pf:p3, need:p3.ch+LH+16}; }
+    if(B.gloss){ var g4=glossFit(w-16); return {mode:'gloss', gfs:g4.fs, L:g4.L, need:104}; }
+    return {mode:'box', need:104};
+  }
+  /* 한 줄(한 단계)의 칸 배치. 그림 + 뜻풀이 칸 중 하나라도 그림을 둘 자리가 없으면 그 줄의 그림 + 뜻풀이 칸은 모두 뜻풀이만(칸마다 들쭉날쭉하지 않게, 전과 같은 모습) */
+  function rowPlans(bins){
+    var n=bins.length, w=(VB.w-16-8*(n-1))/n, P={}, drop=false;
+    bins.forEach(function(id){ P[id]=binPlan(BIN[id],w); if(BIN[id].pic && BIN[id].gloss && P[id].mode==='gloss') drop=true; });
+    if(drop) bins.forEach(function(id){ var B=BIN[id]; if(B.pic && B.gloss && P[id].mode!=='gloss'){ P[id]=binPlan({gloss:B.gloss},w); } });
+    return P;
+  }
+  /* 이 게임의 칸 높이(한 번): 모든 단계와 도전(칸 전부)의 줄마다 가장 높은 칸 */
+  function layout(){
+    var sets=STAGES.map(function(S){ return S.bins; }).concat([BINS.map(function(b){ return b.id; })]), need=104;
+    sets.forEach(function(bins){ var P=rowPlans(bins); bins.forEach(function(id){ need=Math.max(need, P[id].need); }); });
+    BIN_H=Math.min(BIN_HMAX, Math.ceil(need)); BIN_Y=VB.h-6-BIN_H; Y1=BIN_Y-CH-14; return {h:BIN_H};
+  }
   function laneX(G,lane){ var at=stageOf(G).at; return at>1 ? (lane===0?VB.w/4+6:VB.w*3/4-6) : VB.w/2; }
   function cardXY(G,c){
     var y=Y0+(Y1-Y0)*Math.min(1,c.y);
@@ -886,10 +961,13 @@ var SCENE = (function(){
     gStatic=el('g',{}); gBins=el('g',{}); gCards=el('g',{});
     svg.appendChild(gStatic); svg.appendChild(gBins); svg.appendChild(gCards);
     host.insertBefore(svg, host.firstChild);
+    if(!LAY) LAY=layout();   /* 칸 높이를 첫 그림 전에 정한다(rectOf가 처음부터 맞게) */
+    alphaScan(function(){ ABB={}; LAY=layout(); sig=''; });   /* PNG 그림의 보이는 크기로 다시(다음 프레임에 칸을 다시 그림) */
     /* '왜?' 카드가 열려 있는 동안 멈춰 둔 시간(아래 renderScene)을 장면을 누르는 순간 먼저 푼다. 엔진의 pointerdown(같은 누름에서 '왜?'를 접고 카드를 집음)보다 먼저 돈다 */
     host.addEventListener('pointerdown', function(){ if(PZ && typeof U!=='undefined'){ PZ=false; PZK=PZH; U.paused=false; LAST=performance.now(); } }, true);
   }
   function buildStatic(G){
+    if(!LAY) LAY=layout();
     var h='<rect x="-700" y="-600" width="2000" height="1600" class="f-shal"/>';
     h+='<rect x="-700" y="-600" width="2000" height="'+(600+HEAD)+'" class="f-sea"/>';
     h+='<text class="frm" x="300" y="'+(HEAD-10)+'" text-anchor="middle" font-size="19" fill="#FBF8F1" style="font-family:var(--game)">'+esc(C.frame||'알맞은 칸에 넣어요')+'</text>';
@@ -904,6 +982,7 @@ var SCENE = (function(){
        칸 사이·이름표 여백을 줄여 4칸에서도 22px 안팎. 이름표 칸 높이는 늘 같아서 위 그림 크기도 그대로 */
     var units=function(t){ var w=0; for(var i=0;i<t.length;i++) w+=(/[ㄱ-힝]/.test(t[i])?1:t[i]===' '?0.4:0.55); return w; };
     var split2=function(lab){ var sp=lab.indexOf(' '); if(sp>0) return [lab.slice(0,sp), lab.slice(sp+1)]; var d=lab.indexOf('·'); if(d>0) return [lab.slice(0,d+1), lab.slice(d+1)]; var h=Math.ceil(lab.length/2); return [lab.slice(0,h), lab.slice(h)]; };
+    var RP=rowPlans(stageOf(G).bins);
     var bins0=stageOf(G).bins, fit=function(id,t){ return (binBox(G,id).w-14)/Math.max(2,units(t)); };
     var fsAll=Math.min(30, Math.min.apply(null, bins0.map(function(id){ return fit(id,BIN[id].label); }))), LH=40;
     stageOf(G).bins.forEach(function(id){
@@ -911,17 +990,20 @@ var SCENE = (function(){
       var isNew=stageOf(G).add.indexOf(id)>=0 && G.phase!=='title';
       /* r5: 칸 그림은 B.pic이 있을 때만(뜻 있는 그림). 뜻풀이(B.gloss)만 있으면 그림 없이 가운데 글(4차 블라인드: 뜻 없는 작은 상자를 '좁은 칸?'으로 읽음).
          둘 다 없으면 상자. 그림 + 뜻풀이가 한 줄에 안 들어가면 뜻풀이만 */
-      var pic=B.pic||'binBox', topH=b.h-LH-10, top='';
-      if(B.gloss){
-        var gw=units(B.gloss), gfs=20, room=b.w-66-8, withPic=!!B.pic && gw*gfs<=room, gl=[B.gloss];
-        if(!withPic){ room=b.w-16; gfs=Math.max(18,Math.min(22,room/gw)); if(gw*gfs>room){ gl=split2(B.gloss); gfs=Math.max(18,Math.min(20,room/Math.max(units(gl[0]),units(gl[1])))); } }
-        var gy=b.y+6+topH/2-(gl.length-1)*gfs*0.6+gfs*0.36;
-        top=(withPic?useArt(pic,b.x+12,b.y+4+(topH-Math.min(46,topH))/2,Math.min(46,topH),Math.min(46,topH)):'')
-          +'<text x="'+(withPic?b.x+66:b.x+b.w/2)+'" font-size="'+gfs.toFixed(1)+'" fill="#1E2B3A"'+(withPic?'':' text-anchor="middle"')+' style="font-family:var(--game)">'
-          +gl.map(function(t,i){ return '<tspan x="'+(withPic?b.x+66:b.x+b.w/2)+'" y="'+(gy+i*gfs*1.2).toFixed(1)+'">'+esc(t)+'</tspan>'; }).join('')+'</text>';
+      var pic=B.pic||'binBox', topH=b.h-LH-10, top='', pl=RP[id], my=b.y+4+topH/2;
+      if(pl.mode==='side'){   /* 그림(왼쪽) + 뜻풀이(오른쪽 한 줄) */
+        var gx=b.x+10+pl.pf.cw+10;
+        top=pl.pf.at(b.x+10+pl.pf.cw/2, my)+'<text x="'+gx+'" y="'+(my+pl.gfs*0.36).toFixed(1)+'" font-size="'+pl.gfs+'" fill="#1E2B3A" style="font-family:var(--game)">'+esc(B.gloss)+'</text>';
+      } else if(pl.mode==='stack' || pl.mode==='gloss'){   /* 그림 위 · 뜻풀이 아래(가운데). 그림 자리가 없으면 뜻풀이만 가운데 */
+        var gh=pl.L.length*pl.gfs*1.2, ph=pl.mode==='stack'?pl.pf.ch+6:0, y0=b.y+4+(topH-ph-gh)/2;
+        top=(pl.mode==='stack'?pl.pf.at(b.x+b.w/2, y0+pl.pf.ch/2):'')
+          +'<text x="'+(b.x+b.w/2)+'" font-size="'+pl.gfs.toFixed(1)+'" fill="#1E2B3A" text-anchor="middle" style="font-family:var(--game)">'
+          +pl.L.map(function(t,i){ return '<tspan x="'+(b.x+b.w/2)+'" y="'+(y0+ph+pl.gfs*(0.95+i*1.2)).toFixed(1)+'">'+esc(t)+'</tspan>'; }).join('')+'</text>';
+      } else if(pl.mode==='pic'){
+        top=pl.pf.at(b.x+b.w/2, my);
       } else {
-        var ph=Math.min(B.pic?50:bw*0.6, topH), pw=B.pic?ph:Math.min(bw, ph/0.6);
-        top=useArt(pic,b.x+(b.w-pw)/2,b.y+4+(topH-ph)/2,pw,ph);
+        var ph0=Math.min(bw*0.6, topH), pw0=Math.min(bw, ph0/0.6);
+        top=useArt(pic,b.x+(b.w-pw0)/2,b.y+4+(topH-ph0)/2,pw0,ph0);
       }
       var lines=fs*units(lab)>b.w-14+0.5 ? split2(lab) : [lab], ly=b.y+b.h-6-LH, lt=ly+LH/2-(lines.length-1)*fs*0.55+fs*0.36;
       var labTxt='<text x="'+(b.x+b.w/2)+'" text-anchor="middle" font-size="'+fs.toFixed(1)+'" fill="#1E2B3A" style="font-family:var(--game)">'
@@ -1175,6 +1257,29 @@ function title(){
   setBtn(SAY.startBtn||'시작',function(){ G=start(G); beginStage(); });
   engChTitleBtn();   /* §19: 도전(또는 '연습에서 도전')은 첫 화면부터 둘째 버튼으로(2026-11-07 잠금 폐지) */
   ribbon(GAME.title,GAME.subtitle,0);
+  var tr=ovl.querySelector('.ribbon'); if(tr){ tr._title=1; tr._t0=performance.now(); }   /* §21: 제목 카드는 첫 화면의 중요한 그림을 피한다(engTitleSync, 매 프레임 렌더 뒤) */
+}
+/* §21 제목 카드(첫 화면 리본) 자리(2026-11-08, 10개 넘는 게임에서 판의 중요한 그림을 가림): GAME.titlePos('top'|'bottom'|'center')가 있으면 그 자리.
+   없으면 후보(가운데 38% = 전과 같음, 위, 아래, 왼쪽 위, 오른쪽 위, 왼쪽 아래, 오른쪽 아래, 62%, 26%) 중 덮으면 안 되는 자리(SCENE.keepClear·labels·avoid·[data-keep])와 장면 글자를 가장 덜 가리는 곳.
+   가운데가 넓이의 2% 넘게 가리지 않으면 가운데 그대로(이미 첫 화면 배치를 바꿔 우회한 게임은 전과 같다). 모두 5% 넘게 가리면 작게(.sm). 처음 0.6초 동안(장면이 자리 잡는 동안) 매 프레임, 그 뒤는 크기가 바뀔 때만 다시 고른다 */
+function engTitleSync(now){
+  var d=ovl.querySelector('.ribbon'); if(!d||!d._title||!G||!U) return;
+  var s=sceneEl.getBoundingClientRect(), key=Math.round(s.width)+'x'+Math.round(s.height)+'|'+d.offsetWidth+'x'+d.offsetHeight;
+  if(now-d._t0>600 && d._tk===key) return;
+  var W=s.width, H=s.height; if(!(W>0&&H>0)) return;
+  var fx=GAME.titlePos, place=function(){ var w=d.offsetWidth, h=d.offsetHeight, m=10, best=null;
+    var C=[['c',0.38],['c','t'],['c','b'],['l','t'],['r','t'],['l','b'],['r','b'],['c',0.62],['c',0.26]];
+    if(fx==='top') C=[['c','t']]; else if(fx==='bottom') C=[['c','b']]; else if(fx==='center') C=[['c',0.38]];
+    ENG_KB.t=-1e9; var K=(fx?[]:engKeepBoxes().concat(engTextBoxes()));
+    C.forEach(function(c,i){ var x=c[0]==='l'?m:c[0]==='r'?W-w-m:(W-w)/2, y=c[1]==='t'?m:c[1]==='b'?H-h-m:c[1]*H-h/2;
+      x=Math.max(4,Math.min(W-w-4,x)); y=Math.max(4,Math.min(H-h-4,y));
+      var o=overlap(x,y,w,h,K), cst=o+i*30; if(i===0 && o<=0.02*w*h) cst=-1;
+      if(!best||cst<best.c) best={c:cst,o:o,x:x+w/2,y:y+h/2,a:w*h}; });
+    return best; };
+  d.classList.remove('sm'); var b=place();
+  if(!fx && b.o>0.05*b.a){ d.classList.add('sm'); var b2=place(); if(b2.o<b.o) b=b2; else { d.classList.remove('sm'); b=place(); } }
+  d.style.left=b.x.toFixed(1)+'px'; d.style.top=b.y.toFixed(1)+'px';
+  d._tk=Math.round(s.width)+'x'+Math.round(s.height)+'|'+d.offsetWidth+'x'+d.offsetHeight;
 }
 function beginStage(){
   U.mode='play'; U.hint=0; U.hintMv=null; U.bounces=0; U.okN=0; U.lastAct=performance.now(); U.demo=null; U.demoAt=performance.now()+(G.si===0?2200:2400);
@@ -1182,7 +1287,7 @@ function beginStage(){
   if(ENG_CHON && G.si===0) ribbon(engChLab(ENG_CHLV), ENG_CHR.kind()==='reason' ? '모두 맞히기' : '목표 '+ENG_CHGOAL, 1400);   /* §19: 첫 단계는 레벨과 목표 점수(추론형은 '모두 맞히기') */
   else ribbon((G.si+1)+'단계', engStg()[G.si].name, ENG_CHON?ENG_CH_GAP:1500);
   tryBegin();   /* §12 '해 보기': 새 규칙이 나오는 단계면 시간을 멈추고 한 번 직접 해 보게 한다 */
-  tq.forEach(toast);
+  if(tq.length) engBadgeBump();   /* §21(2026-11-08): 앞 단계에서 미룬 배지 토스트는 버린다(a5·a6: '건조 기후' 칩이 초원 마을 장면에 붙어 보임). 배지는 받았고 결과 화면·배지 선반에 있다 */
 }
 /* 단계 끝 리본(§14): GAME.stageRibbon(G)가 글을 주면 그것. 없으면 G.res가 있고 missed===0이면 '○단계 성공!'(꽃가루), 아니면 '○단계 끝!'(엔진은 성공 여부를 모른다) */
 function stageRibbon(){
@@ -1470,7 +1575,7 @@ function engDemoTap(id){
      {point:id, text, at}     손가락이 id를 가리키고 말풍선 text(at 위치). point가 null이면 아직 기다림
      {move:{src,dst}}         시작 시범을 이 수로. move가 null이면 아직 기다림 */
 function maybeDemo(now){
-  if(ENG_CHON) return;   /* §19 도전: 저절로 뜨는 손가락 시범 없음(답을 보여 주지 않음). 힌트 버튼은 그대로 */
+  if(ENG_CHON||ENG_PENON) return;   /* §21 판서 중에도 없음. §19 도전: 저절로 뜨는 손가락 시범 없음(답을 보여 주지 않음). 힌트 버튼은 그대로 */
   if(U.mode!=='play'||U.demo||U.drag||U.sel||U.busy||U.hint||tryHold()) return;   /* '해 보기' 중에는 시범 없음(§12) */   /* 힌트가 켜져 있으면 시범 없음(힌트가 보여 주는 수와 다른 곳을 가리키지 않게) */
   if(now-U.okAt<2000) return;   /* 바르게 놓은 직후 2초는 시범 없음(맞혔는데 틀린 줄 알게 됨, §11) */
   if(now-U.downAt<2500) return;   /* r4: 장면을 누른 직후 2.5초도 시범 없음(3차 블라인드: 버튼을 누르자 손가락이 '저절로' 나옴) */
@@ -1718,7 +1823,7 @@ function hintCheck(now){
 }
 function doHint(auto){ if(auto!==true) auto=false;   /* 버튼 onclick은 이벤트를 넘기므로 true일 때만 자동 */
   if(XPC) xpClose();   /* 힌트는 '왜?' 카드를 접기만 한다. 카드는 '왜?' 버튼(xpToggle)으로만 열린다(r3 check: 힌트 뒤 2초 동안 카드 없음) */
-  if(U.mode!=='play'||U.busy||tryHold()) return;   /* '해 보기' 중에는 이미 길이 보인다 */
+  if(U.mode!=='play'||U.busy||ENG_PENON||tryHold()) return;   /* '해 보기' 중에는 이미 길이 보인다 */
   if(auto && performance.now()-U.okAt<2000) return;   /* r5: 바르게 놓은 직후에는 저절로 뜨는 힌트 화살표 없음 */
   if(!auto) U.actAt=performance.now();   /* r5: 힌트 누름도 행동(그 뒤 0.6초는 힌트 표시만) */
   stopDemo();
@@ -1795,7 +1900,7 @@ function engTrySkip(T,why){
 function tryFrame(now,dt){
   var T=U.tr; if(!T) return false;
   if(T.phase==='pre'){
-    if(U.paused) return true;
+    if(U.paused||ENG_PENON) return true;
     var m=tryMove(T);
     if(m===false){ U.tr=null; return false; }
     if(!m){ if(T.late) return false; T.seek+=dt; if(T.seek>6) U.tr=null; return false; }
@@ -1806,7 +1911,7 @@ function tryFrame(now,dt){
     return true;
   }
   if(T.phase==='wait'){
-    if(!U.drag && !U.sel && !U.paused && now>T.again && !(T.tap!=null?U.demo:U.hf)) tryFinger(T);
+    if(!U.drag && !U.sel && !U.paused && !ENG_PENON && now>T.again && !(T.tap!=null?U.demo:U.hf)) tryFinger(T);
     trySync();
   }
   return true;
@@ -1824,8 +1929,9 @@ function trySpot(T,anim){
   el.innerHTML='<defs><mask id="tdMask" maskUnits="userSpaceOnUse" x="-50" y="-50" width="9999" height="9999"><rect x="-50" y="-50" width="9999" height="9999" fill="#fff"/></mask></defs><rect class="tv" x="-50" y="-50" width="9999" height="9999" mask="url(#tdMask)"/>';
   el._ids = T.tap!=null ? [T.tap] : [T.mv.src, T.mv.dst];
   el._ids.forEach(function(){ var h=document.createElementNS(NS,'rect'); h.setAttribute('fill','#000'); h.setAttribute('rx','16'); el.firstChild.firstChild.appendChild(h); });
-  if(T.tap!=null){ U.hintMv=null; ring(T.tap,'dst hd'); }
-  else { U.hintMv=T.mv; ring(T.mv.src,'hs'); ring(T.mv.dst,'dst hd'); hintArrow(false); }
+  var ol=GAME.tryDim==='outline'; if(ol) el.setAttribute('class','tdim ol');   /* §21: 흐림 대신 목표만 테두리(다른 칸이 '못 쓰는 칸'으로 보이지 않게). 막(#tDim)·구멍은 그대로 두어 점검이 같다 */
+  if(T.tap!=null){ U.hintMv=null; ring(T.tap,'dst hd'+(ol?' tol':'')); }
+  else { U.hintMv=T.mv; ring(T.mv.src,'hs'); ring(T.mv.dst,'dst hd'+(ol?' tol':'')); hintArrow(false); }
   ovl.insertBefore(el, ovl.firstChild);   /* 맨 아래: 테두리·화살표·손가락·말풍선은 막 위에 */
   el._k=''; trySync();
   if(anim&&!RM) el.animate([{opacity:0},{opacity:1}],{duration:250});
@@ -1951,6 +2057,14 @@ function resultArt(R){
   if(typeof a==='string') return '<div class="rart" aria-hidden="true">'+a+'</div>';
   return '<div class="rart" aria-hidden="true"><svg viewBox="'+(a.vb||[0,0,400,120]).join(' ')+'" preserveAspectRatio="xMidYMid meet">'+a.svg+'</svg></div>';
 }
+/* §21 도전 결과 그림 고리(2026-11-08): GAME.challenge.resultArt(G) → HTML/SVG 글(놓친 단서 칩 등) 또는 {vb, svg}. 도전 기록 사다리 아래에 넣는다. 없거나 오류면 칸 없음 */
+function engChResultArt(){
+  if(!CHC || typeof CHC.resultArt!=='function') return ''; var a=null;
+  try{ a=CHC.resultArt(G); }catch(e){ return ''; } if(!a) return '';
+  if(typeof a==='string') return '<div class="eng-chart">'+a+'</div>';
+  if(a.svg!=null) return '<div class="eng-chart"><svg viewBox="'+(a.vb||[0,0,400,120]).join(' ')+'" preserveAspectRatio="xMidYMid meet" aria-hidden="true">'+a.svg+'</svg></div>';
+  return '';
+}
 function results(){
   U.mode='result'; tryClear(); stopDemo(); clearOvl(); panelAll(); $('#combo').classList.remove('on'); U.comboT=0;
   $('#stgName').textContent='결과'; $('#stgPips').innerHTML='';
@@ -1976,7 +2090,7 @@ function results(){
     var cr=U.chRes, N=ENG_CHR.max()||Math.max(ENG_CHM.top+1, cr.lv), lad='';
     for(var li=1; li<=N; li++){ var dn=li<=ENG_CHM.top, ns=dn?Math.max(1,ENG_CHR.stars(ENG_CHM.best[li]||0, ENG_CHR.goal(li))):0;
       lad+='<div class="eng-lv'+(dn?' done':'')+(li===cr.lv?' cur':'')+'"><b>'+li+'</b>'+(dn?'<span class="eng-ls">'+[1,2,3].map(function(i){ return engStar(i<=ns); }).join('')+'</span>':'')+'</div>'; }
-    d.innerHTML=left+'<div class="rcard eng-chrec"><div class="rh">도전 기록<small>깬 도전 '+ENG_CHM.top+(ENG_CHR.max()?' / '+ENG_CHR.max():'')+'</small></div><div class="eng-lad">'+lad+'</div></div>';
+    d.innerHTML=left+'<div class="rcard eng-chrec"><div class="rh">도전 기록<small>깬 도전 '+ENG_CHM.top+(ENG_CHR.max()?' / '+ENG_CHR.max():'')+'</small></div><div class="eng-lad">'+lad+'</div>'+engChResultArt()+'</div>';
   } else
   d.innerHTML=left
    +'<div class="rcard"><div class="rh">'+R.label+'<small>'+R.note+'</small></div><div class="bars">'+rows.map(function(r){ return '<span>'+r[0]+'</span><div class="bar"><i data-v="'+(r[1]/mx)+'"></i></div><b>'+r[1]+'</b>'; }).join('')+'</div>'
@@ -1988,6 +2102,86 @@ function results(){
   say(R.say); setBtn(null);
   requestAnimationFrame(function(){ d.querySelectorAll('.bar i').forEach(function(i){ i.style.transform='scaleX('+i.dataset.v+')'; }); });
   var t0=performance.now(), g=GEN; (function roll(){ if(g!==GEN) return; var p=Math.min(1,(performance.now()-t0)/(RM?1:900)); var n=$('#rnum'); if(n) n.textContent=Math.round(sc*p); if(p<1) requestAnimationFrame(roll); })();
+}
+
+/* ---------- §21 판서(교사용, 2026-11-08) ----------
+   주소에 ?teach=1(또는 해시 안 teach)이 있을 때만 HUD에 펜 버튼이 생긴다. 학생 화면(파라미터 없음)은 DOM·동작이 전과 같다.
+   켜면 화면 전체를 덮는 투명 판서 층(canvas, devicePixelRatio)이 입력을 받고 게임 시간(tick·해 보기·시범)을 멈춘다(ENG_PENON). 끄면 다시 흐른다.
+   도구: 펜 빨강·파랑·노랑, 형광펜(반투명 굵게), 지우개(획 단위), 모두 지움, 닫기. 판서는 단계가 바뀌어도 남고 '모두 지움'으로만 지운다.
+   획은 화면 비율 좌표(0~1)로 두고 창 크기가 바뀌면 다시 그린다. 키보드: P 켜기/끄기, Esc 끄기 */
+var ENG_TEACH=(function(){ try{ return /[?&]teach=1(&|$)/.test(location.search||'') || /teach/i.test(location.hash||''); }catch(e){ return false; } })();
+var ENG_PENON=false, ENG_PEN=null;
+var ENG_PCOL={red:'#E5484D', blue:'#2F7BFF', yellow:'#FFC83D'};
+function engPenIco(k,col){
+  if(k==='pen') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.4-4.6L15.8 5a2.1 2.1 0 0 1 3 0l.2.2a2.1 2.1 0 0 1 0 3L8.6 18.6z" fill="'+col+'" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  if(k==='hl') return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="15" width="18" height="6" rx="2" fill="'+col+'" opacity=".45"/><path d="M8 13l7-9 4 3-7 9H8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+  if(k==='er') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 20h11M4.5 15.5l9-9a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L12 18H7z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M8.5 11.5l5 5" stroke="currentColor" stroke-width="1.9"/></svg>';
+  if(k==='clr') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  if(k==='x') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
+  return '';
+}
+function engPenInit(){
+  if(!ENG_TEACH) return;
+  var bb=$('#bBadges'), b=document.createElement('button'); b.className='ib lb eng-penbtn'; b.id='engPenBtn'; b.setAttribute('aria-label','판서 펜'); b.setAttribute('aria-pressed','false');
+  b.innerHTML=engPenIco('pen','var(--accent)')+'<span>펜</span>'; bb.parentNode.insertBefore(b, bb.nextSibling);
+  var cv=document.createElement('canvas'); cv.className='eng-ink'; cv.id='engInk'; cv.setAttribute('aria-hidden','true'); document.body.appendChild(cv);
+  var bar=document.createElement('div'); bar.className='eng-penbar hide'; bar.id='engPenBar'; bar.setAttribute('role','toolbar'); bar.setAttribute('aria-label','판서 도구');
+  var T=[['red','pen','빨강'],['blue','pen','파랑'],['yellow','pen','노랑'],['hl','hl','형광'],['er','er','지우개'],['clr','clr','모두 지움'],['x','x','닫기']];
+  bar.innerHTML=T.map(function(t){ return '<button class="eng-pt" data-pt="'+t[0]+'"'+(t[0]==='clr'||t[0]==='x'?'':' aria-pressed="false"')+'>'+engPenIco(t[1], ENG_PCOL[t[0]]||'var(--accent)')+'<span>'+t[2]+'</span></button>'; }).join('');
+  document.body.appendChild(bar);
+  ENG_PEN={cv:cv, cx:cv.getContext('2d'), bar:bar, btn:b, tool:'red', col:'red', S:[], cur:null, pid:null, dirty:true, W:0, H:0};
+  b.onclick=function(){ engPenSet(!ENG_PENON); };
+  bar.addEventListener('click',function(e){ var t=e.target.closest('[data-pt]'); if(!t) return; var k=t.dataset.pt;
+    if(k==='x'){ engPenSet(false); return; } if(k==='clr'){ ENG_PEN.S=[]; ENG_PEN.cur=null; ENG_PEN.dirty=true; return; } engPenTool(k); });
+  cv.addEventListener('pointerdown',engPenDown); cv.addEventListener('pointermove',engPenMove);
+  cv.addEventListener('pointerup',engPenUp); cv.addEventListener('pointercancel',engPenUp);
+  document.addEventListener('keydown',function(e){ if(e.ctrlKey||e.metaKey||e.altKey) return; var k=e.key;
+    if(k==='p'||k==='P'||k==='ㅔ'){ e.preventDefault(); engPenSet(!ENG_PENON); } else if(k==='Escape' && ENG_PENON){ e.preventDefault(); engPenSet(false); } });
+  engPenTool('red'); engPenFit();
+}
+function engPenTool(k){ var P=ENG_PEN; P.tool=k; if(ENG_PCOL[k]) P.col=k;
+  P.bar.querySelectorAll('[data-pt]').forEach(function(x){ if(x.hasAttribute('aria-pressed')) x.setAttribute('aria-pressed', String(x.dataset.pt===k)); });
+  var h=P.bar.querySelector('[data-pt="hl"] rect'); if(h) h.setAttribute('fill', ENG_PCOL[P.col]); }   /* 형광펜은 마지막으로 고른 펜 색 */
+function engPenSet(on){
+  var P=ENG_PEN; if(!P) return; on=!!on; if(on===ENG_PENON) return; ENG_PENON=on;
+  P.cv.classList.toggle('on',on); P.bar.classList.toggle('hide',!on); P.btn.setAttribute('aria-pressed',String(on));
+  if(on){ if(P.tool==='er') engPenTool(P.col); if(U){ if(U.drag) endDrag({clientX:0,clientY:0},true); if(U.sel){ var s=U.sel; U.sel=null; var bk=SCENE.rectOf(G,s.id); if(bk) flyGhost(s.gh,bk,200); else s.gh.remove(); } stopDemo(); } if(XPC) xpClose(); }
+  else { P.cur=null; P.pid=null; LAST=performance.now(); if(U){ U.lastAct=U.downAt=performance.now(); } }   /* 끄면 시간이 다시 흐른다(멈춘 동안의 시간은 넘기지 않음), 끄자마자 시범이 뜨지 않게 */
+}
+function engPenFit(){
+  var P=ENG_PEN; if(!P) return; var dpr=window.devicePixelRatio||1, W=P.cv.clientWidth||innerWidth, H=P.cv.clientHeight||innerHeight;
+  if(W===P.W && H===P.H && P.dpr===dpr) return; P.W=W; P.H=H; P.dpr=dpr;
+  P.cv.width=Math.round(W*dpr); P.cv.height=Math.round(H*dpr); P.dirty=true;
+}
+function engPenPt(e){ var P=ENG_PEN, r=P.cv.getBoundingClientRect(), pr=(e.pointerType==='pen' && e.pressure>0) ? 0.45+1.1*e.pressure : 1; return [(e.clientX-r.left)/(r.width||1), (e.clientY-r.top)/(r.height||1), pr]; }
+function engPenDown(e){
+  var P=ENG_PEN; if(!ENG_PENON || P.pid!=null) return; e.preventDefault(); try{ P.cv.setPointerCapture(e.pointerId); }catch(_){}
+  P.pid=e.pointerId; var p=engPenPt(e);
+  if(P.tool==='er'){ P.cur={er:true}; engPenErase(p); return; }
+  P.cur={hl:P.tool==='hl', col:ENG_PCOL[P.col], pts:[p]}; P.S.push(P.cur); P.dirty=true;
+}
+function engPenMove(e){
+  var P=ENG_PEN; if(!P.cur || e.pointerId!==P.pid) return; e.preventDefault();
+  var L=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
+  L.forEach(function(ev){ var p=engPenPt(ev); if(P.cur.er) engPenErase(p); else P.cur.pts.push(p); }); P.dirty=true;
+}
+function engPenUp(e){ var P=ENG_PEN; if(e.pointerId!==P.pid) return; P.pid=null; P.cur=null; P.dirty=true; }
+/* 지우개: 누른 자리에서 18px 안을 지나는 획을 통째로 지운다 */
+function engPenErase(p){
+  var P=ENG_PEN, W=P.W, H=P.H, x=p[0]*W, y=p[1]*H, R=18, n0=P.S.length;
+  P.S=P.S.filter(function(s){ var a=s.pts, wr=engPenW(s,1)/2; for(var i=0;i<a.length;i++){ var b=a[Math.max(0,i-1)], ax=a[i][0]*W, ay=a[i][1]*H, bx=b[0]*W, by=b[1]*H, dx=ax-bx, dy=ay-by, L2=dx*dx+dy*dy, t=L2?Math.max(0,Math.min(1,((x-bx)*dx+(y-by)*dy)/L2)):0;
+    if(Math.hypot(bx+t*dx-x, by+t*dy-y)<=R+wr) return false; } return true; });
+  if(P.S.length!==n0) P.dirty=true;
+}
+function engPenW(s,pr){ var P=ENG_PEN, k=Math.max(0.6, Math.min(P.W,P.H)/480); return (s.hl?22:5)*k*(s.hl?1:pr); }   /* 굵기도 화면 크기에 비례(1000×480에서 펜 5px, 형광 22px) */
+function engPenDraw(){
+  var P=ENG_PEN; engPenFit(); if(!P.dirty) return; P.dirty=false;
+  var c=P.cx, W=P.W, H=P.H; c.setTransform(P.dpr,0,0,P.dpr,0,0); c.clearRect(0,0,W,H); c.lineCap='round'; c.lineJoin='round';
+  P.S.forEach(function(s){ var a=s.pts; if(!a.length) return;
+    if(s.hl){ c.globalAlpha=0.38; c.strokeStyle=s.col; c.lineWidth=engPenW(s,1); c.beginPath(); c.moveTo(a[0][0]*W,a[0][1]*H); for(var i=1;i<a.length;i++) c.lineTo(a[i][0]*W,a[i][1]*H); if(a.length===1) c.lineTo(a[0][0]*W+0.1,a[0][1]*H); c.stroke(); c.globalAlpha=1; return; }
+    /* 펜: 어두운 테두리 한 번 + 색 한 번(밝은 바다·어두운 판 모두에서 보이게). 펜 압력이 있으면 마디마다 굵기 */
+    [0,1].forEach(function(pass){ c.strokeStyle=pass?s.col:'rgba(20,30,42,.55)';
+      for(var i=0;i<a.length;i++){ var b=a[Math.max(0,i-1)], w=engPenW(s,(a[i][2]+b[2])/2)+(pass?0:3); c.lineWidth=w; c.beginPath(); c.moveTo(b[0]*W,b[1]*H); c.lineTo(a[i][0]*W+(i?0:0.1),a[i][1]*H); c.stroke(); } }); });
 }
 
 /* ---------- 버튼 ---------- */
@@ -2002,20 +2196,22 @@ var LAST=performance.now(), RAF=0;
 function frame(now){
   var dt=Math.min(0.1,(now-LAST)/1000); LAST=now;
   var frz = U.mode==='play' && tryFrame(now,dt);   /* '해 보기' 동안 게임 시간은 멈춘다 */
-  if(U.mode==='play' && !U.paused && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G; engScoreSeen();   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
+  if(U.mode==='play' && !U.paused && !ENG_PENON && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G; engScoreSeen();   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
     if(r.ev.length) handle(r.ev); }
-  SCENE.renderScene(G);
+  SCENE.renderScene(G); if(U.mode==='title') engTitleSync(now);   /* §21 제목 카드 자리 */
   syncRings(); if(U.mode==='play'){ unblockOverlays(now); hintCheck(now); hintFingerStep(now); hintArrowSync(); }
   if(U.shown!==G.score && !engHeld(now)){ U.shown += Math.ceil((G.score-U.shown)/4); if(U.shown>G.score) U.shown=G.score; $('#score').textContent=U.shown; }
   if(U.comboT && now-U.comboT>GAME.comboWin*1000){ U.comboT=0; $('#combo').classList.remove('on'); }
   maybeDemo(now); progTag(now); engTxtPump(now);
   if(XPC) xpSync();
+  if(ENG_PEN && ENG_PEN.dirty) engPenDraw();   /* §21 판서 다시 그리기(획이 바뀌었거나 창 크기가 바뀜) */
   RAF=requestAnimationFrame(frame);
 }
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ cancelAnimationFrame(RAF); RAF=0; } else if(!RAF){ LAST=performance.now(); RAF=requestAnimationFrame(frame); } });
-window.addEventListener('resize',function(){ clearRings('.ring:not(.bad)'); if(U.hint&&U.hintMv) hintShow(U.hintMv,U.hint,false); if(U.tr&&U.tr.phase==='wait') trySpot(U.tr,false); });
+window.addEventListener('resize',function(){ if(ENG_PEN) engPenFit(); clearRings('.ring:not(.bad)'); if(U.hint&&U.hintMv) hintShow(U.hintMv,U.hint,false); if(U.tr&&U.tr.phase==='wait') trySpot(U.tr,false); });
 
 engChLoad();
+engPenInit();   /* §21: ?teach=1일 때만 펜 버튼·판서 층 */
 reset();
 RAF=requestAnimationFrame(frame);
 </script>
