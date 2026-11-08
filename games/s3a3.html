@@ -1,0 +1,1994 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>전자석 실험대 – 6-2 과학 주제 3 수업용 게임</title>
+<meta name="description" content="6-2 과학 주제 3 「전자석의 성질이 궁금해!」 수업용 게임. 주문대로 철 고리 개수와 나침반 바늘 방향을 맞추려면 전지를 몇 개, 어느 방향으로 넣을지 정해요.">
+<meta name="eng-pair" content="s3b3.html">
+<link rel="canonical" href="https://wlfmghzm-dotcom.github.io/sahoe-game/games/s3a3.html">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>전자석 실험대</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<style>
+/* 수업용 개념 체험 게임 엔진 (무역항 v3-2d-k에서 떼어 냄). 태블릿 가로 기준: HUD 한 줄 → [장면 63% | 패널 37%], 한 화면, 세로 스크롤 없음.
+   그림은 전부 ASSETS(id → SVG 문자열/이미지 URI)에서 온다. 장면 = SCENE.renderScene(G) 한 곳, 패널·HUD = 장면과 독립된 HTML.
+   게임마다 바꾸는 곳은 아래 스크립트 안의 표시된 구역 셋뿐이다: ① GAME  ② LOGIC  ③ SCENE + ASSETS. build.js가 채운다. */
+:root{
+  --bg:#EDF2EF; --surface:#FBF8F1; --ink:#1E2B3A; --muted:#55657A; --line:#DCD4C2;
+  --accent:#E8743B; --accent-d:#C95F2C; --accent-ink:#FBF8F1; --good:#4CAF7A; --bad:#D9534F; --veil:rgba(20,30,42,.62);
+  --a-sea:#2E6F8E; --a-sea-d:#245A74; --a-shal:#4FA3B8; --a-shal-d:#3F8798; --a-sand:#EBD9B4; --a-sand-d:#D6C196;
+  --a-land:#8DB48E; --a-land-d:#779D78; --a-wood:#A8754F; --a-wood-d:#8C603F; --a-navy:#1E2B3A; --a-navy-l:#33475C;
+  --a-org:#E8743B; --a-org-d:#C95F2C; --a-grn:#4CAF7A; --a-grn-d:#3C9064; --a-red:#D9534F; --a-red-d:#B94340;
+  --a-paper:#FBF8F1; --a-paper-d:#E6E0D2;
+  --game:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121A23; --surface:#1C2835; --ink:#F1ECE0; --muted:#A9B4C1; --line:#2F3E50;
+  --accent:#E8743B; --accent-d:#C95F2C; --accent-ink:#1E2B3A; --good:#4CAF7A; --bad:#D9534F; --veil:rgba(0,0,0,.7);
+  --a-sea:#245A74; --a-sea-d:#1D4B61; --a-shal:#3F8798; --a-shal-d:#357484; --a-land:#779D78; --a-land-d:#668A67;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121A23; --surface:#1C2835; --ink:#F1ECE0; --muted:#A9B4C1; --line:#2F3E50;
+  --accent:#E8743B; --accent-d:#C95F2C; --accent-ink:#1E2B3A; --good:#4CAF7A; --bad:#D9534F; --veil:rgba(0,0,0,.7);
+  --a-sea:#245A74; --a-sea-d:#1D4B61; --a-shal:#3F8798; --a-shal-d:#357484; --a-land:#779D78; --a-land-d:#668A67;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:19px;line-height:1.4;
+  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));
+  overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font-family:var(--game);color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible{outline:3px solid var(--a-shal);outline-offset:2px}
+.ico{width:26px;height:26px;display:block}
+
+/* 아트 색 클래스 (ASSETS 안 SVG가 씀) */
+.f-sea{fill:var(--a-sea)}.f-sead{fill:var(--a-sea-d)}.f-shal{fill:var(--a-shal)}.f-shald{fill:var(--a-shal-d)}
+.f-sand{fill:var(--a-sand)}.f-sandd{fill:var(--a-sand-d)}.f-land{fill:var(--a-land)}.f-landd{fill:var(--a-land-d)}
+.f-wood{fill:var(--a-wood)}.f-woodd{fill:var(--a-wood-d)}.f-navy{fill:var(--a-navy)}.f-navyl{fill:var(--a-navy-l)}
+.f-org{fill:var(--a-org)}.f-orgd{fill:var(--a-org-d)}.f-grn{fill:var(--a-grn)}.f-grnd{fill:var(--a-grn-d)}
+.f-red{fill:var(--a-red)}.f-paper{fill:var(--a-paper)}.f-paperd{fill:var(--a-paper-d)}
+.s-line{fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+.app{height:100vh;height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px;padding-bottom:10px}
+
+/* HUD */
+.hud{display:flex;align-items:center;gap:8px;padding-top:6px;min-height:58px}
+.ib{width:50px;height:50px;border-radius:14px;background:var(--surface);display:grid;place-items:center;flex:none}
+.ib:active{transform:scale(.94)}
+/* §13: 규칙·배지 버튼은 아이콘 아래 이름(블라인드 시험: 아이콘만으로는 몰랐음) */
+.ib.lb{width:58px;grid-template-rows:auto auto;gap:0;align-content:center;font-family:var(--game);font-size:18px;line-height:1;color:var(--ink,currentColor)}
+.ib.lb svg{width:24px;height:24px}
+.ib.lb span{display:block;margin-top:1px}
+.stg{display:flex;align-items:center;gap:10px;font-family:var(--game);font-size:22px;white-space:nowrap;min-width:0}
+.pips{display:flex;gap:5px}
+.pips i{width:12px;height:12px;border-radius:50%;background:var(--line);display:block}
+.pips i.on{background:var(--accent)}.pips i.done{background:var(--good)}
+.sp{flex:1}
+.combo{font-family:var(--game);font-size:22px;color:var(--accent-ink);background:var(--accent);border-radius:999px;padding:4px 14px;opacity:0;transform:scale(.6);transition:opacity .2s,transform .2s}
+.combo.on{opacity:1;transform:scale(1)}
+.score{display:flex;align-items:baseline;gap:8px;background:var(--surface);border-radius:14px;padding:2px 16px;min-height:50px}
+.score small{font-family:var(--game);font-size:18px;color:var(--muted)}
+.score b{font-family:var(--game);font-weight:400;font-size:34px;font-variant-numeric:tabular-nums;min-width:2.2em;text-align:right;display:inline-block}
+.score b.bump{animation:bump .3s}
+@keyframes bump{50%{transform:scale(1.25)}}
+
+/* 본문 2단 */
+.main{position:relative;display:grid;grid-template-columns:minmax(0,63fr) minmax(300px,37fr);gap:10px;min-height:0}
+.scene{position:relative;min-height:0;border-radius:18px;overflow:hidden;background:var(--a-sea);touch-action:none;user-select:none;-webkit-user-select:none}
+.scene>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ovl{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+
+/* 패널 */
+.panel{min-height:0;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.cap{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border-radius:18px;padding:12px}
+.cap svg{width:64px;height:64px;flex:none}
+.say{font-size:19px;line-height:1.42;word-break:keep-all;min-height:2.84em}
+.say b{font-family:var(--game);font-weight:400;display:block;font-size:18px;color:var(--muted);margin-bottom:2px}
+.big{font-family:var(--game);font-size:26px;min-height:60px;border-radius:16px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-shadow:inset 0 -5px 0 var(--accent-d)}
+.big:active{transform:translateY(2px)}
+.big .ico{width:24px;height:24px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px}
+.rc{background:var(--surface);border-radius:14px;padding:6px 6px 4px;text-align:center;position:relative}
+.rc svg{width:100%;height:58px;display:block}
+.rc span{font-family:var(--game);font-size:18px;display:block;line-height:1.15;word-break:keep-all}
+.rc.new{box-shadow:inset 0 0 0 3px var(--accent)}
+.rc.new::after{content:"새 규칙";position:absolute;top:-12px;right:4px;font-family:var(--game);font-size:18px;line-height:1.2;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:0 6px}
+.prog{display:flex;flex-wrap:wrap;gap:5px;background:var(--surface);border-radius:14px;padding:8px 10px;align-items:center}
+.prog svg{width:28px;height:18px}
+.prog .wt{opacity:.4}.prog .ms{opacity:.55;filter:grayscale(1)}
+/* §13 진행 표시 = '이번 단계 남은 일': 끝낸 칸에 초록 체크, 방금 끝낸 칸은 반짝. 처음 보일 때 한 번 '남은 일' 이름표 */
+.prog{position:relative}
+.prog .pc{position:relative;display:inline-flex}
+.prog .pc .ck{position:absolute;right:-5px;bottom:-5px;width:15px;height:15px}
+.prog .pc.just{animation:pcPop .5s ease-out 2}
+/* r5: '남은 일' 줄은 늘 한 줄(B형 4단계 12칸이 1000×480에서 두 줄로 넘쳤다). 칸이 많으면 그림이 줄어든다(최대 28px) */
+.prog{flex-wrap:nowrap}
+.prog .pc{flex:0 1 28px;min-width:8px}
+.prog .pc>svg:not(.ck){width:100%;height:auto;max-height:18px}
+.prog.many{gap:3px;padding-left:8px;padding-right:8px}
+@keyframes pcPop{40%{transform:scale(1.45);filter:drop-shadow(0 0 5px var(--good))}}
+.prog-tag{position:absolute;left:10px;top:calc(100% + 9px);background:var(--ink);color:var(--surface);font-family:var(--game);font-size:18px;line-height:1;border-radius:10px;padding:5px 10px;pointer-events:none;white-space:nowrap;box-shadow:0 3px 0 rgba(30,43,58,.2)}
+.prog-tag::after{content:'';position:absolute;left:18px;top:-7px;border:7px solid transparent;border-top:0;border-bottom-color:var(--ink)}   /* r3: 진행 줄 아래(위에 두면 규칙 칸 글을 가렸다) */
+
+.hint{display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;border-radius:16px;background:var(--surface);font-size:24px;box-shadow:inset 0 -4px 0 var(--line);margin-top:auto}
+.hint .ico{width:30px;height:30px;color:var(--accent)}
+.hint .pips i{width:13px;height:13px}
+.hint:active{transform:translateY(2px)}
+.hide{display:none!important}
+/* '왜?' 버튼 줄(GAME.explain이 있을 때만 생김): [힌트 | 왜?]. 버튼 자리는 늘 같고, 설명이 없으면 보이지 않기만 한다(힌트가 움직이지 않게) */
+.xp-row{display:flex;gap:8px;margin-top:auto;position:relative}
+.xp-row .hint{flex:1;margin-top:0;min-width:0}
+.xp-btn{flex:none;min-width:100px;min-height:58px;border-radius:16px;background:var(--surface);font-size:24px;color:var(--accent-d);box-shadow:inset 0 -4px 0 var(--line)}
+.xp-btn:active{transform:translateY(2px)}
+.xp-btn.off{opacity:.5}   /* r4: 설명이 아직 없으면 흐리게(사라지지 않음). 누르면 이 단계의 일반 '왜?' */
+.xp-btn.new{animation:xpPop .5s 2}
+@keyframes xpPop{50%{box-shadow:inset 0 0 0 4px var(--accent)}}
+.xp-btn[aria-expanded="true"]{background:var(--a-navy);color:var(--a-paper);box-shadow:none}
+.xp-card{position:absolute;left:0;right:0;bottom:calc(100% + 8px);z-index:3;background:var(--a-navy);color:var(--a-paper);border-radius:16px;padding:10px 14px;font-size:19px;line-height:1.4;word-break:keep-all;box-shadow:0 4px 0 rgba(30,43,58,.18)}
+.xp-card em{font-style:normal;color:var(--a-org)}
+.xp-card .d{display:block;margin-top:4px;opacity:.92}
+.xp-card small{display:block;font-size:18px;opacity:.8;margin-top:2px}
+.ib.got{animation:bump .4s 2}
+
+/* 장면 위 오버레이 (HTML, 렌더러와 독립) */
+.ghost{position:absolute;left:0;top:0;width:54px;height:54px;margin:-27px 0 0 -27px;will-change:transform}
+.ghost svg{width:100%;height:100%}
+.ghost.sel{animation:pulse .8s ease-in-out infinite alternate}
+@keyframes pulse{to{transform:var(--t) scale(1.15)}}
+.ring{position:absolute;border-radius:18px;box-shadow:0 0 0 4px var(--accent);animation:blink .7s ease-in-out infinite alternate}
+.ring.dst{box-shadow:0 0 0 4px var(--a-paper),0 0 0 8px var(--accent)}
+.ring.bad{box-shadow:0 0 0 4px var(--bad);animation:shake .3s}
+.ring.hover{box-shadow:0 0 0 3px var(--a-paper);animation:none;opacity:.8}
+@keyframes blink{from{opacity:.35}to{opacity:1}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.callout{position:absolute;left:0;top:0;max-width:92%;background:var(--a-paper);color:var(--a-navy);font-family:var(--game);font-size:20px;line-height:1.25;border-radius:14px;padding:7px 14px;white-space:normal;word-break:keep-all;box-shadow:0 4px 0 rgba(30,43,58,.18);transform-origin:50% 100%}
+.callout em{font-style:normal;color:var(--a-org-d)}
+.toast{position:absolute;left:0;top:0;display:flex;gap:8px;align-items:center;background:var(--a-navy);color:var(--a-paper);font-family:var(--game);font-size:19px;border-radius:14px;padding:6px 14px 6px 8px;max-width:80%}
+.toast svg{width:36px;height:36px;flex:none}
+.fx{position:absolute;left:0;top:0;font-family:var(--game);font-size:28px;color:var(--a-paper);text-shadow:0 2px 0 var(--a-navy)}
+.fx.fast{font-size:34px;color:var(--a-org)}
+.dot{position:absolute;left:0;top:0;width:10px;height:10px;border-radius:50%}
+.ribbon{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);background:var(--a-paper);color:var(--a-navy);font-family:var(--game);font-size:34px;border-radius:18px;padding:10px 26px;white-space:nowrap;box-shadow:0 6px 0 var(--a-org)}
+.ribbon{white-space:normal;word-break:keep-all;width:max-content;max-width:calc(100% - 20px)}   /* 장면보다 길면 장면 안에서 줄을 바꾼다. 한 줄에 들어가면 전과 같다 */
+.ribbon small{display:block;font-size:20px;color:var(--a-navy-l);text-align:center}
+.ribbon.sm{font-size:26px;padding:6px 18px}.ribbon.sm small{font-size:18px}   /* r5: 가릴 수밖에 없을 때 작게 */
+.finger{position:absolute;left:0;top:0;width:54px;height:66px;margin:-4px 0 0 -22px}
+.finger svg{width:100%;height:100%}
+.finger{transform-origin:22px 4px}   /* r4: 손끝 기준(뒤집기 rotate 180deg가 손끝 자리를 지킨다) */
+/* 힌트(§11): 1단계부터 집을 것(hs)·놓을 곳(hd)이 함께 빛나고 화살표(.harrow)가 잇는다. 2단계는 더 굵고 빠르게(strong) */
+.ring.hs{box-shadow:0 0 0 4px var(--accent),0 0 16px 6px rgba(232,116,59,.6);animation:hGlow .6s ease-in-out infinite alternate}
+.ring.hd{box-shadow:0 0 0 4px var(--a-paper),0 0 0 8px var(--accent),0 0 20px 10px rgba(232,116,59,.5);animation:hGlow .6s ease-in-out infinite alternate}
+.ring.hs.strong{box-shadow:0 0 0 6px var(--accent),0 0 24px 10px rgba(232,116,59,.75);animation-duration:.35s}
+.ring.hd.strong{box-shadow:0 0 0 5px var(--a-paper),0 0 0 11px var(--accent),0 0 28px 14px rgba(232,116,59,.65);animation-duration:.35s}
+@keyframes hGlow{from{opacity:.6}to{opacity:1}}
+.harrow{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.harrow .ho{fill:none;stroke:var(--a-paper);stroke-width:13;stroke-linecap:round;opacity:.92}
+.harrow .hl{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;stroke-dasharray:16 10;animation:hFlow .55s linear infinite}
+.harrow .hh{fill:var(--accent);stroke:var(--a-paper);stroke-width:3.5;stroke-linejoin:round}
+.harrow.strong .ho{stroke-width:16}.harrow.strong .hl{stroke-width:10;animation-duration:.35s}
+@keyframes hFlow{to{stroke-dashoffset:-26}}
+/* '해 보기'(§12): 새 동작을 단계 시작에 한 번 직접. 시간이 멈추고 집을 것·놓을 곳만 밝다(.tdim 구멍), 나머지·패널은 흐리게. 해 보면 이름표(.trylab) */
+.tdim{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.tdim .tv{fill:rgba(14,22,34,.6)}
+.trylab{position:absolute;pointer-events:none;left:0;top:0;background:var(--accent);color:#FBF8F1;font-family:var(--game);font-size:20px;line-height:1.15;border-radius:13px;padding:4px 12px;white-space:nowrap;box-shadow:0 0 0 2px var(--a-paper),0 3px 0 rgba(30,43,58,.25)}
+/* r3: 해 본 동작과 같은 규칙 칸이 잠깐 빛남(이름표와 같은 때) / 새 규칙 '보이는 상태' 가리키기는 손가락 대신 빛 테두리 / 틀린 놓기 기본 '다시!' */
+.rc.hit{box-shadow:inset 0 0 0 4px var(--accent),inset 0 0 18px rgba(232,116,59,.45);animation:rcHit .45s ease-out 2}   /* 안쪽 빛만(패널 밖으로 넘치지 않게) */
+@keyframes rcHit{40%{box-shadow:inset 0 0 0 7px var(--accent),inset 0 0 26px rgba(232,116,59,.6)}}
+.ring.look{box-shadow:0 0 0 4px var(--a-paper),0 0 0 7px var(--a-navy),0 0 18px 8px rgba(251,248,241,.55);animation:lookP .6s ease-in-out infinite alternate}
+@keyframes lookP{from{opacity:.45}to{opacity:1}}
+/* r5: 알림이 장면에 빈자리가 없으면 작게(.sm), 그래도 없으면 패널의 힌트 줄 위(.eng-dock)에 뜬다(장면의 집을 것·놓을 곳·keepClear를 가리지 않게) */
+.callout.sm{font-size:18px;padding:4px 10px;line-height:1.2}
+.trylab.sm{font-size:18px;padding:3px 9px}
+.panel{position:relative}
+.eng-dock{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:6}
+.eng-dock>.callout,.eng-dock>.trylab{position:relative;left:auto;top:auto;max-width:96%}
+.nope{position:absolute;left:0;top:0;pointer-events:none;background:var(--bad);color:#fff;font-family:var(--game);font-size:20px;line-height:1.1;border-radius:12px;padding:4px 12px;white-space:nowrap;box-shadow:0 0 0 2px var(--a-paper)}
+.app.trying .panel{opacity:.32;transition:opacity .2s}
+.app.trying .panel *{pointer-events:none}
+
+/* 모달 */
+.veil{position:fixed;inset:0;background:var(--veil);display:grid;place-items:center;z-index:20;padding:12px}
+.modal{background:var(--surface);border-radius:20px;padding:16px 18px;width:min(640px,100%);max-height:calc(100dvh - 24px);overflow:auto;display:flex;flex-direction:column;gap:12px}
+.modal h2{font-family:var(--game);font-weight:400;font-size:26px;margin:0}
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mrow .rc svg{height:70px}
+.btns{display:flex;gap:10px}
+.btn2{flex:1;min-height:54px;border-radius:14px;font-size:22px;background:var(--bg)}
+.btn2.pri{background:var(--accent);color:var(--accent-ink)}
+.shelf{display:flex;flex-wrap:wrap;gap:8px}
+.bd{width:58px;height:58px;border-radius:14px;background:var(--bg);display:grid;place-items:center}
+.bd svg{width:46px;height:46px}
+.bd.off svg{opacity:.25;filter:grayscale(1)}
+.bd.cur{box-shadow:inset 0 0 0 3px var(--accent)}
+.def{font-size:19px;word-break:keep-all;min-height:2.8em}
+.credit{font-size:12px;color:var(--ink);text-align:right;margin-top:-6px;opacity:.85}
+.def b{font-family:var(--game);font-weight:400;display:block}
+
+/* 결과 */
+.res{position:absolute;inset:0;z-index:5;background:var(--bg);display:grid;grid-template-columns:minmax(0,40fr) minmax(0,60fr);gap:10px}
+.rcard{background:var(--surface);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.rcard.l{align-items:center;justify-content:center;text-align:center}
+.rcard .lab{font-family:var(--game);font-size:20px;color:var(--muted)}
+.rcard .num{font-family:var(--game);font-size:min(96px,15vh);line-height:1;font-variant-numeric:tabular-nums}
+.rcard .ttl{font-family:var(--game);font-size:30px;background:var(--a-navy);color:var(--a-paper);border-radius:14px;padding:4px 18px}
+.rcard .rec{font-size:18px;color:var(--muted);min-height:1.4em}
+.rcard .btns{width:100%;margin-top:4px}
+.bars{display:grid;grid-template-columns:auto minmax(0,1fr) 2.4em;gap:4px 10px;align-items:center;font-size:18px}
+.bars .bar{height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
+.bars .bar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .9s}
+.bars b{font-family:var(--game);font-weight:400;text-align:right}
+.formula{font-family:var(--game);font-size:22px;background:var(--bg);border-radius:12px;padding:6px 12px;text-align:center}
+.nextq{font-size:18px;color:var(--muted);word-break:keep-all}
+.rh{font-family:var(--game);font-size:20px;display:flex;justify-content:space-between;gap:8px}
+.rh small{font-family:var(--body);font-size:18px;color:var(--muted)}
+/* 결과 그림 칸(GAME.result.art가 있을 때만): 오른쪽 카드에서 남는 높이를 쓴다 */
+.rart{flex:1 1 0;min-height:56px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.rart svg{width:100%;height:100%;max-height:220px;display:block}
+
+/* 세로·휴대폰: 1단으로 쌓기 */
+@media (max-width:760px),(orientation:portrait){
+  body{overflow:auto}
+  .app{height:auto;min-height:100dvh;grid-template-rows:auto auto;align-content:start}
+  .main{grid-template-columns:1fr}
+  .scene{aspect-ratio:var(--scene-ar,600/440);height:auto}
+  .panel{overflow:visible}
+  .hint{margin-top:0}
+  .stg .nm,.stg .pips,.score small{display:none}
+  .hud{gap:6px}
+  .stg{font-size:19px;white-space:normal;line-height:1.1;word-break:keep-all;flex:1}
+  .sp{display:none}
+  .score{padding:2px 10px}
+  .score b{font-size:28px;min-width:1.6em}
+  .combo{font-size:18px;padding:4px 8px}
+  .sp{min-width:0}
+  .res{position:static;grid-template-columns:1fr}
+  .main.showres>.scene,.main.showres>.panel{display:none}
+  .callout{font-size:18px;padding:5px 10px}.toast{font-size:18px;padding:4px 10px 4px 6px}.toast svg{width:28px;height:28px}
+  .ribbon{font-size:28px;padding:8px 18px;text-align:center}.ribbon small{font-size:19px}
+  .rart{flex:none;min-height:0}.rart svg{height:auto;max-height:150px}
+  .xp-row{margin-top:0}
+}
+@media (max-height:540px) and (orientation:landscape){
+  .hud{min-height:52px;padding-top:4px}
+  .ib{width:48px;height:48px}
+  .cap{padding:8px 10px}.cap svg{width:52px;height:52px}
+  .rc svg{height:62px}
+  .panel{gap:8px}
+  .prog{padding:6px 10px}
+  .rcard{padding:10px 14px;gap:6px}
+  .rcard .ttl{font-size:26px}
+}
+/* §19 도전 모드: HUD 작은 표시, 타이틀·결과의 '도전' 버튼(남색 + 작은 번개 그림), 새 기록 효과 */
+.eng-chtag{display:inline-flex;align-items:center;gap:3px;font-family:var(--game);font-size:18px;line-height:1;background:var(--a-navy);color:var(--a-paper);border-radius:999px;padding:4px 10px 4px 6px;flex:none}
+.eng-chi{width:20px;height:20px;flex:none;display:block}
+#pbtn.eng-p2{display:flex;flex-direction:column;gap:8px}
+.big.eng-ch{background:var(--a-navy);color:var(--a-paper);box-shadow:inset 0 -5px 0 rgba(0,0,0,.35)}
+.big.eng-ch .eng-chi{width:24px;height:24px;color:var(--a-org)}
+.big.eng-ch small{font-size:18px;opacity:.85;margin-left:4px}
+.big.eng-sec{min-height:52px;font-size:22px;text-decoration:none}   /* 첫 화면 둘째 버튼(도전·연습에서 도전): 주 버튼 '시작'보다 작게 */
+.rcard .btns .btn2{white-space:nowrap}
+/* 결과 '도전'은 '다시 하기'와 같은 너비, 남색으로 구분(도전 결과에서는 주황 = 주 버튼) */
+.eng-pair{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn2.eng-ch.pri{background:var(--accent);color:var(--accent-ink)}.btn2.eng-ch.pri .eng-chi{color:var(--accent-ink)}
+.btn2.eng-ch{flex:1;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--a-navy);color:var(--a-paper)}
+.btn2.eng-ch .eng-chi{color:var(--a-org)}
+.btn2.eng-ch.new{animation:engChPop .5s ease-out 3}
+@keyframes engChPop{45%{transform:scale(1.08);box-shadow:0 0 0 4px var(--accent)}}
+.eng-chrec .eng-lad{flex:1;align-content:center}
+.eng-lad{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}   /* 도전 결과 오른쪽: 레벨 사다리(깬 레벨 = 채운 칸 + 별 수, 아직 = 점선 빈칸, 이번 = 주황 테두리) */
+.eng-lv{width:56px;height:80px;border-radius:14px;border:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--game);font-size:24px;color:var(--muted)}
+.eng-lv.done{border:2px solid transparent;background:var(--bg);color:var(--ink)}.eng-lv .eng-ls{display:flex;gap:0}.eng-lv .eng-star{width:16px;height:16px;animation:none}
+.eng-lv.cur{border:2px solid transparent;color:var(--ink);box-shadow:0 0 0 4px var(--accent)}
+.rcard .ttl.eng-new{background:var(--accent);color:var(--accent-ink);animation:engChPop .6s ease-out 3}
+.eng-chres{gap:6px}
+.rcard .ttl.eng-big{font-size:34px;padding:4px 22px}
+.eng-stars{display:flex;gap:6px}
+.eng-star{width:40px;height:40px;fill:var(--line)}
+.eng-star.on{fill:var(--accent);animation:engStar .5s ease-out both}
+.eng-star.on:nth-child(2){animation-delay:.25s}.eng-star.on:nth-child(3){animation-delay:.5s}
+@keyframes engStar{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.3);opacity:1}100%{transform:scale(1)}}
+.eng-goal{width:100%;display:flex;align-items:center;gap:10px;font-size:18px;color:var(--muted)}
+.eng-gbar{flex:1;height:16px;border-radius:8px;background:var(--bg);overflow:hidden}
+.eng-gbar i{display:block;height:100%;background:var(--a-navy-l);transform-origin:left}
+.eng-chres.pass .eng-gbar i{background:var(--good)}
+.rcard .lab .eng-chi{display:inline-block;vertical-align:-3px;color:var(--accent)}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div class="app" id="app">
+  <header class="hud">
+    <button class="ib" id="bReset" aria-label="처음으로"></button>
+    <div class="stg"><span id="stgName">전자석 실험대</span><span class="pips" id="stgPips"></span><span class="eng-chtag hide" id="engChTag"></span></div>
+    <div class="sp"></div>
+    <div class="combo" id="combo"></div>
+    <div class="score"><small>점수</small><b id="score">0</b></div>
+    <button class="ib" id="bRules" aria-label="규칙 보기"></button>
+    <button class="ib" id="bBadges" aria-label="배지 보기"></button>
+  </header>
+  <div class="main" id="main">
+    <div class="scene" id="scene" aria-label="전지 끼우개와 전자석, 철 고리, 나침반, 영구 자석이 있는 실험대"><div class="ovl" id="ovl"></div></div>
+    <aside class="panel" id="panel">
+      <div class="cap"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#a-captain"/></svg><div class="say" id="say"></div></div>
+      <div id="pbtn"></div>
+      <div class="rules" id="rules"></div>
+      <div class="prog" id="prog"></div>
+      <button class="hint" id="bHint"></button>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ASSETS — 그림 전부. id → {vb:[x,y,w,h], svg:'SVG 조각'} 또는 {vb:[...], src:'이미지 URI(data:)'}.
+   장면·HUD·패널은 이 키로만 그림을 부른다(<use href="#a-키">). 이 객체만 바꾸면 그림 전체가 바뀐다.
+   엔진 기본 키(아래 8개)는 HUD·패널이 쓴다. 게임 assets.js가 같은 키를 다시 정의하면 그 그림이 대신 쓰인다. */
+var ASSETS = {
+  /* 안내자·손가락 (시리즈 공통) */
+  captain: {vb:[0,0,64,64], svg:'<circle cx="32" cy="32" r="31" class="f-shal"/><circle cx="32" cy="38" r="17" class="f-sand"/><path d="M32 21a17 17 0 0 1 0 34z" class="f-sandd"/><path d="M12 29q20-24 40 0z" class="f-navy"/><rect x="10" y="27" width="44" height="6" rx="3" class="f-navyl"/><circle cx="32" cy="21" r="4" class="f-org"/><circle cx="25" cy="38" r="2.4" class="f-navy"/><circle cx="39" cy="38" r="2.4" class="f-navy"/><path d="M24 46q8 6 16 0" fill="none" stroke="#1E2B3A" stroke-width="2.6" stroke-linecap="round"/>'},
+  finger:  {vb:[0,0,48,60], svg:'<g transform="translate(2.5 2.5)" opacity=".38" class="f-navy"><rect x="18" y="1" width="11" height="34" rx="5.5"/><rect x="27" y="22" width="9" height="17" rx="4.5"/><rect x="34" y="26" width="8" height="15" rx="4"/><rect x="11" y="28" width="31" height="25" rx="10"/><rect x="4" y="30" width="10" height="19" rx="5" transform="rotate(-35 9 39)"/><rect x="13" y="50" width="28" height="9" rx="3"/></g><rect x="4" y="30" width="10" height="19" rx="5" transform="rotate(-35 9 39)" class="f-paperd"/><rect x="11" y="28" width="31" height="25" rx="10" class="f-paper"/><rect x="34" y="26" width="8" height="15" rx="4" class="f-paperd"/><rect x="27" y="22" width="9" height="17" rx="4.5" class="f-paperd"/><rect x="18" y="1" width="11" height="34" rx="5.5" class="f-paper"/><rect x="25" y="3" width="4" height="30" rx="2" class="f-paperd"/><rect x="20" y="4" width="6" height="5" rx="2.5" class="f-sand"/><rect x="13" y="50" width="28" height="9" rx="3" class="f-org"/>'},
+  /* HUD 아이콘 24×24 (선 굵기 2.6 통일) */
+  icReset: {vb:[0,0,24,24], svg:'<path class="s-line" d="M5 12a7 7 0 1 0 2.2-5.1"/><path class="s-line" d="M6 3.5v4h4"/>'},
+  icRules: {vb:[0,0,24,24], svg:'<path class="s-line" d="M12 6.5C10 5 6.5 4.5 3 5v13c3.5-.5 7 0 9 1.5 2-1.5 5.5-2 9-1.5V5c-3.5-.5-7 0-9 1.5zM12 6.5v13"/>'},   /* 펼친 책 */
+  icMedal: {vb:[0,0,24,24], svg:'<path class="s-line" d="M7.5 2.5l3 6.5M16.5 2.5l-3 6.5"/><circle class="s-line" cx="12" cy="15" r="6"/><path d="M12 11.3l1.1 2.3 2.5.3-1.8 1.7.5 2.5-2.3-1.2-2.3 1.2.5-2.5-1.8-1.7 2.5-.3z" fill="currentColor"/>'},   /* 끈 달린 메달 + 별 */
+  icBulb:  {vb:[0,0,24,24], svg:'<path class="s-line" d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z"/>'},
+  icNext:  {vb:[0,0,24,24], svg:'<path class="s-line" d="M9 5l7 7-7 7"/>'},
+  icClock: {vb:[0,0,24,24], svg:'<circle class="s-line" cx="12" cy="12" r="8"/><path class="s-line" d="M12 7.5V12l3 2"/>'}
+};
+/* ===== ③-b ASSETS-START: 게임 그림 (games/<이름>/assets.js) ===== */
+/* ③ 그림 — 과학 6-2 3단원 S3 A형 「전자석 실험대」
+   - 실험 부품(전지·철 고리·전자석·나침반·막대자석): Kenney에 없음 → nm.js 기본 도형 모델을 sprite.js(같은 렌더, --linfix)로 찍은 PNG(아래 KENNEY_A3)
+   - 바늘·끼우개·전선·주문 카드·배지·규칙 칸: 직접 그린 SVG(같은 팔레트). 전지·전선 그림은 S1·S2 에이전트 것과 조율자가 나중에 통일한다 */
+var ASSETS_SVG_WHY = {
+  pBatt: '단원 공통 전기 부품(S1이 정함, parts-u3.js U3_PARTS) — Kenney에 건전지 없음',
+  ring: 'Kenney에 둥근 철 고리 없음(space-station pipe-ring은 관 이음매로 읽힘) → nm.js 기본 도형',
+  emag: 'Kenney에 전자석(볼트+에나멜선) 없음(factory crane-magnet은 받침대 모양) → nm.js 기본 도형',
+  compass: 'Kenney에 나침반 없음 → nm.js 몸체 + 장면 SVG 바늘(돌려야 해서)',
+  barMag: 'Kenney에 막대자석 없음 → nm.js 기본 도형(빨강 N·파랑 S)',
+  holder: '전지 끼우개는 회로 도면의 일부라 SVG'
+};
+Object.assign(ASSETS, {
+  /* 안내자(임시, 조율자가 단원 공통으로 덮어씀): 번개 무늬 원 */
+  captain: {vb:[0,0,64,64], svg:'<circle cx="32" cy="32" r="31" class="f-shal"/><circle cx="32" cy="27" r="13" class="f-sand"/><path d="M14 58a18 15 0 0 1 36 0z" class="f-paper"/><path d="M22 20a10 9 0 0 1 20 0z" class="f-navy"/><circle cx="27" cy="27" r="1.8" class="f-navy"/><circle cx="37" cy="27" r="1.8" class="f-navy"/>'},
+  /* 끄는 그림·전지 상자 전지: A = +극(주황) 오른쪽, B = 거꾸로 */
+  batA: {vb:[-56,-20,112,40], svg:'<use href="#a-pBatt" x="-56" y="-20" width="112" height="40"/>'},
+  batB: {vb:[-56,-20,112,40], svg:'<g transform="scale(-1 1)"><use href="#a-pBatt" x="-56" y="-20" width="112" height="40"/></g>'},
+  emagS: {vb:[-90,-22,180,44], svg:'<use href="#a-emag" x="-90" y="-22" width="180" height="44"/>'},
+  /* 나침반 바늘(가운데 0,0, 오른쪽을 가리킴. 빨간 끝 = 가리키는 쪽) */
+  needle: {vb:[-30,-8,60,16], svg:'<path d="M28 0L0 -6.5L0 6.5Z" fill="#D9534F"/><path d="M-28 0L0 -6.5L0 6.5Z" fill="#3F7CC4"/><circle r="3.6" fill="#FBF8F1" stroke="#1E2B3A" stroke-width="1.6"/>'},   /* 블라인드 1차(시계로 읽힘): 막대자석과 같은 빨강·파랑 두 끝 */
+  progOrd: {vb:[0,0,28,18], svg:'<rect x="1" y="1" width="26" height="16" rx="3" fill="#FBF8F1" stroke="#1E2B3A" stroke-width="1.2"/><rect x="6" y="4" width="16" height="4" rx="2" fill="#C77B3A"/><circle cx="14" cy="12" r="3" fill="none" stroke="#8C96A6" stroke-width="1.6"/>'},
+  /* 규칙 칸 120×60 */
+  rPut: {vb:[0,0,120,60], svg:'<rect width="120" height="60" rx="10" class="f-sea"/><use href="#a-batA" x="6" y="18" width="44" height="22"/><path d="M54 29h14M62 23l7 6-7 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<use href="#a-emag" x="72" y="6" width="44" height="12"/><use href="#a-ring" x="86" y="18" width="16" height="16"/><use href="#a-ring" x="86" y="32" width="16" height="16"/>'},
+  rMore: {vb:[0,0,120,60], svg:'<rect width="120" height="60" rx="10" class="f-sea"/><use href="#a-batA" x="4" y="10" width="38" height="19"/><use href="#a-batA" x="4" y="31" width="38" height="19"/><path d="M48 30h12M54 25l6 5-6 5" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<use href="#a-emag" x="66" y="3" width="50" height="12"/><use href="#a-ring" x="83" y="13" width="13" height="13"/><use href="#a-ring" x="83" y="24" width="13" height="13"/><use href="#a-ring" x="83" y="35" width="13" height="13"/><use href="#a-ring" x="83" y="46" width="13" height="13"/>'},
+  rFlip: {vb:[0,0,120,60], svg:'<rect width="120" height="60" rx="10" class="f-sea"/><use href="#a-batA" x="4" y="6" width="40" height="20"/><use href="#a-batB" x="4" y="34" width="40" height="20"/>'
+    +'<circle cx="86" cy="30" r="22" class="f-navyl"/><circle cx="86" cy="30" r="18" class="f-paper"/><g transform="translate(86 30)"><use href="#a-needle" x="-16" y="-5" width="32" height="10"/></g><g transform="translate(86 30) scale(-1 1)" opacity=".35"><use href="#a-needle" x="-16" y="-5" width="32" height="10"/></g>'
+    +'<path d="M50 16q8 14 0 28" fill="none" stroke="#E8743B" stroke-width="3.4" stroke-linecap="round"/><path d="M45 41l5 4 3-6" fill="none" stroke="#E8743B" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'},
+  rFast: {vb:[0,0,120,60], svg:'<rect width="120" height="60" rx="10" class="f-sea"/><rect x="34" y="6" width="52" height="34" rx="6" class="f-paper"/><use href="#a-emag" x="40" y="12" width="40" height="10"/><use href="#a-ring" x="54" y="22" width="13" height="13"/>'
+    +'<rect x="10" y="46" width="100" height="8" rx="4" class="f-navyl"/><rect x="10" y="46" width="44" height="8" rx="4" class="f-org"/>'},
+  /* 배지 48×48 */
+  bdEmag: {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-org"/><use href="#a-emag" x="5" y="13" width="38" height="10"/><use href="#a-ring" x="18" y="22" width="12" height="12"/><use href="#a-ring" x="18" y="31" width="12" height="12"/>'},
+  bdPower: {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-grn"/><use href="#a-batA" x="7" y="11" width="34" height="17"/><use href="#a-batA" x="7" y="24" width="34" height="17"/>'},
+  bdPole: {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-sea"/><circle cx="24" cy="24" r="15" class="f-paper"/><g transform="translate(24 24)"><use href="#a-needle" x="-13" y="-4" width="26" height="8"/></g><path d="M12 9q12-6 24 0" fill="none" stroke="#FBF8F1" stroke-width="2.6" stroke-linecap="round"/><path d="M33 5l3 4-5 2" fill="none" stroke="#FBF8F1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'},
+  bdPerm: {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-navyl"/><use href="#a-barMag" x="7" y="14" width="34" height="11"/><use href="#a-ring" x="18" y="24" width="12" height="12"/>'}
+});
+
+/* sprite.js 출력(games/s3-a3/sprites.json + nm.js, --linfix) */
+/* KENNEY_A3 — sprite.js로 찍은 스프라이트(투명 PNG, 96색). 그림: Kenney (www.kenney.nl), CC0.
+   ring = 기본 도형 ring
+   emag = 기본 도형 emag
+   compass = 기본 도형 compass
+   barMag = 기본 도형 barMag */
+var KENNEY_A3 = {
+  ring: {vb:[-16,-16,32,32], src:'data:image/png;base64,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'},
+  emag: {vb:[-90,-22,180,44], src:'data:image/png;base64,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'},
+  compass: {vb:[-30,-30,60,60], src:'data:image/png;base64,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'},
+  barMag: {vb:[-60,-18,120,36], src:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABICAMAAAD/Eoi4AAAAJ1BMVEVMaXFIh9PrXFjLTkw8drs8eLvLUEzMTkw7dbxFh9TrW1ZAfsjcVVHtymqAAAAAB3RSTlMAQECAgEBAiAYbUwAAAAlwSFlzAAALEgAACxIB0t1+/AAAAH1JREFUeNrt3FsNgDAUBcFboLz96+W3Ck5COutgDGzVlC35Wr7Be+e78jVgYGBgYGBgYGBgYGBg4BG8v/mefAP4yHfm68DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA/B9eab8vXpxxafMfi8YdtXHNvAAAAAElFTkSuQmCC'}
+};
+Object.assign(ASSETS, KENNEY_A3);
+
+/* 단원 공통 전기 부품(parts-u3.js 그대로 복사, 2026-11-08 조율자 지시) */
+/* ③ 그림 — 단원 공통 전기 부품 블록(과학 6-2 3단원 기준).
+   ── 단원 공통 전기 부품(과학 6-2 3단원 기준, S1이 정함. 다른 게임은 이 블록을 그대로 복사해 같은 키로 쓴다) ──
+   pBatt     전지(가로, (+)극이 오른쪽. 왼쪽으로 돌리려면 scale(-1,1)). vb [-56,-20,112,40], (0,0) = 전지 가운데, 양 끝 x = ±56
+   pBulbOff  전구(꺼짐) / pBulbOn 전구(켜짐) / pBulbBright 전구(더 밝게: 전지 둘). 모두 vb [-60,-70,120,136], 유리 가운데 (0,-12) 반지름 26,
+             금속 부분(나사) y 12~36, 꼭지 (0,44). 빛은 같은 상자 안에서 커진다
+   pSwOpen / pSwClosed  스위치(열림·닫힘). vb [-40,-26,80,48], 양쪽 기둥(전선 닿는 곳) x = ±24, y = -4
+   pClip     집게(전선 끝). vb [-20,-14,40,28], 물리는 끝 = 왼쪽(x -18)
+   전선은 그림이 아니라 장면의 선: stroke #33414F, 굵기 6, 둥근 끝(U3_WIRE)
+   ─────────────────────────────────────────────────────────────── */
+var U3_WIRE = 'stroke="#33414F" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+var U3_PARTS = {
+  pBatt: {vb:[-56,-20,112,40], svg:
+    '<rect x="-56" y="-14" width="6" height="28" rx="2" fill="#8C99A5"/>'+
+    '<rect x="-51" y="-17" width="95" height="34" rx="6" fill="#2F4A66"/>'+
+    '<rect x="24" y="-17" width="20" height="34" fill="#E8743B"/><rect x="38" y="-17" width="6" height="34" rx="2" fill="#C95F2C"/>'+
+    '<rect x="44" y="-8" width="10" height="16" rx="3" fill="#B8C2CC"/><rect x="44" y="-8" width="10" height="5" rx="2" fill="#E3E8EC"/>'+
+    '<rect x="-49" y="-14" width="91" height="5" rx="2" fill="#FFFFFF" opacity=".16"/>'+
+    '<path d="M27 0h10M32-5v10" stroke="#FBF8F1" stroke-width="3.6" stroke-linecap="round"/>'+
+    '<path d="M-44 0h10" stroke="#FBF8F1" stroke-width="3.6" stroke-linecap="round"/>'},
+  pBulbOff: {vb:[-60,-70,120,136], svg:
+    '<path d="M-13 12v-6q-13-8-13-18a26 26 0 1 1 52 0q0 10-13 18v6z" fill="#E4ECF0" stroke="#9FB3BF" stroke-width="2"/>'+
+    '<path d="M-6 8v-12q6-12 12 0v12" stroke="#6B5B4B" stroke-width="2.2" fill="none"/>'+
+    '<ellipse cx="-10" cy="-24" rx="5" ry="9" fill="#FFFFFF" opacity=".75"/>'+
+    '<rect x="-14" y="12" width="28" height="24" rx="3" fill="#A9B4BE"/><path d="M-14 18h28M-14 24h28M-14 30h28" stroke="#7E8B97" stroke-width="2"/>'+
+    '<rect x="-7" y="36" width="14" height="5" rx="2" fill="#3E4A57"/><circle cx="0" cy="44" r="4.5" fill="#8C99A5"/>'},
+  pBulbOn: {vb:[-60,-70,120,136], svg:
+    '<circle cx="0" cy="-12" r="46" fill="#FFE27A" opacity=".35"/><circle cx="0" cy="-12" r="36" fill="#FFE27A" opacity=".45"/>'+
+    '<path d="M-13 12v-6q-13-8-13-18a26 26 0 1 1 52 0q0 10-13 18v6z" fill="#FFF1A6" stroke="#E2B53E" stroke-width="2"/>'+
+    '<path d="M-6 8v-12q6-12 12 0v12" stroke="#E8743B" stroke-width="2.6" fill="none"/>'+
+    '<ellipse cx="-10" cy="-24" rx="5" ry="9" fill="#FFFFFF" opacity=".8"/>'+
+    '<rect x="-14" y="12" width="28" height="24" rx="3" fill="#A9B4BE"/><path d="M-14 18h28M-14 24h28M-14 30h28" stroke="#7E8B97" stroke-width="2"/>'+
+    '<rect x="-7" y="36" width="14" height="5" rx="2" fill="#3E4A57"/><circle cx="0" cy="44" r="4.5" fill="#8C99A5"/>'},
+  pBulbBright: {vb:[-60,-70,120,136], svg:
+    '<circle cx="0" cy="-12" r="58" fill="#FFE27A" opacity=".3"/><circle cx="0" cy="-12" r="46" fill="#FFE27A" opacity=".45"/><circle cx="0" cy="-12" r="36" fill="#FFF3B8" opacity=".7"/>'+
+    '<path d="M0-66v10M0 32v0M-46-12h-10M46-12h10M-33-45l-7-7M33-45l7-7M-33 21l-7 7M33 21l7 7" stroke="#F2B640" stroke-width="4" stroke-linecap="round"/>'+
+    '<path d="M-13 12v-6q-13-8-13-18a26 26 0 1 1 52 0q0 10-13 18v6z" fill="#FFFBE0" stroke="#F2B640" stroke-width="2"/>'+
+    '<path d="M-6 8v-12q6-12 12 0v12" stroke="#FFFFFF" stroke-width="3" fill="none"/>'+
+    '<rect x="-14" y="12" width="28" height="24" rx="3" fill="#A9B4BE"/><path d="M-14 18h28M-14 24h28M-14 30h28" stroke="#7E8B97" stroke-width="2"/>'+
+    '<rect x="-7" y="36" width="14" height="5" rx="2" fill="#3E4A57"/><circle cx="0" cy="44" r="4.5" fill="#8C99A5"/>'},
+  pSwOpen: {vb:[-40,-26,80,48], svg:
+    '<rect x="-38" y="2" width="76" height="18" rx="5" fill="#BCC6CE"/><rect x="-38" y="-2" width="76" height="17" rx="5" fill="#E4E9ED"/>'+
+    '<rect x="-29" y="-10" width="10" height="12" rx="2" fill="#8C99A5"/><rect x="19" y="-10" width="10" height="12" rx="2" fill="#8C99A5"/>'+
+    '<path d="M-24-6L12-24" stroke="#9AA7B3" stroke-width="6" stroke-linecap="round"/><circle cx="14" cy="-24" r="5" fill="#E8743B"/>'},
+  pSwClosed: {vb:[-40,-26,80,48], svg:
+    '<rect x="-38" y="2" width="76" height="18" rx="5" fill="#BCC6CE"/><rect x="-38" y="-2" width="76" height="17" rx="5" fill="#E4E9ED"/>'+
+    '<rect x="-29" y="-10" width="10" height="12" rx="2" fill="#8C99A5"/><rect x="19" y="-10" width="10" height="12" rx="2" fill="#8C99A5"/>'+
+    '<path d="M-24-6L26-6" stroke="#9AA7B3" stroke-width="6" stroke-linecap="round"/><circle cx="30" cy="-10" r="5" fill="#E8743B"/>'},
+  pClip: {vb:[-20,-14,40,28], svg:
+    '<path d="M-2-8L-19-3L-19-1L-2-1z" fill="#9AA7B3"/><path d="M-2 8L-19 3L-19 1L-2 1z" fill="#7E8B97"/>'+
+    '<rect x="-4" y="-9" width="22" height="18" rx="5" fill="#D9534F"/><rect x="-2" y="-7" width="18" height="4" rx="2" fill="#FFFFFF" opacity=".3"/>'}
+};
+Object.assign(ASSETS, U3_PARTS);
+/* 과학 3단원 공통 안내자 전기 박사(Kenney mini-characters 머리, 2026-11-08) */
+Object.assign(ASSETS,{sciGuide:{"vb":[-22,-22,44,44],"src":"data:image/png;base64,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"},captain:{"vb":[0,0,64,64],"svg":"<circle cx=\"32\" cy=\"32\" r=\"31\" fill=\"#7FC8D8\"/><use href=\"#a-sciGuide\" x=\"8\" y=\"9\" width=\"48\" height=\"48\"/>"}});
+/* ===== ASSETS-END ===== */
+</script>
+<script>
+/* LOGIC-START *//* ② LOGIC — 과학 6-2 3단원 「전기의 이용」 S3 「전자석의 성질」(교과서 64~66쪽) A형 「전자석 실험대」.
+   순수 함수만(DOM·시간·Math.random 없음). 시간 단위 = 초. 입력 G를 바꾸지 않고 새 G를 돌려준다.
+   동작은 하나: 전지를 끌어 놓는다.
+     pile:A / pile:B(전지 상자의 전지 — A = +극(주황)이 오른쪽, B = +극이 왼쪽) → hold(끼우개의 빈 칸에 더하기) | bat:i(그 칸 전지와 바꾸기 = 방향 바꾸기)
+     bat:i(끼우개의 전지) → box(전지 상자로 빼기)
+   전기가 흐름 = 끼우개에 전지가 있고 모두 같은 방향(직렬연결). 엇갈리면 흐르지 않는다(교과서 63쪽 질문과 이어짐).
+   흐르면 전자석이 된다(64쪽): 철 고리 = 전지 수 × 2(직렬로 많이 이을수록 셈, 66쪽 — 고리 수는 게임 속 상대 크기),
+   나침반 바늘 = 전지 방향(A → 왼쪽, B → 오른쪽, 바꾸면 반대, 66쪽. 어느 쪽이 N극인지는 교과서가 정하지 않으므로 '반대'만 씀).
+   왼쪽 영구 자석(막대자석)은 늘 고리 3개, 바늘이 늘 같은 쪽(세기 일정·극 못 바꿈, 66쪽 비교) — 비교 대상으로 화면에 늘 있다.
+   주문 카드(그림): 고리 n개(r) / 바늘 방향(c). 카드 하나에 판단 하나. 주문은 지금 상태와 다른 것만 나온다.
+   점수: 주문을 채우면 10 + 가장 적은 손놀림으로 채우면 '한 번에' 5 + 빠르기(최대 5, 9초에 걸쳐 줄어듦) + 콤보.
+   모르면 손해: 더해야 할 때 빼거나, 엇갈리게 더하거나(0개), 바늘 주문에 전지 수만 바꾸면 손놀림이 늘어 '한 번에'·빠르기를 잃는다(3단계는 막대가 다 줄면 주문이 떠남). */
+var SEED = 20261108;
+var T = { base:10, onePts:5, fastPts:5, fastT:9, hintPts:4, comboWin:7, comboStep:2, comboCap:4, gap:1.7, arrive:0.6, endDelay:1.0, permRings:3 };
+/* mix: 주문 종류 비율(r 고리, c 바늘), seq: 앞 주문(정해 둠), pat: 기다림 막대(초, 처음 → 끝) */
+var STAGES = [
+  {key:'s1', name:'전지 넣고 빼기', rule:'count', piles:['A'],     n:8,  mix:{r:1},          start:'',  seq:[{k:'r',v:2},{k:'r',v:4},{k:'r',v:0}]},
+  {key:'s2', name:'전지 방향',     rule:'dir',   piles:['A','B'], n:9,  mix:{r:0.35,c:0.65}, start:'A', seq:[{k:'c',v:'B'},{k:'r',v:4}]},
+  {key:'s3', name:'바쁜 실험실',   rule:'fast',  piles:['A','B'], n:12, mix:{r:0.5,c:0.5},   start:'',  pat:[11,8]}
+];
+/* §19 추론형 도전(GAME.challenge.kind='reason'): 한 줄 설계 — "주문 그림을 보고 전지를 바꿔 맞힌다. 한 번이라도 헛손질(가장 짧은 길에서 벗어난 수)을 하면 그 주문은 실패".
+   일반 판 2단계(rule 'dir')와 같은 동작·같은 규칙(전지 넣기·빼기·바꾸기). 시간 막대·빠르기·콤보 없음(시간 무관). 판마다 시드로 처음 끼우개 상태와 주문이 바뀐다.
+   레벨이 올리는 것 = 함께 따질 개념 요소: 1 개수(세기) 2 방향(극) 3 둘이 섞임 4 + 한 카드에 둘 다(rc) 5 rc가 많고 '끄기'(0개) 섞임 6 rc 대부분 + 판이 길어짐.
+   함정(반쪽만 알면 틀림): 레벨 1부터 '+극이 왼쪽(B)인 전지에 더하기' 주문(방향을 안 보고 A를 더하면 엇갈려 0개), 레벨 2부터 바늘 주문(개수만 바꾸면 그대로). */
+var CH = { pts:10, maxLv:6, n:[0,15,15,17,18,20,22], mix:[0,{r:1},{c:1},{r:.5,c:.5},{r:.3,c:.35,rc:.35},{r:.2,c:.2,rc:.6},{r:.1,c:.1,rc:.8}] };
+var CH_PARTIALS = ['개수만 봄(방향을 안 따짐)', '방향만 봄(개수를 안 따짐)'];
+function chStages(lv){ lv=Math.max(1,Math.min(CH.maxLv,lv||1)); return [{key:'c', name:'실험 주문 맞히기', rule:'dir', piles:['A','B'], n:CH.n[lv], mix:CH.mix[lv], start:'?', lv:lv}]; }
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+function chGoal(lv){ return CH.pts*chStages(lv)[0].n; }
+function stOf(G,si){ var i=si==null?G.si:si; return G && G.ch ? chStages(G.ch)[i] : STAGES[i]; }
+function nStages(G){ return G && G.ch ? 1 : STAGES.length; }
+
+var BADGES = [
+  {k:'emag',  name:'전자석',        art:'bdEmag',  def:'전기가 흐를 때만 자석의 성질이 나타나는 자석을 전자석이라고 해요.(교과서 64쪽 참고)'},
+  {k:'power', name:'전자석의 세기', art:'bdPower', def:'전자석에 직렬연결한 전지가 많을수록 전자석의 세기가 세져요. 둥근 철 고리가 더 많이 붙어요.(교과서 66쪽 참고)'},
+  {k:'pole',  name:'전자석의 극',   art:'bdPole',  def:'전자석에 연결한 전지의 방향을 바꾸면 양쪽 극이 반대로 바뀌어요. 나침반 바늘도 반대쪽을 가리켜요.(교과서 66쪽 참고)'},
+  {k:'perm',  name:'영구 자석',     art:'bdPerm',  def:'막대자석처럼 늘 자석의 성질이 있는 자석이에요. 세기가 일정하고 양쪽 극을 바꿀 수 없어요.(교과서 64·66쪽 참고)'}
+];
+/* 행동 직후 한 줄 말풍선(20자 안팎, <em>은 교과서 용어) */
+var NAMES = {
+  emag:  '전기가 흐르니 <em>전자석</em>!',
+  off:   '전기가 끊기면 뚝!',
+  power: '전지 둘: 더 <em>세게</em>!',
+  pole:  '방향 바꾸니 바늘이 <em>반대</em>!',
+  cross: '엇갈리면 전기가 안 흘러요',
+  perm:  '<em>영구 자석</em>은 늘 그대로',
+  leave: '늦어서 주문이 떠났어요'
+};
+var TITLES = [[0,'실험실 새내기'],[250,'실험 조수'],[470,'전자석 연구원'],[620,'전자석 박사'],[700,'실험실 대장']];
+
+function cl(o){ return JSON.parse(JSON.stringify(o)); }
+function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
+function firstName(G,ev,k,at){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+
+/* ---- 회로 계산(끼우개 상태 h = 'A','AB' 같은 글) ---- */
+function flowOf(h){ return h.length>0 && h.split('').every(function(x){ return x===h[0]; }); }
+function ringsOf(h){ return flowOf(h) ? 2*h.length : 0; }
+function dirOf(h){ return flowOf(h) ? h[0] : null; }
+function sat(o,h){ if(!o) return false; if(o.k==='r') return ringsOf(h)===o.v; if(o.k==='c') return dirOf(h)===o.v; return ringsOf(h)===o.v && dirOf(h)===o.d; }
+/* 한 수: {src, dst, h(결과)} */
+function movesOf(h,piles){
+  var r=[], i;
+  if(h.length<2) piles.forEach(function(p){ r.push({src:'pile:'+p, dst:'hold', h:h+p}); });
+  if(piles.length>1) for(i=0;i<h.length;i++) piles.forEach(function(p){ if(p!==h[i]) r.push({src:'pile:'+p, dst:'bat:'+i, h:h.slice(0,i)+p+h.slice(i+1)}); });
+  for(i=0;i<h.length;i++) r.push({src:'bat:'+i, dst:'box', h:h.slice(0,i)+h.slice(i+1)});
+  return r;
+}
+/* 주문까지 가장 짧은 손놀림 수(끼우개 상태 7가지뿐이라 너비 우선 탐색) */
+function distOf(h,o,piles){
+  if(sat(o,h)) return 0; var seen={}, q=[[h,0]]; seen[h]=1;
+  while(q.length){ var x=q.shift(), ms=movesOf(x[0],piles);
+    for(var i=0;i<ms.length;i++){ var y=ms[i].h; if(seen[y]) continue; if(sat(o,y)) return x[1]+1; seen[y]=1; q.push([y,x[1]+1]); } }
+  return 99;
+}
+function bestStep(h,o,piles){
+  var d=distOf(h,o,piles), ms=movesOf(h,piles);
+  for(var i=0;i<ms.length;i++) if(distOf(ms[i].h,o,piles)===d-1) return ms[i];
+  return null;
+}
+
+/* ---- 주문 만들기 ---- */
+function pickKind(G,mix){ var r=rnd(G), acc=0, ks=Object.keys(mix); for(var i=0;i<ks.length;i++){ acc+=mix[ks[i]]; if(r<acc) return ks[i]; } return ks[ks.length-1]; }
+function makeOrder(G,S){
+  var h=G.h, o=null, tries=0, i=G.oi;
+  if(!G.ch && S.seq && i<S.seq.length){ o=cl(S.seq[i]); if(sat(o,h)) o=null; }
+  while(!o && tries++<40){
+    var k=pickKind(G,S.mix), c;
+    if(k==='r'){ var vs=[0,2,4].filter(function(v){ return v!==ringsOf(h); }); c={k:'r', v:vs[Math.floor(rnd(G)*vs.length)]}; }
+    else if(k==='c'){ var d=dirOf(h); c={k:'c', v: d ? (d==='A'?'B':'A') : (rnd(G)<0.5?'A':'B')}; }
+    else { c={k:'rc', v:(rnd(G)<0.5?2:4), d:(rnd(G)<0.5?'A':'B')}; }
+    if(sat(c,h)) continue;
+    /* 1단계 처음 판 같은 '0개' 주문이 연달아 나오지 않게 */
+    if(G.lastK && c.k==='r' && c.v===0 && G.lastK==='r0') continue;
+    o=c;
+  }
+  if(!o) o={k:'r', v: ringsOf(h)===2?4:2};
+  var pat=S.pat ? Math.round((S.pat[0]+(S.pat[1]-S.pat[0])*i/Math.max(1,S.n-1))*10)/10 : 0;
+  o.id=G.nid++; o.pat=pat; o.wait=0; o.used=0; o.min=distOf(h,o,S.piles); o.bad=0; o.arr=T.arrive;
+  G.lastK=o.k+(o.k==='r'?o.v:'');
+  return o;
+}
+/* 도전: 처음 끼우개 상태를 시드로(엇갈린 상태는 빼고, B 방향이 꼭 한 번은 나오게) */
+function chStart(G){ var a=['','A','B','AA','BB','B','BB']; return a[Math.floor(rnd(G)*a.length)]; }
+
+function setupStage(G,si){
+  var S=stOf(G,si);
+  G.si=si; G.t=0; G.oi=0; G.ord=null; G.shown=null; G.gapT=0.8; G.endT=-1; G.combo=0; G.lastDel=-99; G.flash=null; G.lastK='';
+  G.h = S.start==='?' ? chStart(G) : S.start;
+  G.res={total:S.n, served:0, missed:0};
+  return G;
+}
+function newGame(seed){
+  var G={seed:(seed||SEED)>>>0, si:0, phase:'title', t:0, score:0, combo:0, nid:1, first:{}, badges:[], h:'A', ord:null, gapT:0, endT:-1,
+    stats:{done:0, one:0, miss:0, moves:0, hint:0, cross:0}, res:{total:7, served:0, missed:0}};
+  G.ord={id:0, k:'r', v:2, pat:0, wait:0, used:0, min:0, arr:0};   /* 타이틀 정지 장면: 전지 하나, 고리 2개, 주문 카드 */
+  return G;
+}
+function start(G0){ var G=cl(G0); G.score=0; G.phase='play'; G.badges=[]; G.first={}; G.nid=1; if(!G0.ch) G.seed=SEED>>>0;
+  G.stats={done:0, one:0, miss:0, moves:0, hint:0, cross:0}; return setupStage(G,0); }
+
+function finishOrder(G,ev,ok){
+  var o=G.ord; G.ord=null; G.oi++; G.gapT=T.gap;
+  G.shown={id:o.id, k:o.k, v:o.v, d:o.d, ok:ok?1:0, t:G.t, why:(G.flash&&G.flash.id===o.id)?G.flash.why:null};   /* 장면: 끝난 주문 카드를 1.3초 동안 초록 체크 / 빨간 X로 남김 */
+  if(ok) G.res.served++; else G.res.missed++;
+  if(G.oi>=stOf(G).n){ G.gapT=-1; G.endT=G.t; }
+}
+function tick(G0,dt){
+  var G=cl(G0), ev=[]; if(G.phase!=='play') return {G:G, ev:ev};
+  G.t+=dt;
+  if(G.endT>=0){
+    if(G.t-G.endT>=T.endDelay){
+      G.phase='stageEnd';
+      if(!G.ch && G.si===2){ award(G,ev,'perm'); }
+      ev.push({t:'stageEnd', si:G.si});
+    }
+    return {G:G, ev:ev};
+  }
+  if(G.ord){
+    if(G.ord.arr>0) G.ord.arr=Math.max(0,G.ord.arr-dt);
+    else { G.ord.wait+=dt;
+      if(G.ord.pat>0 && G.ord.wait>=G.ord.pat){ G.combo=0; G.stats.miss++; ev.push({t:'miss', id:G.ord.id}); firstName(G,ev,'leave','ord'); finishOrder(G,ev,false); } }
+  } else if(G.gapT>=0){
+    G.gapT-=dt;
+    if(G.gapT<=0){ G.gapT=-1; G.ord=makeOrder(G,stOf(G)); ev.push({t:'arrive', id:G.ord.id}); }
+  }
+  return {G:G, ev:ev};
+}
+function canPlay(G){ return G && G.phase==='play' && G.endT<0; }
+
+/* src: 'pile:A|B' | 'bat:i'   dst: 'hold' | 'bat:i' | 'box' */
+function drop(G0,src,dst,via){
+  var fail=function(why){ var g=G0; if(G0 && G0.combo && /^w/.test(why)){ g=cl(G0); g.combo=0; } return {G:g, ok:false, why:why, ev:[{t:'bounce', why:why, src:src, dst:dst}]}; };
+  if(!canPlay(G0)) return fail('phase');
+  var S=stOf(G0), sp=String(src).split(':'), dp=String(dst).split(':'), h=G0.h, nh=null;
+  if(G0.ord && G0.ord.arr>0) return fail('phase');
+  if(sp[0]==='pile'){
+    if(S.piles.indexOf(sp[1])<0) return fail('src');
+    if(dp[0]==='hold'){ if(h.length>=2) return fail('wFull'); nh=h+sp[1]; }
+    else if(dp[0]==='bat'){ var i=+dp[1]; if(!(i>=0&&i<h.length)) return fail('dst'); if(h[i]===sp[1]) return fail('wSame'); nh=h.slice(0,i)+sp[1]+h.slice(i+1); }
+    else return fail('wBox');
+  } else if(sp[0]==='bat'){
+    var j=+sp[1]; if(!(j>=0&&j<h.length)) return fail('src');
+    if(dp[0]!=='box') return fail('wBat');
+    nh=h.slice(0,j)+h.slice(j+1);
+  } else return fail('src');
+  var G=cl(G0), ev=[], o=G.ord, before=h, r0=ringsOf(before), d0=dirOf(before);
+  /* 도전: 가장 짧은 길에서 벗어난 수 = 그 주문 실패(바뀐 결과는 그대로 보임) */
+  if(G.ch && o){
+    var dB=distOf(before,o,S.piles), dA=distOf(nh,o,S.piles);
+    if(dA!==dB-1){ G.h=nh; G.stats.moves++; o.bad=1; var why = (nh.length===2 && !flowOf(nh)) ? 'cross' : o.k==='r' ? 'count' : o.k==='c' ? 'dir' : (ringsOf(nh)!==o.v && dirOf(nh)===o.d ? 'count' : 'dir');   /* 놓친 단서(블라인드 1차): 개수 / 방향 / 엇갈림 */
+      G.flash={k:'bad', t:G.t, id:o.id, why:why}; G.stats.why=G.stats.why||{}; G.stats.why[why]=(G.stats.why[why]||0)+1; ev.push({t:'bad', id:o.id, at:'hold', why:why}); finishOrder(G,ev,false); return {G:G, ok:true, ev:ev}; }
+  }
+  G.h=nh; G.stats.moves++; if(o) o.used++;
+  var r1=ringsOf(nh), d1=dirOf(nh);
+  ev.push({t:'place', h:nh, r0:r0, r1:r1, d0:d0, d1:d1});
+  if(r1>0 && r0===0) firstName(G,ev,'emag','mag');
+  if(r0>0 && r1===0 && flowOf(before) && !flowOf(nh) && nh.length===0) firstName(G,ev,'off','mag');
+  if(nh.length===2 && !flowOf(nh)){ G.stats.cross++; firstName(G,ev,'cross','hold'); }
+  if(r1===4) firstName(G,ev,'power','mag');
+  if(d0 && d1 && d0!==d1){ firstName(G,ev,'pole','cmp'); G.flip={t:G.t}; }   /* 장면: 같은 나침반이 그 자리에서 크게 돌아감 + 돌림 화살표 */
+  if(r1>0) award(G,ev,'emag');
+  if(o && sat(o,nh)){
+    var pts;
+    if(G.ch) pts=o.bad?0:CH.pts;
+    else if(via){ pts=T.hintPts; G.stats.hint++; G.combo=0; }
+    else {
+      G.combo=(G.t-G.lastDel<=T.comboWin)?G.combo+1:1; G.lastDel=G.t;
+      var one = o.used<=o.min ? T.onePts : 0, fast=Math.round(T.fastPts*Math.max(0,1-o.wait/T.fastT));
+      if(one) G.stats.one++;
+      pts=T.base+one+fast+Math.min(G.combo-1,T.comboCap)*T.comboStep;
+    }
+    G.score+=pts; G.stats.done++;
+    ev.push({t:'done', id:o.id, pts:pts, one:!G.ch && !via && o.used<=o.min, combo:via?0:G.combo});
+    if(o.k==='r' && o.v===4) award(G,ev,'power');
+    if(o.k==='c' || o.k==='rc') award(G,ev,'pole');
+    finishOrder(G,ev,true);
+  } else if(G.ch && o){ ev.push({t:'step', id:o.id}); }
+  return {G:G, ok:true, ev:ev};
+}
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } G.phase='play'; return setupStage(G,G.si+1); }
+
+/* 지금 할 만한 한 수(가장 짧은 길의 첫 수) */
+function hintMove(G){
+  if(!canPlay(G) || !G.ord || G.ord.arr>0) return null;
+  var m=bestStep(G.h,G.ord,stOf(G).piles); return m ? {src:m.src, dst:m.dst} : null;
+}
+/* §19 추론형 반쪽 봇. 0 = 개수만 봄: 방향을 따지지 않고 늘 A를 더하고, 바늘 주문에는 개수를 바꿈(더하거나 뺌).
+   1 = 방향만 봄: 고리 주문에도 전지 방향만 바꿈(개수를 안 바꿈). 둘 다 할 수가 없으면 보통 수 */
+function partialMove(G,k){
+  if(!canPlay(G) || !G.ord || G.ord.arr>0) return null;
+  var o=G.ord, h=G.h, piles=stOf(G).piles;
+  if(k===0){
+    var want = o.k==='c' ? (h.length<2 ? h.length+1 : 1) : o.v/2;   /* 바늘 주문: 개수를 바꾸면 될 줄 앎 */
+    if(h.length<want) return {src:'pile:A', dst:'hold'};
+    if(h.length>want) return {src:'bat:0', dst:'box'};
+    return hintMove(G);
+  }
+  if(k===1){
+    if(o.k!=='c' && h.length){ return {src:'pile:'+(h[0]==='A'?'B':'A'), dst:'bat:0'}; }
+    if(o.k!=='c' && !h.length) return {src:'pile:A', dst:'hold'};
+    return hintMove(G);
+  }
+  return hintMove(G);
+}
+function sources(G){ if(!canPlay(G) || (G.ord && G.ord.arr>0)) return []; var a=stOf(G).piles.map(function(p){ return 'pile:'+p; }); for(var i=0;i<G.h.length;i++) a.push('bat:'+i); return a; }
+function targets(G){ if(!canPlay(G) || (G.ord && G.ord.arr>0)) return []; var a=[], S=stOf(G); if(G.h.length<2) a.push('hold'); if(S.piles.length>1) for(var i=0;i<G.h.length;i++) a.push('bat:'+i); if(G.h.length) a.push('box'); return a; }
+function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='pile') return p[1]==='A'?'batA':'batB'; if(p[0]==='bat'){ var c=G.h[+p[1]]; return c==='B'?'batB':'batA'; } return null; }
+function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
+
+if(typeof module!=='undefined') module.exports={SEED:SEED,T:T,CH:CH,CH_PARTIALS:CH_PARTIALS,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,stOf:stOf,nStages:nStages,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,
+  flowOf:flowOf,ringsOf:ringsOf,dirOf:dirOf,sat:sat,distOf:distOf,movesOf:movesOf,partialMove:partialMove,
+  newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf};
+/* LOGIC-END */
+
+/* ===== ① GAME-START: 게임 설정 (games/<이름>/game.js) ===== */
+/* ① 게임 설정 — 과학 6-2 3단원 S3 「전자석의 성질」(교과서 64~66쪽) A형 「전자석 실험대」.
+   핵심 동작: 전지를 끼우개에 끌어 넣고·빼고·바꿔(방향) 주문 카드 그림과 같은 전자석을 만든다.
+   규칙 한 문장: 주문 카드처럼 만들어요(고리 몇 개 / 바늘 어느 쪽). 표는 logic.js. 불러올 때 DOM을 건드리지 않는다. */
+var GAME = {
+  title: '전자석 실험대',
+  subtitle: '과학 6-2 · 전기의 이용 · 64~66쪽',
+  sceneLabel: '전지 끼우개와 전자석, 철 고리, 나침반, 영구 자석이 있는 실험대',
+  guide: '전기 박사',
+  seed: SEED,
+  stages: STAGES,
+  badges: BADGES,
+  names: NAMES,
+  titles: TITLES,
+  titleOf: titleOf,
+  comboWin: T.comboWin,
+  progArt: 'progOrd',
+  credit: '그림: Kenney 그림체 기본 도형(CC0 방식)',
+  source: ['64쪽 영구 자석(막대자석처럼 늘 자석)·전자석(전기가 흐를 때만 자석)의 뜻, 실험 1 스위치를 닫으면 둥근 철 고리가 붙음',
+           '64쪽 안전: 스위치를 오래 닫으면 전자석이 뜨거워지므로 필요할 때만',
+           '65쪽 실험 2: 전지 한 개 / 두 개 직렬연결 → 붙는 고리 수 비교, 전지 방향을 바꾸며 양쪽 끝 나침반 바늘 관찰',
+           '66쪽 정리: 직렬연결한 전지가 많을수록 세기가 셈, 전지 방향을 바꾸면 극이 반대. 영구 자석은 세기 일정·극 못 바꿈',
+           '63쪽 질문: 전지 두 개를 엇갈리게 넣는 것은 직렬연결이 아님 → 엇갈리면 전기가 흐르지 않음',
+           '고리 수(전지 하나 2개, 둘 4개, 영구 자석 3개)는 게임 속 상대 크기. 어느 쪽이 N극인지는 교과서가 정하지 않아 바늘은 반대만 씀'],
+  say: {
+    title: '주문 카드처럼 전자석을 만들어 줄래?',
+    startBtn: '시작',
+    start: ['카드처럼 고리를 붙여!',
+            '바늘 방향도 주문해!',
+            '막대가 줄기 전에!'],
+    end: [['전지가 있어야 붙고, 둘이면 더 세!'],
+          ['방향을 바꾸면 바늘이 반대야!'],
+          ['영구 자석은 못 하는 일이야!']],
+    idle: '다음 주문이 와요'
+  },
+  ruleCards: [
+    [['rPut','전지 넣고 빼기',1]],
+    [['rFlip','방향 바꾸기',1]],
+    [['rFast','막대 전에',1]]   /* 블라인드 1차(과부하·그림 잘림): 단계마다 새 규칙 칸 하나만 */
+  ],
+  rulesModal: { cards: [['rPut','전지를 넣으면 붙고, 빼면 떨어져요'],['rMore','전지 둘을 같은 방향으로: 더 세게'],['rFlip','전지를 뒤집으면 바늘이 반대']],
+    note: '주문 카드 그림과 똑같이 만들어요. 엇갈리게 넣으면 전기가 안 흘러요.' },
+  result: {
+    label: '내 실험 기록', note: '',
+    rows: function(G){ var s=G.stats; return [['채운 주문', s.done], ['한 번에 채움', s.one]]; },
+    art: function(G){
+      /* 결과 그림: 영구 자석(늘 고리 3) | 전자석 전지 0·1·2개(고리 0·2·4). 글 없이 */
+      var h='', x, i;
+      h += useArt('barMag', 6, 8, 96, 28);
+      for(i=0;i<3;i++) h += useArt('ring', 40, 34+i*20, 26, 26);
+      [0,1,2].forEach(function(n,k){ x=130+k*120;
+        h += useArt('emagS', x, 8, 104, 26);
+        for(i=0;i<n;i++) h += useArt('batA', x+8+i*44, 96, 40, 20);
+        for(i=0;i<2*n;i++) h += useArt('ring', x+40, 32+i*15, 22, 22);
+      });
+      return {vb:[0,0,490,120], svg:h};
+    },
+    formula: '흐를 때만 자석 · 전지 많으면 셈 · 방향 바꾸면 극 반대',
+    next: '다음 시간: 전자석은 어디에 쓰일까?',
+    say: '친구 점수와 비교해 봐!'
+  },
+  explain: {
+    bounce: '다시!',
+    reasons: {
+      wFull: {line:'칸이 꽉 찼어요', why:'끼우개는 두 칸이에요. 빼거나 바꿔 넣어요'},
+      wSame: {line:'같은 방향이에요', why:'방향을 바꾸려면 +극(주황)이 반대인 전지를 놓아요'},
+      wBox:  {line:'끼우개에 넣어요', why:'전지는 가운데 끼우개에 넣어요'},
+      wBat:  {line:'상자로 빼요', why:'끼운 전지를 빼려면 왼쪽 전지 상자로 끌어요'}
+    },
+    of: function(G){
+      if(G.phase!=='play') return null;
+      var h=G.h||'', two=h.length===2, x=two && h[0]!==h[1];
+      if(x) return {why:'두 전지가 <em>엇갈려</em> 있어요. 직렬연결이 아니라서 전기가 흐르지 않아요', page:'교과서 63쪽 참고'};
+      if(G.ch) return {why:'고리는 전지 수, 바늘은 전지 방향으로 정해져요. 한 번에 맞혀요', def:'직렬연결한 전지가 많을수록 세고, 전지 방향을 바꾸면 극이 반대예요.', page:'교과서 66쪽 참고'};
+      if(G.si===0) return {why:'전지를 넣어 전기가 흐를 때만 <em>전자석</em>이 돼요. 같은 방향 전지 둘이면 고리가 더 많이 붙어요', def:BADGES[0].def, page:'교과서 64·66쪽 참고'};
+      if(G.si===1) return {why:'+극(주황)이 반대인 전지로 바꾸면 바늘이 반대쪽을 가리켜요', def:BADGES[2].def, page:'교과서 66쪽 참고'};
+      return {why:'왼쪽 <em>영구 자석</em>은 고리 수도 바늘도 늘 그대로예요', def:BADGES[3].def, page:'교과서 66쪽 참고'};
+    }
+  },
+  toast: {show:'name'},
+  /* 해 보기: 1단계 = 전지를 끼우개에 넣기, 2단계 = 끼운 전지를 반대 방향 전지로 바꾸기. 3단계(막대)는 보이는 상태라 없음(demo가 막대를 가리킴) */
+  tryIt: function(G){
+    if(G.si===2) return null;
+    if(!G.ord || G.ord.arr>0) return {wait:true};
+    if(G.si===0) return {src:'pile:A', dst:'hold', label:'전지 넣기'};
+    if(G.si===1 && G.h.length===1) return {src:'pile:'+(G.h[0]==='A'?'B':'A'), dst:'bat:0', label:'방향 바꾸기'};
+    return {};
+  },
+  demo: function(G){
+    if(G.si===2 && G.ord && G.ord.pat>0 && G.res.served<1) return {point:'pbar', text:'막대가 다 줄면 떠나요', at:'ord'};
+    return null;
+  },
+  challenge: {
+    kind: 'reason',
+    maxLevel: CH.maxLv,
+    stages: CH_STAGES,
+    goal: chGoal,
+    partials: CH_PARTIALS,
+    say: {start: ['한 번에 맞혀 봐!']},
+    ruleCards: [[['rPut','넣고 빼기'],['rFlip','방향 바꾸기']]]
+  },
+  onEvent: function(e,FX){
+    if(e.t==='done'){ FX.score('ordPic', e.pts, e.one, e.combo); FX.burst('ordPic', e.one?12:7); FX.progress(); }
+    else if(e.t==='place'){ FX.burst(e.r1>0?'mag':'hold', e.r1>e.r0?6:3); }
+    else if(e.t==='miss' || e.t==='bad'){ FX.progress(); FX.comboOff(); if(e.t==='bad') FX.explain({why:{count:'고리 수(전지 개수)를 놓쳤어요',dir:'바늘 방향(전지 방향)을 놓쳤어요',cross:'전지가 엇갈려 전기가 안 흘러요'}[e.why]||'', page:'교과서 66쪽 참고'}); }
+  }
+};
+/* ===== GAME-END ===== */
+
+/* ================= 엔진: 화면 ================= */
+var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+var $ = function(s){ return document.querySelector(s); };
+var NS = 'http://www.w3.org/2000/svg';
+var GEN = 0; /* 처음으로 버튼을 누르면 증가 → 진행 중이던 연출(타이머·애니메이션 콜백)은 조용히 멈춘다 */
+var later = function(ms,fn){ var g=GEN; return setTimeout(function(){ if(g===GEN) fn(); }, ms); };
+function useArt(key,x,y,w,h,cls){ var a=ASSETS[key].vb; return '<use href="#a-'+key+'"'+(cls?' class="'+cls+'"':'')+' x="'+(x==null?a[0]:x)+'" y="'+(y==null?a[1]:y)+'" width="'+(w==null?a[2]:w)+'" height="'+(h==null?a[3]:h)+'"/>'; }
+function iconSvg(key,cls){ var a=ASSETS[key].vb; return '<svg class="'+(cls||'ico')+'" viewBox="'+a.join(' ')+'" aria-hidden="true">'+useArt(key)+'</svg>'; }
+function itemSvg(item){ return iconSvg(item,'it'); }
+
+/* ASSETS → 숨은 스프라이트(<symbol id="a-키">) */
+(function buildSprite(){
+  var h='<svg xmlns="'+NS+'" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>';
+  Object.keys(ASSETS).forEach(function(k){ var a=ASSETS[k], vb=a.vb.join(' ');
+    h+='<symbol id="a-'+k+'" viewBox="'+vb+'" overflow="visible">'+(a.src ? '<image href="'+a.src+'" x="'+a.vb[0]+'" y="'+a.vb[1]+'" width="'+a.vb[2]+'" height="'+a.vb[3]+'" preserveAspectRatio="xMidYMid meet"/>' : a.svg)+'</symbol>'; });
+  h+='</defs></svg>';
+  document.getElementById('app').insertAdjacentHTML('beforebegin', h);
+})();
+
+/* ===== ③-a SCENE-START: 렌더 계층 (games/<이름>/scene.js) =====
+   var SCENE = {mount(host), renderScene(G), rectOf(G,id), avoid(G), [idleAt(G)], [css], [aspect]} */
+/* ③ 장면 — 「전자석 실험대」 viewBox 600×400.
+   왼쪽 위: 영구 자석(막대자석, 늘 고리 3개 · 2단계부터 늘 같은 쪽을 가리키는 나침반)  가운데 위: 전자석(볼트+에나멜선)과 그 아래 철 고리 접시
+   오른쪽 위: 나침반(2단계부터)  가운데 아래: 전지 끼우개(두 칸, 전선으로 전자석과 이어짐)  왼쪽 아래: 전지 상자(A·B 더미)  오른쪽: 주문 카드.
+   전지를 놓으면 끼우개 → 전선(흐르는 점) → 전자석에서 곧바로 고리가 뛰어오르고 바늘이 돈다(놓은 자리에서 이어지는 움직임). */
+var SCENE = (function(){
+  var VB={w:600,h:400}, svg, gStatic, gDyn, sig='', N={};
+  var MAG={x:186,y:70,w:236,h:58}, COIL=312, HANGY=124, RS=28, TRAY={x:246,y:262,w:136,h:22};
+  var CMP={cx:470,cy:104,r:40}, PERM={x:26,y:78,w:112,h:34}, PCMP={cx:82,cy:232,r:24};
+  var SLOT=[{x:226,y:316,w:80,h:42},{x:314,y:316,w:80,h:42}], HOLD={x:218,y:308,w:184,h:58};
+  var BOX={x:12,y:258,w:168,h:136}, PILE={A:{x:48,y:276,w:84,h:42}, B:{x:48,y:336,w:84,h:42}};
+  var ORD={x:440,y:160,w:152,h:228};
+  var ringsNow=[], needleA=-90, needleT=-90, lastT=0;
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function S(G){ return stOf(G); }
+  function piles(G){ return G.phase==='title' ? ['A'] : S(G).piles; }
+  function showCmp(G){ return G.ch || (G.phase!=='title' && G.si>=1); }
+  function mount(host){
+    svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
+    gStatic=el('g',{}); gDyn=el('g',{}); svg.appendChild(gStatic); svg.appendChild(gDyn);
+    host.insertBefore(svg, host.firstChild);
+    var st=document.createElement('style'); st.textContent=CSS; document.head.appendChild(st);
+  }
+  /* 전선 길(끼우개 왼쪽 끝 → 전자석 왼쪽 → 오른쪽 → 끼우개 오른쪽 끝) */
+  var WIRE='M222 337H202V146H254V124 M370 124V146H418V337H398';
+  function buildStatic(G){
+    var h='<rect x="-700" y="-600" width="2000" height="1640" class="f-sand"/>'
+      + '<rect x="-700" y="296" width="2000" height="800" class="f-wood"/><rect x="-700" y="296" width="2000" height="8" class="f-woodd"/>';
+    /* 영구 자석: 받침대 + 막대자석 + 이름표 */
+    h += '<rect x="18" y="58" width="8" height="200" rx="3" class="f-navyl"/><rect x="18" y="58" width="74" height="7" rx="3" class="f-navyl"/><rect x="80" y="58" width="5" height="22" class="f-navyl"/>'
+      + useArt('barMag', PERM.x, PERM.y, PERM.w, PERM.h)
+      + '<text x="82" y="44" font-size="19" text-anchor="middle" class="a3x-lab">영구 자석</text>';
+    /* 전자석 받침 + 이름표 */
+    h += '<rect x="'+(MAG.x-10)+'" y="46" width="8" height="250" rx="3" class="f-navyl"/><rect x="'+(MAG.x-10)+'" y="'+(MAG.y+18)+'" width="24" height="8" rx="3" class="f-navyl"/>'
+      + '<text x="'+COIL+'" y="44" font-size="19" text-anchor="middle" class="a3x-lab">전자석</text>';
+    /* 고리 접시 */
+    h += '<rect x="'+TRAY.x+'" y="'+(TRAY.y+12)+'" width="'+TRAY.w+'" height="12" rx="6" class="f-navyl"/>';
+    /* 전선 */
+    h += '<path d="'+WIRE+'" class="a3x-wire"/>';
+    /* 끼우개(두 칸) */
+    h += '<rect x="'+HOLD.x+'" y="'+(HOLD.y+40)+'" width="'+HOLD.w+'" height="14" rx="5" class="f-navy"/>'
+      + '<rect x="'+(HOLD.x)+'" y="'+(HOLD.y+12)+'" width="6" height="42" rx="2" fill="#C9CDD6"/><rect x="'+(HOLD.x+HOLD.w-6)+'" y="'+(HOLD.y+12)+'" width="6" height="42" rx="2" fill="#C9CDD6"/>'
+      + '<rect x="307" y="'+(HOLD.y+22)+'" width="5" height="32" rx="2" fill="#C9CDD6"/>';
+    SLOT.forEach(function(s){ h += '<rect x="'+(s.x+2)+'" y="'+(s.y+2)+'" width="'+(s.w-4)+'" height="'+(s.h-6)+'" rx="8" class="a3x-slot"/>'; });
+    /* 전지 상자 */
+    h += '<rect x="'+BOX.x+'" y="'+(BOX.y+6)+'" width="'+BOX.w+'" height="'+BOX.h+'" rx="12" class="f-woodd"/><rect x="'+BOX.x+'" y="'+BOX.y+'" width="'+BOX.w+'" height="'+BOX.h+'" rx="12" class="f-paperd"/>';
+    piles(G).forEach(function(p){ var b=PILE[p], k=p==='A'?'batA':'batB';
+      h += useArt(k, b.x+10, b.y-6, b.w-10, b.h-6, 'a3x-back') + useArt(k, b.x, b.y, b.w, b.h); });
+    /* 주문 카드 틀 */
+    gStatic.innerHTML=h;
+  }
+  function ringsFor(G){ return G.phase==='title' ? 2 : ringsOf(G.h); }
+  function needleFor(G){ var d=G.phase==='title'?'A':dirOf(G.h); return d==='A' ? 180 : d==='B' ? 0 : -90; }
+  /* 주문 카드 그림 */
+  function ordArt(o,x,y,w){
+    var h='', cx=x+w/2, i;
+    if(o.k==='r' || o.k==='rc'){
+      var ew=o.k==='rc'?92:124, ex=o.k==='rc'?x+6:cx-ew/2;
+      h += useArt('emag', ex, y+16, ew, 28);
+      var rx=ex+ew*0.54-13;
+      if(o.v>0){ h += '<path d="M'+(ex+ew*0.18)+' '+(y+48)+'h'+(ew*0.72)+'" class="a3x-zap"/>'; for(i=0;i<o.v;i++) h += useArt('ring', rx, y+42+i*26, 28, 28); }
+      else {   /* 고리 0개(블라인드 1차: '떨어뜨려라/3개 붙여라'로 헷갈림) → 자석 아래 빈 고리 자리 둘 + 빗금 = 붙은 고리 없음 */
+        for(i=0;i<2;i++) h += '<circle cx="'+(rx+14)+'" cy="'+(y+56+i*26)+'" r="11" fill="none" stroke="#9AA3B2" stroke-width="3" stroke-dasharray="4 3"/>';
+        h += '<path d="M'+(rx-8)+' '+(y+44)+'l44 52" stroke="#D9534F" stroke-width="5" stroke-linecap="round"/>'; }
+      if(o.k==='rc'){ h += '<circle cx="'+(x+w-30)+'" cy="'+(y+30)+'" r="25" class="f-navyl"/><circle cx="'+(x+w-30)+'" cy="'+(y+30)+'" r="21" class="f-paper"/>'
+        + '<g transform="translate('+(x+w-30)+' '+(y+30)+') rotate('+(o.d==='A'?180:0)+')"><use href="#a-needle" x="-20" y="-6" width="40" height="12"/></g>'; }
+    } else {
+      h += useArt('compass', cx-48, y+30, 96, 96)
+        + '<g transform="translate('+cx+' '+(y+78)+') rotate('+(o.v==='A'?180:0)+')"><use href="#a-needle" x="-40" y="-11" width="80" height="22"/></g>';
+    }
+    return h;
+  }
+  /* 매 프레임: 노드는 한 번 만들고 transform·표시만 바꾼다(보급형 태블릿). 내용이 바뀔 때만 innerHTML */
+  function node(k,parent){ if(!N[k]){ N[k]=el('g',{}); (parent||gDyn).appendChild(N[k]); N[k]._s=null; } return N[k]; }
+  function setH(n,sg,html){ if(n._s!==sg){ n._s=sg; n.innerHTML=html; } }
+  function renderScene(G){
+    var now=(typeof performance!=='undefined'?performance.now():0), dt=Math.min(0.1,(now-(lastT||now))/1000); lastT=now;
+    var s2=(G.ch?'c':'')+G.si+'|'+(G.phase==='title')+'|'+piles(G).join(''); if(s2!==sig){ sig=s2; buildStatic(G); N={}; gDyn.innerHTML=''; ringsNow=[]; }
+    var i, flow=G.phase==='title' || flowOf(G.h), hh=G.phase==='title'?'A':G.h, cm=showCmp(G);
+    /* 영구 자석의 고리 3개(늘 붙음)와 늘 같은 쪽 바늘 */
+    var hp=''; for(i=0;i<T.permRings;i++) hp += useArt('ring', 82-RS/2, PERM.y+PERM.h-6+i*(RS-6), RS, RS);
+    if(cm) hp += useArt('compass', PCMP.cx-PCMP.r-4, PCMP.cy-PCMP.r-4, 2*PCMP.r+8, 2*PCMP.r+8) + '<g transform="translate('+PCMP.cx+' '+PCMP.cy+') rotate(180)"><use href="#a-needle" x="-22" y="-6" width="44" height="12"/></g>';
+    /* 영구 자석도 이 주문을 맞출 수 있나(블라인드 1차: 1단계부터 비교 대상으로): 고리 3개·바늘 늘 왼쪽이라 대부분 X */
+    var po=G.ord && !(G.ord.arr>0) && G.phase==='play' ? G.ord : null, pok=po && po.k==='c' && po.v==='A';
+    var mini='<rect x="-17" y="-22" width="34" height="44" rx="6" fill="#FBF8F1" stroke="#1E2B3A" stroke-width="1.6"/><rect x="-17" y="-22" width="34" height="11" rx="5" fill="#E8743B"/>';   /* 블라인드 2차: 작은 주문 카드 모양 위에 초록 체크·빨간 가위표 = '이 주문을 영구 자석은 못 해요' */
+    if(po) hp += pok ? '<g transform="translate(148 104)">'+mini+'<circle r="13" cy="5" fill="#3C9064"/><path d="M-7 5l5 6 10-12" fill="none" stroke="#FBF8F1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>'
+                     : '<g transform="translate(148 104)">'+mini+'<circle r="13" cy="5" fill="#D9534F"/><path d="M-6 -1l12 12M6 -1l-12 12" stroke="#FBF8F1" stroke-width="4" stroke-linecap="round"/></g>';
+    setH(node('perm'), 'p'+cm+'|'+(po?po.id+(pok?'y':'n'):'-'), hp);
+    /* 전자석: 흐르면 빛 */
+    var ng=node('glow'); setH(ng,'g','<rect x="'+(MAG.x+44)+'" y="'+(MAG.y+4)+'" width="'+(MAG.w-56)+'" height="'+(MAG.h-8)+'" rx="22" class="a3x-glow"/>'); ng.style.display=flow?'':'none';
+    setH(node('mag'),'m',useArt('emag', MAG.x, MAG.y, MAG.w, MAG.h));
+    /* 철 고리: 접시에 5개, 세기만큼 위로(뛰어오름) */
+    var want=ringsFor(G);
+    for(i=0;i<5;i++){
+      var up=i<want, tx=up?COIL-RS/2:TRAY.x+6+i*25, ty=up?HANGY+i*(RS-5):TRAY.y-12;
+      if(!ringsNow[i]) ringsNow[i]={x:tx,y:ty};
+      var r=ringsNow[i], k=RM?1:Math.min(1,dt*14); r.x+=(tx-r.x)*k; r.y+=(ty-r.y)*k;
+      var nr=node('r'+i); setH(nr,'r',useArt('ring',0,0,RS,RS)); nr.setAttribute('transform','translate('+r.x.toFixed(1)+' '+r.y.toFixed(1)+')');
+    }
+    /* 전선 위 흐르는 점(애니메이션이 끊기지 않게 같은 노드) */
+    var nf=node('flow'); setH(nf,'f','<path d="'+WIRE+'" class="a3x-flow"/>'); nf.style.display=flow?'':'none';
+    /* 나침반 */
+    var nc=node('cmp'); setH(nc,'c'+cm, cm ? useArt('compass', CMP.cx-CMP.r-6, CMP.cy-CMP.r-6, 2*CMP.r+12, 2*CMP.r+12)+'<g class="a3x-nd"><use href="#a-needle" x="-36" y="-10" width="72" height="20"/></g>' : '');
+    /* 전지를 뒤집은 순간: 같은 나침반 둘레에 돌림 화살표(1초) — 블라인드 1차 '한 장면에서 반대로 돈다' */
+    var fp = cm && G.flip && G.phase==='play' && G.t-G.flip.t<1.0, R2=CMP.r+14, cx0=CMP.cx, cy0=CMP.cy;
+    setH(node('flip'), fp?'f'+G.flip.t:'-', fp ? '<path d="M'+(cx0-R2)+' '+cy0+'A'+R2+' '+R2+' 0 0 1 '+(cx0+R2*0.7)+' '+(cy0-R2*0.7)+'" class="a3x-turn"/><path d="M'+(cx0+R2*0.7-12)+' '+(cy0-R2*0.7-4)+'l12 4-2 12" class="a3x-turn"/>'
+      + '<path d="M'+(cx0+R2)+' '+cy0+'A'+R2+' '+R2+' 0 0 1 '+(cx0-R2*0.7)+' '+(cy0+R2*0.7)+'" class="a3x-turn"/><path d="M'+(cx0-R2*0.7+12)+' '+(cy0+R2*0.7+4)+'l-12 -4 2 -12" class="a3x-turn"/>' : '');
+    if(cm){ needleT=needleFor(G); var dA=((needleT-needleA+540)%360)-180; needleA += RM?dA:dA*Math.min(1,dt*9);
+      var nd=nc.querySelector('.a3x-nd'); if(nd) nd.setAttribute('transform','translate('+CMP.cx+' '+CMP.cy+') rotate('+needleA.toFixed(1)+')'); }
+    /* 끼우개의 전지 + 엇갈림 표시 + (도전) 헛손질 판정 */
+    var bad=!!(G.flash && G.flash.k==='bad' && G.t-G.flash.t<1.0 && G.phase==='play'), hb='';
+    for(i=0;i<hh.length;i++){ var s=SLOT[i]; hb += useArt(hh[i]==='A'?'batA':'batB', s.x+2, s.y, s.w-4, s.h-4); }
+    if(hh.length===2 && !flow) hb += '<path d="M303 304l9 9-9 9 9 9" class="a3x-x"/>';
+    if(bad) hb += '<g data-verdict="bad"><rect x="'+(HOLD.x-4)+'" y="'+(HOLD.y-4)+'" width="'+(HOLD.w+8)+'" height="'+(HOLD.h+8)+'" rx="12" class="a3x-bad"/><path d="M296 300l28 28M324 300l-28 28" class="a3x-badx"/></g>';
+    setH(node('hold'), hh+'|'+bad, hb);
+    /* 주문 카드 */
+    var o=G.ord, no=node('ord'), sh=null;
+    if(!o && G.shown && G.phase==='play' && G.t-G.shown.t<1.3){ o=G.shown; sh=G.shown.ok?'ok':'bad'; }
+    if(o && G.phase!=='stageEnd'){
+      setH(no, o.id+'|'+o.k+o.v+(o.d||'')+'|'+(o.pat>0)+'|'+sh+'|'+(o.why||''),
+        '<rect x="'+ORD.x+'" y="'+(ORD.y+4)+'" width="'+ORD.w+'" height="'+ORD.h+'" rx="14" class="f-paperd"/><rect x="'+ORD.x+'" y="'+ORD.y+'" width="'+ORD.w+'" height="'+ORD.h+'" rx="14" class="f-paper"/>'
+        + '<rect x="'+ORD.x+'" y="'+ORD.y+'" width="'+ORD.w+'" height="30" rx="14" class="f-org"/><rect x="'+ORD.x+'" y="'+(ORD.y+16)+'" width="'+ORD.w+'" height="14" class="f-org"/>'
+        + '<text x="'+(ORD.x+ORD.w/2)+'" y="'+(ORD.y+23)+'" font-size="19" text-anchor="middle" class="a3x-ordlab">주문</text>'
+        + ordArt(o, ORD.x, ORD.y+30, ORD.w)
+        + (sh==='ok' ? '<g data-verdict="ok"><circle cx="'+(ORD.x+ORD.w-24)+'" cy="'+(ORD.y+54)+'" r="22" fill="#3C9064" stroke="#FBF8F1" stroke-width="4"/><path d="M'+(ORD.x+ORD.w-34)+' '+(ORD.y+54)+'l7 8 14-16" fill="none" stroke="#FBF8F1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>' : '')
+        + (sh==='bad' && o.why==='count' ? '<rect x="'+(ORD.x+30)+'" y="'+(ORD.y+64)+'" width="64" height="'+(ORD.h-100)+'" rx="12" fill="none" stroke="#D9534F" stroke-width="4" stroke-dasharray="7 4"/>' : '')
+        + (sh==='bad' && o.why==='dir' ? '<circle cx="'+(o.k==='rc'?ORD.x+ORD.w-30:ORD.x+ORD.w/2)+'" cy="'+(o.k==='rc'?ORD.y+60:ORD.y+108)+'" r="'+(o.k==='rc'?30:56)+'" fill="none" stroke="#D9534F" stroke-width="4" stroke-dasharray="7 4"/>' : '')
+        + (sh==='bad' ? '<g data-verdict="bad"><rect x="'+(ORD.x+3)+'" y="'+(ORD.y+3)+'" width="'+(ORD.w-6)+'" height="'+(ORD.h-6)+'" rx="12" class="a3x-bad"/><path d="M'+(ORD.x+ORD.w-42)+' '+(ORD.y+38)+'l32 32M'+(ORD.x+ORD.w-10)+' '+(ORD.y+38)+'l-32 32" class="a3x-badx"/></g>' : '')
+        + (o.pat>0 && !sh ? '<rect x="'+(ORD.x+12)+'" y="'+(ORD.y+ORD.h-18)+'" width="'+(ORD.w-24)+'" height="10" rx="5" class="f-navyl"/><rect class="a3x-pb f-grn" x="'+(ORD.x+12)+'" y="'+(ORD.y+ORD.h-18)+'" width="'+(ORD.w-24)+'" height="10" rx="5"/>' : ''));
+      no.style.display=''; var slide=o.arr>0 && !sh ? (o.arr/T.arrive)*180 : 0; no.setAttribute('transform','translate('+slide.toFixed(1)+' 0)');
+      var pb=no.querySelector('.a3x-pb'); if(pb){ var rr=Math.max(0,1-o.wait/o.pat), x0=ORD.x+12; pb.setAttribute('transform','translate('+x0+' 0) scale('+rr.toFixed(3)+' 1) translate('+(-x0)+' 0)'); pb.setAttribute('class','a3x-pb '+(rr>.5?'f-grn':rr>.25?'f-org':'f-red')); }
+    } else no.style.display='none';
+    /* 단계 끝: 영구 자석과 견주는 카드 */
+    var ne=node('end'); setH(ne, G.phase==='stageEnd' && !G.ch ? 'e'+G.si : '-', G.phase==='stageEnd' && !G.ch ? endCard(G) : '');
+  }
+  function endCard(G){
+    var x=432, y=150, w=160, h0=236, h='<g data-keep="비교 카드"><rect x="'+x+'" y="'+(y+4)+'" width="'+w+'" height="'+h0+'" rx="14" class="f-paperd"/><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h0+'" rx="14" class="f-paper"/>', i;
+    if(G.si===0){
+      /* 전지 0·1·2 → 고리 0·2·4 (막대 그래프 대신 그림) */
+      [0,1,2].forEach(function(n,k){ var cx=x+30+k*50;
+        for(i=0;i<n;i++) h += useArt('batA', cx-20, y+16+i*22, 40, 20);
+        for(i=0;i<2*n;i++) h += useArt('ring', cx-12, y+82+i*24, 24, 24);
+        if(!n) for(i=0;i<2;i++) h += '<circle cx="'+cx+'" cy="'+(y+94+i*24)+'" r="10" fill="none" stroke="#9AA3B2" stroke-width="3" stroke-dasharray="4 3"/>'; });
+    } else {
+      /* 블라인드 2차: 정지 화면에서도 '같은 나침반이 뒤집힘' — 위: 전지(전 흐리게 → 뒤집은 뒤), 가운데: 나침반 하나에 전(흐린 바늘)·후(진한 바늘) + 돌림 화살표 */
+      var cx=x+w/2, cy=y+150, R=44;
+      h += '<g opacity=".4">'+useArt('batA', x+12, y+18, 60, 30)+'</g><path d="M'+(x+78)+' '+(y+33)+'h14M'+(x+86)+' '+(y+27)+'l6 6-6 6" fill="none" stroke="#E8743B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'+useArt('batB', x+96, y+18, 60, 30);
+      h += '<circle cx="'+cx+'" cy="'+cy+'" r="'+(R+4)+'" class="f-navyl"/><circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" class="f-paper"/>'
+        + '<g opacity=".3" transform="translate('+cx+' '+cy+') rotate(180)"><use href="#a-needle" x="-38" y="-10" width="76" height="20"/></g>'
+        + '<g transform="translate('+cx+' '+cy+')"><use href="#a-needle" x="-38" y="-10" width="76" height="20"/></g>'
+        + '<path d="M'+(cx-R-12)+' '+cy+'A'+(R+12)+' '+(R+12)+' 0 0 1 '+(cx+(R+12)*0.6)+' '+(cy-(R+12)*0.8)+'" fill="none" stroke="#E8743B" stroke-width="5" stroke-linecap="round"/><path d="M'+(cx+(R+12)*0.6-12)+' '+(cy-(R+12)*0.8-5)+'l12 5-3 12" fill="none" stroke="#E8743B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+    return h+'</g>';
+  }
+  function vbRect(G,id){
+    var p=String(id).split(':'), i;
+    if(p[0]==='pile'){ var b=PILE[p[1]]; return b && piles(G).indexOf(p[1])>=0 ? b : null; }
+    if(p[0]==='bat'){ i=+p[1]; return (i>=0 && i<G.h.length) ? SLOT[i] : null; }
+    if(p[0]==='hold'){ return G.h.length<2 ? SLOT[G.h.length] : null; }
+    if(p[0]==='box') return BOX;
+    if(p[0]==='ord') return ORD;
+    if(p[0]==='ordPic') return {x:ORD.x+10, y:ORD.y+ORD.h-44, w:ORD.w-20, h:38};
+    if(p[0]==='pbar') return {x:ORD.x+8, y:ORD.y+ORD.h-24, w:ORD.w-16, h:22};
+    if(p[0]==='mag') return {x:MAG.x+30, y:MAG.y, w:MAG.w-30, h:HANGY+4*(RS-5)-MAG.y+RS};
+    if(p[0]==='cmp') return showCmp(G) ? {x:CMP.cx-CMP.r-6, y:CMP.cy-CMP.r-6, w:2*CMP.r+12, h:2*CMP.r+12} : null;
+    if(p[0]==='perm') return {x:14, y:28, w:136, h:PERM.y+PERM.h+3*RS-20};
+    if(p[0]==='endCard') return G.phase==='stageEnd' ? {x:432,y:150,w:160,h:240} : null;
+    return null;
+  }
+  function rectOf(G,id){
+    var b=vbRect(G,id); if(!b||!svg) return null; var m=svg.getScreenCTM(); if(!m) return null;
+    var x1=m.a*b.x+m.e, y1=m.d*b.y+m.f, x2=m.a*(b.x+b.w)+m.e, y2=m.d*(b.y+b.h)+m.f;
+    return {left:x1, top:y1, right:x2, bottom:y2, width:x2-x1, height:y2-y1, cx:(x1+x2)/2, cy:(y1+y2)/2};
+  }
+  function avoid(G){ var a=sources(G).concat(targets(G)); if(G.ord) a.push('ord'); return a; }
+  function keepClear(G){ var a=['mag','perm']; if(G.ord) a.push('ord'); if(showCmp(G)) a.push('cmp'); if(G.phase==='stageEnd') a.push('endCard'); return a; }
+  var CSS = '.a3x-lab{font-family:var(--game);fill:var(--a-navy)}.a3x-ordlab{font-family:var(--game);fill:var(--a-paper)}'
+    + '.a3x-wire{fill:none;stroke:#33414F;stroke-width:6;stroke-linejoin:round;stroke-linecap:round;stroke-linejoin:round}'
+    + '.a3x-flow{fill:none;stroke:#F2C14E;stroke-width:5;stroke-linecap:round;stroke-dasharray:3 15;animation:a3xflow .6s linear infinite}'
+    + '@keyframes a3xflow{to{stroke-dashoffset:-18}}'
+    + '.a3x-glow{fill:#F2C14E;opacity:.55}.a3x-zap{stroke:#F2C14E;stroke-width:4;stroke-linecap:round;opacity:.9}'
+    + '.a3x-slot{fill:none;stroke:var(--a-paper);stroke-width:2.5;stroke-dasharray:7 5;opacity:.85}.a3x-back{opacity:.55}'
+    + '.a3x-turn{fill:none;stroke:#E8743B;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}'
+    + '.a3x-down{fill:none;stroke:#33475C;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}'
+    + '.a3x-x{fill:none;stroke:#D9534F;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}'
+    + '.a3x-bad{fill:none;stroke:#D9534F;stroke-width:5}.a3x-badx{stroke:#D9534F;stroke-width:7;stroke-linecap:round}'
+    + '@media (prefers-reduced-motion:reduce){.a3x-flow{animation:none;stroke-dasharray:none;opacity:.6}}';
+  return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, keepClear:keepClear, labels:function(G){ return []; }, idleAt:function(G){ return 'ord'; }, aspect:'600/400'};
+})();
+/* ===== SCENE-END ===== */
+
+function renderScene(state){ SCENE.renderScene(state); }
+/* 화면 좌표 → 가장 가까운 id (rectOf만 씀 → 렌더러가 바뀌어도 그대로) */
+function pick(ids,x,y,pad){
+  var best=null, bd=1e9;
+  ids.forEach(function(id){ var r=SCENE.rectOf(G,id); if(!r) return;
+    if(x>=r.left-pad && x<=r.right+pad && y>=r.top-pad && y<=r.bottom+pad){ var d=Math.hypot(x-r.cx,y-r.cy); if(d<bd){ bd=d; best=id; } } });
+  return best;
+}
+
+/* ---------- 상태 ---------- */
+var G, U, BEST=0;
+var sceneEl=$('#scene'), ovl=$('#ovl');
+SCENE.mount(sceneEl);
+if(SCENE.css){ var styleAnim=document.createElement('style'); styleAnim.textContent=SCENE.css; document.head.appendChild(styleAnim); }
+if(SCENE.aspect) document.documentElement.style.setProperty('--scene-ar', SCENE.aspect);
+var SAY=GAME.say, NSTAGE=GAME.stages.length;
+/* 선택 기능(설정하지 않은 게임은 전과 같다): GAME.explain = '왜?' 버튼, GAME.toast = 배지 토스트 방식 */
+var XPC = GAME.explain ? (GAME.explain===true ? {} : GAME.explain) : null;
+var TOASTC = GAME.toast ? (typeof GAME.toast==='string' ? {show:GAME.toast} : GAME.toast) : null;
+if(XPC){ var hb0=$('#bHint'), row0=document.createElement('div'); row0.className='xp-row'; row0.id='xpRow'; hb0.parentNode.insertBefore(row0,hb0); row0.appendChild(hb0);
+  row0.insertAdjacentHTML('beforeend','<button class="xp-btn off" id="xpBtn" aria-expanded="false">'+(XPC.label||'왜?')+'</button>'); }
+
+function freshU(){ return {mode:'title', paused:false, drag:null, sel:null, hint:0, hintMv:null, bounces:0, lastAct:0, demo:null, demoDone:{}, callQ:[], callBusy:false, shown:0, busy:false, comboT:0,
+     toastQ:[], callNow:null, xpCur:null, xpKey:'', okAt:-1e9, okN:0, hf:null, tr:null, trPts:null,
+     labQ:[], txtAt:-1e9, callN:0, trKinds:{}, didKinds:{}, trSkip:{}, keepDemo:{}, dropPt:null, downAt:-1e9, autoH:{}, toastW:{}, actAt:-1e9}; }   /* r5: 마지막 학생 행동 시각(actAt): 그 뒤 0.6초는 직접 결과만 */   /* r4: 마지막 누름(downAt), 단계별 자동 힌트 1회(autoH), 미룬 토스트(toastW) */   /* r3: 글 줄(labQ·txtAt), 해 본 동작 종류(trKinds), 놓친 이유 기록(trSkip) */
+/* '마지막 단계 다시'(§10)는 2026-11-07 폐지(§19 도전 모드로 대체). GAME.replayLast가 있어도 읽지 않는다 */
+/* §19 도전 모드 = 레벨 사다리. 엔진은 틀만(잠금 해제·레벨·판마다 새 시드·목표 점수·통과/아깝다/다시·별·기록·결과 화면).
+   도전 '내용'은 게임이 정의한다: GAME.challenge = {stages:[{name}…], goal(lv), say:{start:[…]}, ruleCards?:[…], speed?(lv), cfg?(lv)}.
+   LOGIC은 G.ch(레벨, 1부터)가 있으면 자기 도전 단계 표를 쓴다. GAME.challenge가 없으면 도전 버튼도 없다(잘못된 도전을 내보내지 않음).
+   아래 ENG-CHRULE 구역은 규칙(순수 함수)만: check.js가 잘라 Node에서 같은 규칙으로 봇 세션을 돌린다 */
+/* ENG-CHRULE-START */
+var CHC = GAME.challenge && typeof GAME.challenge==='object' && Array.isArray(GAME.challenge.stages) && GAME.challenge.stages.length ? GAME.challenge : null;
+var ENG_CHNEAR = 0.9;   /* 목표의 90% 이상이면 '아깝다' */
+var ENG_CHR = {
+  spd: function(lv){ return typeof CHC.speed==='function' ? (+CHC.speed(lv)||1) : 1; },   /* 시간 배속: 기본 1(시간만 줄인 도전 금지). 게임이 원하면 */
+  cfg: function(lv){ return typeof CHC.cfg==='function' ? CHC.cfg(lv) : (CHC.cfg||null); },   /* G.cfg로 LOGIC에 넘길 레벨별 값(선택) */
+  goal: function(lv){ return Math.max(1, Math.round(+CHC.goal(lv)||1)); },
+  stars: function(sc,g){ if(CHC.kind==='reason') return sc<g ? 0 : 3;   /* 추론형: 목표 = 모두 맞힘(만점)이라 통과면 별 셋 */
+    return sc<g ? 0 : sc>=g*1.3 ? 3 : sc>=g*1.15 ? 2 : 1; },
+  seed: function(n){ return ((GAME.seed||1)+7919*(n+1))>>>0; },
+  max: function(){ var m=Math.floor(+CHC.maxLevel||0); return m>0 ? m : 0; },   /* §19-추론형(2026-11-07): 최고 레벨(0 = 끝없음). 다 깨면 '모든 도전 완주!' */
+  kind: function(){ return CHC.kind==='reason' ? 'reason' : 'score'; }          /* 'reason' = 추론형 도전(시간 무관, 그 레벨 예측을 모두 맞혀야 통과). check.js 공리 판정이 달라짐 */
+};
+/* ENG-CHRULE-END */
+var ENG_CH_GAP = 900, ENG_CHON = false, ENG_CHLV = 1, ENG_CHSPD = 1, ENG_CHCFG = null, ENG_CHGOAL = 0, ENG_CHRS = Math.floor(Math.random()*100000);
+var ENG_CHM = {open:false, lv:1, top:0, best:{}, n:0};   /* lv = 열린 레벨(다음에 할 것), top = 깬 최고 레벨, best = 레벨별 최고 점수, n = 판 수 */
+function engHash(s){ var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return (h>>>0).toString(36); }
+var ENG_CHK = 'engch:'+(GAME.id ? String(GAME.id) : engHash(String(GAME.title)+'|'+String(GAME.subtitle)));
+/* ENG-STORE-START: 엔진이 브라우저 저장을 쓰는 곳은 이 두 함수뿐(check.js가 이 구역 밖의 사용과 try 없는 사용을 막는다). 막혀 있으면 ENG_CHM(메모리)만으로 이 접속 동안 동작 */
+function engChLoad(){ try{ var s=window.localStorage.getItem(ENG_CHK); if(s) engChMerge(JSON.parse(s)); }catch(e){} }
+function engChSave(){ try{ window.localStorage.setItem(ENG_CHK, JSON.stringify(ENG_CHM)); }catch(e){} }
+/* ENG-STORE-END */
+function engChMerge(o){ if(!o||typeof o!=='object') return; var M=ENG_CHM; if(o.open) M.open=true; if(o.all) M.all=1; ['lv','top','n'].forEach(function(k){ if(+o[k]>M[k]) M[k]=+o[k]; });
+  if(o.best&&typeof o.best==='object') for(var k in o.best) if(+o.best[k]>(M.best[k]||0)) M.best[k]=+o.best[k]; }
+function engChMark(g){ if(ENG_CHON && g && typeof g==='object' && g.ch!==ENG_CHLV){ g.ch=ENG_CHLV; if(ENG_CHCFG) g.cfg=ENG_CHCFG; } return g; }
+/* 지금 판의 단계 표·규칙 칸·시작 대사(도전이면 GAME.challenge 것) */
+function engStg(){ return ENG_CHON ? CHC.stages : GAME.stages; }
+function engRC(si){ return (ENG_CHON ? (CHC.ruleCards||[])[si] : GAME.ruleCards[si]) || []; }
+function engSay0(si){ return ENG_CHON ? ((CHC.say||{}).start||[])[si] || '' : SAY.start[si]; }   /* LOGIC이 새 G를 만들며 빠뜨려도 다시 붙인다 */
+function engChLab(lv){ return '도전 '+lv+(CHC && ENG_CHR.max() ? ' / '+ENG_CHR.max() : ''); }   /* 블라인드(11-07): '도전 5'가 무엇인지 모름 → GAME.challenge.maxLevel이 있으면 '도전 5 / 8'(HUD 알약·첫 리본·결과 큰 글). 없으면 '도전 5' */
+function engChIcon(){ return '<svg class="eng-chi" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 2.2 4.8 13.6h6.1L9.4 21.8l9.8-12.2h-6.3z" fill="currentColor"/></svg>'; }
+function engStar(on){ return '<svg class="eng-star'+(on?' on':'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.2l-5.8 3.2 1.2-6.5L2.6 9.4l6.5-.8z"/></svg>'; }
+function engChStart(lv){
+  if(!CHC) return; lv=Math.max(1, +lv||ENG_CHM.lv); if(ENG_CHR.max()) lv=Math.min(lv, ENG_CHR.max()); reset();
+  ENG_CHON=true; ENG_CHLV=lv; ENG_CHSPD=ENG_CHR.spd(lv); ENG_CHCFG=ENG_CHR.cfg(lv); ENG_CHGOAL=ENG_CHR.goal(lv);
+  G=engChMark(newGame(ENG_CHR.seed(ENG_CHM.n+ENG_CHRS))); ENG_CHM.n++; engChSave();   /* 판마다 새 시드 */
+  G=engChMark(start(G));
+  var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage();
+}
+/* §19-짝(2026-11-07, 교사 승인): 도전이 없는 체험 게임은 같은 차시 '떠올리기 연습'의 도전으로 이어 준다.
+   주소는 배포 때 넣는다: <meta name="eng-pair" content="주소"> 또는 GAME.pairUrl. 주소가 없으면 버튼도 없다. */
+function engPairUrl(){ try{ var m=document.querySelector('meta[name="eng-pair"]'); var u=(m&&m.getAttribute('content'))||GAME.pairUrl||''; return /^(https:\/\/|\.{0,2}\/|[\w-]+\.html)/.test(u)?u:''; }catch(e){ return ''; } }
+function engPairBtn(){ var u=engPairUrl(); if(!u) return ''; return '<a class="btn2 eng-ch eng-pair" id="engPair" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>'; }
+/* 2026-11-07 교사 결정: 잠금 폐지 — 도전은 첫 화면부터 늘 열려 있다(중간에 나갔다 들어오는 학생·복습하는 학생). 레벨 = 기기 기록(없으면 1).
+   시각 위계: 개념 판 '시작'이 주 버튼(주황, 60px, 먼저), 도전은 둘째 버튼(남색, 52px). 도전이 없는 체험 게임은 eng-pair 주소가 있을 때만 '연습에서 도전'을 둘째로 */
+function engChTitleBtn(){
+  var p=$('#pbtn'); if(!p.children.length) return;
+  if(CHC){ var lv=ENG_CHR.max()?Math.min(ENG_CHM.lv,ENG_CHR.max()):ENG_CHM.lv; p.classList.add('eng-p2');
+    p.insertAdjacentHTML('beforeend','<button class="big eng-ch eng-sec" id="engChGo">'+engChIcon()+'도전 '+lv+'</button>');
+    $('#engChGo').onclick=function(){ if(U.busy) return; engChStart(lv); }; return; }
+  var u=engPairUrl(); if(!u) return; p.classList.add('eng-p2');
+  p.insertAdjacentHTML('beforeend','<a class="big eng-ch eng-sec eng-pair" id="engPairGo" href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+engChIcon()+'연습에서 도전</a>');
+}
+function reset(){
+  ENG_CHON=false; GEN++; G=newGame(GAME.seed); ovl.innerHTML=''; engDockClear();
+  U=freshU(); $('#app').classList.remove('trying');
+  if(XPC){ xpClose(); $('#xpBtn').classList.add('off'); }
+  $('#combo').classList.remove('on'); closeModal(); var r=$('.res'); if(r) r.remove(); $('#main').classList.remove('showres');
+  $('#score').textContent='0'; /* U.shown=0, G.score=0이라 frame()이 갱신하지 않으므로 직접 지운다 */
+  stageHud(); title();
+}
+function stageHud(){
+  var on=U.mode!=='title', si=G.si;
+  $('#stgName').innerHTML = on ? (si+1)+'단계<span class="nm"> · '+engStg()[si].name+'</span>' : GAME.title;
+  $('#stgPips').innerHTML = on ? engStg().map(function(_,i){ return '<i class="'+(i<si?'done':i===si?'on':'')+'"></i>'; }).join('') : '';
+  var ct=$('#engChTag'); if(ct){ if(ENG_CHON) ct.innerHTML=engChIcon()+engChLab(ENG_CHLV); ct.classList.toggle('hide', !ENG_CHON); }   /* §19 도전 중 표시 */
+}
+function say(html,who){ $('#say').innerHTML='<b>'+(who||GAME.guide)+'</b>'+html; }
+function setBtn(label,fn){ var p=$('#pbtn'); p.classList.remove('eng-p2'); if(!label){ p.innerHTML=''; return; } p.innerHTML='<button class="big" id="bBig">'+label+iconSvg('icNext')+'</button>'; $('#bBig').onclick=function(){ if(U.busy) return; fn(); }; }
+function ruleCard(c){ return '<div class="rc'+(c[2]?' new':'')+'"><svg viewBox="0 0 120 60">'+useArt(c[0],0,0,120,60)+'</svg><span>'+c[1]+'</span></div>'; }
+function rulesPanel(){ var h=''; if(U.mode==='play'||U.mode==='stageEnd'){ engRC(G.si).forEach(function(c){ h+=ruleCard(c); }); } $('#rules').innerHTML=h; }
+/* 진행 표시: 끝낸 일(G.res.served) 초록, 놓친 일(G.res.missed) 회색, 남은 일 흐리게 */
+function progPanel(){
+  var p=$('#prog'); if(U.mode!=='play'&&U.mode!=='stageEnd'){ p.classList.add('hide'); return; } p.classList.remove('hide');
+  var total=G.res.total, h='', art=GAME.progArt, vb=ASSETS[art].vb;
+  var done=G.res.served, miss=G.res.missed, key=G.si+'|'+total, prev=U.progKey===key?U.progDone:done;   /* 같은 단계에서 새로 끝낸 칸만 반짝(§13) */
+  for(var i=0;i<total;i++){ var c = i<done?'':(i<done+miss?'ms':'wt');
+    h+='<span class="pc'+(i<done&&i>=prev?' just':'')+'"><svg viewBox="0 0 '+vb[2]+' '+vb[3]+'" class="'+c+'">'+useArt(art,0,0,vb[2],vb[3])+'</svg>'
+      +(i<done?'<svg class="ck" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="var(--good)"/><path d="M4.4 8.3l2.4 2.4 4.8-5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>':'')+'</span>'; }
+  var tg=p.querySelector('.prog-tag');
+  p.innerHTML=h; if(tg) p.appendChild(tg); p.classList.toggle('many', total>9);   /* r5: 칸이 많으면 간격을 줄인다(늘 한 줄) */
+  U.progKey=key; U.progDone=done;
+}
+/* 진행 줄을 처음 볼 때 한 번(이 화면에서) '남은 일' 이름표(§13). '해 보기'가 끝나고 시범 시각이 지난 뒤 3초 */
+var PTAG=0;
+function progTag(now){
+  if(PTAG||U.mode!=='play'||tryHold()||now<U.demoAt-400) return;
+  /* r4: '해 보기' 이름표('칸에 넣기')와 같은 때 뜨지 않게: 글 줄이 비고 마지막 글이 나타나고 1.7초 뒤(최대 8초 기다림) */
+  if(!U.ptWait) U.ptWait=now; var busyTxt=U.labQ.length||ovl.querySelector('.trylab')||now-U.txtAt<1700; if(busyTxt && now-U.ptWait<8000) return;
+  var p=$('#prog'); if(!p||!p.offsetParent||p.classList.contains('hide')||!p.children.length) return;
+  PTAG=1; var d=document.createElement('div'); d.className='prog-tag'; d.textContent='남은 일'; p.appendChild(d);
+  if(!RM) d.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:220});
+  later(3200,function(){ d.animate([{opacity:1},{opacity:0}],{duration:RM?1:300}).onfinish=function(){ d.remove(); }; });
+}
+function hintBtn(){
+  var b=$('#bHint'); if(XPC) $('#xpRow').classList.toggle('hide', U.mode!=='play');
+  if(U.mode!=='play'){ b.classList.add('hide'); return; } b.classList.remove('hide');
+  b.innerHTML=iconSvg('icBulb')+'힌트<span class="pips">'+[1,2,3].map(function(i){ return '<i class="'+(i<=U.hint?'on':'')+'"></i>'; }).join('')+'</span>';
+}
+function panelAll(){ rulesPanel(); progPanel(); hintBtn(); stageHud(); }
+
+function title(){
+  U.mode='title'; panelAll();
+  say(SAY.title);
+  setBtn(SAY.startBtn||'시작',function(){ G=start(G); beginStage(); });
+  engChTitleBtn();   /* §19: 도전(또는 '연습에서 도전')은 첫 화면부터 둘째 버튼으로(2026-11-07 잠금 폐지) */
+  ribbon(GAME.title,GAME.subtitle,0);
+}
+function beginStage(){
+  U.mode='play'; U.hint=0; U.hintMv=null; U.bounces=0; U.okN=0; U.lastAct=performance.now(); U.demo=null; U.demoAt=performance.now()+(G.si===0?2200:2400);
+  var tq=clearOvl(); setBtn(null); say(engSay0(G.si)); panelAll(); U.xpCur=null;
+  if(ENG_CHON && G.si===0) ribbon(engChLab(ENG_CHLV), ENG_CHR.kind()==='reason' ? '모두 맞히기' : '목표 '+ENG_CHGOAL, 1400);   /* §19: 첫 단계는 레벨과 목표 점수(추론형은 '모두 맞히기') */
+  else ribbon((G.si+1)+'단계', engStg()[G.si].name, ENG_CHON?ENG_CH_GAP:1500);
+  tryBegin();   /* §12 '해 보기': 새 규칙이 나오는 단계면 시간을 멈추고 한 번 직접 해 보게 한다 */
+  tq.forEach(toast);
+}
+/* 단계 끝 리본(§14): GAME.stageRibbon(G)가 글을 주면 그것. 없으면 G.res가 있고 missed===0이면 '○단계 성공!'(꽃가루), 아니면 '○단계 끝!'(엔진은 성공 여부를 모른다) */
+function stageRibbon(){
+  var n=(G.si+1)+'단계', t=typeof GAME.stageRibbon==='function'?GAME.stageRibbon(G):null;
+  if(t&&typeof t==='object') return {text:t.text||n+' 끝!', ok:t.confetti!==false};   /* {text, confetti:false}도 된다 */
+  if(t!=null&&t!=='') return {text:String(t), ok:true};
+  var ok=!!(G.res&&typeof G.res.missed==='number'&&G.res.missed===0);
+  return {text:n+(ok?' 성공!':' 끝!'), ok:ok};
+}
+/* u2(§18): 단계 끝 비교 카드(SCENE이 phase stageEnd에 그림)가 보이는 동안 장면 위 글은 카드와 리본뿐.
+   +점수 글은 띄우지 않고(HUD 점수는 그대로 오름), 말풍선은 패널 자리(#engDock)로, 배지 토스트는 다음 단계 시작으로 미룬다 */
+function engEndCard(){ if(!U||!G) return false; if(U.mode==='stageEnd'||G.phase==='stageEnd') return true; return typeof SCENE.endCard==='function' && !!SCENE.endCard(G); }
+function engEndSweep(){
+  ovl.querySelectorAll('.fx').forEach(function(d){ d.remove(); });
+  var tz=ovl.querySelectorAll('.toast'); tz.forEach(function(d){ d._gone=1; d.remove(); }); if(tz.length) engBadgeBump();   /* 단계 끝 직전에 뜬 배지 토스트도 거둔다(배지 버튼 통통, 결과 선반에 있음) */
+  ovl.querySelectorAll('.callout').forEach(function(d){ if(d._gone||d._dock) return; d.getAnimations().forEach(function(a){ a.cancel(); }); engDockPut(d); });
+}
+function onStageEnd(){
+  U.mode='stageEnd'; U.busy=true; tryClear(); engEndSweep(); stopDemo(); if(XPC){ U.xpCur=null; xpSync(); } clearRings(); hintBtn(); progPanel(); $('#combo').classList.remove('on'); U.comboT=0;
+  var sr=stageRibbon();
+  if(ENG_CHON){   /* §19 도전: 단계 끝 대사·'다음'·비교 카드 없이 짧은 리본 뒤 바로 다음 단계(LOGIC next를 곧바로 불러 비교 카드 장면을 건너뜀) */
+    ribbon(sr.text, '', ENG_CH_GAP); if(sr.ok) confetti(); setBtn(null);
+    G=engChMark(next(G));
+    later(ENG_CH_GAP+100,function(){ U.busy=false; if(G.phase==='end') results(); else beginStage(); }); return; }
+  ribbon(sr.text, '', 1700); if(sr.ok) confetti();
+  later(700,function(){ U.busy=false; var lines=SAY.end[G.si], k=0;
+    var show=function(){ say(lines[k]); setBtn(k<lines.length-1?'다음':(G.si<NSTAGE-1?'다음 단계':'결과 보기'), function(){ k++; if(k<lines.length) show(); else { G=next(G); if(G.phase==='end') results(); else beginStage(); } }); };
+    show(); });
+}
+
+/* ---------- 오버레이 (HTML, 렌더러 독립) ---------- */
+function oRect(r){ var s=sceneEl.getBoundingClientRect(); return {x:r.cx-s.left, y:r.cy-s.top, l:r.left-s.left, t:r.top-s.top, w:r.width, h:r.height}; }
+function clearOvl(){ ovl.innerHTML=''; engDockClear(); ENG_KB.t=-1e9; U.callQ=[]; U.labQ=[]; U.callBusy=false; U.callNow=null; U.txtAt=-1e9; U.toastW={}; ENG_AO={}; ENG_FR={}; var q=U.toastQ||[]; U.toastQ=[]; return q; }   /* 미뤄 둔 배지 토스트를 돌려준다(단계 시작에 띄움) */
+function ribbon(big,small,ms){
+  var old=ovl.querySelector('.ribbon'); if(old) old.remove();
+  var d=document.createElement('div'); d.className='ribbon'; d.innerHTML=big+(small?'<small>'+small+'</small>':''); ovl.appendChild(d);
+  if(ms) engRibbonPlace(d);
+  if(ms){ d.animate([{opacity:0,transform:'translate(-50%,-50%) scale(.8)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)'}],{duration:RM?1:220}); later(ms,function(){ d.animate([{opacity:1},{opacity:0}],{duration:RM?1:250}).onfinish=function(){ d.remove(); }; }); }
+}
+/* r5: 단계 리본(시작·끝)은 장면의 덮으면 안 되는 자리(SCENE.labels·keepClear·[data-keep]·avoid, 플레이 중이면 집을 것·놓을 곳)와 장면 글자를 가장 덜 가리는 높이에.
+   (a4: 단계 끝 '성공!' 리본이 개념 증거인 탑 가운데를 가렸다.) 후보 높이 38%(기본)·14%·86%·62%·26%·50%. 모두 5% 넘게 가리면 작게(.sm) 다시 */
+function engRibbonPlace(d){
+  if(!G||!U) return; ENG_KB.t=-1e9; var s=sceneEl.getBoundingClientRect(), K=engKeepBoxes().concat(engTextBoxes()), H=s.height, W=s.width;
+  var pick=function(){ var w=d.offsetWidth, h=d.offsetHeight, x=(W-w)/2, best=null;
+    [0.38,0.14,0.86,0.62,0.26,0.5].forEach(function(f,i){ var y=Math.max(4,Math.min(H-h-4,f*H-h/2)), o=overlap(x,y,w,h,K), c=o+i*20;
+      if(!best||c<best.c) best={c:c,o:o,y:y+h/2,a:w*h}; }); return best; };
+  var b=pick(); if(b.o>0.05*b.a){ d.classList.add('sm'); var b2=pick(); if(b2.o<b.o) b=b2; else d.classList.remove('sm'); }
+  d.style.top=b.y+'px';
+}
+function callout(html,at){
+  U.callN++; U.callQ.push({html:html,at:at,pri:ENG_PRI}); engTxtPump();   /* r5: pri = 틀린 놓기에 곧바로 붙는 한 줄(그 행동의 직접 결과라 0.6초 기다리지 않음) */
+}
+/* r5 행동 뒤 0.6초(블라인드 4차 a4: 놓자 탑 움직임 + 점수 + 설명 + 힌트 화살표가 한꺼번에 떠 '무엇 때문인지' 헷갈림):
+   학생이 놓거나(맞음·틀림) 힌트를 누르면 U.actAt. 그 뒤 ENG_ACT_HOLD 동안은 그 행동의 직접 결과(놓은 자리의 변화·파티클·빨간 테두리·'다시!'·힌트 표시)만 보이고,
+   점수(+N·HUD 숫자·콤보), 말풍선·이름표·배지 토스트, '왜?' 버튼 반짝임은 그 뒤에 나온다 */
+var ENG_ACT_HOLD=600, ENG_PRI=false;
+function engHeld(now){ return !!U && (now||performance.now())-U.actAt<ENG_ACT_HOLD; }
+/* r3 글 줄(블라인드 2차: 배지 토스트·말풍선·이름표가 한꺼번에 떠 서로 가렸다): 장면 위 글(말풍선·이름표·토스트)은 한 번에 하나씩 나타난다.
+   앞 글이 나타나고 ENG_TXT_GAP(0.8초)이 지나야 다음 글. 차례: 말풍선(서로는 하나씩) → 해 보기 이름표 → 배지 토스트(맨 뒤, GAME.toast.wait면 말풍선이 다 끝난 뒤).
+   자리는 placeFree가 다른 글과 겹치지 않는 곳을 고른다 */
+var ENG_TXT_GAP=850;   /* r5: 800 → 850(앞 글이 0.2초 동안 떠오르는 사이 표본 흔들림 여유) */
+function engTxtPump(now){
+  if(!U) return; now=now||performance.now(); if(now-U.txtAt<ENG_TXT_GAP) return;
+  if(engHeld(now) && !(U.callQ.length && U.callQ[0].pri && !U.callBusy)) return;   /* r5: 행동 직후 0.6초는 글을 띄우지 않는다(틀린 놓기의 한 줄만 예외) */
+  if(U.callQ.length && !U.callBusy){ nextCallout(); U.txtAt=performance.now(); return; }   /* r5: 자리 찾기가 끝나 실제로 뜬 시각 */
+  while(U.labQ.length && now>=U.labQ[0].nb){ var L=U.labQ.shift(); if(tryLabelShow(L)){ U.txtAt=performance.now(); return; } }
+  if(engEndCard()) return;   /* u2(§18): 단계 끝 카드가 보이는 동안 배지 토스트는 다음 단계 시작에(clearOvl이 돌려줌) */
+  if(U.toastQ.length && !U.callQ.length && !U.labQ.length && !(TOASTC && TOASTC.wait!==false && U.callBusy)){
+    /* r4: 배지 토스트는 장면의 글(나라 이름·제목 띠 등)·다른 글을 가리지 않는 빈자리가 있을 때만 뜬다. 없으면 0.5초마다 다시 보고, 4.5초가 지나면 띄우지 않는다(배지는 받았고 결과 선반에 있음. 배지 버튼만 통통) */
+    var k=U.toastQ[0], w=U.toastW[k]||(U.toastW[k]={t0:now, nb:0});
+    if(now<w.nb) return;
+    if(engToastShow(k)){ U.toastQ.shift(); delete U.toastW[k]; U.txtAt=performance.now(); }
+    else if(now-w.t0>4500){ U.toastQ.shift(); delete U.toastW[k]; engBadgeBump(); }
+    else w.nb=now+500;
+  }
+}
+function engBadgeBump(){ var bb=$('#bBadges'); bb.classList.remove('got'); void bb.offsetWidth; if(!RM) bb.classList.add('got'); }
+/* r4: 장면 안 글자(SVG <text>, 보이는 것만)의 상자. 말풍선·이름표·토스트 자리 찾기와 힌트 화살표·손가락이 피한다(3차 블라인드: 알림이 나라 이름·'우리 공장'·위 이름표를 가렸다).
+   SCENE.labels(G)가 id 목록을 주면 그 rectOf도 글 상자로 본다(글 없는 이름표 그림 등). 0.12초 동안 같은 목록을 쓴다 */
+var ENG_TB={t:-1e9, L:[]};
+function engTextVis(e){
+  for(var p=e; p && p!==sceneEl; p=p.parentNode){ if(p.nodeType!==1) continue; var cs=getComputedStyle(p); if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<0.15) return false; }
+  return true;
+}
+function engTextBoxes(){
+  var now=performance.now(); if(now-ENG_TB.t<120) return ENG_TB.L;
+  var s=sceneEl.getBoundingClientRect(), L=[];
+  sceneEl.querySelectorAll('text').forEach(function(e){
+    if(ovl.contains(e)) return; var r=e.getBoundingClientRect(); if(r.width<3||r.height<3) return;
+    if(r.right<s.left||r.left>s.right||r.bottom<s.top||r.top>s.bottom) return; if(!engTextVis(e)) return;
+    L.push({l:r.left-s.left-3, t:r.top-s.top-3, r:r.right-s.left+3, b:r.bottom-s.top+3});
+  });
+  if(SCENE.labels && G){ (SCENE.labels(G)||[]).forEach(function(id){ var r=SCENE.rectOf(G,id); if(r) L.push({l:r.left-s.left, t:r.top-s.top, r:r.right-s.left, b:r.bottom-s.top}); }); }
+  ENG_TB={t:now, L:L}; return L;
+}
+/* r5: 알림이 덮으면 안 되는 장면 자리(블라인드 4차: 주황 이름표·말풍선이 탑·화살표·나라 칸·배를 가렸다).
+   = SCENE.avoid(G) + 플레이 중 sources(G)·targets(G)(장면 넓이 45%가 넘는 큰 판은 뺌) + 지금 힌트·해 보기의 집을 것·놓을 곳
+   + SCENE.keepClear(G)(선택: id | 장면 안 Element | rectOf 모양 {left,top,width,height}(화면 좌표)의 목록) + 장면 안 [data-keep] 요소(보이는 것). 0.1초 캐시 */
+var ENG_KB={t:-1e9, L:[]};
+function engKeepBoxes(){
+  var now=performance.now(); if(now-ENG_KB.t<100) return ENG_KB.L;
+  var s=sceneEl.getBoundingClientRect(), A=s.width*s.height, L=[], seen={};
+  var addR=function(r,pad,big){ if(!r||!(r.width>0)||!(r.height>0)) return; if(!big && r.width*r.height>A*0.45) return;
+    L.push({l:r.left-s.left-pad, t:r.top-s.top-pad, r:r.left+r.width-s.left+pad, b:r.top+r.height-s.top+pad}); };
+  var addId=function(id,big){ if(id==null||seen[id]) return; seen[id]=1; addR(SCENE.rectOf(G,id),4,big); };
+  if(G && U){
+    SCENE.avoid(G).forEach(function(id){ addId(id,true); });
+    if(U.mode==='play'){ sources(G).forEach(function(id){ addId(id); }); targets(G).forEach(function(id){ addId(id); }); }
+    if(U.hintMv){ addId(U.hintMv.src,true); addId(U.hintMv.dst,true); }
+    if(U.tr && U.tr.mv){ addId(U.tr.mv.src,true); addId(U.tr.mv.dst,true); }
+    if(typeof SCENE.keepClear==='function') (SCENE.keepClear(G)||[]).forEach(function(k){
+      if(k==null) return; if(typeof k==='string'||typeof k==='number') addId(k,true);
+      else if(k.nodeType===1){ if(engTextVis(k)) addR(k.getBoundingClientRect(),3,true); }
+      else if(k.width!=null) addR(k,3,true); });
+  }
+  if(G && SCENE.labels) (SCENE.labels(G)||[]).forEach(function(id){ addId(id,true); });   /* r5: §16-1 SCENE.labels(G)도 덮으면 안 되는 자리(게임이 목록을 두 번 쓰지 않게) */
+  sceneEl.querySelectorAll('[data-keep]').forEach(function(e){ if(ovl.contains(e)||!engTextVis(e)) return; addR(e.getBoundingClientRect(),3,true); });
+  ENG_KB={t:now, L:L}; return L;
+}
+/* 빈자리 찾기: 덮으면 안 되는 자리(engKeepBoxes + 이 알림의 extra id)·다른 알림·장면 글자를 가장 덜 가리는 자리. rectOf만 쓰므로 렌더러와 무관 */
+function blockers(self,extra){
+  var s=sceneEl.getBoundingClientRect(), a=engKeepBoxes().slice(), b=[];
+  var add=function(id){ var r=SCENE.rectOf(G,id); if(r) a.push({l:r.left-s.left-4, t:r.top-s.top-4, r:r.right-s.left+4, b:r.bottom-s.top+4}); };
+  (extra||[]).forEach(add);
+  ovl.querySelectorAll('.callout,.toast,.ribbon,.trylab').forEach(function(e){ if(e===self) return; var r=e.getBoundingClientRect(); b.push({l:r.left-s.left-12, t:r.top-s.top-12, r:r.right-s.left+12, b:r.bottom-s.top+12}); });   /* r4: 6 → 12px(말풍선이 10px 아래에서 올라오며 나타나는 동안에도 안 겹치게) */
+  return {s:s, hard:a, ui:b, txt:engTextBoxes()};
+}
+function overlap(x,y,w,h,L){ var sum=0; L.forEach(function(q){ var ox=Math.min(x+w,q.r)-Math.max(x,q.l), oy=Math.min(y+h,q.b)-Math.max(y,q.t); if(ox>0&&oy>0) sum+=ox*oy; }); return sum; }
+function placeFree(d,at,widths,pt,extra){
+  var B=blockers(d,extra), W=B.s.width, H=B.s.height, r=at?SCENE.rectOf(G,at):null;
+  var ax=pt?pt.x:r?r.cx-B.s.left:W/2, ay=pt?pt.y:r?r.top-B.s.top:0, best=null;
+  (widths||['']).forEach(function(mw){
+    d.style.maxWidth=mw; var w=d.offsetWidth, h=d.offsetHeight, X1=Math.max(6,W-w-6), Y1=Math.max(6,H-h-6), bw=null;
+    var at=function(x,y){
+      var oh=overlap(x,y,w,h,B.hard), ou=overlap(x,y,w,h,B.ui), ot=overlap(x,y,w,h,B.txt);   /* r4: 장면 글자를 가리면 40배 벌점(조작 대상 3배, 다른 글 120배: 글끼리는 절대 안 겹치게) */
+      var c=oh*50 + ou*120 + ot*40 + Math.hypot(x+w/2-ax, y+h/2-ay)*0.6 + h*1.5;   /* r5: 덮으면 안 되는 자리 3 → 50배 */
+      if(!bw||c<bw.c) bw={c:c,x:x,y:y,mw:mw,oh:oh,ou:ou,ot:ot,w:w,h:h};
+    };
+    /* r5: 16px 격자로 먼저 찾고 그 둘레를 4px로 다듬는다(덮으면 안 되는 자리가 늘어 8px 전체 격자가 느렸다) */
+    for(var y=6; y<=Y1; y+=16) for(var x=6; x<=X1; x+=16) at(x,y);
+    var bx0=bw.x, by0=bw.y; for(var yy=Math.max(6,by0-12); yy<=Math.min(Y1,by0+12); yy+=4) for(var xx=Math.max(6,bx0-12); xx<=Math.min(X1,bx0+12); xx+=4) at(xx,yy);
+    if(X1-6<16||Y1-6<16) at(X1,Y1);
+    if(!best||bw.c<best.c) best=bw;
+  });
+  d.style.maxWidth=best.mw; return best;
+}
+/* r5: 자리가 '빈자리'인가: 다른 알림과 안 겹치고, 덮으면 안 되는 자리·장면 글자를 합쳐 알림 넓이의 5% 넘게 덮지 않음 */
+function engFit(p){ return p.ou<=0 && (p.oh+p.ot)<=0.05*p.w*p.h; }
+/* 빈자리 → 그대로, 없으면 작게(.sm) 다시, 그래도 없으면 null(패널 자리 engDockPut) */
+function engPlace(d,at,widths,pt,extra){
+  var p=placeFree(d,at,widths,pt,extra); if(engFit(p)) return p;
+  d.classList.add('sm'); var q=placeFree(d,at,widths,pt,extra); if(engFit(q)) return q;
+  d.classList.remove('sm'); d.style.maxWidth=p.mw; return null;
+}
+/* 패널 힌트 줄 바로 위 자리(장면 밖). 규칙 칸·남은 일 줄과 가까워 '방금 한 일 = 이 규칙'으로 이어진다 */
+function engDockPut(d){
+  var pn=$('#panel'), dk=$('#engDock'); if(!dk){ dk=document.createElement('div'); dk.id='engDock'; dk.className='eng-dock'; pn.appendChild(dk); }
+  var hb=XPC?$('#xpRow'):$('#bHint'), pr=pn.getBoundingClientRect(), hr=hb?hb.getBoundingClientRect():null;
+  dk.style.bottom=(hr&&hr.height?Math.max(8,pr.bottom-hr.top+8):8)+'px';
+  d.style.transform=''; d.style.maxWidth=''; d._x=null; d._dock=1; dk.appendChild(d);
+  if(!RM) d.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:200});
+}
+function engDockClear(){ var dk=document.getElementById('engDock'); if(dk) dk.innerHTML=''; }
+function nextCallout(){
+  var c=U.callQ.shift(); U.callNow=c||null;
+  if(!c){ U.callBusy=false; return; } U.callBusy=true;   /* 글 줄(engTxtPump)만 부른다. 말풍선이 다 끝나면 txtPump가 미뤄 둔 토스트를 띄운다 */
+  var d=document.createElement('div'); d.className='callout'; d.innerHTML=c.html; ovl.appendChild(d);
+  var p=engEndCard()?null:engPlace(d,c.at,['','64%','46%']);   /* u2(§18): 단계 끝 카드가 보이는 동안은 곧바로 패널 자리 */
+  if(!p) engDockPut(d);   /* r5: 장면에 빈자리가 없으면 패널 자리 */
+  else { var x=p.x, y=p.y;
+    d.style.transform='translate('+x+'px,'+y+'px)'; d._x=x; d._y=y;
+    d.animate([{opacity:0,transform:'translate('+x+'px,'+(y+10)+'px)'},{opacity:1,transform:'translate('+x+'px,'+y+'px)'}],{duration:RM?1:200}); }
+  later(2300,function(){ d._gone=1; d.animate([{opacity:1},{opacity:0}],{duration:RM?1:200}).onfinish=function(){ d.remove(); U.callBusy=false; U.callNow=null; engTxtPump(); }; });
+}
+/* 조작 대상이 새로 들어와 말풍선·토스트 밑에 깔리면 가까운 빈자리로 옮긴다(0.25초마다 확인) */
+var FIXT=0;
+function unblockOverlays(now){
+  if(now-FIXT<250) return; FIXT=now;
+  ovl.querySelectorAll('.callout,.toast,.trylab').forEach(function(d){
+    if(d._x==null||d._gone) return; var w=d.offsetWidth, h=d.offsetHeight, B=blockers(d);
+    var oh=overlap(d._x,d._y,w,h,B.hard), ot=overlap(d._x,d._y,w,h,B.txt); if(oh<=0 && ot<=0) return;   /* r4: 장면 글자(움직이는 나라 이름표 등)에 깔려도 옮긴다 */
+    var p=placeFree(d,null,[d.style.maxWidth],{x:d._x+w/2,y:d._y+h/2}); if(p.x===d._x&&p.y===d._y) return;
+    if(p.ou>0 || p.oh*50+p.ot*40 >= oh*50+ot*40-1) return;   /* r5: 가중치 3 → 50(placeFree와 같게) */   /* 더 나은 자리가 없거나 다른 글과 겹치는 자리면 그대로(흔들리지 않게) */
+    d._x=p.x; d._y=p.y; d.style.transform='translate('+p.x+'px,'+p.y+'px)';
+    if(!RM) d.animate([{opacity:0.15},{opacity:1}],{duration:180,easing:'ease-out'});   /* r5: 미끄러지지 않고 새 자리에서 살짝 나타남(옮겨 가는 길에 다른 알림 위를 지나지 않게) */
+  });
+}
+/* 배지 토스트. GAME.toast가 없으면 전과 같다(바로 띄움, '배지: 이름').
+   GAME.toast = {show:'full'|'name'|'off', wait:true}: wait = 말풍선이 떠 있으면 다 끝날 때까지 미룸, name = 그림 + 이름만, off = 토스트 없이 배지 버튼만 통통 */
+function toast(k){
+  var b=GAME.badges.find(function(x){ return x.k===k; }); if(!b) return;
+  if(TOASTC){
+    if(TOASTC.show==='off'){ var bb=$('#bBadges'); bb.classList.remove('got'); void bb.offsetWidth; if(!RM) bb.classList.add('got'); return; }
+  }
+  if(engEndCard()) engBadgeBump();   /* u2(§18): 단계 끝에는 배지 버튼만 통통, 토스트는 다음 단계 시작에 */
+  U.toastQ.push(k); if(!(U.tr && U.tr.phase==='wait')) engTxtPump();   /* r4: 해 보기 수가 준 배지는 이름표(tryAfter가 곧 넣음) 뒤에. r3: 토스트는 글 줄 맨 뒤(GAME.toast가 없어도 0.8초 간격, 다른 글과 겹치지 않는 자리) */
+}
+function engToastShow(k){
+  var b=GAME.badges.find(function(x){ return x.k===k; }); if(!b) return true;
+  var d=document.createElement('div'); d.className='toast'; d.innerHTML=iconSvg(b.art,'')+'<span>'+(TOASTC&&TOASTC.show==='name'?'':'배지: ')+b.name+'</span>';
+  ovl.appendChild(d); var sw=sceneEl.getBoundingClientRect(), p=placeFree(d,null,[''],{x:sw.width, y:sw.height*0.35});   /* r4: 패널 쪽(오른쪽)을 먼저 본다 */
+  if(p.ot>0 || p.ou>0 || p.oh>p.w*p.h*0.04){ d.remove(); return false; }   /* r5: 덮으면 안 되는 자리 12% → 4% */   /* r4: 글·다른 알림을 가리거나 조작 대상을 많이 가리면 띄우지 않고 미룬다 */
+  var tt='translate('+p.x+'px,'+p.y+'px)'; d.style.transform=tt; d._x=p.x; d._y=p.y;
+  d.animate([{opacity:0,transform:tt+' translateX('+Math.min(30,Math.max(0,sw.width-p.x-p.w-2))+'px)'},{opacity:1,transform:tt}],{duration:RM?1:250});   /* r5: 장면 오른쪽 끝에서는 밀려 들어오는 거리를 줄인다(장면 밖으로 나가지 않게) */
+  later(2600,function(){ d._gone=1; d.animate([{opacity:1},{opacity:0}],{duration:RM?1:250}).onfinish=function(){ d.remove(); }; });
+  return true;
+}
+function fxText(at,txt,fast,r0){
+  if(engEndCard()) return;   /* u2(§18): 단계 끝에는 +점수 글 없음 */
+  var r=r0||SCENE.rectOf(G,at); if(!r) return; var o=oRect(r);
+  var d=document.createElement('div'); d.className='fx'+(fast?' fast':''); d.textContent=txt; ovl.appendChild(d);
+  d.animate([{transform:'translate('+(o.x-20)+'px,'+(o.t+10)+'px)',opacity:1},{transform:'translate('+(o.x-20)+'px,'+(o.t-30)+'px)',opacity:0}],{duration:RM?300:900,easing:'ease-out'}).onfinish=function(){ d.remove(); };
+}
+function burst(at,n){
+  if(RM) return; var r=SCENE.rectOf(G,at); if(!r) return; var o=oRect(r), cols=['var(--a-org)','var(--a-paper)','var(--a-grn)','var(--a-shal)'];
+  for(var i=0;i<(n||8);i++){ (function(i){ var d=document.createElement('div'); d.className='dot'; d.style.background=cols[i%4]; ovl.appendChild(d);
+    var a=Math.PI*2*i/(n||8), dx=Math.cos(a)*50, dy=Math.sin(a)*40-20;
+    d.animate([{transform:'translate('+o.x+'px,'+(o.t+30)+'px)',opacity:1},{transform:'translate('+(o.x+dx)+'px,'+(o.t+30+dy)+'px) scale(.4)',opacity:0}],{duration:600,easing:'ease-out'}).onfinish=function(){ d.remove(); }; })(i); }
+}
+function confetti(){ if(RM) return; var s=sceneEl.getBoundingClientRect(); var cols=['var(--a-org)','var(--a-paper)','var(--a-grn)','var(--a-sand)'];
+  for(var i=0;i<18;i++){ var d=document.createElement('div'); d.className='dot'; d.style.background=cols[i%4]; ovl.appendChild(d); var x=Math.random()*s.width;
+    d.animate([{transform:'translate('+x+'px,-10px)'},{transform:'translate('+(x+(Math.random()*60-30))+'px,'+(s.height*0.7)+'px) rotate(200deg)',opacity:0}],{duration:1200+Math.random()*500,easing:'ease-in'}).onfinish=(function(d){ return function(){ d.remove(); }; })(d); } }
+
+/* 끌기 그림자 */
+function ghost(item,x,y){ var d=document.createElement('div'); d.className='ghost'; d.innerHTML=itemSvg(item); ovl.appendChild(d); moveGhost(d,x,y); return d; }
+function moveGhost(d,x,y){ var s=sceneEl.getBoundingClientRect(); var t='translate('+(x-s.left)+'px,'+(y-s.top)+'px)'; d.style.setProperty('--t',t); d.style.transform=t; d._x=x; d._y=y; }
+function flyGhost(d,to,ms,done){
+  var s=sceneEl.getBoundingClientRect(), x0=d._x-s.left, y0=d._y-s.top, x1=to.cx-s.left, y1=to.cy-s.top, my=Math.min(y0,y1)-60;
+  d.classList.remove('sel');
+  var a=d.animate([{transform:'translate('+x0+'px,'+y0+'px)'},{transform:'translate('+((x0+x1)/2)+'px,'+my+'px) scale(1.1)'},{transform:'translate('+x1+'px,'+y1+'px) scale(.8)'}],{duration:RM?60:ms,easing:'ease-in-out'});
+  var g=GEN; a.onfinish=function(){ d.remove(); if(g===GEN&&done) done(); };
+}
+/* 깜박이는 테두리 */
+function ring(id,cls){ var r=SCENE.rectOf(G,id); if(!r) return null; var o=oRect(r); var d=document.createElement('div'); d.className='ring '+(cls||''); d.dataset.id=id;
+  d.style.cssText='left:'+o.l+'px;top:'+o.t+'px;width:'+o.w+'px;height:'+o.h+'px'; ovl.appendChild(d); return d; }
+function clearRings(sel){ ovl.querySelectorAll(sel||'.ring,.harrow').forEach(function(e){ e.remove(); }); }   /* 선택자 없이 부르면 힌트 화살표도 지운다 */
+function badRing(id){ var d=ring(id,'bad'); if(d) later(450,function(){ d.remove(); }); }
+/* r3: 틀린 놓기 기본 표시 '다시!'(놓은 자리, 0.9초). 글 줄과 따로(바로 떠야 함) */
+function engNope(pt,dst,src){
+  var s=sceneEl.getBoundingClientRect(), x, y, r=null;
+  if(pt){ x=pt.x-s.left; y=pt.y-s.top; } else { r=(dst&&dst!=='none'&&SCENE.rectOf(G,dst))||SCENE.rectOf(G,src); if(!r) return; x=r.cx-s.left; y=r.top-s.top+10; }
+  ovl.querySelectorAll('.nope').forEach(function(e){ e.remove(); });
+  var d=document.createElement('div'); d.className='nope'; d.textContent=(XPC&&(dst==null||dst==='none')&&XPC.offTarget)||(XPC&&XPC.bounce)||'다시!';   /* 대상 밖에 놓기: GAME.explain.offTarget 글이 있으면 그것 */ ovl.appendChild(d);
+  var w=d.offsetWidth, h=d.offsetHeight; x=Math.max(4,Math.min(s.width-w-4,x-w/2)); y=Math.max(4,Math.min(s.height-h-4,y-h-30));
+  var tt='translate('+x+'px,'+y+'px)'; d.style.transform=tt;
+  d.animate([{opacity:0,transform:tt+' scale(.7)'},{opacity:1,transform:tt,offset:.15},{opacity:1,transform:tt,offset:.75},{opacity:0,transform:tt}],{duration:RM?600:900}).onfinish=function(){ d.remove(); };
+}
+function syncRings(){ ovl.querySelectorAll('.ring:not(.bad)').forEach(function(d){ var r=SCENE.rectOf(G,d.dataset.id); if(!r){ d.remove(); return; } var o=oRect(r); d.style.left=o.l+'px'; d.style.top=o.t+'px'; d.style.width=o.w+'px'; d.style.height=o.h+'px'; }); }
+
+/* ---------- 손가락 시범 ---------- */
+function stopDemo(){ if(U.demo){ U.demo.forEach(function(e){ e.remove(); }); U.demo=null; } hintFingerStop(); }
+function endDemo(mine){ if(mine){ mine.forEach(function(e){ e.remove(); }); U.demo=null; } }   /* 시범이 저절로 끝남: 그 시범만 지운다 */
+function demoMove(mv,loops){
+  stopDemo(); var a=SCENE.rectOf(G,mv.src), b=SCENE.rectOf(G,mv.dst); if(!a||!b) return;
+  var s=sceneEl.getBoundingClientRect(), item=itemOf(G,mv.src);
+  var f=document.createElement('div'); f.className='finger'; f.innerHTML=iconSvg('finger','');
+  var gh=document.createElement('div'); gh.className='ghost'; gh.innerHTML=itemSvg(item); gh.style.opacity='.85';
+  ovl.appendChild(gh); ovl.appendChild(f); var mine=U.demo=[f,gh];
+  var x0=a.cx-s.left, y0=a.cy-s.top, x1=b.cx-s.left, y1=b.cy-s.top;
+  var kf=function(dx,dy){ return [
+    {transform:'translate('+(x0+dx)+'px,'+(y0+dy+30)+'px)',opacity:0,offset:0},
+    {transform:'translate('+(x0+dx)+'px,'+(y0+dy)+'px)',opacity:1,offset:.15},
+    {transform:'translate('+(x0+dx)+'px,'+(y0+dy)+'px) scale(.92)',opacity:1,offset:.25},
+    {transform:'translate('+(x1+dx)+'px,'+(y1+dy)+'px) scale(.92)',opacity:1,offset:.75},
+    {transform:'translate('+(x1+dx)+'px,'+(y1+dy)+'px)',opacity:0,offset:1}]; };
+  var opt={duration:RM?2600:2000,iterations:loops,easing:'ease-in-out'};
+  f.animate(kf(0,6),opt); var an=gh.animate(kf(0,0),opt);
+  an.onfinish=function(){ endDemo(U.demo===mine?mine:null); };   /* 지운 시범의 늦은 끝 알림이 새 시범·힌트 손가락을 지우지 않게 */
+}
+/* 새 규칙이 '보이는 상태'일 때(예: 기다림 막대) 그곳을 가리킨다. r3: 손가락이 아니라 빛 테두리(.ring.look) 두 번(블라인드 2차: 남은 손가락을 '눌러야 하나?'로 읽었고 말풍선 글을 가렸다) */
+function demoPoint(id){
+  stopDemo(); var d=ring(id,'look'); if(!d) return; var mine=U.demo=[d];
+  later(RM?2400:2600,function(){ endDemo(U.demo===mine?mine:null); if(d.parentNode) d.remove(); });
+}
+/* 손가락이 한 곳(rectOf(G,id) 아래쪽)을 콕콕 누른다: 탭 '해 보기'({tap})에서만 */
+function engDemoTap(id){
+  stopDemo(); var r=SCENE.rectOf(G,id); if(!r) return; var s=sceneEl.getBoundingClientRect();
+  var f=document.createElement('div'); f.className='finger'; f.innerHTML=iconSvg('finger',''); ovl.appendChild(f); var mine=U.demo=[f];
+  var x=r.cx-s.left, y=r.bottom-s.top+4;
+  f.animate([{transform:'translate('+x+'px,'+(y+30)+'px)',opacity:0},{transform:'translate('+x+'px,'+y+'px)',opacity:1,offset:.3},{transform:'translate('+x+'px,'+(y+8)+'px)',offset:.5},{transform:'translate('+x+'px,'+y+'px)',offset:.7},{transform:'translate('+x+'px,'+y+'px)',opacity:0}],{duration:RM?2400:1600,iterations:2}).onfinish=function(){ endDemo(U.demo===mine?mine:null); };
+}
+/* 언제 시범을 보일지. 기본: 단계 시작에 hintMove를 한 번(2회 반복), 그 뒤는 10초 동안 아무것도 못 하면 한 번.
+   GAME.demo(G)가 이 단계의 시작 시범을 바꿀 수 있다:
+     {repeat:true}            멈출 때마다(1.2초) 시범 반복(첫 단계 튜토리얼)
+     {point:id, text, at}     손가락이 id를 가리키고 말풍선 text(at 위치). point가 null이면 아직 기다림
+     {move:{src,dst}}         시작 시범을 이 수로. move가 null이면 아직 기다림 */
+function maybeDemo(now){
+  if(ENG_CHON) return;   /* §19 도전: 저절로 뜨는 손가락 시범 없음(답을 보여 주지 않음). 힌트 버튼은 그대로 */
+  if(U.mode!=='play'||U.demo||U.drag||U.sel||U.busy||U.hint||tryHold()) return;   /* '해 보기' 중에는 시범 없음(§12) */   /* 힌트가 켜져 있으면 시범 없음(힌트가 보여 주는 수와 다른 곳을 가리키지 않게) */
+  if(now-U.okAt<2000) return;   /* 바르게 놓은 직후 2초는 시범 없음(맞혔는데 틀린 줄 알게 됨, §11) */
+  if(now-U.downAt<2500) return;   /* r4: 장면을 누른 직후 2.5초도 시범 없음(3차 블라인드: 버튼을 누르자 손가락이 '저절로' 나옴) */
+  var done=!!U.demoDone[G.si], p=(GAME.demo&&GAME.demo(G))||{};
+  if(('point' in p) && !done){ if(p.point && now>U.demoAt){ U.demoDone[G.si]=1; demoPoint(p.point); if(p.text) callout(p.text,p.at||null); } return; }
+  var mv=hintMove(G);
+  if(!mv) return;
+  /* r3: '해 보기'가 켜진 엔진(GAME.tryIt!==false)에서는 손가락 = '지금 이것을 하세요'(해 보기·힌트)만. 단계 시작 손가락 시범(기본·move·repeat)은 없다.
+     예외: 해 보기에서 keepDemo:true를 준 단계의 게임 시범. 10초 동안 아무것도 못 하면 한 번 보여 주는 시범은 그대로 */
+  var noF=GAME.tryIt!==false && !U.keepDemo[G.si];
+  if(p.repeat && !noF){ if(now-U.lastAct>1200 && now>U.demoAt) demoMove(mv,2); return; }
+  if(!done && now>U.demoAt && noF){ U.demoDone[G.si]=1; return; }
+  if(!done && now>U.demoAt){
+    if(!('move' in p) && U.okN>0){ U.demoDone[G.si]=1; return; }   /* 기본 시작 시범: 이미 스스로 한 수를 맞혔으면 건너뜀 */
+    if('move' in p){ if(!p.move) return; mv=p.move; }
+    U.demoDone[G.si]=1; demoMove(mv,2); return;
+  }
+  if(now-U.lastAct>10000){ U.lastAct=now; demoMove(mv,1); }
+}
+
+/* ---------- 이벤트 처리 ----------
+   엔진이 직접 받는 이벤트: name(k, at) → 한 줄 말풍선, badge(k) → 배지 토스트, stageEnd → 단계 끝.
+   나머지는 GAME.onEvent(e, FX)로 넘긴다. FX는 화면 효과 몇 가지뿐이다(점수는 FX.score 하나로만 보인다). */
+var FX = {
+  score:function(at,pts,fast,combo){ if(U.trPts!=null){ pts=U.trPts; if(!pts) return; }
+    /* r5: +점수·HUD 튐·콤보는 행동 0.6초 뒤(그 사이 또 행동하면 그만큼 더 뒤). 자리는 지금 잡아 둔다(대상이 그새 떠나도 그 자리에) */
+    var r0=SCENE.rectOf(G,at), t0=performance.now(), go=function(){ if(engHeld()){ later(ENG_ACT_HOLD-(performance.now()-U.actAt)+10,go); return; }
+      engScoreSeen(); var got=engScoreTake(pts); if(!(got>0)) return;   /* 블라인드(11-07): +n은 점수가 실제로 오른 만큼만. 오르지 않았으면 +n·점수 튐·콤보 모두 없음 */
+      if(!(U.badAt>t0)) fxText(at,'+'+got,fast,r0);   /* 블라인드(11-07): 맞힌 수의 +n이 그 뒤 틀린 수 직후에 떠 '틀려도 점수'로 읽힘 → 그 사이 틀린 놓기가 있었으면 +n 글은 띄우지 않는다(점수 칸만 튐) */ bumpScore(); if(combo>=2){ var c=$('#combo'); c.textContent='콤보 '+combo; c.classList.add('on'); U.comboT=performance.now(); } };
+    go(); },
+  burst:function(at,n){ burst(at,n); },
+  progress:function(){ progPanel(); },
+  comboOff:function(){ $('#combo').classList.remove('on'); },
+  callout:function(html,at){ callout(html,at); },
+  explain:function(x){ xpSet(x); }   /* GAME.explain이 있을 때: 지금 '왜?'로 열 설명. 글 | {why, def, page} | null(지움) */
+};
+
+/* ---------- '왜?' 버튼 (GAME.explain이 있을 때만. 인지부하: 부가 설명은 학생이 골라서 연다) ----------
+   보여 줄 설명 = 게임이 넘긴 것(이벤트 {t:'explain'} / FX.explain / 틀린 놓기의 reasons[why]) → 없으면 GAME.explain.of(G).
+   넘긴 설명은 다음 놓기·단계 바뀜에서 사라진다. 카드는 장면을 누르거나 힌트를 누르면 접힌다. 게임은 멈추지 않는다 */
+function xpHtml(x){
+  if(!x) return ''; if(typeof x==='string') return x;
+  return (x.why?'<span>'+x.why+'</span>':'')+(x.def?'<span class="d">'+x.def+'</span>':'')+(x.page?'<small>'+x.page+'</small>':'');
+}
+function xpSet(x){ if(!XPC) return; U.xpCur=(x==null||x==='')?null:x; xpSync(); }
+function xpSync(){
+  if(!XPC) return; if(U.mode==='play' && engHeld()) return;   /* r5: '왜?' 반짝임도 행동 0.6초 뒤 */
+  var h = U.mode==='play' ? xpHtml(U.xpCur) : '';
+  if(!h && U.mode==='play' && XPC.of) h = xpHtml(XPC.of(G));
+  if(h===U.xpKey) return; U.xpKey=h; xpClose();
+  var b=$('#xpBtn'); b.classList.toggle('off',!h);   /* r4: 없으면 흐리게만(사라지지 않음) */
+  if(h&&!RM){ b.classList.remove('new'); void b.offsetWidth; b.classList.add('new'); }
+}
+function xpClose(){ if(!XPC) return; var c=$('#xpCard'); if(c) c.remove(); $('#xpBtn').setAttribute('aria-expanded','false'); }
+function xpToggle(){
+  if(!XPC) return; if($('#xpCard')){ xpClose(); return; } if(U.mode!=='play') return;
+  var h=U.xpKey||engXpGeneral(); if(!h) return;   /* r4: 넘긴 설명이 없으면 이 단계의 일반 '왜?' */
+  var c=document.createElement('div'); c.className='xp-card'; c.id='xpCard'; c.setAttribute('role','note'); c.innerHTML=h; $('#xpRow').appendChild(c);
+  $('#xpBtn').setAttribute('aria-expanded','true');
+  if(!RM) c.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:180});
+}
+/* r4: 이 단계의 일반 '왜?' — GAME.explain.general(G)(글 | {why, def, page}) → 없으면 단계 시작 대사 + 이번 규칙 칸 글 */
+function engXpGeneral(){
+  if(typeof XPC.general==='function'){ var g=XPC.general(G); if(g) return xpHtml(g); }
+  var rc=engRC(G.si).map(function(c){ return c[1]; }).filter(Boolean).join(' · ');
+  return xpHtml({why:engSay0(G.si)||engStg()[G.si].name, def:rc?'이번 규칙: '+rc:''});
+}
+/* 틀린 놓기 기본 동작: reasons[why 코드]가 있으면 대상 옆에 짧은 한 줄(bounce, 기본 '다시!')만 띄우고 이유는 '왜?'에 둔다 */
+function xpBounce(r,src,dst){
+  if(!XPC||!XPC.reasons||r.why==null) return; var rs=XPC.reasons[r.why]; if(rs==null) return;
+  U.xpCur=rs;
+  var line=(typeof rs==='object'&&rs.line!=null)?rs.line:('bounce' in XPC?XPC.bounce:'다시!');
+  if(!line) return;
+  var dup=(U.callNow&&U.callNow.html===line)||U.callQ.some(function(c){ return c.html===line; }); if(dup) return;   /* 연달아 틀려도 쌓지 않는다 */
+  callout(line, dst&&dst!=='none'?dst:src);
+}
+
+function handle(evs){
+  evs.forEach(function(e){
+    if(e.t==='name') callout(GAME.names[e.k], e.at);
+    else if(e.t==='badge') toast(e.k);
+    else if(e.t==='explain' && XPC) xpSet(e.k!=null ? (XPC.reasons||{})[e.k] : (e.html!=null ? e.html : e));
+    else if(e.t==='stageEnd') onStageEnd();
+    else if(GAME.onEvent) GAME.onEvent(e, FX);
+  });
+}
+/* 점수 장부(블라인드 11-07): G.score가 실제로 오른 양을 시각과 함께 적어 두고, FX.score가 +n을 띄울 때 최근 2.5초 안에 오른 만큼에서만 꺼내 쓴다.
+   게임이 점수 안 오른 수(틀린 짐작 등)에 FX.score를 불러도 +n이 뜨지 않는다. U가 새로 만들어지면(reset) 장부도 비워진다 */
+function engScoreSeen(){ var s=G.score, L=U.scLast; U.scLast=s; if(L==null||!(s>L)) return; (U.scLog||(U.scLog=[])).push({t:performance.now(), n:s-L}); }
+function engScoreTake(pts){ var now=performance.now(), L=U.scLog||[], got=0; pts=+pts||0;
+  for(var i=0;i<L.length && got<pts;i++){ if(now-L[i].t>2500){ L[i].n=0; continue; } var k=Math.min(L[i].n, pts-got); L[i].n-=k; got+=k; }
+  U.scLog=L.filter(function(x){ return x.n>0 && now-x.t<=2500; }); return got; }
+function bumpScore(){ var b=$('#score'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
+
+function commit(src,dst,via,gh){
+  var T=U.tr&&U.tr.phase==='wait'?U.tr:null;
+  if(T && !(src===T.mv.src && dst===T.mv.dst)) return tryBounce(src,dst,gh);   /* '해 보기'에서 다른 수는 LOGIC에 보내지 않고 튕긴다(틀릴 수 없음) */
+  var s0=G.score, G0=G, cn=U.callN, pt=U.dropPt; U.dropPt=null; U.actAt=performance.now();   /* r5: 행동 시각 */ if(T && typeof GAME.tryPts==='number') U.trPts=GAME.tryPts;
+  var r=drop(G,src,dst,via);
+  if(T && r.ok && U.trPts!=null){ r.G.score=s0+U.trPts; }
+  if(XPC){ xpClose(); U.xpCur=null; }   /* 넘겨 둔 설명은 다음 놓기까지만 */
+  if(r.ok){
+    G=r.G; engScoreSeen(); U.lastAct=U.okAt=performance.now(); U.okN++; U.bounces=0; U.didKinds[engTryKind({src:src,dst:dst})]=1;
+    if(!via){ U.hint=0; U.hintMv=null; clearRings(); hintFingerStop(); hintBtn(); }
+    var to=SCENE.rectOf(G,dst); if(gh&&to) flyGhost(gh,to,220); else if(gh) gh.remove();
+    handle(r.ev); U.trPts=null;
+    if(XPC) xpSync();
+    if(T && U.tr===T) tryAfter(T,dst);
+  } else {
+    U.trPts=null; U.badAt=performance.now(); if(T && U.tr===T) tryEnd(T);   /* 보여 준 수를 LOGIC이 받지 않으면(있으면 안 됨) 멈춤을 풀고 그냥 이어 간다 */
+    /* 틀린 놓기도 LOGIC이 새 G를 돌려주면 받는다(B형: 틀린 카드 기록). bounce 말고 다른 이벤트는 onEvent로(B형: 이유 말풍선) */
+    if(r.G && r.G!==G){ var cOff=r.G.combo!==G.combo; G=r.G; if(cOff) $('#combo').classList.remove('on'); } engScoreSeen();
+    var back=SCENE.rectOf(G,src);
+    if(gh&&back) flyGhost(gh,back,260); else if(gh) gh.remove();
+    if(dst) badRing(dst);
+    ENG_PRI=true; try{   /* r5: 틀린 놓기에 붙는 한 줄은 그 행동의 직접 결과 → 곧바로 */
+    if(XPC) xpBounce(r,src,dst);
+    if(r.ev) handle(r.ev.filter(function(e){ return e.t!=='bounce'; }));
+    } finally { ENG_PRI=false; }
+    if(XPC) xpSync();
+    /* r3: 틀린 놓기는 조용히 지나가지 않는다. 게임이 한 줄(xpBounce·onEvent 말풍선)을 띄우지 않았으면 놓은 자리에 '다시!'.
+       예외: GAME.explain.bounce===''이고 LOGIC이 새 G를 돌려줌(장면이 그 자리에 직접 그림, A8) */
+    if(U.callN===cn && !(XPC && XPC.bounce==='' && r.G && r.G!==G0)) engNope(pt, dst, src);
+    U.bounces++; if(U.bounces>=3 && U.hint===0 && !U.autoH[G.si]){ U.bounces=0; U.autoH[G.si]=1; doHint(true); }   /* r4: 3번 튕기면 힌트 1단계를 한 단계에 한 번만, 손가락 없이(테두리·화살표만). 손가락은 힌트 버튼을 눌렀을 때만 */
+  }
+  return r;
+}
+
+/* ---------- 힌트 3단계 (§11): 1 = 집을 것 + 놓을 곳이 함께 빛나고 화살표 + 손가락이 집을 것→놓을 곳을 그린다,
+   2 = 같은 표시를 더 굵고 빠르게(손가락 다시), 3 = 대신 해 줌(drop의 via=true: 점수는 LOGIC이 줄여 준다). 모두 hintMove 하나로 ---------- */
+/* 화살표 곡선(장면 좌표): 집을 것 가운데 → 놓을 곳 가운데, 위로 볼록한 2차 곡선. 손가락도 같은 곡선을 따라간다 */
+function hintCurve(mv){
+  var a=SCENE.rectOf(G,mv.src), b=mv.dst!=null?SCENE.rectOf(G,mv.dst):null; if(!a||!b) return null;
+  var s=sceneEl.getBoundingClientRect(), x0=a.cx-s.left, y0=a.cy-s.top, x1=b.cx-s.left, y1=b.cy-s.top, dx=x1-x0, dy=y1-y0, L=Math.hypot(dx,dy);
+  var nx=-dy/(L||1), ny=dx/(L||1); if(ny>0||(ny===0&&nx>0)){ nx=-nx; ny=-ny; }   /* 볼록한 쪽은 위(세로로 놓을 때는 왼쪽) */
+  var off=Math.min(60,L*0.2), c={a:a, b:b, L:L, x0:x0, y0:y0, x1:x1, y1:y1, nx:nx, ny:ny};
+  var o=engArrowOff(mv,c,s,off); c.cx=(x0+x1)/2+nx*o; c.cy=(y0+y1)/2+ny*o;
+  /* r4: 손가락이 쉬는 자리(집을 것·놓을 곳 안)는 손가락 몸이 장면 글자를 덜 가리는 곳. 손가락 곡선은 그 두 점을 같은 볼록함으로 잇는다 */
+  var R=engFingerRest(mv,a,b,s), mx=(R.x0+R.x1)/2, my=(R.y0+R.y1)/2;
+  c.f={x0:R.x0, y0:R.y0, x1:R.x1, y1:R.y1, cx:c.cx+mx-(x0+x1)/2, cy:c.cy+my-(y0+y1)/2, flip:R.flip};
+  return c;
+}
+/* r4: 화살표 볼록함 고르기(3차 블라인드: 화살표·손가락이 '사우디아라비아'·'오스트레일리아' 글자를 가렸다).
+   후보(위로 0~200px, 아래로 30~150px) 곡선을 16점 표본으로 재어 장면 글자 상자(집을 것·놓을 곳에 붙은 글은 뺌)를 덜 지나는 것. 0.15초마다 다시 재고, 지금 것이 가장 좋은 것만큼 좋으면 바꾸지 않는다(흔들림 없음) */
+var ENG_AO={};
+function engHitR(q,R){ return q.l<R.r && q.r>R.l && q.t<R.b && q.b>R.t; }
+function engArrowOff(mv,c,s,def){
+  var key=mv.src+'>'+mv.dst, m=ENG_AO[key], now=performance.now();
+  if(m && now-m.t<150) return m.o;
+  var A={l:c.a.left-s.left-6, t:c.a.top-s.top-6, r:c.a.right-s.left+6, b:c.a.bottom-s.top+6}, B={l:c.b.left-s.left-6, t:c.b.top-s.top-6, r:c.b.right-s.left+6, b:c.b.bottom-s.top+6};
+  var TB=engTextBoxes().filter(function(q){ return !engHitR(q,A) && !engHitR(q,B); });
+  var cost=function(o){ var cx=(c.x0+c.x1)/2+c.nx*o, cy=(c.y0+c.y1)/2+c.ny*o, n=0;
+    for(var i=2;i<15;i++){ var t=i/16, u=1-t, x=u*u*c.x0+2*u*t*cx+t*t*c.x1, y=u*u*c.y0+2*u*t*cy+t*t*c.y1;
+      if(x<4||y<4||x>s.width-4||y>s.height-4) n+=0.6;
+      for(var j=0;j<TB.length;j++){ var q=TB[j]; if(x>q.l-8 && x<q.r+8 && y>q.t-8 && y<q.b+8){ n++; break; } } }
+    return n*1000 + Math.abs(o-def)*(o>=0?0.4:0.8) + (o<0?25:0); };
+  var best=def, bc=cost(def);
+  if(TB.length) [0,30,90,130,180,-30,-70,-120].forEach(function(o){ var k=cost(o); if(k<bc-0.01){ bc=k; best=o; } });
+  if(m && Math.floor(cost(m.o)/1000)<=Math.floor(bc/1000)) best=m.o;
+  ENG_AO[key]={o:best, t:now}; return best;
+}
+/* 손끝 자리 후보(상자 안 7곳 × 손가락 위로 향함/아래로 향함). 손가락 몸 상자가 글자 상자를 덮는 넓이 + 가운데에서 먼 정도가 작은 것.
+   두 끝(집을 것·놓을 곳)은 같은 방향을 쓴다(움직이는 동안 뒤집히지 않음). 아래로 향함(flip)은 위로 향함이 글을 가릴 때만 */
+var ENG_FR={};
+function engFingerRest(mv,a,b,s){
+  var key=mv.src+'>'+mv.dst, m=ENG_FR[key], now=performance.now(), ax=a.cx-s.left, ay=a.cy-s.top, bx=b.cx-s.left, by=b.cy-s.top;
+  if(!m || now-m.t>=150){   /* 0.15초마다 다시 고르고, 그 사이에는 상자 가운데에서 떨어진 만큼(dx,dy)을 그대로 써서 움직이는 카드를 따라간다 */
+    var TB=engTextBoxes();
+    var cand=function(r){ var W=r.width, H=r.height, L=r.left-s.left, T=r.top-s.top, cx=r.cx-s.left, cy=r.cy-s.top;
+      return [[cx,cy],[cx,T+H*0.3],[cx,T+H*0.7],[L+W*0.3,cy],[L+W*0.7,cy],[L+W*0.3,T+H*0.3],[L+W*0.7,T+H*0.3]]; };
+    var pick=function(r,flip){ var best=null, cx=r.cx-s.left, cy=r.cy-s.top; cand(r).forEach(function(p){ var x=p[0], y=p[1];
+        var fx=flip?x-32:x-22, fy=flip?y-68:y+2, ov=overlap(fx,fy,54,66,TB), k=ov+Math.hypot(x-cx,y-cy)*2;
+        if(!best||k<best.k) best={dx:x-cx, dy:y-cy, k:k, ov:ov}; }); return best; };
+    var u0=pick(a,false), u1=pick(b,false), d0=pick(a,true), d1=pick(b,true);
+    var fl=(u0.ov+u1.ov)>0 && d0.k+d1.k+400 < u0.k+u1.k;
+    m=ENG_FR[key]={t:now, s:fl?d0:u0, d:fl?d1:u1, flip:fl};
+  }
+  return {x0:ax+m.s.dx, y0:ay+m.s.dy, x1:bx+m.d.dx, y1:by+m.d.dy, flip:m.flip};
+}
+function qpt(c,t){ var u=1-t; return {x:u*u*c.x0+2*u*t*c.cx+t*t*c.x1, y:u*u*c.y0+2*u*t*c.cy+t*t*c.y1}; }
+function hintArrowSync(){
+  var el=document.getElementById('hArrow'); if(!el) return;
+  var c=U.hintMv?hintCurve(U.hintMv):null;
+  if(!c||c.L<40){ el.style.display='none'; return; } el.style.display='';
+  /* 상자 테두리에서 시작·끝(가운데끼리 직선 기준으로 자름) */
+  var dx=c.x1-c.x0, dy=c.y1-c.y0, cut=function(r){ var hw=r.width/2+6, hh=r.height/2+10; return Math.min(dx?hw/Math.abs(dx):1e9, dy?hh/Math.abs(dy):1e9); };
+  var t0=Math.min(cut(c.a),0.35), t1=1-Math.min(cut(c.b),0.35), need=Math.min(80,c.L*0.6)/c.L;
+  if(t1-t0<need){ var m=(t0+t1)/2; t0=Math.max(0,m-need/2); t1=Math.min(1,m+need/2); }   /* 붙어 있는 두 상자 사이에서도 화살표가 보일 만큼 */
+  /* r4: 시작·끝이 장면 글자(집을 것의 나라 이름 등) 위면 글자를 벗어날 때까지 곡선을 따라 줄인다(보일 길이는 남김) */
+  var TBa=engTextBoxes(), inT=function(t){ var q=qpt(c,t); for(var j=0;j<TBa.length;j++){ var z=TBa[j]; if(q.x>z.l-7&&q.x<z.r+7&&q.y>z.t-7&&q.y<z.b+7) return true; } return false; };
+  var keep=Math.min(56,c.L*0.45)/c.L; while(t1-t0>keep+0.02 && inT(t0)) t0+=0.02; while(t1-t0>keep+0.02 && inT(t1)) t1-=0.02;
+  var p0=qpt(c,t0), p1=qpt(c,t1), d0x=(1-t0)*(c.cx-c.x0)+t0*(c.x1-c.cx), d0y=(1-t0)*(c.cy-c.y0)+t0*(c.y1-c.cy);
+  var k={x:p0.x+(t1-t0)*d0x, y:p0.y+(t1-t0)*d0y};   /* 잘라 낸 곡선의 조절점 */
+  var ux=p1.x-k.x, uy=p1.y-k.y, ul=Math.hypot(ux,uy)||1; ux/=ul; uy/=ul;
+  var hl=22, hw=13, bx=p1.x-ux*hl, by=p1.y-uy*hl, f=function(v){ return v.toFixed(1); };
+  var dd='M'+f(p0.x)+' '+f(p0.y)+'Q'+f(k.x)+' '+f(k.y)+' '+f(bx+ux*4)+' '+f(by+uy*4);
+  if(el._d!==dd){ el._d=dd; el.children[0].setAttribute('d',dd); el.children[1].setAttribute('d',dd);
+    el.children[2].setAttribute('d','M'+f(p1.x)+' '+f(p1.y)+'L'+f(bx-uy*hw)+' '+f(by+ux*hw)+'L'+f(bx+uy*hw)+' '+f(by-ux*hw)+'Z'); }
+}
+function hintArrow(strong){
+  var old=document.getElementById('hArrow'); if(old) old.remove();
+  var el=document.createElementNS(NS,'svg'); el.setAttribute('class','harrow'+(strong?' strong':'')); el.id='hArrow'; el.setAttribute('aria-hidden','true');
+  el.innerHTML='<path class="ho"/><path class="hl"/><path class="hh"/>'; ovl.insertBefore(el, ovl.firstChild);   /* 테두리·손가락·말풍선 아래 */
+  hintArrowSync(); if(!RM) el.animate([{opacity:0},{opacity:1}],{duration:180});
+}
+/* 손가락 + 집을 것 그림이 곡선을 따라 집을 것 → 놓을 곳(엔진 시범과 같은 그림·같은 박자). 매 프레임 rectOf로 자리를 다시 잡아 움직이는 대상(떨어지는 카드)도 따라간다 */
+function hintFingerStop(){ if(U&&U.hf){ U.hf.els.forEach(function(e){ e.remove(); }); U.hf=null; } }
+function hintFinger(mv,loops){
+  hintFingerStop(); if(!hintCurve(mv)) return; var item=itemOf(G,mv.src);
+  var f=document.createElement('div'); f.className='finger'; f.innerHTML=iconSvg('finger','');
+  var gh=document.createElement('div'); gh.className='ghost'; if(item) gh.innerHTML=itemSvg(item);
+  ovl.appendChild(gh); ovl.appendChild(f); U.hf={els:[f,gh], f:f, gh:gh, t0:performance.now(), n:loops, mv:mv};
+  hintFingerStep(U.hf.t0);
+}
+function hintFingerStep(now){
+  var h=U.hf; if(!h) return; var k=(now-h.t0)/(RM?2600:2000); if(k>=h.n){ hintFingerStop(); return; }
+  var c0=hintCurve(h.mv); if(!c0){ hintFingerStop(); return; } var c=c0.f||c0, fl=!!c.flip;
+  /* r4 박자(3차 블라인드: 손가락이 놓을 곳에 머물러 '칸을 누르라는 건지 끌라는 건지' 헷갈림): 집을 것 위에 나타나 꾹 누르고(그림이 그때 손에 붙음)
+     → 곡선을 따라 끌고 → 놓을 곳에서 바로 떼며 사라지고 → 잠깐 쉼. 놓을 곳에 머무는 시간은 짧다 */
+  var p=k-Math.floor(k), x=c.x0, y=c.y0, op=1, sc=1, go=0;
+  if(p<0.12){ op=p/0.12; y=c.y0+(fl?-30:30)*(1-op); }
+  else if(p<0.26){ sc=1-0.1*(p-0.12)/0.14; go=(p-0.12)/0.14; }
+  else if(p<0.72){ var q=(p-0.26)/0.46; q=q<0.5?2*q*q:1-2*(1-q)*(1-q); var pt=qpt(c,q); x=pt.x; y=pt.y; sc=0.9; go=1; }
+  else if(p<0.84){ x=c.x1; y=c.y1; var z=(p-0.72)/0.12; op=1-z; sc=0.9+0.1*z; go=1-z; }
+  else { x=c.x1; y=c.y1; op=0; go=0; }
+  h.f.style.transform='translate('+x+'px,'+(y+(fl?-6:6))+'px) scale('+sc+')'+(fl?' rotate(180deg)':''); h.f.style.opacity=op;
+  h.gh.style.transform='translate('+x+'px,'+y+'px) scale('+sc+')'; h.gh.style.opacity=(0.85*Math.min(op,0.25+0.75*go)).toFixed(3);
+}
+/* 지금 단계의 힌트 표시 전부(테두리 둘 + 화살표 [+ 손가락]). dst가 없거나 화면에 없으면 예전처럼 집을 것만 */
+function hintShow(mv,lvl,finger){
+  clearRings(); var st=lvl>=2?' strong':'';
+  ring(mv.src,'hs'+st);
+  var hasDst=mv.dst!=null && !!SCENE.rectOf(G,mv.dst);
+  if(hasDst){ ring(mv.dst,'dst hd'+st); hintArrow(lvl>=2); if(finger) hintFinger(mv,2); }
+}
+function hintClear(){ U.hint=0; U.hintMv=null; clearRings(); hintFingerStop(); hintBtn(); }
+/* 힌트가 켜진 동안 0.25초마다: 가리키던 수가 없어졌으면(카드가 바닥에 닿음 등) 지금 할 수로 바꾸고, 할 수가 없으면 끈다 */
+var HCHK=0;
+function hintCheck(now){
+  if(!U.hint||!U.hintMv||U.busy||now-HCHK<250||engHeld(now)) return; HCHK=now;   /* r5: 행동 직후 0.6초는 힌트를 다른 수로 옮겨 그리지 않음 */
+  var mv=U.hintMv; if(sources(G).indexOf(mv.src)>=0 && (mv.dst==null || targets(G).indexOf(mv.dst)>=0)) return;
+  var nm=hintMove(G); if(!nm){ hintClear(); return; }
+  if(nm.src===mv.src && nm.dst===mv.dst) return;
+  U.hintMv=nm; hintFingerStop(); hintShow(nm,U.hint,false);
+}
+function doHint(auto){ if(auto!==true) auto=false;   /* 버튼 onclick은 이벤트를 넘기므로 true일 때만 자동 */
+  if(XPC) xpClose();   /* 힌트는 '왜?' 카드를 접기만 한다. 카드는 '왜?' 버튼(xpToggle)으로만 열린다(r3 check: 힌트 뒤 2초 동안 카드 없음) */
+  if(U.mode!=='play'||U.busy||tryHold()) return;   /* '해 보기' 중에는 이미 길이 보인다 */
+  if(auto && performance.now()-U.okAt<2000) return;   /* r5: 바르게 놓은 직후에는 저절로 뜨는 힌트 화살표 없음 */
+  if(!auto) U.actAt=performance.now();   /* r5: 힌트 누름도 행동(그 뒤 0.6초는 힌트 표시만) */
+  stopDemo();
+  var mv=hintMove(G);
+  if(!mv){ clearRings(); callout(SAY.idle, SCENE.idleAt ? SCENE.idleAt(G) : (SCENE.avoid(G)[0]||null)); return; }
+  U.hintMv=mv; U.hint=Math.min(3,U.hint+1); hintBtn();
+  hintShow(mv,U.hint,U.hint<3 && !auto);
+  if(U.hint===3){
+    U.busy=true; var a=SCENE.rectOf(G,mv.src), b=SCENE.rectOf(G,mv.dst), gh=ghost(itemOf(G,mv.src),a.cx,a.cy);
+    later(350,function(){ flyGhost(gh,b,520,function(){ U.busy=false; U.hint=0; U.hintMv=null; clearRings(); commit(mv.src,mv.dst,true,null); hintBtn(); }); });
+  }
+}
+
+/* ---------- '해 보기' (§12): 새 동작이 나오는 단계 시작에 한 번, 시간을 멈추고 직접 해 보게 한다 ----------
+   언제: GAME.tryIt(G)가 있으면 그것(null = 이 단계는 없음, {wait:true} = 아직 기다림), GAME.tryIt===false면 끔.
+         없으면 1단계와 새 규칙 단계(STAGES[si].rule이 앞 단계와 다름. STAGES가 없으면 ruleCards의 새 규칙 표시)에.
+   무엇을: tryIt이 준 {src,dst[,keepDemo]} | {tap:id[, dst]} | {later:true}(그 수가 생길 때까지 보통 플레이), 없으면 GAME.demo(G).move(move:null이면 3초까지 기다림), 그것도 없으면 hintMove(G). 아직 할 수가 없으면 시간을 흘려 최대 6초 기다린다.
+   흐름: pre(리본 1.6초, 할 수가 있으면 시간 멈춤) → wait(집을 것·놓을 곳만 밝게 + 화살표 + 손가락 반복, 다른 수는 튕김)
+         → after(진짜 drop의 결과·효과, 시간은 곧바로 다시 흐름, 0.3초 뒤 이름표가 흐르는 게임 위에 1.5초). 점수는 drop 그대로, GAME.tryPts가 수면 그 점수 */
+function tryNewRule(si){
+  if(si===0) return true;
+  if(typeof STAGES!=='undefined' && STAGES && STAGES[si] && STAGES[si-1] && STAGES[si].rule!==undefined) return STAGES[si].rule!==STAGES[si-1].rule;
+  return (GAME.ruleCards[si]||[]).some(function(c){ return !!c[2]; });
+}
+function tryLabelOf(si){ var rc=GAME.ruleCards[si]||[], c=rc.find(function(x){ return x[2]; })||rc[0]; return c?c[1]:GAME.stages[si].name; }
+/* {later:true}: 리본이 걷힌 뒤 해 볼 수가 생길 때까지는 보통 플레이(입력·힌트·시범 그대로). tryHold() = 지금 해 보기가 화면을 붙잡고 있음 */
+function tryOpen(){ var T=U&&U.tr; return !!T && T.phase==='pre' && !!T.late && performance.now()-T.t0>=1600; }
+function tryHold(){ return !!U.tr && !tryOpen(); }
+function tryClear(){
+  if(U) U.tr=null; $('#app').classList.remove('trying');
+  var d=document.getElementById('tDim'); if(d) d.remove();
+}
+function tryBegin(){
+  tryClear(); if(ENG_CHON){ U.demoDone[G.si]=1; return; }   /* §19 도전: 해 보기·시작 시범 없음 */
+  if(GAME.tryIt===false) return;
+  if(typeof GAME.tryIt!=='function' && !tryNewRule(G.si)) return;
+  U.tr={phase:'pre', t0:performance.now(), seek:0, si:G.si, again:0, k:0};
+}
+/* r3: 동작 종류 = rectOf id에서 끝의 번호를 뗀 것('slot:3' → 'slot', 'spot:A:ban'은 그대로). 해 본 종류는 이 판(⟲까지) 동안 기억한다 */
+function engKindId(id){ return String(id).replace(/([:_-]?\d+)+$/,''); }
+function engTryKind(mv,tap){ return tap!=null ? 'tap>'+engKindId(tap) : engKindId(mv.src)+'>'+engKindId(mv.dst); }
+/* 지금 해 볼 수: {mv:{src,dst}, tap, label} | null(아직 기다림) | false(이 단계는 해 보기 없음)
+   r3: GAME.tryIt이 배열을 주면 T.k번째를 차례로(각자 이름표). 두 번째부터는 {later:true}처럼 그 수가 생길 때까지 보통 플레이.
+       같은 동작 종류(engTryKind)를 이 판에서 이미 해 봤으면 건너뛴다({force:true}면 그래도 함). 두 번째부터는 학생이 이 판에서 이미 한 종류도 건너뛴다 */
+function tryMove(T){
+  var t=null, mv=null, lab=tryLabelOf(G.si), seq=false;
+  if(typeof GAME.tryIt==='function'){ t=GAME.tryIt(G);
+    if(Array.isArray(t)){ seq=true; T.seq=t.length; if(T.k>=t.length) return false; t=t[T.k]; if(t==null||t===false){ return engTrySkip(T,'null'); } if(T.k>0) T.late=true; }
+    if(t==null||t===false) return false; if(t.wait||t.later){ T.late=T.late||!!t.later; return null; } if(t.label) lab=t.label; if(t.keepDemo) T.point=T.keep=true; }
+  if(t && t.tap!=null){ if(!SCENE.rectOf(G,t.tap)) return null; var mt={src:t.tap, dst:t.dst!=null?t.dst:t.tap}, dk=engTryDup(T,t,mt,t.tap); return dk ? engTrySkip(T,'dup:'+dk) : {mv:mt, tap:t.tap, label:lab}; }
+  var expl=!!(t && t.src!=null);
+  if(expl) mv={src:t.src, dst:t.dst};
+  else { var p=(GAME.demo&&GAME.demo(G))||{}; T.point=T.point||('point' in p);
+    if('move' in p && p.move) mv=p.move;
+    else if('move' in p && T.seek<3 && !T.k) return null;   /* 게임 시범이 '아직 기다림'이면 3초까지 기다린다(그 수가 곧 생길 수 있음) */
+    else { if('move' in p) T.point=true; mv=hintMove(G); } }   /* 그래도 없으면 지금 할 수로 해 보고, 게임 시범은 뒤에 그대로 둔다 */
+  if(!mv||mv.dst==null||sources(G).indexOf(mv.src)<0||targets(G).indexOf(mv.dst)<0||!SCENE.rectOf(G,mv.src)||!SCENE.rectOf(G,mv.dst)) return null;
+  mv={src:mv.src, dst:mv.dst};
+  var dk=engTryDup(T,t,mv,null); if(dk) return (!expl && T.k>0) ? null : engTrySkip(T,'dup:'+dk);   /* 둘째부터 기본 수가 겹치면 지금 할 수가 바뀔 때까지 기다림 */
+  return {mv:mv, label:lab};
+}
+/* 같은 종류를 이미 해 봤으면 그 종류(글), 아니면 null. {force:true}면 늘 null */
+function engTryDup(T,t,mv,tap){
+  if(t && t.force) return null; var k=engTryKind(mv,tap);
+  return (U.trKinds[k] || (T.k>0 && U.didKinds[k])) ? k : null;
+}
+/* 이 해 보기를 건너뜀: 배열이면 다음 것으로(null = 기다림), 아니면 이 단계는 해 보기 없음(false). 까닭은 U.trSkip[si](check가 읽음) */
+function engTrySkip(T,why){
+  if(!T.seq || T.k+1>=T.seq){ if(!U.trSkip[T.si]) U.trSkip[T.si]={why:why, k:T.k}; if(T.k===0) U.demoDone[T.si]=1; return false; }
+  if(!U.trSkip[T.si]) U.trSkip[T.si]={why:why, k:T.k};
+  T.k++; T.late=true; T.seek=0; return null;
+}
+/* 매 프레임(플레이 중). true = 이번 프레임은 시간을 멈춘다 */
+function tryFrame(now,dt){
+  var T=U.tr; if(!T) return false;
+  if(T.phase==='pre'){
+    if(U.paused) return true;
+    var m=tryMove(T);
+    if(m===false){ U.tr=null; return false; }
+    if(!m){ if(T.late) return false; T.seek+=dt; if(T.seek>6) U.tr=null; return false; }
+    if(T.nb && now<T.nb) return false;   /* 배열의 다음 해 보기: 앞 이름표가 먼저 보이게 잠깐 보통 플레이 */   /* 할 수가 아직 없으면(주문이 아직 안 옴 등) 시간을 흘려 기다린다, 최대 6초. {later:true}면 보통처럼 놀며 끝없이 기다림 */
+    if(T.late && (U.drag||U.sel||U.busy)) return false;   /* 나중 해 보기: 하던 끌기·힌트 비행은 끝나고 나서 */
+    if(T.late && now-U.downAt<900) return false;   /* r4: 학생이 방금 누른 것의 결과가 먼저 보이게(누르자마자 손가락이 뜨지 않게) */
+    if(now-T.t0>=1600 && (now-T.t0>=2600 || !ovl.querySelector('.ribbon'))) tryEnter(T,m);   /* 단계 리본이 다 걷힌 뒤(r5: 사라지는 0.25초 동안 해 보기 빛 칸과 겹쳤다 → 리본이 없어질 때까지, 최대 2.6초) */
+    return true;
+  }
+  if(T.phase==='wait'){
+    if(!U.drag && !U.sel && !U.paused && now>T.again && !(T.tap!=null?U.demo:U.hf)) tryFinger(T);
+    trySync();
+  }
+  return true;
+}
+function tryEnter(T,m){
+  T.phase='wait'; T.mv=m.mv; T.tap=m.tap; T.label=m.label; T.again=0;
+  var r=SCENE.rectOf(G,m.mv.dst); T.r0=r?oRect(r):null;
+  stopDemo(); if(U.hint) hintClear(); $('#app').classList.add('trying');
+  trySpot(T,true); tryFinger(T);
+}
+/* 흐린 막 + 구멍(집을 것·놓을 곳) + 힌트와 같은 테두리·화살표(§11) */
+function trySpot(T,anim){
+  clearRings(); var old=document.getElementById('tDim'); if(old) old.remove();
+  var el=document.createElementNS(NS,'svg'); el.setAttribute('class','tdim'); el.id='tDim'; el.setAttribute('aria-hidden','true');
+  el.innerHTML='<defs><mask id="tdMask" maskUnits="userSpaceOnUse" x="-50" y="-50" width="9999" height="9999"><rect x="-50" y="-50" width="9999" height="9999" fill="#fff"/></mask></defs><rect class="tv" x="-50" y="-50" width="9999" height="9999" mask="url(#tdMask)"/>';
+  el._ids = T.tap!=null ? [T.tap] : [T.mv.src, T.mv.dst];
+  el._ids.forEach(function(){ var h=document.createElementNS(NS,'rect'); h.setAttribute('fill','#000'); h.setAttribute('rx','16'); el.firstChild.firstChild.appendChild(h); });
+  if(T.tap!=null){ U.hintMv=null; ring(T.tap,'dst hd'); }
+  else { U.hintMv=T.mv; ring(T.mv.src,'hs'); ring(T.mv.dst,'dst hd'); hintArrow(false); }
+  ovl.insertBefore(el, ovl.firstChild);   /* 맨 아래: 테두리·화살표·손가락·말풍선은 막 위에 */
+  el._k=''; trySync();
+  if(anim&&!RM) el.animate([{opacity:0},{opacity:1}],{duration:250});
+}
+function trySync(){
+  var el=document.getElementById('tDim'); if(!el) return; var k='', hs=el.firstChild.firstChild.children, R=[];
+  el._ids.forEach(function(id){ var r=SCENE.rectOf(G,id); R.push(r?oRect(r):null); if(r) k+=Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width)+','+Math.round(r.height)+';'; });
+  if(k===el._k) return; el._k=k;
+  R.forEach(function(o,i){ var h=hs[i+1]; if(!o){ h.setAttribute('width',0); return; } var pd=10;
+    h.setAttribute('x',(o.l-pd).toFixed(1)); h.setAttribute('y',(o.t-pd).toFixed(1)); h.setAttribute('width',(o.w+2*pd).toFixed(1)); h.setAttribute('height',(o.h+2*pd).toFixed(1)); });
+}
+function tryFinger(T){ if(T.tap!=null) engDemoTap(T.tap); else hintFinger(T.mv,1e9); }
+/* 장면 누름(pointerdown). true = 여기서 처리함 */
+function tryDown(e){
+  var T=U.tr; if(T.phase!=='wait'){ if(tryOpen()) return false; e.preventDefault(); return true; }   /* 리본이 떠 있는 동안은 받지 않는다. 나중 해 보기를 기다리는 동안은 보통처럼 */
+  T.again=performance.now()+700;
+  if(T.tap!=null){ e.preventDefault(); stopDemo();
+    if(pick([T.tap],e.clientX,e.clientY,12)) commit(T.mv.src,T.mv.dst,false,null); else T.again=performance.now()+300;
+    return true; }
+  return false;   /* 끌기·탭→탭은 보통 길로 간다(commit이 다른 수를 튕긴다) */
+}
+function tryBounce(src,dst,gh){
+  var back=SCENE.rectOf(G,src); if(gh&&back) flyGhost(gh,back,260); else if(gh) gh.remove();
+  if(dst&&dst!=='none'&&SCENE.rectOf(G,dst)) badRing(dst);
+  hintFingerStop(); if(U.tr){ U.tr.again=performance.now()+350; U.tr.bounced=(U.tr.bounced||0)+1; }
+  return {ok:false, G:G, why:'try', ev:[]};
+}
+function tryAfter(T,dst){
+  T.phase='after'; $('#app').classList.remove('trying'); U.trKinds[engTryKind(T.mv,T.tap)]=1;
+  var d=document.getElementById('tDim'); if(d){ d.id=''; if(RM) d.remove(); else d.animate([{opacity:1},{opacity:0}],{duration:250}).onfinish=function(){ d.remove(); }; }
+  tryEnd(T);   /* 맞게 해 보면 시간이 곧바로 다시 흐른다(배가 떠나는 것처럼 시간이 드는 결과도 바로 보이게) */
+  /* 이름표는 글 줄로(0.3초 뒤부터, 앞 글이 나타나고 0.8초 뒤). 다른 글·조작 대상을 피한 자리에 1.5초 */
+  if(T.label) { U.labQ.push({label:T.label, si:T.si, dst:dst, src:T.tap!=null?null:T.mv.src, r0:T.r0, nb:performance.now()+ENG_ACT_HOLD});   /* r5: 0.3 → 0.6초(행동 직후는 직접 결과만) */ engTxtPump(); }
+  if(T.seq && T.k+1<T.seq){ var now=performance.now();   /* 배열의 다음 해 보기: 보통 플레이로 기다리다가 그 수가 생기면(이름표가 먼저 보이게 1.8초 뒤부터) */
+    U.tr={phase:'pre', t0:now-1600, seek:0, si:T.si, again:0, k:T.k+1, seq:T.seq, late:true, nb:now+1800}; }
+}
+/* 이름표 한 개를 띄운다(글 줄에서). false = 이미 지난 단계라 버림 */
+function tryLabelShow(L){
+  if(U.mode!=='play'||G.si!==L.si) return false;
+  var s=sceneEl.getBoundingClientRect(), d=document.createElement('div'); d.className='trylab'; d.textContent=L.label; ovl.appendChild(d);
+  var r=SCENE.rectOf(G,L.dst), o=r?oRect(r):L.r0, p;
+  if(r) p=engPlace(d,L.dst,[''],null,[L.dst].concat(L.src?[L.src]:[]));
+  else if(o) p=engPlace(d,null,[''],{x:o.x,y:o.t},[]);
+  else p=engPlace(d,null,[''],null,[]);
+  if(!p) engDockPut(d);   /* r5: 장면에 빈자리가 없으면 패널(빛나는 규칙 칸 아래) */
+  else { var tt='translate('+p.x+'px,'+p.y+'px)'; d.style.transform=tt; d._x=p.x; d._y=p.y;
+    if(!RM) d.animate([{opacity:0,transform:tt+' scale(.7)'},{opacity:1,transform:tt}],{duration:200,easing:'ease-out'}); }
+  later(1500,function(){ d._gone=1; d.animate([{opacity:1},{opacity:0}],{duration:RM?1:250}).onfinish=function(){ d.remove(); }; });
+  /* 같은 글의 규칙 칸(없으면 '새 규칙' 칸)이 함께 빛난다: 방금 한 동작 = 이 규칙 */
+  var cs=[].slice.call(document.querySelectorAll('#rules .rc')), c=cs.find(function(e){ var t=e.querySelector('span'); return t && t.textContent.replace(/\s/g,'')===L.label.replace(/\s/g,''); })||cs.find(function(e){ return e.classList.contains('new'); });
+  if(c){ c.classList.remove('hit'); void c.offsetWidth; c.classList.add('hit'); later(1700,function(){ c.classList.remove('hit'); }); }
+  return true;
+}
+function tryEnd(T){
+  if(!U.tr||U.tr!==T) return; tryClear();
+  clearRings('.ring.hs,.ring.hd,.harrow'); hintFingerStop(); stopDemo(); U.hintMv=null; if(U.hint){ U.hint=0; hintBtn(); }   /* r3: 해 보기가 끝나면 손가락·시범을 남기지 않는다 */
+  if(!T.point) U.demoDone[T.si]=1;   /* 해 봤으니 기본 시작 시범은 건너뜀. 새 규칙 가리키기(demo point)는 그대로 */
+  if(T.keep) U.keepDemo[T.si]=1;   /* keepDemo:true = 게임 시범을 해 보기 뒤에도 그대로(손가락 시범 허용) */
+  U.lastAct=performance.now();
+}
+
+/* ---------- 끌어다 놓기 (탭→탭도 됨). 게임의 동작은 이것 하나: sources(G)의 하나를 targets(G)의 하나에 놓는다 ---------- */
+sceneEl.addEventListener('pointerdown',function(e){
+  if(XPC) xpClose();   /* 다음 행동을 하면 '왜?' 카드는 접힌다 */
+  if(U.mode==='play'){ U.downAt=U.lastAct=performance.now(); }   /* r4: 누른 직후에는 손가락이 저절로 나오지 않는다(maybeDemo) */
+  if(U.mode!=='play'||U.paused||U.busy) return;
+  if(U.tr){ if(tryDown(e)) return; }   /* §12 '해 보기': 기다리는 동안만 받는다 */
+  stopDemo();
+  var src=pick(sources(G),e.clientX,e.clientY,10);
+  if(U.sel){ /* 탭→탭: 두 번째 탭이 놓을 곳이면 놓는다 */
+    var tg=pick(targets(G),e.clientX,e.clientY,14), s=U.sel; U.sel=null;
+    if(tg && !(src===s.id)){ U.dropPt={x:e.clientX, y:e.clientY}; commit(s.id,tg,false,s.gh); e.preventDefault(); return; }
+    var back=SCENE.rectOf(G,s.id); if(back) flyGhost(s.gh,back,200); else s.gh.remove();
+    if(src===s.id) return;
+    if(!src && !U.tr) engNope({x:e.clientX, y:e.clientY}, 'none', s.id);   /* r3: 탭→탭에서 대상 밖을 누름 → '다시!'(조용히 튕기지 않음) */
+  }
+  if(!src) return;
+  e.preventDefault(); try{ sceneEl.setPointerCapture(e.pointerId); }catch(_){}
+  U.drag={id:src, x0:e.clientX, y0:e.clientY, moved:false, gh:ghost(itemOf(G,src),e.clientX,e.clientY), hov:null};
+});
+sceneEl.addEventListener('pointermove',function(e){
+  var d=U.drag; if(!d) return;
+  if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)>8) d.moved=true;
+  moveGhost(d.gh,e.clientX,e.clientY);
+  var tg=d.moved?pick(targets(G),e.clientX,e.clientY,14):null;
+  if(tg!==d.hov){ clearRings('.ring.hover'); d.hov=tg; if(tg) ring(tg,'hover'); }
+});
+function endDrag(e,cancel){
+  var d=U.drag; if(!d) return; U.drag=null; clearRings('.ring.hover');
+  if(U.paused||U.mode!=='play') cancel=true; /* 끄는 도중 모달이 열렸으면 놓지 않는다 */
+  if(cancel){ var b=SCENE.rectOf(G,d.id); if(b) flyGhost(d.gh,b,200); else d.gh.remove(); return; }
+  if(!d.moved){ d.gh.classList.add('sel'); U.sel={id:d.id, gh:d.gh}; return; }
+  var tg=pick(targets(G),e.clientX,e.clientY,14);
+  U.dropPt={x:e.clientX, y:e.clientY}; commit(d.id,tg||'none',false,d.gh);
+}
+sceneEl.addEventListener('pointerup',function(e){ endDrag(e,false); });
+sceneEl.addEventListener('pointercancel',function(e){ endDrag(e,true); });
+
+/* ---------- 모달 (규칙 버튼, 배지 버튼, 처음으로 확인). 플레이 중 저절로 뜨는 모달은 없다 ---------- */
+function modal(html){ closeModal(); U.paused=true; var v=document.createElement('div'); v.className='veil'; v.id='veil'; v.innerHTML='<div class="modal" role="dialog">'+html+'</div>'; document.body.appendChild(v);
+  v.addEventListener('click',function(e){ if(e.target===v || e.target.closest('[data-close]')) closeModal(); }); }
+function closeModal(){ var v=$('#veil'); if(v) v.remove(); if(U) { U.paused=false; LAST=performance.now(); } }
+function rulesModal(){
+  var M=GAME.rulesModal;
+  modal('<h2>이렇게 해요</h2><div class="mrow">'+M.cards.map(ruleCard).join('')+'</div><div class="def">'+M.note+'</div><div class="btns"><button class="btn2 pri" data-close>알겠어요</button></div>'+(GAME.credit?'<div class="credit">'+GAME.credit+'</div>':''));
+}
+function shelfHtml(cur){ return '<div class="shelf">'+GAME.badges.map(function(b){ var on=G.badges.indexOf(b.k)>=0; return '<button class="bd'+(on?'':' off')+(cur===b.k?' cur':'')+'" data-bd="'+b.k+'" aria-label="'+b.name+'">'+iconSvg(b.art,'')+'</button>'; }).join('')+'</div>'; }
+function badgeModal(k){
+  var b=k?GAME.badges.find(function(x){ return x.k===k; }):null, on=b&&G.badges.indexOf(b.k)>=0;
+  modal('<h2>배지</h2>'+shelfHtml(k)+'<div class="def">'+(b?'<b>'+b.name+'</b>'+(on?b.def:'아직 못 받았어요'):'배지를 누르면 뜻이 나와요')+'</div><div class="btns"><button class="btn2 pri" data-close>닫기</button></div>');
+  $('#veil').querySelectorAll('[data-bd]').forEach(function(x){ x.onclick=function(){ badgeModal(x.dataset.bd); }; });
+}
+function confirmReset(){
+  if(U.mode==='title'){ reset(); return; }
+  modal('<h2>처음으로 갈까요?</h2><div class="def">지금 점수는 사라져요.</div><div class="btns"><button class="btn2" data-close>계속하기</button><button class="btn2 pri" id="yesReset">처음으로</button></div>');
+  $('#yesReset').onclick=function(){ closeModal(); reset(); };
+}
+
+/* ---------- 결과: 큰 점수, 칭호, 기록 막대('처음엔 모두 0'), 공식 한 줄, 배지 선반, 다음 시간 질문 ---------- */
+/* 결과 그림 칸(선택): GAME.result.art(G) → {vb:[x,y,w,h], svg:'SVG 조각'} 또는 '<svg …>' 문자열. 막대와 공식 사이, 남는 높이만큼 */
+function resultArt(R){
+  if(typeof R.art!=='function') return ''; var a=R.art(G); if(!a) return '';
+  if(typeof a==='string') return '<div class="rart" aria-hidden="true">'+a+'</div>';
+  return '<div class="rart" aria-hidden="true"><svg viewBox="'+(a.vb||[0,0,400,120]).join(' ')+'" preserveAspectRatio="xMidYMid meet">'+a.svg+'</svg></div>';
+}
+function results(){
+  U.mode='result'; tryClear(); stopDemo(); clearOvl(); panelAll(); $('#combo').classList.remove('on'); U.comboT=0;
+  $('#stgName').textContent='결과'; $('#stgPips').innerHTML='';
+  var R=GAME.result, sc=G.score, CH=ENG_CHON, prev=BEST, rec=sc>prev&&prev>0, fresh=false, left;
+  if(CH){   /* §19 도전 결과: 큰 글 하나('도전 3 성공!' / '아깝다!' / '도전 3') + 별 + 점수와 목표 막대. 버튼 [다시 하기 | 도전 n+1 또는 다시] */
+    var lv=ENG_CHLV, goal=ENG_CHGOAL, pass=sc>=goal, near=!pass&&sc>=goal*ENG_CHNEAR, st=ENG_CHR.stars(sc,goal), pb=ENG_CHM.best[lv]||0;
+    var mx=ENG_CHR.max(), all=pass&&mx>0&&lv>=mx;   /* §19-추론형: 최고 레벨을 깨면 완주(다음 레벨 없음, 버튼은 '다시') */
+    ENG_CHM.best[lv]=Math.max(pb,sc); ENG_CHM.open=true; if(pass){ ENG_CHM.top=Math.max(ENG_CHM.top,lv); ENG_CHM.lv=Math.max(ENG_CHM.lv,mx?Math.min(mx,lv+1):lv+1); } if(all) ENG_CHM.all=1; engChSave();
+    U.chRes={lv:lv, goal:goal, pass:pass, near:near, stars:st, score:sc, next:pass&&!all?lv+1:lv, all:all};
+    left='<div class="rcard l eng-chres'+(pass?' pass':'')+'"><div class="ttl eng-big'+(pass||near?' eng-new':'')+'">'+(all?'모든 도전 완주!':pass?engChLab(lv)+' 성공!':near?'아깝다!':engChLab(lv))+'</div>'
+      +(pass?'<div class="eng-stars">'+[1,2,3].map(function(i){ return engStar(i<=st); }).join('')+'</div>':'')
+      +'<div class="num" id="rnum">0</div><div class="eng-goal"><div class="eng-gbar"><i style="transform:scaleX('+Math.min(1,sc/goal).toFixed(3)+')"></i></div><span>목표 '+goal+'</span></div>'
+      +'<div class="btns"><button class="btn2" id="again">다시 하기</button><button class="btn2 eng-ch pri'+(near?' new':'')+'" id="engCh">'+engChIcon()+(pass&&!all?'도전 '+(lv+1):'다시')+'</button></div></div>';
+  } else {
+    BEST=Math.max(BEST,sc); if(CHC){ ENG_CHM.open=true; engChSave(); }   /* §19: 도전은 처음부터 열려 있음(2026-11-07 잠금 폐지) → '열렸다' 효과 없음 */
+    left='<div class="rcard l"><div class="lab">최종 점수</div><div class="num" id="rnum">0</div><div class="ttl">'+GAME.titleOf(sc)+'</div><div class="rec">'+(rec?'신기록! 전 기록 '+prev:(prev>0&&prev!==sc?'이 화면 최고 '+BEST:''))+'</div>'
+      +'<div class="btns"><button class="btn2 pri" id="again">다시 하기</button>'+(CHC?'<button class="btn2 eng-ch'+(fresh?' new':'')+'" id="engCh">'+engChIcon()+'도전 '+ENG_CHM.lv+'</button>':engPairBtn())+'</div></div>';   /* 결과 버튼은 [다시 하기 | 도전] 둘만. 처음으로는 HUD ⟲ */
+  }
+  var rows=R.rows(G), mx=Math.max.apply(null,[1].concat(rows.map(function(r){ return r[1]; })));
+  var d=document.createElement('div'); d.className='res';
+  if(CH){   /* 블라인드(11-07): 도전 결과 오른쪽에 일반 판 막대·회색 배지가 나와 '못 얻음'처럼 보임 → 도전 기록(레벨 사다리 1~최고 레벨)만, 배지 칸 숨김.
+       깬 레벨 = 그 레벨 최고 점수의 별 수, 이번 레벨 = 주황 테두리. maxLevel이 없으면 지금까지 깬 레벨 + 다음 하나 */
+    var cr=U.chRes, N=ENG_CHR.max()||Math.max(ENG_CHM.top+1, cr.lv), lad='';
+    for(var li=1; li<=N; li++){ var dn=li<=ENG_CHM.top, ns=dn?Math.max(1,ENG_CHR.stars(ENG_CHM.best[li]||0, ENG_CHR.goal(li))):0;
+      lad+='<div class="eng-lv'+(dn?' done':'')+(li===cr.lv?' cur':'')+'"><b>'+li+'</b>'+(dn?'<span class="eng-ls">'+[1,2,3].map(function(i){ return engStar(i<=ns); }).join('')+'</span>':'')+'</div>'; }
+    d.innerHTML=left+'<div class="rcard eng-chrec"><div class="rh">도전 기록<small>깬 도전 '+ENG_CHM.top+(ENG_CHR.max()?' / '+ENG_CHR.max():'')+'</small></div><div class="eng-lad">'+lad+'</div></div>';
+  } else
+  d.innerHTML=left
+   +'<div class="rcard"><div class="rh">'+R.label+'<small>'+R.note+'</small></div><div class="bars">'+rows.map(function(r){ return '<span>'+r[0]+'</span><div class="bar"><i data-v="'+(r[1]/mx)+'"></i></div><b>'+r[1]+'</b>'; }).join('')+'</div>'
+   +resultArt(R)+'<div class="formula">'+R.formula+'</div>'+shelfHtml(null)+'<div class="nextq">배지를 누르면 뜻이 나와요.<br>'+R.next+'</div></div>';
+  $('#main').appendChild(d); $('#main').classList.add('showres');
+  d.querySelectorAll('[data-bd]').forEach(function(x){ x.onclick=function(){ badgeModal(x.dataset.bd); }; });
+  $('#again').onclick=function(){ reset(); G=start(G); var t=ovl.querySelector('.ribbon'); if(t) t.remove(); beginStage(); };
+  if($('#engCh')) $('#engCh').onclick=function(){ engChStart(CH ? U.chRes.next : ENG_CHM.lv); };
+  say(R.say); setBtn(null);
+  requestAnimationFrame(function(){ d.querySelectorAll('.bar i').forEach(function(i){ i.style.transform='scaleX('+i.dataset.v+')'; }); });
+  var t0=performance.now(), g=GEN; (function roll(){ if(g!==GEN) return; var p=Math.min(1,(performance.now()-t0)/(RM?1:900)); var n=$('#rnum'); if(n) n.textContent=Math.round(sc*p); if(p<1) requestAnimationFrame(roll); })();
+}
+
+/* ---------- 버튼 ---------- */
+$('#bReset').innerHTML=iconSvg('icReset'); $('#bRules').innerHTML=iconSvg('icRules')+'<span>규칙</span>'; $('#bBadges').innerHTML=iconSvg('icMedal')+'<span>배지</span>';
+$('#bRules').classList.add('lb'); $('#bBadges').classList.add('lb');
+$('#bReset').onclick=confirmReset; $('#bRules').onclick=rulesModal; $('#bBadges').onclick=function(){ badgeModal(null); };
+$('#bHint').onclick=doHint;
+if(XPC) $('#xpBtn').onclick=xpToggle;
+
+/* ---------- 한 개의 rAF 루프: tick → renderScene → 오버레이 맞춤. 화면이 안 보이면 멈춘다 ---------- */
+var LAST=performance.now(), RAF=0;
+function frame(now){
+  var dt=Math.min(0.1,(now-LAST)/1000); LAST=now;
+  var frz = U.mode==='play' && tryFrame(now,dt);   /* '해 보기' 동안 게임 시간은 멈춘다 */
+  if(U.mode==='play' && !U.paused && !frz){ if(ENG_CHON) engChMark(G); var r=tick(G, ENG_CHON?Math.min(0.1,dt)*ENG_CHSPD:dt); G=r.G; engScoreSeen();   /* §19 도전: 시간 배속(LOGIC에 넘기는 dt만 키움) */
+    if(r.ev.length) handle(r.ev); }
+  SCENE.renderScene(G);
+  syncRings(); if(U.mode==='play'){ unblockOverlays(now); hintCheck(now); hintFingerStep(now); hintArrowSync(); }
+  if(U.shown!==G.score && !engHeld(now)){ U.shown += Math.ceil((G.score-U.shown)/4); if(U.shown>G.score) U.shown=G.score; $('#score').textContent=U.shown; }
+  if(U.comboT && now-U.comboT>GAME.comboWin*1000){ U.comboT=0; $('#combo').classList.remove('on'); }
+  maybeDemo(now); progTag(now); engTxtPump(now);
+  if(XPC) xpSync();
+  RAF=requestAnimationFrame(frame);
+}
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ cancelAnimationFrame(RAF); RAF=0; } else if(!RAF){ LAST=performance.now(); RAF=requestAnimationFrame(frame); } });
+window.addEventListener('resize',function(){ clearRings('.ring:not(.bad)'); if(U.hint&&U.hintMv) hintShow(U.hintMv,U.hint,false); if(U.tr&&U.tr.phase==='wait') trySpot(U.tr,false); });
+
+engChLoad();
+reset();
+RAF=requestAnimationFrame(frame);
+</script>
+</body>
+</html>
