@@ -74,7 +74,7 @@
 
 학생들은 지금 마을의 변화 신호가 20년 뒤 어떤 문제로 자라는지 이어 보며, 미래 사회에 인구·환경·윤리 문제가 생길 수 있음을 겪습니다.
 
-- [20년 뒤 우리 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4a1.html) — A 개념 체험: 지금 마을의 변화 신호(아기·학생 감소, 연기, 규칙 없는 새 기술)를 20년 뒤 마을의 문제 자리에 이어 미리 대비해요.
+- [20년 뒤 우리 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4a1.html) — A 개념 체험: 지금 마을의 변화 신호를 20년 뒤 마을의 문제 자리에 이어 대비하고, 괜찮은 신호는 통과 문으로 보내요.
 - [어떤 미래 문제일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4b1.html) — B 떠올리기 연습: 미래 사회의 상황 카드를 인구·환경·윤리 문제 칸에 나눠 담아요.
 
 ### 주제 2 미래 사회의 문제를 과학이 해결할 수 있을까?

@@ -442,13 +442,18 @@ Object.assign(ASSETS,{sseonyang:{"vb":[-24,-24,48,48],"src":"data:image/png;base
    2단계 '원인 줄이기와 대처하기': 재생 에너지로 굴뚝을 바꾸면 그 발전소는 다시 연기를 내지 않는다(원인 줄이기). 장치는 이미 생긴 연기 하나를 없앤다(대처하기).
    3단계 '두 문제 함께': 연기 + 일손 빈자리. 일손이 모자라는 변화는 원인을 줄일 기술이 쟁반에 없다 → 로봇으로 대처(과학만으로는 한계, '왜?'). */
 var SEED = 20261109;
-var CFG = { idle:0.9, cap:5, dayK:2, pFix:5, pClean:3, hintPts:2, endPause:1.0, M:3, VM:3 };
+var CFG = { roundPause:1.8, slideOut:0.6, slideIn:0.5, idle:0.9, cap:5, dayK:2, pFix:5, pClean:3, hintPts:2, endPause:1.0, M:3, VM:3 };
 var TECH = { env:'sun', lab:'robot', sec:'lock' };
 var STAGES = [
   {name:'알맞은 기술', rule:'match', days:8, plants:2, P:0, ph:[0,0], cloud0:0, posts:2, comps:2,
    ev:[['env',0,0],['sec',1,0],['lab',2,0],['sec',4,1],['env',4,1],['lab',6,1]]},
-  {name:'원인 줄이기와 대처하기', rule:'cause', days:10, plants:3, P:2, ph:[1,1,2], cloud0:3, posts:0, comps:0, ev:[]},
-  {name:'두 문제 함께', rule:'both', days:12, plants:2, P:2, ph:[1,2], cloud0:3, posts:3, comps:0, ev:[['vac',0,0],['vac',3,1],['vac',6,2]]}
+  {name:'원인 줄이기와 대처하기', rule:'cause', days:10, plants:3, P:2, ph:[1,1,2], cloud0:3, posts:0, comps:0, ev:[],
+   /* B판(2026-11-09 판 늘리기): 하늘이 거의 찬 동네 + 빠른 굴뚝(2일)·느린 굴뚝(3일) 섞임 → '지금은 대처 먼저? 어느 굴뚝부터 바꾸나'(새 규칙 0, 새 조건) */
+   B:{days:8, plants:3, Ps:[3,2,2], ph:[1,1,2], cloud0:4}},
+  {name:'두 문제 함께', rule:'both', days:12, plants:2, P:2, ph:[1,2], cloud0:3, posts:3, comps:0, ev:[['vac',0,0],['vac',3,1],['vac',6,2]],
+   /* B판: 굴뚝 3(빠른 굴뚝 하나·느린 굴뚝 둘) + 빈자리 → 굴뚝이 늘어 '원인부터 바꿀까, 막대 찬 빈자리부터 막을까'가 매일 갈림(새 규칙 0, 새 조합).
+      빈자리는 4일 간격(겹치면 동시 요구 3 — load.js 상) */
+   B:{days:12, plants:3, Ps:[2,3,3], ph:[1,2,1], cloud0:2, ev:[['vac',0,0],['vac',4,1],['vac',8,2]]}}
 ];
 var BADGES = [
   {k:'match', name:'문제에 맞는 과학 기술', art:'bdMatch', def:'재생 에너지는 기후 위기·환경오염, 로봇·인공지능 자동화는 일할 사람이 모자라는 문제, 정보 보안 기술은 개인 정보 유출·해킹을 막는 데 도움이 돼요. (교과서 87쪽 참고)'},
@@ -460,7 +465,7 @@ var NAMES = {
   cause:'<em>원인 줄이기</em>! 다시 안 생겨요', cope:'<em>대처하기</em>! 생긴 연기를 없앴어요',
   over:'하늘 칸이 가득! 연기가 넘쳤어요', broke:'문제가 터졌어요', stall:'일손이 없어 멈췄어요'
 };
-var TITLES = [[0,'연구소 새내기'],[220,'연구원'],[290,'수석 연구원'],[320,'연구소장']];
+var TITLES = [[0,'연구소 새내기'],[330,'연구원'],[430,'수석 연구원'],[480,'연구소장']];   /* B판 뒤(2026-11-09): 성실 491, 힌트 연타 297, 무작위 최대 140 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
@@ -473,7 +478,9 @@ function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:
    목표 = 두 판 최대 점수(날 수 × 하늘 칸 5 × 2점)의 CH.gk(고정 비율). 굴뚝·빈자리가 늘수록 같은 날 수에 해야 할 일이 많아져
    '원인부터 바꾸고, 넘치기 직전에만 없애고, 빈자리는 막대가 차기 전에'를 지켜야 목표에 닿는다. */
 var CH = { days:12, gk:0.55,
-  tab:[[2,0,1,2],[2,1,1,2],[2,2,1,3],[3,1,2,3],[3,2,2,3],[3,3,2,3],[3,3,3,4],[4,2,2,4],[4,3,2,4],[4,4,3,4],[4,4,3,5],[5,4,3,5]],
+  /* 2026-11-09 판 늘리기: 개념 판 3단계 A판보다 쉬운 앞 두 줄([2,0,1,2],[2,1,1,2])을 뺐다 → 도전 1 = 3단계 A판 수준(굴뚝 2·둘 다 빠름·빈자리 3).
+     B판(굴뚝 3) 다음 줄부터 시작([3,1,2,3]부터)하면 성실 봇이 도전 7, 4.1분에 막혀 공리 6(5~10분) 미달이라 쓰지 않음(숫자 조정 없이 시작 줄만 고름). */
+  tab:[[2,2,1,3],[3,1,2,3],[3,2,2,3],[3,3,2,3],[3,3,3,4],[4,2,2,4],[4,3,2,4],[4,4,3,4],[4,4,3,5],[5,4,3,5]],
   at:function(lv){ return CH.tab[Math.min(lv,CH.tab.length)-1]; } };
 function chStages(lv){
   var r=CH.at(lv);
@@ -482,7 +489,12 @@ function chStages(lv){
 }
 var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
 function chGoal(lv){ return Math.round(2*CH.days*CFG.cap*CFG.dayK*CH.gk); }
-function stOf(G,si){ var i=si==null?G.si:si; return G.ch && CH_STAGES.length ? chStages(G.ch)[i] : STAGES[i]; }
+function stOf(G,si){ var i=si==null?G.si:si; if(G.ch && CH_STAGES.length) return chStages(G.ch)[i];
+  var S=STAGES[i]; if(S && S.B && G.rb && (si==null || si===G.si)){ var o={}, k; for(k in S) o[k]=S[k]; for(k in S.B) o[k]=S.B[k]; return o; } return S; }
+/* 판 바뀜(블라인드 r1 상: 다 푼 태양광 동네가 그 자리에서 굴뚝으로 바뀌어 '되돌려진 것'처럼 읽힘): A판 동네는 왼쪽으로 밀려 나가고(판 사이 마지막 slideOut초),
+   B판 동네가 오른쪽에서 들어온다(slideIn초, 그동안은 놓지 못함). 장면 scene.js slideX */
+function sliding(G){ return !!(G && !G.ch && G.rb && G.phase==='play' && G.day===0 && G.t<CFG.slideIn); }
+function hasB(G){ return !G.ch && !!(STAGES[G.si] && STAGES[G.si].B); }
 function nStages(G){ return G.ch && CH_STAGES.length ? CH_STAGES.length : STAGES.length; }
 
 function genStage(G,S){
@@ -492,17 +504,17 @@ function genStage(G,S){
   for(i=0;i<g.vac;i++){ d=(i===0? Math.floor(rnd(G)*2) : d+gap-1+Math.floor(rnd(G)*2)); if(d>=S.days-2) break; ev.push(['vac',d,i%S.posts]); }
   return {ph:ph, ev:ev};
 }
-function startStage(G0,si){
-  var G=cl(G0), S=stOf(G,si), i, ph=S.ph, evs=S.ev;
+function startStage(G0,si,rb){
+  var G=cl(G0), i; if(G.si!==si || !rb){ G.sMiss=0; } G.rb=rb?1:0; G.si=si; var S=stOf(G,si), ph=S.ph, evs=S.ev||[];
   if(S.gen){ var gg=genStage(G,S); ph=gg.ph; evs=gg.ev; }
   G.si=si; G.phase='play'; G.t=0; G.endT=-1; G.day=0; G.idleT=0;
-  G.pl=[]; for(i=0;i<S.plants;i++) G.pl.push({i:i, coal:true, cd:ph[i]||0, smoke:0, P:(S.gen ? (i<(S.fast||0)?2:3) : S.P)});
+  G.pl=[]; for(i=0;i<S.plants;i++) G.pl.push({i:i, coal:true, cd:ph[i]||0, smoke:0, P:(S.gen ? (i<(S.fast||0)?2:3) : S.Ps ? S.Ps[i] : S.P)});
   G.sky=[]; for(i=0;i<S.cloud0;i++) G.sky.push({id:G.nid++, from:-1});
   G.posts=[]; for(i=0;i<S.posts;i++) G.posts.push({i:i, st:'off', t:0, max:CFG.VM});   /* off: 아직 안 연 자리, vac: 사람 구함(막대), stall: 멈춤, robot */
   G.comps=[]; for(i=0;i<S.comps;i++) G.comps.push({i:i, st:'calm', t:0});
   G.pr=[]; G.q=evs.map(function(e,k){ return {k:e[0], at:e[1], n:e[2], i:k}; });
   G.days=[]; G.fx=[]; G.dayPts=0; G.sx={cause:0, cope:0, robot:0, over:0};
-  G.res={total:S.days, served:0, missed:0};
+  G.res={total:S.days, served:0, missed:0};   /* 진행 줄은 판(A·B)마다 */
   var ev=[]; spawnDue(G,ev);
   return G;
 }
@@ -533,7 +545,7 @@ function clearSlots(G){ return Math.max(0, CFG.cap-G.sky.length); }
 function advance(G,ev,waste){
   var S=stOf(G), broke=false, over=false, overFrom=-1;
   /* ① 굴뚝 연기 */
-  if(S.P>0) G.pl.forEach(function(p){ if(!p.coal) return; p.cd--; if(p.cd<=0){ p.cd=p.P||S.P;
+  if(S.P>0||S.Ps) G.pl.forEach(function(p){ if(!p.coal) return; p.cd--; if(p.cd<=0){ p.cd=p.P||S.P;
       if(G.sky.length<CFG.cap){ var c={id:G.nid++, from:p.i}; G.sky.push(c); ev.push({t:'puff', id:c.id, from:p.i}); }
       else { over=true; if(overFrom<0) overFrom=p.i; fxPush(G,{k:'over', from:p.i}); } } });
   /* ② 1단계 문제 막대 */
@@ -550,10 +562,10 @@ function advance(G,ev,waste){
   /* ④ 그날 점수 */
   var pts = (broke||over||waste===true) ? 0 : clearSlots(G)*CFG.dayK; if(waste==='via') pts=Math.floor(pts/2);   /* 힌트 3단계가 대신 둔 날은 절반 */   /* 틀린 수로 보낸 날(waste)은 점수 없는 회색 날(튕긴 놓기는 점수를 바꾸지 않는다) */
   G.days.push(pts); G.day++;
-  if(pts>0){ G.res.served++; G.stats.good++; } else { G.res.missed++; G.stats.bad++; }
+  if(pts>0){ G.res.served++; G.stats.good++; } else { G.res.missed++; G.stats.bad++; G.sMiss=(G.sMiss||0)+1; }
   if(over){ G.sx.over++; G.stats.over++; ev.push({t:'over', at:'plant:'+overFrom}); firstName(G,ev,'over','plant:'+overFrom); }
   G.score+=pts; fxPush(G,{k:'day', bad:pts===0, over:over}); ev.push({t:'day', n:G.day, pts:pts, bad:pts===0});
-  if(G.day>=S.days){ G.endT=G.t+CFG.endPause; G.pr.forEach(function(p){ }); return; }
+  if(G.day>=S.days){ G.endT=G.t+(hasB(G) && !G.rb ? CFG.roundPause : CFG.endPause); if(hasB(G) && !G.rb) ev.push({t:'roundEnd'}); return; }
   spawnDue(G,ev);
 }
 function busy(G){   /* 지금 학생이 할 일이 있나(없으면 하루가 저절로 흐름) */
@@ -565,11 +577,14 @@ function busy(G){   /* 지금 학생이 할 일이 있나(없으면 하루가 �
 function tick(G0,dt){
   var G=cl(G0), ev=[], S=stOf(G); if(G.phase!=='play') return {G:G, ev:ev};
   G.t+=dt;
-  if(G.endT>=0){ if(G.t>=G.endT){ G.phase='stageEnd'; award(G,ev,S.rule); ev.push({t:'stageEnd', si:G.si}); } return {G:G, ev:ev}; }
+  if(G.endT>=0){ if(G.t>=G.endT){
+      if(hasB(G) && !G.rb){ var keep={score:G.score, sx:G.sx, sMiss:G.sMiss}; G=startStage(G,G.si,1); G.sx=keep.sx; G.sMiss=keep.sMiss; G.t=0; ev.push({t:'newRound', si:G.si}); }
+      else { G.phase='stageEnd'; award(G,ev,S.rule); ev.push({t:'stageEnd', si:G.si}); } }
+    return {G:G, ev:ev}; }
   if(!busy(G)){ G.idleT+=dt; if(G.idleT>=CFG.idle){ G.idleT=0; advance(G,ev); } } else G.idleT=0;
   return {G:G, ev:ev};
 }
-var COST = { wrongTech:1, noNeed:1, where:1, doneP:1, calmP:1, fullP:1, doneC:1 };   /* 생각하고 둔 틀린 수 = 하루가 그냥 지나감 */
+var COST = { wrongTech:1, noNeed:1, where:1, cleanP:1, notCloud:1, doneP:1, calmP:1, fullP:1, doneC:1 };   /* 생각하고 둔 틀린 수 = 하루가 그냥 지나감 */
 function fail(G0,why,src,dst){
   var ev=[{t:'bounce', why:why, src:src, dst:dst}];
   if(!G0 || G0.phase!=='play' || !COST[why] || G0.endT>=0) return {G:G0, ok:false, why:why, ev:ev};
@@ -577,12 +592,12 @@ function fail(G0,why,src,dst){
 }
 function pts(G,base,via){ return via ? CFG.hintPts : base; }
 function drop(G0,src,dst,via){
-  if(!G0 || G0.phase!=='play' || G0.endT>=0) return fail(G0,'phase',src,dst);
+  if(!G0 || G0.phase!=='play' || G0.endT>=0 || sliding(G0)) return fail(G0,'phase',src,dst);
   var G=cl(G0), ev=[], S=stOf(G), sp=String(src).split(':'), dp=String(dst).split(':'), tech=sp[1], n=+dp[1], p, pr, q;
   if(sp[0]!=='tech' || techs(G).indexOf(tech)<0) return fail(G0,'src',src,dst);
   var kind=dp[0];
   if(kind==='plant'){ var pl=G.pl[n]; if(!pl) return fail(G0,'dst',src,dst);
-    if(tech!=='sun') return fail(G0, tech==='clean'?'where':'wrongTech',src,dst);
+    if(tech!=='sun') return fail(G0, tech==='clean'?'cleanP':'wrongTech',src,dst);
     if(!pl.coal) return fail(G0,'doneP',src,dst);
     if(S.rule==='match' && !G.pr.some(function(x){ return x.k==='env' && x.n===n; })) return fail(G0,'calmP',src,dst);
     pl.coal=false; pl.smoke=0; pr=G.pr.find(function(x){ return x.k==='env' && x.n===n; }); if(pr) G.pr=G.pr.filter(function(x){ return x!==pr; });
@@ -590,7 +605,7 @@ function drop(G0,src,dst,via){
     ev.push({t:'fix', k:'env', at:dst, pts:q}); firstName(G,ev, S.rule==='match'?'env':'cause', dst); if(S.rule!=='match') firstName(G,ev,'env',dst);
   }
   else if(kind==='cloud'){ var ci=G.sky.findIndex(function(c){ return String(c.id)===dp[1]; }); if(ci<0) return fail(G0,'dst',src,dst);
-    if(tech!=='clean') return fail(G0,'where',src,dst);
+    if(tech!=='clean') return fail(G0,'notCloud',src,dst);   /* 블라인드 r1: 이유별 한 줄 */
     G.sky.splice(ci,1); q=pts(G,CFG.pClean,via); G.score+=q; G.stats.cope++; G.sx.cope++;
     ev.push({t:'fix', k:'cloud', at:dst, pts:q}); firstName(G,ev,'cope',dst);
   }
@@ -618,7 +633,7 @@ function techs(G){ var r=stOf(G).rule; return r==='match' ? ['sun','robot','lock
 /* 지금 할 만한 한 수 */
 function dueCount(G){ return G.pl.filter(function(p){ return p.coal && p.cd===1; }).length; }
 function bestEnv(G,mode){
-  var coal=G.pl.filter(function(p){ return p.coal; }).sort(function(a,b){ return a.cd-b.cd || a.i-b.i; });
+  var coal=G.pl.filter(function(p){ return p.coal; }).sort(function(a,b){ return a.cd-b.cd || (a.P||9)-(b.P||9) || a.i-b.i; });
   var lastCloud=G.sky.length ? G.sky[G.sky.length-1] : null;
   if(mode==='cope') return lastCloud ? {src:'tech:clean', dst:'cloud:'+lastCloud.id} : null;
   if(coal.length){
@@ -628,7 +643,7 @@ function bestEnv(G,mode){
   return lastCloud ? {src:'tech:clean', dst:'cloud:'+lastCloud.id} : null;
 }
 function hintMove(G,mode){
-  if(!G || G.phase!=='play' || G.endT>=0) return null;
+  if(!G || G.phase!=='play' || G.endT>=0 || sliding(G)) return null;
   var S=stOf(G);
   if(S.rule==='match'){
     var ps=G.pr.slice().sort(function(a,b){ return (a.max-a.t)-(b.max-b.t) || a.id-b.id; })[0];
@@ -643,9 +658,9 @@ function hintMove(G,mode){
 }
 /* 반쪽 봇(점검용): 연기를 없애기만 하는 학생(원인을 그대로 둠) */
 function partialMove(G,k){ return hintMove(G,'cope'); }
-function sources(G){ if(!G || G.phase!=='play') return []; return techs(G).map(function(t){ return 'tech:'+t; }); }
+function sources(G){ if(!G || G.phase!=='play' || sliding(G)) return []; return techs(G).map(function(t){ return 'tech:'+t; }); }
 function targets(G){
-  if(!G || G.phase!=='play') return [];
+  if(!G || G.phase!=='play' || sliding(G)) return [];
   var t=[]; G.pl.forEach(function(p){ t.push('plant:'+p.i); });
   G.sky.forEach(function(c){ t.push('cloud:'+c.id); });
   G.posts.forEach(function(p){ if(p.st!=='off') t.push('post:'+p.i); });
@@ -655,7 +670,7 @@ function targets(G){
 function itemOf(G,id){ var p=String(id).split(':'); return p[0]!=='tech' ? null : p[1]==='robot' ? 'robot' : p[1]==='lock' ? 'lock' : 't_'+p[1]; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,CFG:CFG,CH:CH,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,stOf:stOf,
+if(typeof module!=='undefined') module.exports={sliding:sliding,hasB:hasB,SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,CFG:CFG,CH:CH,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,stOf:stOf,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,partialMove:partialMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf};
 /* LOGIC-END */
 
@@ -713,7 +728,7 @@ var GAME = {
     cards: [['rMatch','! 문제에 맞는 기술을 놓아요'],['rDay','한 번 놓으면(틀려도) 하루가 지나요'],['rSky','그날 맑은 하늘 칸마다 +2']],
     note: '하늘 칸이 맑을수록 그날 점수가 커요.'
   },
-  stageRibbon: function(G){ return G.res && G.res.missed===0 ? (G.si+1)+'단계 성공!' : {text:(G.si+1)+'단계 끝!', confetti:false}; },
+  stageRibbon: function(G){ return !G.sMiss ? (G.si+1)+'단계 성공!' : {text:(G.si+1)+'단계 끝!', confetti:false}; },
   result: {
     label: '우리 도시 기록', note: '',
     rows: function(G){ var s=G.stats; return [['맑은 날', s.good], ['바꾼 굴뚝', s.cause], ['없앤 연기', s.cope], ['일하는 로봇', s.robot]]; },
@@ -724,13 +739,15 @@ var GAME = {
   explain: {
     bounce: '다시!',
     reasons: {
-      wrongTech: {line:'다른 기술!', why:'이 문제에 맞는 기술이 아니에요. 하루가 그냥 지나갔어요', page:'교과서 87쪽 참고'},
+      wrongTech: {line:'이 문제엔 다른 기술', why:'이 문제에 맞는 기술이 아니에요. 하루가 그냥 지나갔어요', page:'교과서 87쪽 참고'},
       where:     {line:'여기 아니에요', why:'재생 에너지는 굴뚝 발전소에, 오염 없애는 장치는 하늘의 연기에 놓아요. 하루가 지나갔어요'},
+      cleanP:    {line:'장치는 연기에 놓아요', why:'오염 없애는 장치는 하늘의 연기에 놓아요. 굴뚝을 바꾸려면 재생 에너지! 하루가 지나갔어요'},
+      notCloud:  {line:'연기엔 오염 없애기', why:'하늘의 연기는 오염 없애는 장치로만 없앨 수 있어요. 하루가 지나갔어요'},
       noNeed:    {line:'여기 아니에요', why:'여기는 지금 고칠 문제가 없어요. 하루가 그냥 지나갔어요'},
-      doneP:     {line:'이미 바꿨어요', why:'이 발전소는 벌써 재생 에너지예요. 하루가 그냥 지나갔어요'},
-      calmP:     {line:'연기 안 나요', why:'! 표시가 있는 곳이 지금 문제예요. 하루가 그냥 지나갔어요'},
-      fullP:     {line:'사람이 있어요', why:'점선 빈자리에만 로봇을 놓아요. 하루가 그냥 지나갔어요'},
-      doneC:     {line:'이미 잠갔어요', why:'! 표시가 있는 곳이 지금 문제예요. 하루가 그냥 지나갔어요'}
+      doneP:     {line:'벌써 태양광 발전소', why:'이 발전소는 벌써 재생 에너지로 바뀌어 연기를 안 내요. 하루가 그냥 지나갔어요'},
+      calmP:     {line:'이 굴뚝은 아직 조용', why:'! 표시가 있는 곳이 지금 문제예요. 하루가 그냥 지나갔어요'},
+      fullP:     {line:'사람이 일하는 자리', why:'점선 빈자리에만 로봇을 놓아요. 하루가 그냥 지나갔어요'},
+      doneC:     {line:'벌써 잠근 정보', why:'! 표시가 있는 곳이 지금 문제예요. 하루가 그냥 지나갔어요'}
     },
     general: function(G){
       var r=stOf(G).rule;
@@ -768,6 +785,9 @@ var GAME = {
     else if(e.t==='over'){ FX.callout('하늘 칸이 가득! 넘쳤어요', e.at); FX.explain({why:'굴뚝 연기가 하늘 칸을 넘쳤어요. 그날은 회색 날이에요', def:BADGES[1].def}); }
     else if(e.t==='broke'){ FX.explain({why:'막대가 다 찰 때까지 맞는 기술을 못 놓아 문제가 터졌어요', def:BADGES[0].def}); }
     else if(e.t==='stall'){ FX.explain({why:'빈자리를 채우지 못해 공장이 멈췄어요. 로봇으로 대처할 수 있어요', def:BADGES[2].def}); }
+    else if(e.t==='roundEnd'){ if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0; }   /* A판 끝: 남은 이름 말풍선 줄을 비워 새 동네까지 끌고 가지 않음 */
+    else if(e.t==='newRound'){   /* 블라인드 r1: 새 동네 안내는 장면이 동네 전환과 함께 그린다(scene.js 표지판). 앞 판 행동의 이름 말풍선이 줄에 남아 새 동네에서 뒤늦게 뜨지 않게 줄을 비운다 */
+      if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0; FX.progress(); }
     else if(e.t==='bounce') FX.comboOff();
   }
 };
@@ -810,6 +830,14 @@ var SCENE = (function(){
     ['bg','sky','city','tray','fx','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
     host.insertBefore(svg, host.firstChild);
   }
+  /* 판 바뀜(블라인드 r1 상): A판 동네가 왼쪽으로 밀려 나가고 B판 동네가 오른쪽에서 들어온다(logic CFG.slideOut·slideIn) */
+  function slideX(G){
+    if(!G || G.phase!=='play' || G.ch) return 0;
+    if(G.endT>=0 && hasB(G) && !G.rb){ var r=G.endT-G.t; if(r<CFG.slideOut){ var e=1-Math.max(0,r)/CFG.slideOut; return -e*e*720; } return 0; }
+    if(sliding(G)){ var e2=1-G.t/CFG.slideIn; return e2*e2*720; }
+    return 0;
+  }
+  function newTown(G){ return !!(G && !G.ch && G.rb && G.phase==='play' && G.day===0 && G.t<3.2); }
   function rule(G){ return G.phase==='title' ? 'title' : stOf(G).rule; }
   /* ---- 자리 ---- */
   function slotX(i){ return 110+i*100; }
@@ -850,7 +878,7 @@ var SCENE = (function(){
       var tx=slotX(k), ty=SKY_Y, p=cpos[c.id];
       if(!p){ if(c.from>=0 && G.pl[c.from]){ var ch=chimney(G,c.from); p={x:ch.x, y:ch.y-20}; } else p={x:tx, y:ty}; cpos[c.id]=p; }
       p.x+= (tx-p.x)*0.16; p.y+=(ty-p.y)*0.16;
-      h+=useArt('smoke',p.x-40,p.y-30,80,60);
+      h+=useArt('smoke',p.x-40+SX,p.y-30,80,60);
     });
     Object.keys(cpos).forEach(function(k){ if(!G.sky.some(function(c){ return String(c.id)===k; })) delete cpos[k]; });
     setH(L.sky,h);
@@ -907,6 +935,9 @@ var SCENE = (function(){
       if(c.st==='stolen') h+='<g data-verdict="bad">'+useArt('xBad',cx-18,cy-18,36,36)+'</g>';
     });
     if(G.comps.some(function(c){ return c.st!=='calm'; })) h+=txt(560,316,'개인 정보',20,'#2A3A4E');
+    /* 새 동네 표지판: 동네와 함께 들어오고(같은 순간), 첫 하루가 지나거나 3초 뒤 사라짐 */
+    if(newTown(G)){ var nt=G.si===1?'하늘이 거의 찬 새 동네!':'더 바쁜 새 동네!', nw=nt.length*21+40;
+      h+='<g data-keep="새 동네"><rect x="'+(320-nw/2)+'" y="116" width="'+nw+'" height="40" rx="20" fill="#2A3A4E"/>'+txt(320,144,nt,22,'#FBF8F1')+'</g>'; }
     setH(L.city,h);
   }
   function drawTray(G){
@@ -925,6 +956,8 @@ var SCENE = (function(){
         h+='<path d="M'+ch.x+' '+(ch.y-30)+'L'+slotX(CFG.cap-1)+' '+(SKY_Y+40)+'" stroke="#E8443B" stroke-width="4" stroke-dasharray="8 6" opacity="'+o+'" data-verdict="bad"/><rect x="40" y="14" width="520" height="86" rx="20" fill="none" stroke="#E8443B" stroke-width="5" opacity="'+o+'" data-verdict="bad"/>'; }
       if(e.k==='day' && !e.bad && a>=0.6 && a<1.6){ var cs=CFG.cap-G.sky.length, oo=Math.min(1,(1.6-a)/0.3).toFixed(2);
         for(var k=G.sky.length;k<CFG.cap;k++) h+='<g opacity="'+oo+'">'+txt(slotX(k),SKY_Y+9,'+2',26,'#E8743B',null,' font-weight="bold" stroke="#FBF8F1" stroke-width="4" paint-order="stroke"')+'</g>'; }
+      if(e.k==='miss' && e.dst && a<1.4){ var mb=vbRect(G,e.dst); if(mb){ var mx=mb.x+mb.w/2, my=mb.y+mb.h/2, mo=Math.min(1,(1.4-a)/0.3).toFixed(2);
+          h+='<g data-verdict="bad" opacity="'+mo+'"><rect x="'+(mb.x-3)+'" y="'+(mb.y-3)+'" width="'+(mb.w+6)+'" height="'+(mb.h+6)+'" rx="12" fill="none" stroke="#D9534F" stroke-width="4"/>'+useArt('xBad',mx-20,my-20,40,40)+'</g>'; } }   /* 블라인드 r1: 틀린 수는 놓은 자리에 빨간 테두리 + X */
       if(e.k==='day' && e.bad && a>=0.6 && a<1.8) h+='<g opacity="'+Math.min(1,(1.8-a)/0.3).toFixed(2)+'">'+useArt('smoke',560,14,72,54)+'</g>';
     });
     setH(L.fx,h);
@@ -955,10 +988,12 @@ var SCENE = (function(){
     }
     setH(L.card,h+'</g>');
   }
-  var bgDone=false;
+  var bgDone=false, SX=0;
   function renderScene(G){
     var now=G.t||0; if(!bgDone){ buildBg(G); bgDone=true; }
     var sig=G.si+'|'+G.phase+'|'+(G.ch||0); if(sig!==renderScene._s){ renderScene._s=sig; cpos={}; last=now; }
+    SX=slideX(G); var tr=SX?'translate('+SX.toFixed(1)+' 0)':'';
+    if(L.city.getAttribute('transform')!==tr){ L.city.setAttribute('transform',tr); L.fx.setAttribute('transform',tr); }
     drawSky(G,now); last=now; drawCity(G); drawTray(G); drawFx(G); drawCard(G);
   }
   /* ---- 자리 → 화면 좌표 ---- */

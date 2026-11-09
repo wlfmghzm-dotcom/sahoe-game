@@ -431,7 +431,7 @@ Object.assign(ASSETS,{sseonyang:{"vb":[-24,-24,48,48],"src":"data:image/png;base
    틀리게 심으면 그 땅 밭에서 작물이 시든 채(빨간 가위표) 0.9초 보인 뒤 아래로 돌아온다. 다시 심으면 4점(처음 맞히면 10 + 콤보).
    기후 그림의 막대·선 높이는 실제 값이 아니라 교과서 그래프 모양을 흉내 낸 '상대 크기'다(‘왜?’에 밝힘). 땅마다 조금씩 흔들어 자리를 외워서는 못 맞힌다. */
 var SEED = 20261110;
-var T = { base:10, retryPts:4, hintPts:4, comboWin:4.0, comboStep:2, comboCap:5, cleanPts:6, roundGap:3.0, lag:0.6, endDelay:0.6, tray:3, peek:1.4 };
+var T = { base:10, retryPts:4, hintPts:4, comboWin:4.0, comboStep:2, comboCap:5, cleanPts:6, roundGap:3.0, lag:0.6, endDelay:0.6, tray:3, peek:1.4, slideIn:0.45 };   /* slideIn: 새 판 땅이 들어오는 동안(장면 slideX)은 심지 않는다 */
 /* 작물 → 맞는 땅(기후 종류). E 비가 고른 온대(서부 유럽), D 여름이 건조한 온대(지중해 주변), W 여름에 비가 몰리는 온대(우리나라), C 냉대 */
 var CROPS = {
   wheat:{k:'E', name:'밀'},   cow:{k:'E', name:'젖소'},
@@ -447,6 +447,9 @@ var CLIM = {
   C:{city:'오슬로', rain:[3,3,3,3,4,4,5,5,5,5,4,4], temp:[-4,-4,-1,5,11,15,17,16,11,6,1,-3]}
 };
 var KINDS = 'EDWC';
+/* 블라인드(11-09): 판마다 같은 도시 이름이 되풀이되어 '같은 땅에서 작물만 바뀐' 느낌. 실제 지명(런던·로마·서울·오슬로)은 교과서 값 그대로인 판(홀수째)에만.
+   짝수째 판(그림을 흔든 판)은 실제 지명을 붙이지 않고 그래프 특징 이름표(교과서 말). 정답을 미리 알려 주지 않게 맞게 심은 뒤(또는 판 끝)에만 보이고, 그 전엔 '어떤 땅?' */
+var FEAT = { E:'비 고른 땅', D:'여름 마른 땅', W:'여름 비 많은 땅', C:'긴 겨울 땅' };
 /* 그림에서 읽히는 특징(완벽한 학생의 판단 = 이 분류). 생성한 땅은 반드시 제 종류로 분류되게 만든다 */
 function avg(a,ix){ var s=0; ix.forEach(function(i){ s+=a[i]; }); return s/ix.length; }
 function coldN(t){ return t.filter(function(v){ return v<0; }).length; }
@@ -455,13 +458,22 @@ function rainType(r){ var su=avg(r,[5,6,7]), wi=avg(r,[11,0,1]), mx=Math.max.app
 function climType(r,t){ var rt=rainType(r); if(coldN(t)>=3) return rt==='E' ? 'C' : '?'; if(rt==='E') return coldN(t)===0 ? 'E' : '?'; if(rt==='W') return coldN(t)<=2 ? 'W' : '?'; if(rt==='D') return coldN(t)===0 ? 'D' : '?'; return '?'; }
 
 /* 블라인드 1차(14→15 '감자가 옥수수로 바뀜'): 단계 안에서 판이 바뀌며 밭이 비워져 작물이 바뀐 것처럼 보였다 → 단계마다 한 판(카드 6장, 세 장씩 보임) */
+/* 판 길이(2026-11-09, 엔진 §22): 2·3단계에 판을 되살리되 판마다 땅(기후 그림·자리)이 바뀐다. 판이 바뀔 때 밭을 비우지 않고
+   땅째 왼쪽으로 밀려 나가고 새 땅이 오른쪽에서 들어온다(scene.js slideX) — 블라인드 1차 '감자가 옥수수로 바뀐 것처럼' 방지.
+   1단계: 1판 → 2판 두 땅 자리가 바뀜(자리가 아니라 그림을 다시 읽기). 2단계: 1~3판 세 온대 땅, 판마다 자리가 바뀌고 그림이 흔들림. 3단계: 1판 냉대와 비가 고른 땅이 나란히(함정: 비 막대만 보면 같아 보임)
+   → 2판 냉대·지중해·비 고른 땅 → 3판 네 땅 모두, 작물 8장(끝 화면 = 네 기후 그림과 각 작물 = 개념 증거). 도전 레벨 4(네 땅) 수준까지만, 비슷한 그림(close)·같은 종류 둘(dup)은 도전에만 */
 var STAGES = [
   {name:'비가 언제 와?', rule:'rain', rounds:[
-    {lands:'ED', cards:['wheat','olive','cow','grape','olive','cow']}]},
+    {lands:'ED', cards:['wheat','olive','cow','grape','olive','cow']},
+    {lands:'DE', cards:['cow','grape','wheat','olive','grape','wheat']}]},
   {name:'여름에 비', rule:'wet', rounds:[
-    {lands:'EWD', cards:['rice','cow','olive','rice','wheat','grape']}]},
+    {lands:'EWD', cards:['rice','cow','olive','rice','wheat','grape']},
+    {lands:'WDE', cards:['grape','wheat','rice','olive','cow','rice']},
+    {lands:'DEW', cards:['wheat','rice','olive','cow','rice','grape']}]},
   {name:'긴 겨울', rule:'cold', rounds:[
-    {lands:'EDWC', cards:['potato','cow','logs','olive','rice','corn']}]}
+    {lands:'CEW', cards:['potato','cow','logs','rice','cow','corn']},
+    {lands:'DCE', cards:['olive','corn','cow','logs','grape','potato']},
+    {lands:'WCDE', cards:['corn','olive','cow','rice','logs','grape','potato','cow']}]}
 ];
 /* §19 추론형 도전(kind:'reason'). 한 줄 설계: "이름 없는 땅의 열두 달 기후 그림만 보고 작물을 심는다 — 그 레벨을 모두 처음에 맞히면 통과".
    일반 판 3단계(rule 'cold')와 같은 동작·같은 규칙. 시간 막대·빠르기 점수·콤보 없음. 판마다 시드로 땅 자리·그림 흔들림·작물이 바뀐다.
@@ -503,9 +515,10 @@ var NAMES = {
   wet:   '여름 비 많은 곳: <em>벼농사</em>',
   cold:  '겨울이 길어요: <em>냉대 기후</em>',
   pulp:  '나무로 종이 원료: <em>펄프</em>',
-  temp:  '사계절이 뚜렷: <em>온대 기후</em>'
+  temp:  '사계절이 뚜렷: <em>온대 기후</em>',
+  csum:  '짧은 여름에 <em>옥수수·감자</em>'
 };
-var TITLES = [[0,'새싹 농부'],[190,'들판 농부'],[230,'계절 농부'],[262,'기후 박사'],[284,'세계 농장 대표']];   /* 블라인드 1차 뒤(단계마다 한 판, 카드 18장) logic: 성실 1.25초 288, 무작위 최대 182, 힌트 72 */
+var TITLES = [[0,'새싹 농부'],[460,'들판 농부'],[700,'계절 농부'],[780,'기후 박사'],[830,'세계 농장 대표']];   /* 판 늘린 뒤(11-09, 판 8개·카드 50장) logic: 성실 1.25초 최소 838·중앙 868, 무작위 최대 390(이전 측정 450), 힌트 200 → 둘째는 무작위 최대 위, 위 경계는 옛 비율(0.8·0.91)을 사람 속도만큼 낮춤 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
@@ -575,10 +588,10 @@ function setupRound(G){
   var R=roundsOf(G)[G.ri], lands;
   if(G.ch) lands=cl(R.lands);
   else lands=R.lands.split('').map(function(k,j){ var c=makeClim(G,k,false,G.ri>0||G.si>0); return {id:j+1, k:k, pos:j, rain:c.rain, temp:c.temp}; });
-  lands.forEach(function(L){ L.got=[]; L.named=0; });
+  lands.forEach(function(L){ L.got=[]; L.named=0; var real=G.ch || G.ri%2===0; L.city=real ? CLIM[L.k].city : null; L.feat=real ? null : FEAT[L.k]; });
   G.lands=lands;
   G.queue=R.cards.map(function(c){ return {id:G.nid++, crop:c, bad:0, tried:[]}; });
-  G.tray=[]; G.peek=null; G.pop=null; G.bounced=0; G.gapT=-1; G.sweep=-1;
+  G.tray=[]; G.peek=null; G.pop=null; G.bounced=0; G.gapT=-1; G.sweep=-1; G.r0=G.t;   /* r0: 판 시작 시각(장면이 새 땅을 밀어 들임) */
   refill(G);
 }
 function refill(G){ while(G.tray.length<T.tray && G.queue.length){ var c=G.queue.shift(); c.slot=freeSlot(G); G.tray.push(c); } }
@@ -604,7 +617,7 @@ function start(G0){ var G=cl(G0); G.score=0; G.phase='play'; G.badges=[]; G.firs
   G.stats={right:0, wrong:0, hint:0, clean:0}; G.miss={rain:0, cold:0}; G.queue=[]; G.tray=[]; return setupStage(G,0); }
 function cardOf(G,id){ return G.tray.find(function(c){ return c.id===+id; }) || null; }
 function landOf(G,id){ return G.lands.find(function(L){ return L.id===+id; }) || null; }
-function roundOpen(G){ return G.phase==='play' && G.gapT<0 && G.endT<0; }
+function roundOpen(G){ return G.phase==='play' && G.gapT<0 && G.endT<0 && !(G.ri>0 && G.r0!=null && G.t-G.r0<T.slideIn); }
 
 function finishRound(G,ev){
   if(G.ch){ if(G.bounced) ev.push({t:'roundBad', bad:1}); }
@@ -664,6 +677,7 @@ function drop(G0,src,dst,via){
   var at='land:'+L.id;
   if(L.k==='E') lateName(G,'even',at); if(L.k==='D') lateName(G,'dry',at); if(L.k==='W') lateName(G,'wet',at); if(L.k==='C') lateName(G,'cold',at);
   if(c.crop==='cow'){ lateName(G,'dairy',at,T.lag+2.6); if(!G.ch) lateEv(G,T.lag+0.2,{t:'badgeLate', k:'dairy'}); }
+  if(c.crop==='corn' || c.crop==='potato') lateName(G,'csum',at,T.lag+2.6);   /* 블라인드: 겨울이 긴 땅에 옥수수? → 교과서 39쪽 '여름에는 밀·옥수수·감자' */
   if(c.crop==='logs'){ lateName(G,'pulp',at,T.lag+2.6); if(!G.ch) lateEv(G,T.lag+0.2,{t:'badgeLate', k:'pulp'}); }
   refill(G);
   if(!G.tray.length) finishRound(G,ev);
@@ -706,7 +720,7 @@ var WHY = {
 };
 var PAGE = { wheat:'교과서 38쪽 참고', cow:'교과서 38쪽 참고', olive:'교과서 38쪽 참고', grape:'교과서 38쪽 참고', rice:'교과서 38쪽 참고', potato:'교과서 39쪽 참고', corn:'교과서 39쪽 참고', logs:'교과서 39쪽 참고' };
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,CH:CH,CH_PARTIALS:CH_PARTIALS,CROPS:CROPS,CLIM:CLIM,climType:climType,rainType:rainType,chRound:chRound,partialMove:partialMove,partialLand:partialLand,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,cfgFor:cfgFor,stOf:stOf,nStages:nStages,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,
+if(typeof module!=='undefined') module.exports={roundsOf:roundsOf,SEED:SEED,CH:CH,CH_PARTIALS:CH_PARTIALS,CROPS:CROPS,CLIM:CLIM,climType:climType,rainType:rainType,chRound:chRound,partialMove:partialMove,partialLand:partialLand,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,cfgFor:cfgFor,stOf:stOf,nStages:nStages,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf};
 /* LOGIC-END */
 
@@ -716,7 +730,7 @@ if(typeof module!=='undefined') module.exports={SEED:SEED,CH:CH,CH_PARTIALS:CH_P
    핵심 동작: 작물 카드를 '열두 달 기후 그림'(비 막대 + 기온 선)만 있는 땅에 끌어 심는다. */
 var GAME = {
   title: '일 년 농장 달력',
-  subtitle: '1단원 10차시 · 온대와 냉대 · 37~40쪽',
+  subtitle: '온대와 냉대',
   sceneLabel: '열두 달 비 막대와 기온 선이 그려진 땅과 작물 카드',
   guide: '써냥이',
   seed: SEED,
@@ -829,11 +843,21 @@ var SCENE = (function(){
   var VB = {w:600, h:400}, svg, gBase, gTop, sig = '', PY = 8, TRAY_Y = 226, CW = 124, CHH = 152;
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
   function dims(n){ var W = n<=2 ? 214 : n===3 ? 182 : 141, gap = n<=2 ? 44 : n===3 ? 15 : 9; return {W:W, gap:gap, x0:(VB.w-(n*W+(n-1)*gap))/2}; }
-  function landBox(G,L){ var d=dims(G.lands.length); return {x:d.x0+L.pos*(d.W+d.gap), y:G.phase==='title'?200:PY, w:d.W, h:204}; }   /* 첫 화면: 땅을 아래로 내려 제목 카드(장면 38% 높이)가 가리지 않게(블라인드 1차) */
+  /* 판 바뀜(11-09): 끝난 판의 땅은 밭째 왼쪽으로 밀려 나가고(판 사이 마지막 0.6초), 새 판의 땅은 오른쪽에서 들어온다(0.45초).
+     밭을 그 자리에서 비우면 '작물이 바뀐 것처럼' 보였다(블라인드 1차) → 땅 전체가 바뀌는 것으로 보이게 */
+  var SL_OUT=0.6, SL_IN=T.slideIn;
+  function slideX(G){
+    if(!G || G.phase!=='play') return 0;
+    var n=roundsOf(G).length, e;
+    if(G.gapT>=0 && G.ri<n-1 && G.gapT<SL_OUT){ e=1-G.gapT/SL_OUT; return -e*e*660; }
+    if(G.ri>0 && G.gapT<0 && G.r0!=null && G.t-G.r0<SL_IN){ e=1-(G.t-G.r0)/SL_IN; return e*e*660; }
+    return 0;
+  }
+  function landBox(G,L){ var d=dims(G.lands.length); return {x:d.x0+L.pos*(d.W+d.gap)+slideX(G), y:G.phase==='title'?180:PY, w:d.W, h:204}; }   /* 첫 화면: 땅을 아래로 내려 제목 카드(장면 38% 높이)가 가리지 않게(블라인드 1차) */
   function graphBox(G,L){ var b=landBox(G,L); return {x:b.x+4, y:b.y+26, w:b.w-8, h:116}; }
   function fieldBox(G,L){ var b=landBox(G,L); return {x:b.x+6, y:b.y+148, w:b.w-12, h:50}; }
   function slotX(s){ return 300+(s-1)*164-CW/2; }
-  function cardBox(G,c){ return {x:slotX(c.slot), y:TRAY_Y, w:CW, h:CHH}; }
+  function cardBox(G,c){ return {x:slotX(c.slot)+(G.gapT<0 ? slideX(G) : 0), y:TRAY_Y, w:CW, h:CHH}; }   /* 새 판 작물 카드도 땅과 함께 들어온다(블라인드: 쟁반 작물이 따로 바뀌어 보임) */
   function mount(host){
     svg = el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
     gBase = el('g',{}); gTop = el('g',{}); svg.appendChild(gBase); svg.appendChild(gTop);
@@ -864,8 +888,8 @@ var SCENE = (function(){
     if(G.sweep>=0 && G.gapT>=0){ var sx=px+12*step*Math.min(1,G.sweep); h += '<path d="M'+f1(sx)+' '+(g.y+2)+'V'+f1(yb)+'" class="a7-sweep"/>'; }
     h += '</g>';
     /* 이름(교과서 그래프 도시) */
-    var named = L.named && (!G.ch || G.gapT>=0 || G.phase!=='play');
-    if(named) h += '<text x="'+(b.x+12)+'" y="'+(b.y+21)+'" font-size="19" class="a7-city">'+CLIM[L.k].city+'</text>';
+    var named = G.ch ? (L.named && (G.gapT>=0 || G.phase!=='play')) : true;   /* 블라인드(11-09): 개념 판은 이름을 늘 보임(새 땅인지 알게), 도전은 판 끝에만 */
+    if(named){ var nm = L.city || (L.named ? L.feat : '어떤 땅?'); h += '<text x="'+(b.x+12)+'" y="'+(b.y+21)+'" font-size="19" class="a7-city"'+(L.city||L.named?'':' opacity=".55"')+'>'+nm+'</text>'; }
     /* 밭 */
     h += '<rect x="'+fd.x+'" y="'+fd.y+'" width="'+fd.w+'" height="'+fd.h+'" rx="10" class="a7-soil"/>';
     var n=L.got.length + (G.peek && G.peek.land===L.id ? 1 : 0), sz=44, sp=Math.min(sz+4,(fd.w-sz-6)/Math.max(1,n-1));
@@ -894,7 +918,7 @@ var SCENE = (function(){
   }
   function renderScene(G){
     var pk = G.peek ? G.peek.id+':'+G.peek.land+':'+G.peek.cue+':'+(G.t-G.peek.t>=0.6?1:0) : '', pp = G.pop && G.phase==='play' && G.t-G.pop.t<0.5 ? G.pop.land+':'+G.pop.n : '';
-    var s = [G.ch||0, G.si, G.ri, G.phase, G.gapT>=0?1:0, G.sweep>=0&&G.gapT>=0 ? Math.round(G.sweep*48) : -1, pk, pp,
+    var s = [G.ch||0, G.si, G.ri, G.phase, Math.round(slideX(G)/6), G.gapT>=0?1:0, G.sweep>=0&&G.gapT>=0 ? Math.round(G.sweep*48) : -1, pk, pp,
              G.lands.map(function(L){ return L.id+'.'+L.got.join('')+'.'+L.named+'.'+L.rain.join('')+L.temp.join(''); }).join('|'),
              G.tray.map(function(c){ return c.id+'.'+c.slot+'.'+c.bad; }).join('|'), G.miss?G.miss.rain+'.'+G.miss.cold:''].join('#');
     if(s===sig) return; sig=s;
@@ -904,9 +928,13 @@ var SCENE = (function(){
     if(G.phase!=='title') G.tray.forEach(function(c){ h += cardSvg(G,c); });
     /* 도전: 놓친 단서 칩(여름 비 / 파란 겨울 × 번) — 결과 화면엔 게임 칸이 없어서 판 위 왼쪽 아래에 */
     /* 2차 블라인드(02·13): 노란 띠·파란 칸 뜻 → 왼쪽에 그림 + 낱말 풀이(여름은 처음부터, 영하는 '긴 겨울'과 도전부터) */
-    if(G.phase==='play' || G.phase==='stageEnd'){ var ly=TRAY_Y+4, cold=!!G.ch || STAGES[G.si].rule==='cold';
-      h += '<g data-keep="여름 풀이"><rect x="4" y="'+ly+'" width="66" height="70" rx="10" class="f-paper"/>'+useArt('lgSum', 19, ly+4, 36, 36)+'<text x="37" y="'+(ly+62)+'" font-size="19" text-anchor="middle" class="a7-sumt">여름</text></g>';
-      if(cold) h += '<g data-keep="영하 풀이"><rect x="4" y="'+(ly+78)+'" width="66" height="70" rx="10" class="f-paper"/>'+useArt('lgIce', 19, ly+82, 36, 36)+'<text x="37" y="'+(ly+140)+'" font-size="19" text-anchor="middle" class="a7-icet">영하</text></g>'; }
+    /* 블라인드(11-09): 그래프 읽는 법(파란 막대 = 비, 주황 선 = 기온)이 없음 → 풀이 칸을 넷으로: 비(비구름 + 파란 막대) · 기온(온도계 + 주황 선) · 여름 · 영하 */
+    if(G.phase==='play' || G.phase==='stageEnd'){ var ly=TRAY_Y+2, cold=!!G.ch || STAGES[G.si].rule==='cold', rows=[
+        ['비 풀이', '<path d="M6 13a5 5 0 0 1 5-6 6 6 0 0 1 11 1 4 4 0 0 1 1 8H8a4 4 0 0 1-2-3z" fill="#C9D3DC"/><rect x="7" y="19" width="4" height="11" rx="1" class="a7-bar"/><rect x="14" y="15" width="4" height="15" rx="1" class="a7-bar"/><rect x="21" y="22" width="4" height="8" rx="1" class="a7-bar"/>', '비', 'a7-rt'],
+        ['기온 풀이', '<path d="M3 26l6-7 6 3 8-10" class="a7-line"/><rect x="21" y="3" width="5" height="18" rx="2.5" fill="#fff" stroke="#E8743B" stroke-width="2"/><circle cx="23.5" cy="24" r="4.5" fill="#E8743B"/><rect x="22.3" y="10" width="2.4" height="12" fill="#E8743B"/>', '기온', 'a7-tt'],
+        ['여름 풀이', useArt('lgSum', 1, 2, 28, 28), '여름', 'a7-sumt']];
+      if(cold) rows.push(['영하 풀이', useArt('lgIce', 1, 2, 28, 28), '영하', 'a7-icet']);
+      rows.forEach(function(r,i){ var y=ly+i*42; h += '<g data-keep="'+r[0]+'"><rect x="2" y="'+y+'" width="70" height="38" rx="9" class="f-paper"/><g transform="translate(4 '+(y+6)+') scale(.85)">'+r[1]+'</g><text x="'+(r[2].length>1?51:46)+'" y="'+(y+26)+'" font-size="19" text-anchor="middle" class="'+r[3]+'">'+r[2]+'</text></g>'; }); }
     /* 도전: 놓친 단서 칩(오른쪽) — 단서 그림 + 낱말 + 번 */
     if(G.ch && G.miss){ var cy=TRAY_Y+4; [['rain','rRain','여름 비'],['cold','rCold','영하']].forEach(function(q){ var n=G.miss[q[0]]; if(!n) return;
       h += '<g data-keep="놓친 단서"><rect x="530" y="'+cy+'" width="66" height="96" rx="10" class="f-paper" stroke="#D9534F" stroke-width="2.5"/>'+useArt(q[1], 535, cy+4, 56, 42)+'<text x="563" y="'+(cy+66)+'" font-size="19" text-anchor="middle" class="a7-name">'+q[2]+'</text><text x="563" y="'+(cy+88)+'" font-size="19" text-anchor="middle" fill="#D9534F" style="font-family:var(--game)">×'+n+'</text></g>'; cy+=102; }); }
@@ -934,7 +962,7 @@ var SCENE = (function(){
       + '.a7-city{font-family:var(--game);fill:var(--a-navy)}.a7-name{font-family:var(--game);fill:var(--a-navy)}'
       + '.a7-soil{fill:#B98A5E}.a7-slot{fill:none;stroke:#9DB59A;stroke-width:2.5;stroke-dasharray:8 6}'
       + '.a7-x{stroke:var(--a-red);stroke-width:6;stroke-linecap:round;fill:none}.a7-badbox{fill:none;stroke:var(--a-red);stroke-width:4}'
-      + '.a7-again{fill:var(--a-org)}.a7-icet{font-family:var(--game);fill:#2F6FA8}.a7-cue{fill:none;stroke:#D9534F;stroke-width:4}.a7-cue2{fill:#D9534F;opacity:.28}.a7-barCue{fill:#D9534F}.a7-lineCue{stroke:#D9534F;stroke-width:5}.a7-sweep{stroke:var(--a-navy);stroke-width:3;opacity:.7}'
+      + '.a7-again{fill:var(--a-org)}.a7-icet{font-family:var(--game);fill:#2F6FA8}.a7-rt{font-family:var(--game);fill:#2F7FC1}.a7-tt{font-family:var(--game);fill:#C45A22}.a7-cue{fill:none;stroke:#D9534F;stroke-width:4}.a7-cue2{fill:#D9534F;opacity:.28}.a7-barCue{fill:#D9534F}.a7-lineCue{stroke:#D9534F;stroke-width:5}.a7-sweep{stroke:var(--a-navy);stroke-width:3;opacity:.7}'
       + '.a7-pop{animation:a7pop .45s cubic-bezier(.3,1.6,.5,1) both;transform-box:fill-box;transform-origin:center bottom}@keyframes a7pop{from{transform:scale(.2)}to{transform:scale(1)}}'
       + '@media (prefers-reduced-motion:reduce){.a7-pop{animation:none}}'
       + '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .a7-bg{fill:#2C3B33}:root:not([data-theme="light"]) .a7-plot{fill:#F4F6F8}}:root[data-theme="dark"] .a7-bg{fill:#2C3B33}:root[data-theme="dark"] .a7-plot{fill:#F4F6F8}'

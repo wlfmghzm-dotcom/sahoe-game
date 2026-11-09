@@ -28,7 +28,7 @@
 ## 6-2 과학 (아이스크림미디어) 4. 과학과 나의 진로
 
 - [주제 1 미래 사회에는 어떤 문제가 일어날 수 있을까? (교과서 84~85쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-6-2-4-1.html): 20년 뒤 우리 마을, 어떤 미래 문제일까
-  - [20년 뒤 우리 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4a1.html): A 개념 체험. 지금 마을의 변화 신호(아기·학생 감소, 연기, 규칙 없는 새 기술)를 20년 뒤 마을의 문제 자리에 이어 미리 대비해요.
+  - [20년 뒤 우리 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4a1.html): A 개념 체험. 지금 마을의 변화 신호를 20년 뒤 마을의 문제 자리에 이어 대비하고, 괜찮은 신호는 통과 문으로 보내요.
   - [어떤 미래 문제일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4b1.html): B 떠올리기 연습. 미래 사회의 상황 카드를 인구·환경·윤리 문제 칸에 나눠 담아요.
 - [주제 2 미래 사회의 문제를 과학이 해결할 수 있을까? (교과서 86~87쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-6-2-4-2.html): 미래 도시 해결 연구소, 어떤 기술로 도울까
   - [미래 도시 해결 연구소](https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4a2.html): A 개념 체험. 도시의 문제 자리에 재생 에너지·로봇·정보 보안을 골라 놓고, 원인을 줄일지 대처할지 정해요.

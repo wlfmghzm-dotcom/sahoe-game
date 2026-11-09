@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>20년 뒤 우리 마을 – 6-2 과학 주제 1 수업용 게임</title>
-<meta name="description" content="6-2 과학 주제 1 「미래 사회에는 어떤 문제가 일어날 수 있을까?」 수업용 게임. 지금 마을의 변화 신호(아기·학생 감소, 연기, 규칙 없는 새 기술)를 20년 뒤 마을의 문제 자리에 이어 미리 대비해요.">
+<meta name="description" content="6-2 과학 주제 1 「미래 사회에는 어떤 문제가 일어날 수 있을까?」 수업용 게임. 지금 마을의 변화 신호를 20년 뒤 마을의 문제 자리에 이어 대비하고, 괜찮은 신호는 통과 문으로 보내요.">
 <meta name="eng-pair" content="s4b1.html">
 <link rel="canonical" href="https://wlfmghzm-dotcom.github.io/sahoe-game/games/s4a1.html">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -377,8 +377,12 @@ Object.assign(ASSETS, {
   sig_smoke:  {vb:[-44,-62,88,100], svg:'<use href="#a-kFacSmoke" x="-34" y="-30" width="68" height="68"/><use href="#a-kSmoke" x="4" y="-60" width="40" height="32"/>'},
   sig_car:    {vb:[-60,-46,104,84], svg:'<use href="#a-kCar" x="-30" y="-22" width="64" height="48"/><use href="#a-kSmoke" x="-46" y="-6" width="30" height="24"/>'},
   sig_tech:   {vb:[-44,-46,88,84], svg:'<use href="#a-kComp" x="-38" y="-30" width="50" height="47"/><use href="#a-kLaptop" x="-4" y="-8" width="44" height="38"/>'},
-  sig_rule:   {vb:[-44,-46,88,84], svg:'<use href="#a-kBoard" x="-30" y="-38" width="60" height="67"/>'},
+  sig_rule:   {vb:[-44,-46,88,84], svg:'<use href="#a-kBoard" x="-30" y="-38" width="60" height="67"/><rect x="-22" y="-28" width="44" height="26" rx="3" fill="#FBF8F1" opacity=".9"/><path d="M-15-21h30M-15-14h30M-15-7h18" stroke="#B9C2CC" stroke-width="2.6" stroke-dasharray="4 4"/>'},   /* 빈 규칙판(점선): 도전 결과 칩에서도 '규칙은 아직'으로 보이게 */
+  sig_techOk:    {vb:[-50,-46,96,84], svg:'<use href="#a-kComp" x="-30" y="-26" width="46" height="43"/><use href="#a-kLaptop" x="2" y="-4" width="40" height="34"/><use href="#a-kBoard" x="-52" y="-46" width="37" height="42"/>'},
+  sig_smokeDown: {vb:[-44,-46,88,84], svg:'<use href="#a-kFacSmoke" x="-34" y="-30" width="68" height="68"/>'},
+  sig_carDown:   {vb:[-48,-30,88,64], svg:'<use href="#a-kCar" x="-30" y="-22" width="64" height="48"/>'},
   /* 규칙 칸 */
+  rOk:   {vb:[0,0,64,64], svg:'<rect x="2" y="8" width="60" height="48" rx="10" fill="#FBF8F1"/><circle cx="14" cy="32" r="8" fill="#3D74B8"/><path d="M14 37l5-6h-3v-5h-4v5h-3z" fill="#FBF8F1"/><path d="M24 32H32" stroke="#2F4A66" stroke-width="3"/><path d="M34 50V26a12 12 0 0 1 24 0v24" fill="#DFF2E4" stroke="#4CAF7A" stroke-width="4"/><path d="M40 33l4 4 7-8" stroke="#4CAF7A" stroke-width="3.4" fill="none" stroke-linecap="round"/>'},
   rLink: {vb:[0,0,64,64], svg:'<rect x="2" y="8" width="60" height="48" rx="10" fill="#FBF8F1"/><circle cx="16" cy="32" r="9" fill="#E8743B"/><path d="M26 32H46" stroke="#2F4A66" stroke-width="4" stroke-dasharray="4 4"/><path d="M44 24l10 8-10 8z" fill="#2F4A66"/><rect x="50" y="18" width="8" height="28" rx="2" fill="#4CAF7A"/>'},
   rTwo:  {vb:[0,0,64,64], svg:'<rect x="2" y="8" width="60" height="48" rx="10" fill="#FBF8F1"/><circle cx="14" cy="22" r="8" fill="#E8743B"/><circle cx="14" cy="44" r="8" fill="#E8743B"/><path d="M24 22L46 32M24 44L46 32" stroke="#2F4A66" stroke-width="4"/><rect x="46" y="22" width="12" height="20" rx="3" fill="#4CAF7A"/>'},
   rFlag: {vb:[0,0,64,64], svg:'<rect x="2" y="8" width="60" height="48" rx="10" fill="#FBF8F1"/><use href="#a-kFlag" x="6" y="12" width="26" height="38"/><rect x="34" y="18" width="22" height="28" rx="5" fill="none" stroke="#9FB3C4" stroke-width="3" stroke-dasharray="4 3"/>'},
@@ -390,7 +394,7 @@ Object.assign(ASSETS, {
 });
 var ASSETS_SVG_WHY = {
   cradle: '아기 요람: Kenney 29개 키트(furniture·mini-characters·holiday 등) 검색에 crib·cradle·baby 모델 없음(furniture는 어른 침대뿐)',
-  rLink: '규칙 아이콘(규칙 그림은 SVG가 기본)', rTwo: '규칙 아이콘', rFlag: '규칙 아이콘(Kenney 깃발을 겹침)', progSig: '진행 표시 점',
+  rLink: '규칙 아이콘(규칙 그림은 SVG가 기본)', rTwo: '규칙 아이콘', rFlag: '규칙 아이콘(Kenney 깃발을 겹침)', rOk: '규칙 아이콘(괜찮은 신호 → 초록 통과 문)', progSig: '진행 표시 점',
   bdPop: '배지 판(Kenney 공장 그림을 겹침)', bdEnv: '배지 판(Kenney 나무를 겹침)', bdEth: '배지 판(Kenney 상자·자물쇠를 겹침)'
 };
 /* KENNEY_S4A1 — sprite.js로 찍은 스프라이트(투명 PNG, 96색). 그림: Kenney (www.kenney.nl), CC0.
@@ -456,15 +460,21 @@ var KINDS = {
   smoke:  {spot:'env', name:'공장 연기'},   /* 이산화 탄소 배출 증가 */
   car:    {spot:'env', name:'배기가스'},
   tech:   {spot:'eth', name:'새 기술'},     /* 과학 기술의 빠른 발전 */
-  rule:   {spot:'eth', name:'빈 규칙판'}    /* 제도가 늦게 만들어짐 */
+  rule:   {spot:'eth', name:'빈 규칙판'},   /* 제도가 늦게 만들어짐 */
+  /* 4단계 '문제가 될 신호만'(85쪽: 지금 모습이 '지속되면', 제도가 '늦게' 만들어지면 문제): 괜찮은 신호 = 그냥 보낸다(깃발을 쓰면 낭비) */
+  techOk:    {spot:'eth', ok:1, name:'기술+규칙'},   /* 새 기술이 빠르지만 규칙(제도)도 함께 만들어짐 → 윤리 문제로 이어지지 않음 */
+  smokeDown: {spot:'env', ok:1, name:'연기 줄어요'},  /* 이산화 탄소 배출이 줄어듦 → 늘어날 때의 환경 문제로 이어지지 않음 */
+  carDown:   {spot:'env', ok:1, name:'배기가스 줄어요'}   /* 도전 레벨 4부터 */
 };
 var SPOTS = ['pop', 'env', 'eth'];
-var T = { base:10, early:4, hintPts:5, comboWin:6, flyT:0.65, wrongWait:0.8, good:4, refill:5 };
+var T = { base:10, early:4, hintPts:5, okPts:8, comboWin:6, flyT:0.65, wrongWait:0.8, good:4, refill:5 };
 /* rule: 엔진 '해 보기' 판단용(단계마다 새 규칙). at = 동시에 오는 신호 수, tt = 길 끝까지 걸리는 시간, gap = 다음 신호까지 최소 간격 */
 var STAGES = [
   {name:'하나씩 이어요', rule:'link', at:1, tt:11, gap:3.0, kinds:['smoke','baby','tech','baby','tech','smoke']},
   {name:'둘이 함께 와요', rule:'two',  at:2, tt:10, gap:3.6, kinds:['school','car','rule','baby','smoke','school','tech','car'], mix:2},
-  {name:'깃발 하나씩', rule:'flag', at:2, tt:12, gap:2.0, kinds:['rule','school','smoke','baby','car','tech','smoke','school'], mix:0, flags:1, flagMax:2}
+  {name:'깃발 하나씩', rule:'flag', at:2, tt:12, gap:2.0, kinds:['rule','school','smoke','baby','car','tech','smoke','school'], mix:0, flags:1, flagMax:2},
+  /* 4단계(2026-11-09 판 늘리기): 새 규칙 하나 = '괜찮은 신호는 통과 문으로'(블라인드 r1: '그냥 두기'는 할 일로 안 보여 끄는 동작으로). 첫 신호는 괜찮은 신호(시범이 가리킴), 둘째는 문제 신호(바로 할 수 있는 수), 나머지는 시드로 섞음. 깃발 칸은 3단계 그대로(모자람) */
+  {name:'문제가 될 신호만', rule:'okpass', at:2, tt:12, gap:2.4, kinds:['techOk','baby','smokeDown','tech','car','school','techOk','rule','smoke','smokeDown'], mix:2, flags:1, flagMax:2}
 ];
 var BADGES = [
   {k:'pop', name:'인구 문제', art:'bdPop', def:'아기가 적게 태어나고 고령화가 진행되면 미래에 일할 사람이 모자라는 인구 문제가 생길 수 있어요. (교과서 85쪽 참고)'},
@@ -476,15 +486,47 @@ var NAMES = {
   env:'기후 위기 = <em>환경 문제</em>',
   eth:'기술 악용 = <em>윤리 문제</em>',
   two:'다른 원인도 같은 문제로!',
-  flag:'끝에 가까운 신호 먼저!'
+  flag:'끝에 가까운 신호 먼저!',
+  okpass:'통과 문: 괜찮은 신호'
 };
-var TITLES = [[0,'미래 새내기'],[150,'미래 관찰자'],[230,'미래 예측가'],[275,'미래 설계자']];
+var TITLES = [[0,'미래 새내기'],[190,'미래 관찰자'],[310,'미래 예측가'],[375,'미래 설계자']];   /* 4단계 더한 뒤(11-09): 성실 1.25초 400, 힌트 172, 무작위 p90 158 → 위 경계는 사람 속도만큼 낮춤 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
-function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
-function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
-function stOf(G,si){ return STAGES[si==null?G.si:si]; }
+function firstName(G,ev,k,at){ if(G.ch) return; if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
+function award(G,ev,k){ if(G.ch) return; if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
+/* §19 추론형 도전(kind:'reason'). 한 줄 설계: "길로 오는 신호마다 '20년 뒤 문제가 될까, 된다면 어느 자리일까'를 따져, 문제가 될 신호만 자리에 잇고 괜찮은 신호는 그냥 보낸다 — 그 레벨을 모두 맞히면 통과".
+   일반 판 4단계(rule 'okpass')와 같은 동작·같은 규칙. 시간 점수·콤보 없음(맞힌 신호마다 10), 깃발 칸 없음(모자람 대신 판단만), 길은 넉넉히(11초).
+   레벨이 올리는 것 = 함께 따질 개념 요소:
+     1 늘어요 신호만(연기·배기가스 → 환경, 새 기술·빈 규칙판 → 윤리)   2 + 줄어요 신호(아기·학생 줄어요 → 인구 / 연기 줄어요 → 괜찮음)
+     3 + 규칙이 함께 온 기술(괜찮음)   4 + 배기가스 줄어요   5 괜찮은 신호 40%   6 닮은 짝이 나란히(기술/기술+규칙, 연기 늘어요/줄어요)
+     7 이름표 없이 그림·화살표만   8 7 + 신호 수 늘림
+   함정: 레벨 2부터 판마다 아기·학생 줄어요 하나와 연기 줄어요 하나, 레벨 3부터 기술+규칙 하나가 반드시 들어간다 → 반쪽 봇은 그 레벨에서 막힌다.
+   신호 수는 완벽한 봇 완주 누적 5~10분이 되게 정한 길이 손잡이(판단 구조와 무관). */
+var CH = { pts:10, maxLv:8, n:[0, 14,16,18,20, 22,24,24,28] };   /* 블라인드 r1 뒤(통과 문으로 끌기 → 판이 빨라짐) 길이 손잡이만 다시: 판 30~60초, 완주 5~10분 */
+var CH_PARTIALS = ['모든 신호에 깃발', '기술이면 다 윤리 문제', '줄어요면 다 괜찮음'];
+var CH_OK = {techOk:1, smokeDown:1, carDown:1};
+function chLv(lv){ lv=Math.max(1,Math.min(CH.maxLv,lv||1));
+  var pool=['smoke','car','tech','rule']; if(lv>=2) pool=pool.concat(['baby','school','smokeDown']); if(lv>=3) pool.push('techOk'); if(lv>=4) pool.push('carDown');
+  return {lv:lv, n:CH.n[lv], pool:pool, okShare:lv>=5 ? 0.4 : 0, pair:lv>=6, noLabel:lv>=7}; }
+function chStages(lv){ return [{key:'c', name:'미래 신호 읽기', rule:'okpass', at:2, tt:11, gap:2.2, P:chLv(lv)}]; }
+var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
+function chGoal(lv){ return CH.pts*chLv(lv).n; }
+function stOf(G,si){ var i=si==null?G.si:si; return G && G.ch ? chStages(G.ch)[i] : STAGES[i]; }
+function nStages(G){ return G && G.ch ? 1 : STAGES.length; }
+/* 도전 판의 신호 줄: 함정 신호를 먼저 넣고 나머지는 풀에서, 섞은 뒤(레벨 6부터) 닮은 짝을 나란히 */
+function chQueue(G,P){
+  var q=[], i, pick=function(a){ return a[Math.floor(rnd(G)*a.length)]; };
+  if(P.lv>=2){ q.push(pick(['baby','school'])); q.push('smokeDown'); }
+  if(P.lv>=3) q.push('techOk');
+  if(P.lv>=4) q.push('carDown');
+  var okN=Math.round(P.n*P.okShare), probs=P.pool.filter(function(k){ return !CH_OK[k]; }), oks=P.pool.filter(function(k){ return CH_OK[k]; });
+  while(q.filter(function(k){ return CH_OK[k]; }).length<okN) q.push(pick(oks));
+  while(q.length<P.n){ var c=pick(rnd(G)<0.25 && oks.length ? oks : probs); if(q.filter(function(x){ return x===c; }).length>=3 && rnd(G)<0.8) continue; q.push(c); }   /* 같은 신호가 너무 몰리지 않게 */
+  for(i=q.length-1;i>0;i--){ var j=Math.floor(rnd(G)*(i+1)), t=q[i]; q[i]=q[j]; q[j]=t; }
+  if(P.pair){ var TW={techOk:'tech', smokeDown:'smoke', carDown:'car'};
+    for(i=0;i<q.length-1;i++){ if(TW[q[i]] && q[i+1]!==TW[q[i]]){ var k=q.indexOf(TW[q[i]], i+2); if(k>0){ q.splice(k,1); q.splice(i+1,0,TW[q[i]]); i++; } } } }
+  return q; }
 
 /* 단계의 신호 순서: 앞 mix개는 그대로(새 신호가 먼저 보이게), 나머지는 시드로 섞는다(같은 종류 연달아 셋은 피함) */
 function order(G,S){
@@ -496,12 +538,12 @@ function order(G,S){
 function startStage(G0,si){
   var G=cl(G0), S=stOf(G,si);
   G.si=si; G.phase='play'; G.t=0; G.combo=0; G.lastOk=-99;
-  G.queue = si===0 ? S.kinds.slice() : order(G,{kinds:S.kinds, mix:S.mix, si:si});
+  G.queue = G.ch ? chQueue(G,S.P) : si===0 ? S.kinds.slice() : order(G,{kinds:S.kinds, mix:S.mix, si:si});
   G.sig=[]; G.fly=[]; G.marks=[]; G.lastSpawn=-99; G.lane=0;
   G.spot={}; SPOTS.forEach(function(k){ G.spot[k]={good:T.good, flags:0}; });
-  G.linked={pop:{}, env:{}, eth:{}};
+  G.linked={pop:{}, env:{}, eth:{}}; G.passed={}; G.chMiss=[];
   G.flag = S.flags!=null ? {n:S.flags, max:S.flagMax, cool:0} : null;
-  G.res={total:S.kinds.length, served:0, missed:0};
+  G.res={total:G.queue.length, served:0, missed:0};
   return G;
 }
 function newGame(seed){
@@ -510,9 +552,11 @@ function newGame(seed){
     fly:[], marks:[], spot:{pop:{good:4,flags:1}, env:{good:3,flags:0}, eth:{good:4,flags:0}}, linked:{pop:{},env:{},eth:{}}, flag:null,
     res:{total:0, served:0, missed:0}};
 }
-function start(G){ var g=cl(G); g.score=0; g.stats={link:0, miss:0, wrong:0}; return startStage(g,0); }
+function start(G){ var g=cl(G); g.score=0; g.stats={link:0, miss:0, wrong:0, pass:0, waste:0}; return startStage(g,0); }
 
 /* 신호가 진짜 자리로 날아가 그 자리를 나쁘게 한다(대비 없음) */
+/* 도전 결과 칩용: 놓치거나 틀린 신호(도전에서만 모음) */
+function chMiss(G,k,why){ if(G.ch){ G.chMiss=G.chMiss||[]; if(G.chMiss.length<12) G.chMiss.push({k:k, why:why}); } }
 function sendFly(G,s,why,delay){ G.fly.push({id:s.id, k:s.k, lane:s.lane, p:s.p, spot:KINDS[s.k].spot, t0:G.t+(delay||0), why:why}); }
 
 function tick(G0,dt){
@@ -525,13 +569,18 @@ function tick(G0,dt){
   G.sig.forEach(function(s){
     if(s.st!=='go') return;
     s.p+=dt/s.tt;
-    if(s.p>=1){ s.p=1; s.st='gone'; sendFly(G,s,'arrive'); G.res.missed++; G.stats.miss++; G.combo=0; ev.push({t:'arrive', id:s.id, k:s.k, spot:KINDS[s.k].spot}); }
+    if(s.p>=1){ s.p=1; s.st='gone';
+      if(KINDS[s.k].ok){ G.res.missed++; G.stats.miss++; G.combo=0; G.marks.push({spot:'gate', t0:G.t, type:'gateMiss'}); chMiss(G,s.k,'late');
+        ev.push({t:'arrive', bad:1, ok:1, id:s.id, k:s.k, spot:'gate'}); }   /* 블라인드 r1: 괜찮은 신호도 '통과 문'으로 보내는 동작. 그냥 두면 자리를 해치지는 않지만 놓침(통과 문이 빨갛게 깜빡) */
+      else { sendFly(G,s,'arrive'); chMiss(G,s.k,'late'); G.res.missed++; G.stats.miss++; G.combo=0; ev.push({t:'arrive', bad:1, id:s.id, k:s.k, spot:KINDS[s.k].spot}); } }
   });
   G.sig=G.sig.filter(function(s){ return s.st==='go'; });
   /* 날아간 신호가 닿으면 그 자리가 나빠진다 */
   var keep=[];
   G.fly.forEach(function(f){
-    if(G.t-f.t0>=T.flyT){ var sp=G.spot[f.spot]; if(sp.good>0) sp.good--; G.marks.push({spot:f.spot, t0:G.t, type:'hit'}); ev.push({t:'hit', spot:f.spot, why:f.why}); firstName(G,ev,f.spot,'fut:'+f.spot); award(G,ev,f.spot); }
+    if(G.t-f.t0>=T.flyT && f.why==='pass'){ var pp=G.ch ? CH.pts : T.okPts; G.score+=pp; G.res.served++; G.stats.pass=(G.stats.pass||0)+1; G.passed[f.k]=1;
+      G.marks.push({spot:f.spot, t0:G.t, type:'ok'}); ev.push({t:'pass', k:f.k, spot:f.spot, pts:pp, at:'fut:'+f.spot}); }   /* (지금은 쓰지 않음: 통과 문에서 바로 점수) */
+    else if(G.t-f.t0>=T.flyT){ var sp=G.spot[f.spot]; if(sp.good>0) sp.good--; G.marks.push({spot:f.spot, t0:G.t, type:'hit'}); ev.push({t:'hit', spot:f.spot, why:f.why}); firstName(G,ev,f.spot,'fut:'+f.spot); award(G,ev,f.spot); }
     else keep.push(f);
   });
   G.fly=keep;
@@ -553,20 +602,42 @@ function drop(G0,src,dst,via){
   if(!G0 || G0.phase!=='play') return fail('phase');
   var sp=String(src).split(':'), dp=String(dst).split(':');
   if(sp[0]!=='sig') return fail('src');
-  if(dp[0]!=='fut' || SPOTS.indexOf(dp[1])<0) return fail('dst');
+  var gate = dp[0]==='gate';
+  if(gate ? stOf(G0).rule!=='okpass' : (dp[0]!=='fut' || SPOTS.indexOf(dp[1])<0)) return fail('dst');
   var s=G0.sig.find(function(x){ return String(x.id)===sp[1] && x.st==='go'; }); if(!s) return fail('gone');
+  if(gate){
+    /* 통과 문(4단계·도전): 괜찮은 신호를 보내는 자리. 깃발을 쓰지 않는다 */
+    var Gg=cl(G0), sg=Gg.sig.find(function(x){ return x.id===s.id; }); sg.st='gone'; Gg.sig=Gg.sig.filter(function(x){ return x.st==='go'; });
+    if(KINDS[s.k].ok){
+      var pg = via ? T.hintPts : G0.ch ? CH.pts : T.okPts; Gg.score+=pg; Gg.res.served++; Gg.stats.pass=(Gg.stats.pass||0)+1; Gg.passed[s.k]=1;
+      Gg.marks.push({spot:'gate', t0:Gg.t, type:'gateOk', k:s.k});
+      return {G:Gg, ok:true, ev:[{t:'pass', id:s.id, k:s.k, pts:pg, at:'gate'}]};
+    }
+    /* 문제가 될 신호를 통과 문에: 대비 없이 진짜 자리로 간다(놓친 것과 같음). 통과 문에 X */
+    sendFly(Gg,sg,'wrong',T.wrongWait); Gg.marks.push({spot:'gate', t0:Gg.t, type:'x'}); chMiss(Gg,s.k,'gate');
+    Gg.res.missed++; Gg.stats.miss++; Gg.stats.wrong++; Gg.combo=0;
+    return fail('w_'+s.k, Gg, [{t:'wrong', id:s.id, k:s.k, spot:'gate', want:KINDS[s.k].spot, at:'gate'}]);
+  }
   if(G0.flag && G0.flag.n<=0) return fail('noflag');
   var G=cl(G0), ev=[], s2=G.sig.find(function(x){ return x.id===s.id; }), want=KINDS[s.k].spot;
   if(G.flag) G.flag.n--;
+  if(KINDS[s.k].ok){
+    /* 괜찮은 신호에 깃발: 낭비(점수 그대로, 깃발 하나 사라짐). 놓은 자리에 판정 X + 신호는 사라짐(문제가 안 되므로 자리를 해치지 않음) */
+    s2.st='gone'; G.sig=G.sig.filter(function(x){ return x.st==='go'; });
+    G.marks.push({spot:dp[1], t0:G.t, type:'x'}); if(G.flag) G.marks.push({spot:dp[1], t0:G.t, type:'waste'});
+    chMiss(G,s.k,'waste'); G.res.missed++; G.stats.waste=(G.stats.waste||0)+1; G.stats.wrong++; G.combo=0;
+    return fail('w_'+s.k, G, [{t:'waste', id:s.id, k:s.k, spot:dp[1], at:'fut:'+dp[1]}]);
+  }
   if(want!==dp[1]){
     /* 엉뚱한 자리: 튕기고(점수 그대로) 대비 없이 진짜 자리로 간다. 놓은 자리에 판정 표시(X) */
     s2.st='gone'; G.sig=G.sig.filter(function(x){ return x.st==='go'; });
-    sendFly(G,s2,'wrong',T.wrongWait); G.marks.push({spot:dp[1], t0:G.t, type:'x'});
+    sendFly(G,s2,'wrong',T.wrongWait); G.marks.push({spot:dp[1], t0:G.t, type:'x'}); chMiss(G,s.k,'wrong');
     G.res.missed++; G.stats.miss++; G.stats.wrong++; G.combo=0;
     return fail('w_'+s.k, G, [{t:'wrong', id:s.id, k:s.k, spot:dp[1], want:want, at:'fut:'+dp[1]}]);
   }
   var pts;
   if(via) pts=T.hintPts;
+  else if(G.ch) pts=CH.pts;   /* 추론형 도전: 맞힌 신호마다 10(시간·콤보 없음) */
   else { G.combo=(G.t-G.lastOk<=T.comboWin)?G.combo+1:1; G.lastOk=G.t; pts=T.base+Math.round(T.early*(1-s.p)); }
   G.score+=pts; s2.st='gone'; G.sig=G.sig.filter(function(x){ return x.st==='go'; });
   G.spot[want].flags++; G.linked[want][s.k]=1; G.marks.push({spot:want, t0:G.t, type:'flag'}); if(G.flag) G.marks.push({spot:want, t0:G.t, type:'flagGo'});
@@ -576,21 +647,31 @@ function drop(G0,src,dst,via){
   if(G.flag && !G.first.flag){ firstName(G,ev,'flag','tray'); }
   return {G:G, ok:true, ev:ev};
 }
-function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=STAGES.length-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
+function next(G0){ var G=cl(G0); if(G.phase!=='stageEnd') return G; if(G.si>=nStages(G)-1){ G.phase='end'; return G; } return startStage(G,G.si+1); }
 /* 지금 할 만한 한 수: 길 끝에 가장 가까운 신호를 진짜 자리로(깃발이 없으면 없음) */
 function hintMove(G){
   if(!G || G.phase!=='play' || !G.sig) return null;
-  if(G.flag && G.flag.n<=0) return null;
-  var s=G.sig.filter(function(x){ return x.st==='go'; }).sort(function(a,b){ return b.p-a.p; })[0];
-  return s ? {src:'sig:'+s.id, dst:'fut:'+KINDS[s.k].spot} : null;
+  var s=G.sig.filter(function(x){ return x.st==='go' && x.id>0 && (!G.flag || G.flag.n>0 || KINDS[x.k].ok); }).sort(function(a,b){ return b.p-a.p; })[0];   /* 괜찮은 신호 → 통과 문(깃발 없이도 됨) */
+  return s ? {src:'sig:'+s.id, dst: KINDS[s.k].ok ? 'gate' : 'fut:'+KINDS[s.k].spot} : null;
+}
+/* §19 추론형 측정: k번째 '반쪽만 아는 봇'. 0 모든 신호를 문제로 봄 / 1 기술이면 규칙이 있어도 윤리 문제로 봄 / 2 '줄어요'면 다 괜찮다고 봄(아기·학생 줄어요를 보냄). 그 밖은 바르게 */
+function partialMove(G,k){
+  if(!G || G.phase!=='play' || !G.sig) return null;
+  var DOWN={baby:1, school:1, smokeDown:1, carDown:1}, gateOn=stOf(G).rule==='okpass';
+  /* thinks(k) = 이 봇이 '문제가 될 신호'로 보는가. 문제로 보면 자리에 잇고, 아니면 통과 문으로 */
+  var thinks=function(kk){ if(k===0) return true; if(k===1) return kk==='techOk' || !KINDS[kk].ok; if(k===2) return !DOWN[kk] && !KINDS[kk].ok; return !KINDS[kk].ok; };
+  var noFlag=G.flag && G.flag.n<=0;
+  var s=G.sig.filter(function(x){ return x.st==='go' && x.id>0 && (thinks(x.k) ? !noFlag : gateOn); }).sort(function(a,b){ return b.p-a.p; })[0];
+  return s ? {src:'sig:'+s.id, dst: thinks(s.k) ? 'fut:'+KINDS[s.k].spot : 'gate'} : null;
 }
 function sources(G){ return (G.sig||[]).filter(function(s){ return s.st==='go' && s.id>0; }).map(function(s){ return 'sig:'+s.id; }); }
-function targets(G){ return SPOTS.map(function(k){ return 'fut:'+k; }); }
+function targets(G){ var a=SPOTS.map(function(k){ return 'fut:'+k; }); if(G && G.phase==='play' && stOf(G) && stOf(G).rule==='okpass') a.push('gate'); return a; }
 function itemOf(G,id){ var p=String(id).split(':'); if(p[0]!=='sig') return null; var s=(G.sig||[]).find(function(x){ return String(x.id)===p[1]; }); return s ? 'sig_'+s.k : null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
 if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,KINDS:KINDS,SPOTS:SPOTS,
-  newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,stOf:stOf};
+  newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,stOf:stOf,
+  CH:CH,CH_PARTIALS:CH_PARTIALS,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,nStages:nStages,partialMove:partialMove,chQueue:chQueue};
 /* LOGIC-END */
 
 /* ===== ① GAME-START: 게임 설정 (games/<이름>/game.js) ===== */
@@ -621,22 +702,25 @@ var GAME = {
     startBtn: '시작',
     start: ['신호를 20년 뒤 자리에 이어!',
             '신호 둘이 함께 와!',
-            '깃발 하나뿐! 급한 것 먼저!'],
+            '깃발 하나뿐! 급한 것 먼저!',
+            '괜찮은 신호는 통과 문으로!'],
     end: [['원인을 이으니 미래 문제가 보여!'],
           ['다른 원인도 같은 문제로 이어져!'],
-          ['미리 알면 미래에 대비할 수 있어!']],
+          ['미리 알면 미래에 대비할 수 있어!'],
+          ['지금 모습이 이어질 때만 문제가 돼!']],
     idle: '신호가 오는 중이에요'
   },
   ruleCards: [
     [['rLink','미래에 이어요']],
     [['rTwo','둘이 함께 와요',1]],
-    [['rFlag','깃발 하나에 하나',1]]
+    [['rFlag','깃발 하나에 하나',1]],
+    [['rFlag','깃발 하나에 하나'],['rOk','괜찮으면 통과 문',1]]
   ],
-  rulesModal: { cards: [['rLink','신호를 미래 자리에'],['rTwo','둘이 함께 와요'],['rFlag','깃발 하나에 하나']], note: '엉뚱한 자리에 이으면 그 문제는 대비 없이 진짜 자리로 가요.' },
+  rulesModal: { cards: [['rLink','신호를 미래 자리에'],['rTwo','둘이 함께 와요'],['rFlag','깃발 하나에 하나'],['rOk','괜찮은 신호는 통과 문으로']], note: '엉뚱한 자리에 이으면 그 문제는 대비 없이 진짜 자리로 가요.' },
   result: {
     label: '20년 뒤 마을 기록', note: '신호마다 한 번',
-    rows: function(G){ return [['미리 이은 신호', G.stats.link], ['대비 없이 온 문제', G.stats.miss]]; },
-    formula: '아기·학생 줄어요 → 인구 문제 · 연기 늘어요 → 환경 문제 · 규칙은 아직 → 윤리 문제',
+    rows: function(G){ return [['미리 이은 신호', G.stats.link], ['통과 문으로 보낸 신호', G.stats.pass||0], ['대비 없이 온 문제', G.stats.miss]]; },
+    formula: '아기 줄어요→인구 · 연기 늘어요→환경 · 규칙 아직→윤리 · 연기 줄어요, 규칙 함께→괜찮음',
     next: '다음 시간: 과학은 이 문제들을 어떻게 도울까?',
     say: '친구 점수와 비교해 봐!',
     art: function(G){
@@ -655,13 +739,38 @@ var GAME = {
       w_car:    {line:'배기가스도 지구를 덥게!', why:'자동차 연기(이산화 탄소)도 기후 위기를 키워요', page:'교과서 85쪽 참고'},
       w_tech:   {line:'규칙 없는 기술은 위험!', why:'기술만 빨라지면 정보를 훔치는 데 쓰일 수 있어요', page:'교과서 85쪽 참고'},
       w_rule:   {line:'규칙이 늦으면 정보 위험!', why:'규칙(제도)이 늦으면 기술이 범죄에 쓰일 수 있어요', page:'교과서 85쪽 참고'},
+      w_techOk:    {line:'규칙도 있으면 괜찮아!', why:'기술이 빨라도 규칙(제도)이 함께 만들어지면 범죄에 쓰이기 어려워요. 깃발은 문제가 될 신호에만!', page:'교과서 85쪽 참고'},
+      w_smokeDown: {line:'연기가 줄면 괜찮아!', why:'이산화 탄소가 늘어날 때 기후 위기가 심해져요. 줄고 있으면 그 문제로 이어지지 않아요', page:'교과서 85쪽 참고'},
+      w_carDown:   {line:'배기가스가 줄면 괜찮아!', why:'자동차 연기가 줄고 있으면 기후 위기를 키우지 않아요', page:'교과서 85쪽 참고'},
       noflag: {line:'깃발이 없어!', why:'깃발 하나로 신호 하나를 이어요. 칸이 다시 차면 또 생겨요. 길 끝에 가까운 신호부터!'}
     },
     general: function(G){
       var S=stOf(G);
       if(S.rule==='link') return {why:'왼쪽 신호는 지금 마을의 변화예요. 20년이 지나면 오른쪽 어느 자리가 힘들어질까요?', page:'교과서 84~85쪽 참고'};
       if(S.rule==='two') return {why:'학생이 줄면 아기가 줄 때처럼 일할 사람이, 자동차 연기도 공장 연기처럼 지구가 더워져요', page:'교과서 85쪽 참고'};
+      if(S.rule==='okpass') return {why:'지금 모습이 그대로 이어지거나(연기 늘어요, 아기 줄어요) 규칙이 늦을 때 문제가 돼요. 연기가 줄거나 규칙이 함께 오면 괜찮아요. 가운데 초록 통과 문으로 보내요(깃발은 안 써요)', page:'교과서 85쪽 참고'};
       return {why:'깃발 하나로 신호 하나만 이어요. 길 끝에 가까운 신호부터 이어야 놓치지 않아요', page:'교과서 85쪽 참고'};
+    }
+  },
+  /* §19 추론형 도전(logic.js CH 주석): 4단계와 같은 판단(문제가 될 신호만 잇고 괜찮은 신호는 보냄), 깃발 칸·시간 점수 없음, 모두 맞히면 통과 */
+  challenge: {
+    kind: 'reason',
+    maxLevel: CH.maxLv,
+    stages: CH_STAGES,
+    goal: chGoal,
+    partials: CH_PARTIALS,
+    say: {start: ['문제 신호는 자리에, 괜찮으면 통과 문!']},
+    ruleCards: [[['rLink','미래에 이어요'],['rOk','괜찮으면 통과 문']]],
+    /* 블라인드 r1(상): 도전 결과에 '어디서 틀렸나' — 놓친 신호 칩: 신호 그림 → 가야 했던 곳(문제 자리 배지 또는 통과 문), 빨간 X */
+    resultArt: function(G){
+      var m=(G.chMiss||[]).slice(0,6); if(!m.length) return null;
+      var BD={pop:'bdPop', env:'bdEnv', eth:'bdEth'}, h='', w=150;
+      m.forEach(function(x,i){ var X=i*w, K=KINDS[x.k], to=K.ok ? 'rOk' : BD[K.spot];
+        h+='<g data-verdict="bad"><rect x="'+(X+3)+'" y="3" width="'+(w-8)+'" height="74" rx="12" fill="#FBF8F1" stroke="#D9534F" stroke-width="2.5"/></g>'
+          +useArt('sig_'+x.k, X+8, 10, 62, 58)
+          +'<path d="M'+(X+72)+' 40h20" stroke="#2F4A66" stroke-width="3.5"/><path d="M'+(X+90)+' 33l9 7-9 7z" fill="#2F4A66"/>'
+          +useArt(to, X+100, 18, 42, 42); });
+      return {vb:[0,0,w*m.length,80], svg:h};
     }
   },
   toast: {show:'name'},
@@ -669,6 +778,7 @@ var GAME = {
   tryIt: function(G){
     if(G.ch) return null;
     if(G.si===0){ var s=(G.sig||[]).find(function(x){ return x.st==='go' && x.id>0; }); return s ? {src:'sig:'+s.id, dst:'fut:'+KINDS[s.k].spot, label:'미래에 이어요'} : {wait:true}; }
+    if(stOf(G).rule==='okpass'){ var o=(G.sig||[]).find(function(x){ return x.st==='go' && x.id>0 && KINDS[x.k].ok; }); return o ? {src:'sig:'+o.id, dst:'gate', label:'괜찮으면 통과 문'} : {wait:true}; }   /* 블라인드 r1: 새 동작(통과 문으로 끌기)은 해 보기로 한 번 */
     return null;
   },
   demo: function(G){
@@ -679,9 +789,12 @@ var GAME = {
   onEvent: function(e,FX){
     var WHY={baby:'아기가 줄면 20년 뒤 일할 사람이 모자라요', school:'학생이 줄면 20년 뒤 일할 사람이 모자라요',
              smoke:'연기(이산화 탄소)가 늘면 지구가 더워져요', car:'자동차 연기(이산화 탄소)도 지구를 덥게 해요',
-             tech:'기술만 빨라지면 나쁜 일에 쓰일 수 있어요', rule:'규칙이 늦으면 기술이 범죄에 쓰일 수 있어요'};
+             tech:'기술만 빨라지면 나쁜 일에 쓰일 수 있어요', rule:'규칙이 늦으면 기술이 범죄에 쓰일 수 있어요',
+             techOk:'규칙도 함께 만들어져 기술이 범죄에 쓰이기 어려워요', smokeDown:'연기가 줄면 지구가 더 더워지지 않아요', carDown:'배기가스가 줄면 지구가 더 더워지지 않아요'};
     if(e.t==='link'){ FX.score(e.at, e.pts, false, e.combo); FX.burst(e.at, 8); FX.progress();
       FX.explain({why:WHY[e.k], def:BADGES[SPOTS.indexOf(e.spot)].def.replace(/\(교과서.*$/,''), page:'교과서 85쪽 참고'}); }
+    else if(e.t==='pass'){ FX.score(e.at, e.pts, false, e.combo||0); FX.burst(e.at, 6); FX.progress(); FX.explain({why:WHY[e.k], page:'교과서 85쪽 참고'}); }
+    else if(e.t==='waste'){ FX.progress(); FX.comboOff(); FX.explain({why:WHY[e.k], page:'교과서 85쪽 참고'}); }
     else if(e.t==='wrong'){ FX.progress(); FX.comboOff(); FX.explain({why:WHY[e.k], page:'교과서 85쪽 참고'}); }
     else if(e.t==='arrive'){ FX.progress(); FX.comboOff(); }
     else if(e.t==='hit'){ FX.burst('fut:'+e.spot, 4); }
@@ -721,7 +834,12 @@ var SCENE = (function(){
   var SP={pop:{x:424,y:44,w:172,h:124,name:'공장'}, env:{x:424,y:172,w:172,h:124,name:'들판'}, eth:{x:424,y:300,w:172,h:124,name:'정보 상자'}};
   var PROB={pop:'인구 문제', env:'환경 문제', eth:'윤리 문제'};
   var TRAY={x:8,y:380,w:190,h:56};
-  var LABEL={baby:'아기 줄어요', school:'학생 줄어요', smoke:'연기 늘어요', car:'배기가스 늘어요', tech:'새 기술 쑥쑥', rule:'규칙은 아직'};
+  var GATE={x:214,y:364,w:196,h:72};   /* 4단계·도전 '통과 문'(블라인드 r1: 괜찮은 신호를 보내는 보이는 자리) */
+  function gateOn(G){ var S=G && G.si!=null ? stOf(G) : null; return !!(S && S.rule==='okpass' && G.phase!=='title'); }
+  var LABEL={baby:'아기 줄어요', school:'학생 줄어요', smoke:'연기 늘어요', car:'배기가스 늘어요', tech:'새 기술 쑥쑥', rule:'규칙은 아직',
+    techOk:'기술+규칙 함께', smokeDown:'연기 줄어요', carDown:'배기가스 줄어요'};
+  /* 규칙이 채워진 판(4단계 '괜찮은 신호'): 빈 규칙판(점선)과 달리 실선 줄 + 초록 체크 */
+  function okBoard(x,y,s){ return '<g transform="translate('+x+' '+y+') scale('+s+')">'+useArt('kBoard',-30,-38,60,67)+'<rect x="-22" y="-28" width="44" height="26" rx="3" fill="#FBF8F1"/><path d="M-15-21h30M-15-14h30M-15-7h18" stroke="#2F4A66" stroke-width="2.6"/><circle cx="20" cy="-30" r="11" fill="#4CAF7A" stroke="#FBF8F1" stroke-width="2.5"/><path d="M14-30l4 4 8-8" stroke="#FBF8F1" stroke-width="3" fill="none" stroke-linecap="round"/></g>'; }
   var HEADS=['kHeadA','kHeadB','kHeadC','kHeadD'], SHIRT=['#3D93D6','#4CAF7A','#E8743B','#7A5BA6'];
   var svg, gBg, gSpots, gMap, gSig, gFly, gMark, gTray, nodes={}, bgSig='', spotSig='', mapSig='', traySig='';
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
@@ -746,6 +864,9 @@ var SCENE = (function(){
     if(k==='smoke') return useArt('kFacSmoke',-34,-30,68,68)+useArt('kSmoke',-12,-46,34,27)+useArt('kSmoke',4,-60,40,32)+arrow(1);
     if(k==='car') return useArt('kCar',-30,-22,64,48)+useArt('kSmoke',-46,-6,30,24)+useArt('kSmoke',-58,-20,26,21)+arrow(1);
     if(k==='tech') return useArt('kComp',-38,-30,50,47)+useArt('kLaptop',-4,-8,44,38)+arrow(1);
+    if(k==='techOk') return useArt('kComp',-30,-26,46,43)+useArt('kLaptop',2,-4,40,34)+okBoard(-30,-20,0.8)+arrow(1);
+    if(k==='smokeDown') return useArt('kFacSmoke',-34,-30,68,68)+'<g opacity=".55">'+useArt('kSmoke',-8,-40,24,19)+'</g>'+arrow(-1);
+    if(k==='carDown') return useArt('kCar',-30,-22,64,48)+'<g opacity=".55">'+useArt('kSmoke',-42,-2,18,14)+'</g>'+arrow(-1);
     return useArt('kBoard',-30,-38,60,67)+'<rect x="-22" y="-28" width="44" height="26" rx="3" fill="#FBF8F1" opacity=".9"/><path d="M-15-21h30M-15-14h30M-15-7h18" stroke="#B9C2CC" stroke-width="2.6" stroke-dasharray="4 4"/>';
   }
   function worker(i,x,y,good){
@@ -785,6 +906,11 @@ var SCENE = (function(){
       for(i=0;i<Math.min(s.flags,3);i++) h+=useArt('kFlag', b.x+b.w-24-i*14, b.y-4, 22, 32);
       h+= named ? tag(b.x+60, b.y+18, PROB[k], '#E8743B', '#FBF8F1', 20) : tag(b.x+14+b.name.length*10+4, b.y+18, b.name, '#FBF8F1', '#2F4A66', 20);
     });
+    if(gateOn(G)){ var g=GATE, cx=g.x+44;
+      h+='<rect x="'+g.x+'" y="'+g.y+'" width="'+g.w+'" height="'+g.h+'" rx="14" fill="#DFF2E4" stroke="#4CAF7A" stroke-width="3"/>';
+      h+='<path d="M'+(cx-26)+' '+(g.y+g.h-6)+'V'+(g.y+34)+'a26 26 0 0 1 52 0V'+(g.y+g.h-6)+'" fill="#FBF8F1" stroke="#4CAF7A" stroke-width="6"/>';
+      h+='<path d="M'+(cx-11)+' '+(g.y+46)+'l8 8 15-16" stroke="#4CAF7A" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+      h+='<g data-keep="통과 문">'+tag(g.x+138, g.y+36, '통과 문', '#4CAF7A', '#FBF8F1', 20)+'</g>'; }
     gSpots.innerHTML=h;
   }
   /* 단계 끝: 이은 원인 → 문제 지도(길 위) */
@@ -799,6 +925,9 @@ var SCENE = (function(){
         for(i=0;i<ks.length;i++) h+='<g transform="translate('+(110+i*96)+' '+(y+4)+') scale(.7)">'+sigArt(ks[i])+'</g>';
         h+='<path d="M'+(70+ks.length*96)+' '+y+'H410" stroke="#4CAF7A" stroke-width="5" stroke-linecap="round"/><path d="M408 '+(y-10)+'l14 10-14 10z" fill="#4CAF7A"/></g>';
       });
+      /* 4단계: 그냥 보낸 괜찮은 신호 = 그 자리 줄 아래, 화살표 없이 초록 체크(문제로 이어지지 않음) */
+      Object.keys(G.passed||{}).forEach(function(kk,i){ var sp=KINDS[kk].spot, c=spC(sp), x=296+(sp==='env' ? i%2*62 : 0), y=c.y+34;
+        h+='<g data-keep="괜찮은 신호"><g transform="translate('+x+' '+y+') scale(.52)">'+sigArt(kk)+'</g><circle cx="'+(x+30)+'" cy="'+(y+8)+'" r="11" fill="#4CAF7A" stroke="#FBF8F1" stroke-width="2.5"/><path d="M'+(x+24)+' '+(y+8)+'l4 4 8-8" stroke="#FBF8F1" stroke-width="3" fill="none" stroke-linecap="round"/></g>'; });
     }
     gMap.innerHTML=h;
   }
@@ -809,16 +938,17 @@ var SCENE = (function(){
       h+='<rect x="'+TRAY.x+'" y="'+TRAY.y+'" width="'+TRAY.w+'" height="'+TRAY.h+'" rx="12" fill="#FBF8F1" stroke="#2F4A66" stroke-width="2.5"/>';
       h+=tag(TRAY.x+TRAY.w-38, TRAY.y+28, '깃발', '#2F4A66', '#FBF8F1', 20);
       for(i=0;i<f.max;i++){ var x=TRAY.x+14+i*54;
-        if(i<f.n) h+=useArt('kFlag',x,TRAY.y+2,36,52);
-        else { h+='<rect x="'+(x+2)+'" y="'+(TRAY.y+8)+'" width="40" height="40" rx="8" fill="none" stroke="#9FB3C4" stroke-width="2.5" stroke-dasharray="5 4"/>';
-          if(i===f.n){ var r=14, c=2*Math.PI*r, q=Math.min(1,f.cool/T.refill); h+='<circle cx="'+(x+22)+'" cy="'+(TRAY.y+28)+'" r="'+r+'" fill="none" stroke="#DDE3E8" stroke-width="5"/><circle cx="'+(x+22)+'" cy="'+(TRAY.y+28)+'" r="'+r+'" fill="none" stroke="#4CAF7A" stroke-width="5" stroke-dasharray="'+(c*q).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 '+(x+22)+' '+(TRAY.y+28)+')"/>'; } }
+        /* 블라인드 r1: 찬 칸 = 주황 바탕 + 진한 테두리 + 큰 깃발 / 빈 칸 = 회색 바탕 + 점선 + 흐린 회색 깃발 자국 */
+        if(i<f.n) h+='<rect x="'+x+'" y="'+(TRAY.y+4)+'" width="46" height="48" rx="9" fill="#FFD9BC" stroke="#E8743B" stroke-width="3.5"/>'+useArt('kFlag',x+5,TRAY.y+4,36,48);
+        else { h+='<rect x="'+x+'" y="'+(TRAY.y+4)+'" width="46" height="48" rx="9" fill="#E3E7EB" stroke="#9AA5B0" stroke-width="2.5" stroke-dasharray="5 4"/><g opacity=".22" style="filter:grayscale(1)">'+useArt('kFlag',x+5,TRAY.y+4,36,48)+'</g>';
+          if(i===f.n){ var r=14, c=2*Math.PI*r, q=Math.min(1,f.cool/T.refill); h+='<circle cx="'+(x+23)+'" cy="'+(TRAY.y+28)+'" r="'+r+'" fill="none" stroke="#DDE3E8" stroke-width="5"/><circle cx="'+(x+22)+'" cy="'+(TRAY.y+28)+'" r="'+r+'" fill="none" stroke="#4CAF7A" stroke-width="5" stroke-dasharray="'+(c*q).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 '+(x+22)+' '+(TRAY.y+28)+')"/>'; } }
       }
     }
     gTray.innerHTML=h;
   }
   function renderScene(G){
     var s1=G.si+'|'+(G.phase==='title'); if(s1!==bgSig){ bgSig=s1; buildBg(G); }
-    var s2=JSON.stringify(G.spot)+'|'+JSON.stringify(G.first)+'|'+G.phase; if(s2!==spotSig){ spotSig=s2; buildSpots(G); }
+    var s2=JSON.stringify(G.spot)+'|'+JSON.stringify(G.first)+'|'+G.phase+'|'+G.si+'|'+(G.ch||0); if(s2!==spotSig){ spotSig=s2; buildSpots(G); }
     var s3=G.phase+'|'+G.si+'|'+JSON.stringify(G.linked); if(s3!==mapSig){ mapSig=s3; buildMap(G); }
     var s4=G.flag ? G.flag.n+'|'+Math.round(G.flag.cool*10) : ''; if(s4!==traySig){ traySig=s4; buildTray(G); }
     /* 신호: 길을 따라 가며 자란다 */
@@ -826,8 +956,8 @@ var SCENE = (function(){
     (G.sig||[]).forEach(function(s){
       if(s.st!=='go') return;
       var k='s'+s.id, n=nodes[k]; seen[k]=1;
-      if(!n){ n=nodes[k]=el('g',{}); n.innerHTML='<g class="s4grow">'+sigArt(s.k)+'</g>'+tag(0,50,LABEL[s.k],'#FBF8F1','#2F4A66',20); gSig.appendChild(n); n._g=n.firstChild; }
-      var p=sigPos(s), sc=0.95+0.3*s.p, urg=s.p>0.62;
+      if(!n){ var S0=stOf(G), noLab=S0 && S0.P && S0.P.noLabel; n=nodes[k]=el('g',{}); n.innerHTML='<g class="s4grow">'+sigArt(s.k)+'</g>'+(noLab ? '' : tag(0,50,LABEL[s.k],'#FBF8F1','#2F4A66',20)); gSig.appendChild(n); n._g=n.firstChild; }
+      var p=sigPos(s), sc=0.95+0.3*s.p, urg=s.p>0.62 && !KINDS[s.k].ok;   /* 괜찮은 신호에는 '급해요' 테두리 없음(할 일로 보이지 않게) */
       n.setAttribute('transform','translate('+p.x.toFixed(1)+' '+p.y+')'); n._g.setAttribute('transform','scale('+sc.toFixed(3)+')');
       if(urg!==n._u){ n._u=urg; if(urg){ var r=el('rect',{x:-48,y:-48,width:96,height:90,rx:16,fill:'none',stroke:'#E8743B','stroke-width':4,'stroke-dasharray':'8 6',class:'s4urg'}); n._g.insertBefore(r,n._g.firstChild); } else { var o=n._g.querySelector('.s4urg'); if(o) o.remove(); } }
     });
@@ -837,15 +967,19 @@ var SCENE = (function(){
     (G.fly||[]).forEach(function(f){
       if(G.t<f.t0) return;
       var a=sigPos(f), b=spC(f.spot), q=Math.min(1,Math.max(0,(G.t-f.t0)/T.flyT)), x=a.x+(b.x-a.x)*q, y=a.y+(b.y-a.y)*q-Math.sin(q*Math.PI)*40;
-      h+='<path d="M'+a.x+' '+a.y+'Q'+((a.x+b.x)/2)+' '+(Math.min(a.y,b.y)-40)+' '+b.x+' '+b.y+'" stroke="#D9534F" stroke-width="3" stroke-dasharray="6 6" fill="none" opacity=".7"/>';
+      h+='<path d="M'+a.x+' '+a.y+'Q'+((a.x+b.x)/2)+' '+(Math.min(a.y,b.y)-40)+' '+b.x+' '+b.y+'" stroke="'+(f.why==='pass'?'#4CAF7A':'#D9534F')+'" stroke-width="3" stroke-dasharray="6 6" fill="none" opacity=".7"/>';
       h+='<g transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale(.6)">'+sigArt(f.k)+'</g>';
     });
     gFly.innerHTML=h;
     /* 판정 표시 */
     h='';
     (G.marks||[]).forEach(function(m){
-      var a=G.t-m.t0, c=spC(m.spot), b=SP[m.spot];
+      var a=G.t-m.t0, b=m.spot==='gate' ? GATE : SP[m.spot], c={x:b.x+b.w/2, y:b.y+b.h/2};
+      if(m.spot==='gate' && m.type==='gateOk' && a<1.3){ var sg=1+0.5*Math.max(0,1-a/0.3); h+='<g transform="translate('+(GATE.x+44)+' '+(GATE.y+40)+') scale('+sg.toFixed(2)+')"><circle r="26" fill="#4CAF7A" stroke="#FBF8F1" stroke-width="4"/><path d="M-12 0l8 8 16-16" stroke="#FBF8F1" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>'; }
+      if(m.spot==='gate' && m.type==='gateMiss' && a<1.2) h+='<rect data-verdict="bad" x="'+GATE.x+'" y="'+GATE.y+'" width="'+GATE.w+'" height="'+GATE.h+'" rx="14" fill="none" stroke="#D9534F" stroke-width="5" stroke-dasharray="8 6" opacity="'+(1-a/1.2).toFixed(2)+'"/>';
       if(m.type==='x' && a<1.6) h+='<g data-verdict="bad"><rect x="'+(b.x+2)+'" y="'+(b.y+2)+'" width="'+(b.w-4)+'" height="'+(b.h-4)+'" rx="13" fill="#D9534F" opacity=".18" stroke="#D9534F" stroke-width="5"/><circle cx="'+c.x+'" cy="'+(c.y+6)+'" r="30" fill="#D9534F" stroke="#FBF8F1" stroke-width="4"/><path d="M'+(c.x-12)+' '+(c.y-6)+'l24 24M'+(c.x+12)+' '+(c.y-6)+'l-24 24" stroke="#FBF8F1" stroke-width="6" stroke-linecap="round"/></g>';
+      if(m.type==='ok' && a<1.4){ var so=1+0.5*Math.max(0,1-a/0.3); h+='<g transform="translate('+c.x+' '+c.y+') scale('+so.toFixed(2)+')"><circle r="28" fill="#4CAF7A" stroke="#FBF8F1" stroke-width="4"/><path d="M-13 0l9 9 17-17" stroke="#FBF8F1" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>'; }
+      if(m.type==='waste' && a<1.6){ var qw=Math.min(1,a/0.6); h+='<g data-verdict="bad" opacity="'+(1-0.6*qw).toFixed(2)+'" transform="translate('+(b.x+b.w-36)+' '+(b.y+20+qw*30)+') rotate('+(qw*70).toFixed(0)+')">'+useArt('kFlag',-14,-20,28,40)+'</g>'; }
       if(m.type==='hit' && a<0.9) h+='<rect data-verdict="bad" x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="14" fill="none" stroke="#D9534F" stroke-width="5" opacity="'+(1-a/0.9).toFixed(2)+'"/>';
       if(m.type==='flagGo' && a<0.5){ var q=a/0.5, fx=TRAY.x+40+(c.x-TRAY.x-40)*q, fy=TRAY.y+20+(c.y-TRAY.y-20)*q-Math.sin(q*Math.PI)*60; h+=useArt('kFlag',fx-16,fy-24,32,46); }
       if(m.type==='flag' && a<1.1 && !(G.flag && a<0.5)){ var s=1+0.6*Math.max(0,1-a/0.35); h+='<g transform="translate('+c.x+' '+c.y+') scale('+s.toFixed(2)+')"><circle r="24" fill="#4CAF7A" opacity=".85"/>'+useArt('kFlag',-16,-24,32,46)+'</g>'; }
@@ -857,6 +991,7 @@ var SCENE = (function(){
     if(p[0]==='sig'){ var s=(G.sig||[]).find(function(z){ return String(z.id)===p[1]; }); if(!s) return null; var q=sigPos(s), sc=0.95+0.3*s.p; return {x:q.x-44*sc,y:q.y-46*sc,w:88*sc,h:84*sc}; }
     if(p[0]==='fut'){ var b=SP[p[1]]; return b ? {x:b.x,y:b.y,w:b.w,h:b.h} : null; }
     if(p[0]==='tray') return G.flag ? {x:TRAY.x,y:TRAY.y,w:TRAY.w,h:TRAY.h} : null;
+    if(p[0]==='gate') return gateOn(G) ? {x:GATE.x,y:GATE.y,w:GATE.w,h:GATE.h} : null;
     return null;
   }
   function rectOf(G,id){

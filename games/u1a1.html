@@ -444,7 +444,9 @@ var CFG = {
   stages: [   /* pins: 열린 경관, deck: 손님 말풍선(첫 장 고정, 나머지는 시드로 섞음), slots: 함께 기다리는 손님, pat: 기다림 초, t0: 첫 손님, lag: 둘째 자리 첫 손님 */
     {pins:['volc','river','arch','dune'],          first:'ds', deck:['mt','cs','rv','mt','cs'],                       slots:1, pat:16, t0:0.4, lag:0},
     {pins:['volc','river','arch','dune','fjord'],  first:'mt', deck:['cs','mt','cs','rv','ds','cs','mt','rv','mt'], slots:2, pat:15, t0:0.4, lag:3.2},
-    {pins:['volc','river','arch','dune','fjord'],  first:'aSwim', deck:['aTrek','aBoat','aBoard','aSwim','aTrek','aBoat','aBoard','aSwim'], slots:1, pat:13, t0:0.4, lag:0}
+    {pins:['volc','river','arch','dune','fjord'],  first:'aSwim', deck:['aTrek','aBoat','aBoard','aSwim','aTrek','aBoat','aBoard','aSwim'], slots:1, pat:13, t0:0.4, lag:0,
+     /* B판(2026-11-09 판 늘리기): 하고 싶은 일 + 둘이 함께 기다림(2단계 규칙과 3단계 규칙의 새 조합, 새 규칙 0). 바닷가 수영은 아치·피오르 둘 다 맞음 */
+     B:{first:'aBoat', deck:['aTrek','aSwim','aBoard','aBoat','aTrek','aSwim','aBoard','aSwim','aTrek'], slots:2, pat:15, t0:0.6, lag:3.2}}
   ]
 };
 var STAGES = [
@@ -482,12 +484,14 @@ var NAMES = {
   aBoard:'모래 언덕이 있어 <em>보드</em>!',
   leave: '기다리다 돌아갔어요'
 };
-var TITLES = [[0,'새내기 안내원'],[150,'여행 안내원'],[300,'경관 탐험가'],[400,'세계 경관 박사']];   /* 성실 1.25초 486, 무작위 중앙 93·힌트 연타 88(첫 칭호) */
+var TITLES = [[0,'새내기 안내원'],[250,'여행 안내원'],[450,'경관 탐험가'],[580,'세계 경관 박사']];   /* 3단계 B판 뒤(2026-11-09): 성실 1.25초 681, 무작위 최대 243·힌트 연타 140(첫 칭호) */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.rs+0x6D2B79F5)>>>0; G.rs=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
 function cfgFor(G){ return CFG; }
-function stOf(G,si){ var i=si==null?G.si:si; return cfgFor(G).stages[i]; }
+function stOf(G,si){ var i=si==null?G.si:si, S=cfgFor(G).stages[i];
+  if(S && S.B && G && G.rb && i===G.si){ var o={}, k; for(k in S) o[k]=S[k]; for(k in S.B) o[k]=S.B[k]; return o; } return S; }
+function hasB(G){ var S=cfgFor(G).stages[G.si]; return !!(S && S.B); }
 function nStages(G){ return STAGES.length; }
 function live(G){ return G && G.phase==='play' && G.endAt==null; }
 function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
@@ -496,12 +500,12 @@ function waiting(G){ return G.trav.filter(function(p){ return p.st==='wait'; });
 function shuffle(G,a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(rnd(G)*(i+1)), x=a[i]; a[i]=a[j]; a[j]=x; } return a; }
 /* 같은 말풍선이 바로 이어 나오지 않게 한 번 고친다 */
 function spread(a){ for(var i=1;i<a.length;i++) if(a[i]===a[i-1]){ for(var j=i+1;j<a.length;j++) if(a[j]!==a[i-1]){ var x=a[i]; a[i]=a[j]; a[j]=x; break; } } return a; }
-function startStage(G0,si){
-  var G=cl(G0); G.si=si; var S=stOf(G);
+function startStage(G0,si,rb){
+  var G=cl(G0); if(G.si!==si || !rb) G.sMiss=0; G.si=si; G.rb=rb?1:0; var S=stOf(G);
   G.phase='play'; G.t=0; G.endAt=null; G.combo=0; G.lastDrop=null;
   G.trav=[]; G.queue=[S.first].concat(spread(shuffle(G,S.deck))); G.nid=(G.nid||1);
   G.slotAt=[]; for(var s=0;s<S.slots;s++) G.slotAt.push(S.t0+s*S.lag);
-  G.stars=[]; G.marks=[];
+  G.stars=[]; G.marks=[]; if(!rb) G.prev=null;
   G.res={total:G.queue.length, served:0, missed:0};
   return G;
 }
@@ -527,11 +531,16 @@ function tick(G0,dt){
     }
     /* 기다림 */
     G.trav.forEach(function(p){ if(p.st!=='wait') return; p.wt+=dt;
-      if(p.wt>=p.pat){ p.st='left'; p.t1=G.t; G.res.missed++; G.stats.left++; G.stats.leftBy[G.si]++; G.combo=0; G.stars.push('bad'); G.slotAt[p.slot]=G.t+C.gap;
+      if(p.wt>=p.pat){ p.st='left'; p.t1=G.t; G.res.missed++; G.sMiss=(G.sMiss||0)+1; G.stats.left++; G.stats.leftBy[G.si]++; G.combo=0; G.stars.push('bad'); G.slotAt[p.slot]=G.t+C.gap;
         ev.push({t:'leave', slot:p.slot, at:'slot:'+p.slot}); firstName(G,ev,'leave','slot:'+p.slot); } });
     G.trav=G.trav.filter(function(p){ return p.st==='wait' || G.t-(p.t1||0)<C.fly+C.stay; });
     G.marks=G.marks.filter(function(m){ return G.t-m.t0<2.2; });
     if(!G.queue.length && !waiting(G).length) G.endAt=G.t+C.endHold;
+  } else if(G.t>=G.endAt && hasB(G) && !G.rb){   /* A판 끝 → B판(점수·통계는 이어서, 별 칸·진행 줄은 새로) */
+    /* 블라인드 r1 상(17→18 앞 판 초록 표시·별이 한꺼번에 사라져 '지워진 것'처럼 읽힘): 앞 판 별은 '1판 별 n' 칩으로 남기고(G.prev), 사라지는 중인 판정·손님은 시각만 옮겨 마저 사라지게 */
+    var sm=G.sMiss, T0=G.t, okA=G.stars.filter(function(x){ return x==='ok'; }).length, nA=G.stars.length;
+    var mk=G.marks.map(function(m){ m.t0-=T0; return m; }), tv=G.trav.filter(function(p){ return p.st!=='wait'; }).map(function(p){ p.t1-=T0; return p; });
+    G=startStage(G,G.si,1); G.sMiss=sm; G.prev={ok:okA, n:nA}; G.marks=mk; G.trav=tv; ev.push({t:'newRound', si:G.si});
   } else if(G.t>=G.endAt){
     G.phase='stageEnd'; G.endAt=null; G.trav=[]; G.marks=[];
     award(G,ev,['land4','fjord','life'][G.si]);
@@ -561,7 +570,7 @@ function drop(G0,src,dst,via){
     ev.push({t:'send', ok:true, pin:k, w:p.w, at:dst, pts:pts, combo:via?0:G.combo});
     firstName(G,ev, ACT[p.w]?p.w:k, dst);
   } else {
-    G.res.missed++; G.stats.bad++; G.stats.badBy[G.si]++; if(k==='fjord') G.stats.fjordBad++;
+    G.res.missed++; G.sMiss=(G.sMiss||0)+1; G.stats.bad++; G.stats.badBy[G.si]++; if(k==='fjord') G.stats.fjordBad++;
     G.combo=0; G.stars.push('bad');
     ev.push({t:'send', ok:false, pin:k, w:p.w, at:dst, pts:0});
     ev.push({t:'explain', why:'여긴 <em>'+TYPE[PINS[k].type]+'</em>예요. 손님은 <em>'+(ACT[p.w]?ACTNAME[p.w]:TYPE[p.w])+'</em>'+(ACT[p.w]?'을(를) 하고 싶어요':'에 가고 싶어요'), page:'교과서 13쪽 참고'});
@@ -626,12 +635,13 @@ var GAME = {
   ruleCards: [
     [['rType','말풍선 지형으로',1]],
     [['rTwo','막대가 줄면 떠나요',1]],
-    [['rLife','하고 싶은 일',1]]
+    [['rLife','하고 싶은 일',1],['rTwo','막대가 줄면 떠나요']]   /* B판: 둘이 기다림(2단계에서 배운 규칙) */
   ],
   rulesModal: {
     cards: [['rType','말풍선 지형에 맞는 경관으로'],['rTwo','막대가 다 줄면 돌아가요'],['rLife','하고 싶은 일을 할 수 있는 곳']],
     note: '틀린 곳에 보내면 손님이 실망해요.'
   },
+  stageRibbon: function(G){ return !G.sMiss ? (G.si+1)+'단계 성공!' : {text:(G.si+1)+'단계 끝!', confetti:false}; },
   result: {
     label: '내 여행사 기록', note: '',
     rows: function(G){ return [['웃은 손님', G.stats.ok], ['실망한 손님', G.stats.bad+G.stats.left]]; },
@@ -663,6 +673,8 @@ var GAME = {
       else FX.comboOff();
       FX.progress();
     }
+    else if(e.t==='newRound'){ if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0;   /* 블라인드 r1: 앞 판 이름 말풍선이 줄에 남아 판 전환 말풍선을 늦추지 않게 */
+      FX.callout('둘이 함께 와요!', 'slot:1'); FX.progress(); }
     else if(e.t==='leave'){ FX.progress(); FX.comboOff(); }
     else if(e.t==='bounce') FX.comboOff();
   }
@@ -745,28 +757,30 @@ var SCENE = (function(){
   }
   /* ---- 별 칸(이번 단계 손님 수) ---- */
   function drawStars(G){
-    var n=title(G)?6:G.res.total, a=title(G)?[]:G.stars, k=n+'|'+a.join('')+'|'+G.si+'|'+G.phase; if(st.s===k) return; var prev=st.sn||0; st.s=k; st.sn=a.length;
+    var n=title(G)?6:G.res.total, a=title(G)?[]:G.stars, k=n+'|'+a.join('')+'|'+G.si+'|'+G.phase+'|'+(G.prev?G.prev.ok+'/'+(G.t<1?0:1):''); if(st.s===k) return; var prev=st.sn||0; st.s=k; st.sn=a.length;
     var w=Math.min(36,(STAR.w-16)/n), z=Math.min(30,w-2), h='<g data-keep="별 칸"><rect x="'+STAR.x+'" y="'+STAR.y+'" width="'+STAR.w+'" height="'+STAR.h+'" rx="12" class="f-paper"/>';
     for(var i=0;i<n;i++){ var x=STAR.x+8+i*w+(w-z)/2, y=STAR.y+(STAR.h-z)/2;
       if(a[i]==='ok') h+='<g'+(i>=prev&&G.phase==='play'?' class="e1pop"':'')+'>'+useArt('starOk',x,y,z,z)+'</g>';
       else if(a[i]==='bad') h+='<g'+(i>=prev&&G.phase==='play'?' class="e1pop"':'')+'><circle cx="'+(x+z/2)+'" cy="'+(y+z/2)+'" r="'+(z/2-1)+'" fill="#C9D1DA"/><path d="M'+(x+z*.3)+' '+(y+z*.3)+'L'+(x+z*.7)+' '+(y+z*.7)+'M'+(x+z*.7)+' '+(y+z*.3)+'L'+(x+z*.3)+' '+(y+z*.7)+'" stroke="#7D8794" stroke-width="3" stroke-linecap="round"/></g>';
       else h+='<g transform="translate('+x+' '+y+') scale('+(z/30).toFixed(3)+')"><path d="M15 2l3.6 8 8.4 1-6.2 5.8 1.6 8.4-7.4-4.2-7.4 4.2 1.6-8.4-6.2-5.8 8.4-1z" fill="none" stroke="#B9852F" stroke-width="2" stroke-dasharray="4 3"/></g>'; }
+    if(!title(G) && G.prev){ var pt=G.prev.ok+'/'+G.prev.n;   /* 블라인드 r1: 앞 판 별을 칩으로 남김('1판 별 9/9') */
+      h+='<g data-keep="1판 별"'+(G.phase==='play'&&G.t<1?' class="e1pop"':'')+'><rect x="'+(STAR.x+STAR.w-118)+'" y="'+(STAR.y-32)+'" width="118" height="28" rx="14" fill="#33475C"/>'+txt(STAR.x+STAR.w-92,STAR.y-11,'1판',19,'#FBF8F1')+useArt('starOk',STAR.x+STAR.w-76,STAR.y-29,22,22)+txt(STAR.x+STAR.w-30,STAR.y-11,pt,19,'#FBF8F1')+'</g>'; }
     L.stars.innerHTML=h+'</g>';
   }
   /* ---- 손님 + 말풍선 (매 프레임) ---- */
-  function bubbleIn(w,cx,cy){ if(ACT[w]) return useArt(w,cx-24,cy-24,48,48); return txt(cx,cy+9,TYPE[w],26,'#1E2B3A'); }
+  function bubbleIn(w,cx,cy){ if(ACT[w]) return useArt(w,cx-27,cy-27,54,54);   /* 블라인드 r1 중: 활동 그림이 작음 48 → 54(말풍선 원도 33 → 39, 네모 그림 모서리가 원 안에) */ return txt(cx,cy+9,TYPE[w],26,'#1E2B3A'); }
   function drawTrav(G){
     var h='', fl='';
     (G.trav||[]).forEach(function(p){ var P=SLOTS[p.slot]; if(!P) return;
       if(p.st==='wait'){
         var f=Math.max(0,1-p.wt/p.pat), bw=2*BR-6, bx0=P.bx-BR+14, col=f<0.35?'#D2483C':(f<0.6?'#E8A33B':'#4CAF7A');
-        h+=useArt(TVA[p.slot],P.x,P.y,44,66)+'<path d="M'+(P.bx-30)+' '+(P.by+18)+'l-16 10 20-2z" fill="#FBF8F1"/><circle cx="'+P.bx+'" cy="'+P.by+'" r="'+BR+'" fill="#FBF8F1" stroke="'+SCOL[p.slot]+'" stroke-width="4"/>'+bubbleIn(p.w,P.bx,P.by)
+        h+=useArt(TVA[p.slot],P.x,P.y,44,66)+'<path d="M'+(P.bx-30)+' '+(P.by+18)+'l-16 10 20-2z" fill="#FBF8F1"/><circle cx="'+P.bx+'" cy="'+P.by+'" r="'+(ACT[p.w]?39:BR)+'" fill="#FBF8F1" stroke="'+SCOL[p.slot]+'" stroke-width="4"/>'+bubbleIn(p.w,P.bx,P.by)
           /* 기다림 막대(블라인드 1차: 고리·빨강/초록 막대 뜻을 모름) → 시계 + 줄어드는 가로 막대, 손님 바로 아래 */
           +'<g data-keep="기다림"><circle cx="'+(bx0-12)+'" cy="'+(P.by+44)+'" r="10" fill="#FBF8F1" stroke="#33475C" stroke-width="2"/><path d="M'+(bx0-12)+' '+(P.by+38)+'v6h5" stroke="#33475C" stroke-width="2" fill="none" stroke-linecap="round"/>'
           +'<rect x="'+bx0+'" y="'+(P.by+38)+'" width="'+bw+'" height="12" rx="6" fill="#5A3E28"/><rect x="'+bx0+'" y="'+(P.by+38)+'" width="'+(bw*f).toFixed(1)+'" height="12" rx="6" fill="'+col+'"/></g>';
       } else if(p.st==='left'){
         var r=Math.min(1,(G.t-p.t1)/1.2);
-        h+='<g data-verdict="bad" opacity="'+(1-r).toFixed(2)+'" transform="translate('+(-60*r).toFixed(1)+' 0)">'+useArt(TVA[p.slot],P.x,P.y,44,66)+'<circle cx="'+P.bx+'" cy="'+P.by+'" r="'+BR+'" fill="#C9D1DA" stroke="#33475C" stroke-width="2"/>'+bubbleIn(p.w,P.bx,P.by)+'</g>';
+        h+='<g data-verdict="bad" opacity="'+(1-r).toFixed(2)+'" transform="translate('+(-60*r).toFixed(1)+' 0)">'+useArt(TVA[p.slot],P.x,P.y,44,66)+'<circle cx="'+P.bx+'" cy="'+P.by+'" r="'+(ACT[p.w]?39:BR)+'" fill="#C9D1DA" stroke="#33475C" stroke-width="2"/>'+bubbleIn(p.w,P.bx,P.by)+'</g>';
       } else if(p.st==='go'){
         /* 날아가서 카드 아래 오른쪽에 선다 */
         var q=Math.min(1,(G.t-p.t1)/CFG.fly), b=cardBox(p.pin), sx=P.x+22, sy=P.y+33, ex=b.x+b.w-2, ey=b.y+b.h+2, e=q*q*(3-2*q);
