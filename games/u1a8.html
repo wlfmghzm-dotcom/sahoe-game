@@ -433,7 +433,7 @@ Object.assign(ASSETS,{sseonyang:{"vb":[-24,-24,48,48],"src":"data:image/png;base
        단계 끝 비교 카드: 누크(위도가 높아서 추움, 겨울이 김) / 키토(높이가 높아서 일 년 내내 서늘) 열두 달 기온 선.
    틀리게 놓으면 그 마을 앞에서 물건이 회색 + 빨간 가위표(얼거나 시듦)로 0.9초 보인 뒤 돌아온다. 다시 맞히면 4점(처음 맞히면 10 + 콤보). */
 var SEED = 20261111;
-var T = { base:10, retryPts:4, hintPts:4, comboWin:4.5, comboStep:2, comboCap:5, lag:0.6, endDelay:0.8, peek:1.4, gap:1.0, firstAt:0.2 };
+var T = { slideOut:0.6, slideIn:0.5, roundGap:1.8, base:10, retryPts:4, hintPts:4, comboWin:4.5, comboStep:2, comboCap:5, lag:0.6, endDelay:0.8, peek:1.4, gap:1.0, firstAt:0.2 };
 var SUPS = ['fish','deer','potato','alpaca','banana'];
 var SUPNAME = {fish:'생선', deer:'순록', potato:'감자', alpaca:'알파카', banana:'바나나'};
 var PLACES = {P:{name:'북극 마을', city:'누크'}, C:{name:'산 위 도시', city:'키토'}, B:{name:'산 아래 마을', city:''}};
@@ -443,9 +443,15 @@ var STAGES = [
   {name:'북극 마을', rule:'polar', on:'P', maxOn:1, pat:0,
    reqs:[['P','bowl'],['P','pen'],['P','pen'],['P','bowl'],['P','bowl']]},
   {name:'적도의 높은 산', rule:'high', on:'BC', maxOn:2, pat:0,
-   reqs:[['C','bowl'],['B','bowl'],['C','pen'],['B','bowl'],['C','bowl'],['C','pen']]},
+   reqs:[['C','bowl'],['B','bowl'],['C','pen'],['B','bowl'],['C','bowl'],['C','pen']],
+   /* B판 '깃발만'(2026-11-09 판 늘리기 2차, 숨은 정보): 마을 그림·온도계·얼음을 가리고 같은 깃발만 산 위·산기슭 자리에(도전 깃발 판과 같은 장면).
+      규칙은 같다('높아서 서늘한 곳', 새 규칙 카드 없음) — 판단의 근거가 그림에서 높이로 바뀐다. 실제 도시 이름(키토)은 쓰지 않는다 */
+   B:{on:'', maxOn:2, flags:[{id:'f1',anch:4,k:'C'},{id:'f2',anch:5,k:'B'},{id:'f3',anch:3,k:'C'},{id:'f4',anch:6,k:'B'}],
+      reqs:[['f2','bowl'],['f1','bowl'],['f3','pen'],['f4','bowl'],['f1','pen'],['f3','bowl']]}},
   {name:'두 추운 곳', rule:'wait', on:'PC', maxOn:2, pat:14, gap:3.5,
-   reqs:[['P','bowl'],['C','bowl'],['C','pen'],['P','pen'],['P','bowl'],['C','bowl'],['P','pen'],['C','pen']]}
+   reqs:[['P','bowl'],['C','bowl'],['C','pen'],['P','pen'],['P','bowl'],['C','bowl'],['P','pen'],['C','pen']],
+   /* B판 '세 곳 함께'(새 조합): 산 아래 마을도 같은 '먹을 것'을 부탁 — 같은 그릇에 세 가지 답(생선·감자·바나나). 한꺼번에 뜨는 부탁은 그대로 둘(동시 요구 ≤2) */
+   B:{on:'PCB', reqs:[['B','bowl'],['P','bowl'],['C','bowl'],['B','bowl'],['P','pen'],['C','bowl'],['P','bowl'],['C','pen']]}}
 ];
 /* §19 추론형 도전(kind:'reason'). 한 줄 설계: "말풍선이 뜬 깃발 마을이 어디에 있는지(위도·높이)만 보고 먹을 것·기를 동물을 보낸다 — 모두 처음에 맞히면 통과".
    도전에서는 마을 그림(얼음집·도시·야자수)과 온도계를 숨기고 같은 모양 깃발만 둔다. 깃발 자리는 판마다 시드로 바뀐다(얼음 땅 3곳, 산꼭대기 2곳, 산기슭 2곳).
@@ -467,7 +473,11 @@ function cfgFor(G){ return G && G.ch ? chStages(G.ch) : null; }
 var CH_STAGES = chStages(1).map(function(S){ return {name:S.name, rule:S.rule}; });
 function chTotal(lv){ var P=chLv(lv); return P.R*P.nReq; }
 function chGoal(lv){ return CH.pts*chTotal(lv); }
-function stOf(G,si){ var i=si==null?G.si:si; return G && G.ch ? cfgFor(G)[i] : STAGES[i]; }
+function stOf(G,si){ var i=si==null?G.si:si; if(G && G.ch) return cfgFor(G)[i]; var S=STAGES[i];
+  if(S && S.B && G && G.rb && i===G.si){ var o={}, k; for(k in S) o[k]=S[k]; for(k in S.B) o[k]=S.B[k]; return o; } return S; }
+function hasB(G){ return !!(G && !G.ch && STAGES[G.si] && STAGES[G.si].B); }
+/* 판 바뀜(블라인드 1차 공통): A판 장면이 왼쪽으로 밀려 나가고(gapT 마지막 slideOut초) B판이 오른쪽에서 들어온다(slideIn초, 그동안 못 놓음). scene.js slideX */
+function sliding(G){ return !!(G && !G.ch && G.rb && G.r0!=null && G.phase==='play' && G.t-G.r0<T.slideIn); }
 function nStages(G){ return G && G.ch ? 1 : STAGES.length; }
 
 var BADGES = [
@@ -485,7 +495,7 @@ var NAMES = {
   wait:   '막대 전에 줘요!',
   gone:   '늦어서 떠났어요'
 };
-var TITLES = [[0,'새내기 탐험가'],[140,'추운 곳 탐험가'],[220,'극지·고산 탐험가'],[260,'두 추운 곳 박사'],[285,'세계 탐험 대장']];   /* logic: 성실 1.25초 290, 무작위 최대 120, 힌트 76 */
+var TITLES = [[0,'새내기 탐험가'],[230,'추운 곳 탐험가'],[400,'극지·고산 탐험가'],[490,'두 추운 곳 박사'],[540,'세계 탐험 대장']];   /* 2026-11-09 B판 뒤 logic: 성실 1.25초 522~570(p10 540), 무작위 최대 218, 힌트 132 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
@@ -521,14 +531,14 @@ function chMake(G){ var S=stOf(G), r=[]; for(var i=0;i<S.P.R;i++) r.push(chRound
 function setupRound(G){
   var S=stOf(G);
   if(G.ch){ var R=G.chR[G.ri]; G.flags=cl(R.flags); G.queue=R.reqs.map(function(r){ return {place:r.flag, need:r.need}; }); }
-  else { G.flags=[]; G.queue=S.reqs.map(function(r){ return {place:r[0], need:r[1]}; }); }
+  else { G.flags=S.flags?cl(S.flags):[]; G.queue=S.reqs.map(function(r){ return {place:r[0], need:r[1]}; }); }
   G.reqs=[]; G.peek=null; G.pop=null; G.bounced=0; G.gapT=-1; G.spawnT=T.firstAt; G.done=[];
 }
 function setupStage(G,si){
   var S=stOf(G,si), total=0;
-  G.si=si; G.ri=0; G.t=0; G.combo=0; G.lastDel=-99; G.endT=-1; G.later=[];
+  G.si=si; G.ri=0; G.t=0; G.combo=0; G.lastDel=-99; G.endT=-1; G.later=[]; G.rb=0; G.r0=null; G.sMiss=0; G.prev=null;
   if(G.ch){ G.chR=chMake(G); G.chR.forEach(function(r){ total+=r.reqs.length; }); }
-  else total=S.reqs.length;
+  else total=S.reqs.length+(S.B?S.B.reqs.length:0);   /* 블라인드 r2: 진행 점은 판마다 새로 시작하지 않고 A·B판 이어서 */
   G.res={total:total, served:0, missed:0};
   setupRound(G);
   return G;
@@ -540,8 +550,8 @@ function newGame(seed){
 }
 function start(G0){ var G=cl(G0); G.score=0; G.phase='play'; G.badges=[]; G.first={}; G.nid=1; if(!G0.ch) G.seed=(SEED)>>>0;
   G.stats={right:0, wrong:0, hint:0, left:0}; G.miss={lat:0, alt:0, need:0}; return setupStage(G,0); }
-function roundOpen(G){ return G.phase==='play' && G.gapT<0 && G.endT<0; }
-function placeKind(G,pl){ if(G.ch){ var f=G.flags.find(function(x){ return x.id===pl; }); return f ? f.k : null; } return pl; }
+function roundOpen(G){ return G.phase==='play' && G.gapT<0 && G.endT<0 && !sliding(G); }
+function placeKind(G,pl){ if(G.ch || (G.flags && G.flags.length)){ var f=G.flags.find(function(x){ return x.id===pl; }); return f ? f.k : null; } return pl; }
 function reqAt(G,pl){ return G.reqs.find(function(r){ return r.st==='on' && r.place===pl; }) || null; }
 function onCount(G){ return G.reqs.filter(function(r){ return r.st==='on'; }).length; }
 function nRounds(G){ return G.ch ? G.chR.length : 1; }
@@ -561,6 +571,7 @@ function spawn(G,ev){
 function settle(G,ev){
   if(G.queue.length || onCount(G)) return;
   if(G.ch){ if(G.bounced) ev.push({t:'roundBad', bad:1}); if(G.ri<nRounds(G)-1){ G.gapT=1.6; return; } }
+  if(hasB(G) && !G.rb){ G.gapT=T.roundGap; G.prev={ok:G.res.served, n:G.res.served+G.res.missed}; ev.push({t:'roundEnd'}); return; }   /* A판 끝 → B판 */
   G.endT=G.t;
 }
 function tick(G0,dt){
@@ -572,12 +583,15 @@ function tick(G0,dt){
     if(G.t-G.endT>=T.endDelay){ G.phase='stageEnd'; award(G,ev,STAGE_BADGE[G.si]); ev.push({t:'stageEnd', si:G.si}); }
     return {G:G, ev:ev};
   }
-  if(G.gapT>=0){ G.gapT-=dt; if(G.gapT<=0){ G.ri++; setupRound(G); ev.push({t:'newRound'}); } return {G:G, ev:ev}; }
+  if(G.gapT>=0){ G.gapT-=dt; if(G.gapT<=0){ G.gapT=-1;
+      if(G.ch){ G.ri++; setupRound(G); ev.push({t:'newRound'}); }
+      else { G.rb=1; G.r0=G.t; setupRound(G); G.spawnT=T.slideIn+0.2; ev.push({t:'newRound', si:G.si}); } }
+    return {G:G, ev:ev}; }
   G.spawnT=Math.max(0,G.spawnT-dt);
   G.reqs.forEach(function(r){
     if(r.st!=='on' || !r.pat) return;
     r.wait+=dt;
-    if(r.wait>=r.pat){ r.st='gone'; r.goneT=G.t; G.res.missed++; G.stats.left++; G.combo=0; ev.push({t:'miss', id:r.id, place:r.place}); lateName(G,'gone','place:'+r.place,0.3); }
+    if(r.wait>=r.pat){ r.st='gone'; r.goneT=G.t; G.res.missed++; G.sMiss=(G.sMiss||0)+1; G.stats.left++; G.combo=0; ev.push({t:'miss', id:r.id, place:r.place}); lateName(G,'gone','place:'+r.place,0.3); }
   });
   G.reqs=G.reqs.filter(function(r){ return r.st==='on' || G.t-(r.goneT||r.doneT||G.t)<1.2; });
   spawn(G,ev);
@@ -608,7 +622,7 @@ function drop(G0,src,dst,via){
     pts=(rq.bad?T.retryPts:T.base)+Math.min(G.combo-1,T.comboCap)*T.comboStep;
   }
   if(first) G.stats.right++;
-  G.score+=pts; if(first) G.res.served++; else G.res.missed++;
+  G.score+=pts; if(first) G.res.served++; else { G.res.missed++; G.sMiss=(G.sMiss||0)+1; }
   ev.push({t:'give', place:dp[1], sup:sp[1], pts:pts, combo:via?0:G.combo, first:first});
   lateName(G, sp[1], 'place:'+dp[1]);
   G.spawnT=Math.max(G.spawnT,0.6);
@@ -653,7 +667,7 @@ var WHY = {
 };
 var PAGE = { P:'교과서 41쪽 참고', C:'교과서 42쪽 참고', B:'교과서 32·35쪽 참고' };
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,CH:CH,CH_PARTIALS:CH_PARTIALS,ANCH:ANCH,FIT:FIT,chRound:chRound,partialMove:partialMove,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,cfgFor:cfgFor,stOf:stOf,nStages:nStages,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,
+if(typeof module!=='undefined') module.exports={sliding:sliding,hasB:hasB,SEED:SEED,CH:CH,CH_PARTIALS:CH_PARTIALS,ANCH:ANCH,FIT:FIT,chRound:chRound,partialMove:partialMove,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,cfgFor:cfgFor,stOf:stOf,nStages:nStages,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf};
 /* LOGIC-END */
 
@@ -708,6 +722,7 @@ var GAME = {
     [['rWait','막대가 줄기 전에',1]]
   ],
   rulesModal: { cards: [['rPolar','북극 가까우면 추워요'],['rHigh','높은 산 위는 서늘해요'],['rWait','막대가 줄면 떠나요']], note: '물건을 끌어 말풍선 마을에 줘요. 마을마다 맞는 것이 달라요.' },
+  stageRibbon: function(G){ return !G.sMiss ? (G.si+1)+'단계 성공!' : {text:(G.si+1)+'단계 끝!', confetti:false}; },
   result: {
     label: '내 탐험 기록', note: '부탁 수',
     rows: function(G){ return [['처음에 맞게 준 것', G.stats.right], ['안 맞아 돌아온 것', G.stats.wrong], ['늦어서 떠난 부탁', G.stats.left]]; },
@@ -720,6 +735,7 @@ var GAME = {
     reasons: { wFit: {why:'그 마을이 왜 추운지(위도? 높이?) 생각해 봐요', page:'교과서 41~42쪽 참고'} },
     of: function(G){
       if(G.phase!=='play') return null;
+      if(G.flags && G.flags.length && !G.ch) return {why:'깃발 마을은 그림이 없어요. 산 위 높은 깃발은 서늘한 곳, 산기슭 낮은 깃발은 더운 곳이에요', page:'교과서 32·42쪽 참고'};
       if(G.ch) return {why:'오른쪽 얼음 땅 = 위도가 높아 추운 곳, 산꼭대기 = 높아서 서늘한 곳, 산기슭 = 적도의 더운 곳', page:'교과서 32·41~42쪽 참고'};
       if(G.si===0) return {why:'북극 가까운 곳은 겨울이 길고 아주 추워 땅이 얼어 있어요. 사냥한 생선과 고기를 먹어요', def:BADGES[0].def, page:'교과서 41쪽 참고'};
       if(G.si===1) return {why:'같은 적도라도 산 아래는 덥고, 해발 고도가 높은 산 위는 서늘해요', def:'산 위 사람들은 챙 넓은 모자로 강한 햇빛을, 여러 겹 옷과 망토로 낮과 밤의 큰 기온 차를 견뎌요.', page:'교과서 42쪽 참고'};
@@ -741,8 +757,10 @@ var GAME = {
     return null;
   },
   onEvent: function(e,FX){
+    if(e.t==='give' && typeof U!=='undefined' && U && U.callQ && typeof document!=='undefined'){ U.callQ.length=0; [].forEach.call(document.querySelectorAll('#ovl .callout'),function(d){ d.style.opacity='0'; }); }   /* 블라인드 r2 중: 앞 물건의 이름 말풍선이 다음 물건(알파카) 때 뜨지 않게 */
     if(e.t==='give'){ var at='place:'+e.place; if(e.pts>0) FX.score(at, e.pts, false, e.combo); FX.burst(at, e.first?8:4); FX.progress(); }
     else if(e.t==='miss'){ FX.progress(); FX.comboOff(); }
+    else if(e.t==='roundEnd' || e.t==='newRound'){ if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0; FX.progress(); }   /* 판 바뀜: 남은 말풍선 줄 비움 */
     else if(e.t==='roundBad'){ FX.comboOff(); }
     else if(e.t==='bounce' && e.why==='wFit'){ FX.comboOff(); }
     /* 놓친 단서 글은 장면이 놓은 마을 아래에 그린다(2차 블라인드) */
@@ -784,20 +802,28 @@ var SCENE = (function(){
   var TY = 316, SW = 106, SH = 80, SUPX = function(i){ return 8+i*117; };
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
   function mount(host){ svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'}); gBase=el('g',{}); gTop=el('g',{}); svg.appendChild(gBase); svg.appendChild(gTop); host.insertBefore(svg, host.firstChild); }
+  function fm(G){ return !!(G.ch || (G.flags && G.flags.length && G.phase!=='stageEnd')); }   /* 깃발 판(도전, 개념 2단계 B판). 단계 끝에는 깃발 자리의 마을 그림·온도계를 드러냄(개념 증거: 같은 적도인데 높이로 서늘) */
+  function slideX(G){
+    if(G.ch || G.phase!=='play') return 0;
+    if(G.gapT>=0 && hasB(G) && !G.rb){ if(G.gapT<T.slideOut){ var e=1-G.gapT/T.slideOut; return -e*e*660; } return 0; }
+    if(sliding(G)){ var e2=1-(G.t-G.r0)/T.slideIn; return e2*e2*660; }
+    return 0;
+  }
+  function newTown(G){ return !G.ch && G.rb && G.r0!=null && G.phase==='play' && (G.t-G.r0<3.2 || (G.si===1 && G.t-G.r0>=T.slideIn)); }   /* 블라인드 r2: 깃발판 표지는 판 끝까지 남김 */
   function placeBox(G,pl){
-    if(G.ch){ var f=(G.flags||[]).find(function(x){ return x.id===pl; }); if(!f) return null; var a=AN[f.anch]; return {x:a[0]-36, y:a[1]-58, w:72, h:64}; }
+    if(fm(G)){ var f=(G.flags||[]).find(function(x){ return x.id===pl; }); if(!f) return null; var a=AN[f.anch]; return {x:a[0]-36, y:a[1]-58, w:72, h:64}; }
     return PL[pl] || null;
   }
   function bubbleBox(G,pl){ var b=placeBox(G,pl); if(!b) return null; var cx=b.x+b.w/2, w=96, h=84, y=b.y-h-8;
     if(y<2) return {x:b.x+b.w+12, y:Math.max(2,b.y), w:w, h:h, side:1};   /* 위가 모자라면(산 위) 오른쪽 옆 */
     return {x:cx-w/2, y:y, w:w, h:h}; }
-  function onSet(G){ var S=stOf(G); return G.ch ? '' : (S && S.on) || ''; }
+  function onSet(G){ var S=stOf(G); if(fm(G)) return ''; if(!G.ch && G.phase==='stageEnd') S=STAGES[G.si]; return (S && S.on) || ''; }
   function f1(v){ return (+v).toFixed(1); }
   function thermo(x,y,v,cold){ var h=52, fh=Math.max(6,(h-14)*v);
     return '<g><rect x="'+(x-7)+'" y="'+y+'" width="14" height="'+h+'" rx="7" fill="#fff" stroke="#55657A" stroke-width="2"/><circle cx="'+x+'" cy="'+(y+h+2)+'" r="9" fill="'+(cold?'#2F7FC1':'#D9534F')+'" stroke="#55657A" stroke-width="2"/>'
       + '<rect x="'+(x-3.5)+'" y="'+f1(y+h-fh)+'" width="7" height="'+f1(fh+4)+'" fill="'+(cold?'#2F7FC1':v>0.6?'#D9534F':'#E8955A')+'"/></g>'; }
   function backdrop(G){
-    var h='<rect x="-700" y="-600" width="2000" height="1600" class="a8-sky"/>', ch=!!G.ch, on=onSet(G);
+    var h='<rect x="-700" y="-600" width="2000" height="1600" class="a8-sky"/>', ch=fm(G), on=onSet(G);
     /* 얼음 땅(오른쪽) */
     h += '<path d="M318 300 L330 252 Q420 238 600 244 L600 300Z" class="'+(ch?'a8-ground':'a8-ice')+'"/>';
     if(!ch) h += '<path d="M340 262q30-6 60 0M470 256q30-6 60 0" class="a8-crack"/>';
@@ -866,23 +892,34 @@ var SCENE = (function(){
   function renderScene(G){
     var reqSig=(G.reqs||[]).map(function(r){ return r.id+r.st+(r.pat?Math.round(30*r.wait/r.pat):0); }).join(',');
     var pk=G.peek?G.peek.sup+G.peek.place:'', pp=G.pop && G.phase==='play' && G.t-G.pop.t<0.6 ? G.pop.place+G.pop.sup : '';
-    var s=[G.ch||0,G.si,G.ri,G.phase,reqSig,pk+(G.peek?G.peek.cue+(G.t-G.peek.t>=0.6?1:0):''),pp,G.miss?JSON.stringify(G.miss):'',(G.flags||[]).map(function(f){ return f.anch; }).join(''),JSON.stringify(G.first||{})].join('#');
+    var SX=slideX(G), s=[G.ch||0,G.si,G.ri,G.rb||0,Math.round(SX/6),newTown(G)?1:0,G.prev?G.prev.ok:'',G.phase,reqSig,pk+(G.peek?G.peek.cue+(G.t-G.peek.t>=0.6?1:0):''),pp,G.miss?JSON.stringify(G.miss):'',(G.flags||[]).map(function(f){ return f.anch; }).join(''),JSON.stringify(G.first||{})].join('#');
     if(s===sig) return; sig=s;
     var h=G.phase==='title' ? '<rect x="-700" y="-600" width="2000" height="1600" class="a8-sky"/><g transform="translate(135 205) scale(0.55)">'+backdrop(G)+'</g>' : backdrop(G);   /* 첫 화면: 판을 아래로 작게 → 제목 카드(장면 38% 높이)가 마을을 가리지 않게(블라인드 1차) */
-    if(G.ch) (G.flags||[]).forEach(function(f){ h += flagSvg(G,f); });
+    if(fm(G) && !G.ch){   /* 블라인드 r2 상: 깃발판에서 무엇을 볼지 — 높이 자에 눈금 + 깃발마다 높이까지 점선(그림 단서) */
+      h += '<path d="M14 288V86" stroke="#E8743B" stroke-width="5" fill="none"/>';
+      for(var ty2=268; ty2>=96; ty2-=43) h += '<path d="M8 '+ty2+'h14" stroke="#E8743B" stroke-width="3"/>';
+      (G.flags||[]).forEach(function(f){ var a=AN[f.anch]; var gy=Math.min(284,a[1]-2); h += '<path d="M16 '+gy+'H'+(a[0]-6)+'" stroke="#E8743B" stroke-width="2.5" stroke-dasharray="6 6" opacity=".8"/><circle cx="14" cy="'+gy+'" r="6" fill="#E8743B"/>';   /* 깃발 발밑 높이 */ }); }
+    if(fm(G)) (G.flags||[]).forEach(function(f){ h += flagSvg(G,f); });
     (G.reqs||[]).forEach(function(r){ if(r.st!=='done') h += reqSvg(G,r); });   /* 블라인드 1차 뒤: 끝난 말풍선이 겹쳐 글이 포개짐 → 맞게 준 말풍선은 바로 지움(떠난 것만 가위표로 잠깐) */
     if(G.pop && G.phase==='play' && G.t-G.pop.t<0.6){ var pb=placeBox(G,G.pop.place); if(pb) h += '<g class="a8-pop">'+useArt(G.pop.sup, pb.x-14, pb.y+pb.h-46, 50, 50)+'</g>';   /* 그림 블라인드: 순록이 지붕 위에 겹침 → 마을 왼쪽 아래 땅에 */ }
     if(G.peek){ var kb=placeBox(G,G.peek.place); if(kb){ var cx=kb.x+kb.w/2-26, cy=kb.y+kb.h/2-30;
       /* 블라인드 1차(05·06): 흐린 물건 위 큰 가위표는 '무엇을 놓았는지'가 안 보였다 → 놓은 물건을 또렷이 + 오른쪽 위 작은 가위표 */
       h += '<g data-verdict="bad"><rect x="'+(kb.x-2)+'" y="'+(kb.y-2)+'" width="'+(kb.w+4)+'" height="'+(kb.h+4)+'" rx="12" class="a8-badbox"/><circle cx="'+(cx+26)+'" cy="'+(cy+26)+'" r="34" class="a8-badbg"/>'+useArt(G.peek.sup, cx-2, cy-2, 56, 56)
         + '<circle cx="'+(cx+54)+'" cy="'+(cy+2)+'" r="14" fill="#D9534F"/><path d="M'+(cx+48)+' '+(cy-4)+'L'+(cx+60)+' '+(cy+8)+'M'+(cx+60)+' '+(cy-4)+'L'+(cx+48)+' '+(cy+8)+'" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g>'; } }
-    if(G.peek && G.t-G.peek.t>=0.6){ var wb=placeBox(G,G.peek.place); if(wb){ var wx=Math.max(4,Math.min(596-120,wb.x+wb.w/2-60)), wy=wb.y+wb.h-8;
-      h += '<g data-keep="놓친 단서 글"><rect x="'+wx+'" y="'+wy+'" width="120" height="30" rx="15" fill="#D9534F"/><text x="'+(wx+60)+'" y="'+(wy+22)+'" font-size="19" text-anchor="middle" fill="#fff" style="font-family:var(--game)">'+(G.peek.cue==='lat'?'위도를 봐!':G.peek.cue==='alt'?'높이를 봐!':'부탁을 봐!')+'</text></g>'; } }
+    if(G.peek && G.t-G.peek.t>=0.6){ var wb=placeBox(G,G.peek.place); if(wb){ var wx=Math.max(4,Math.min(596-136,wb.x+wb.w/2-68)), wy=Math.min(wb.y+wb.h-8, 262);   /* 블라인드 r2 상: 띠가 땅 띠·물건 줄 밑으로 잘림 → 땅 위로, 넓게 */
+      h += '<g data-keep="놓친 단서 글"><rect x="'+wx+'" y="'+wy+'" width="136" height="30" rx="15" fill="#D9534F"/><text x="'+(wx+68)+'" y="'+(wy+22)+'" font-size="19" text-anchor="middle" fill="#fff" style="font-family:var(--game)">'+(G.peek.cue==='lat'?'위도를 봐!':G.peek.cue==='alt'?'높이를 봐!':'부탁을 봐!')+'</text></g>'; } }
     /* 놓친 단서: 위도 자 / 높이 화살표를 빨갛게 */
     if(G.peek && G.peek.cue==='lat') h += '<g data-verdict="bad"><path d="M24 306H586" class="a8-cueline"/><rect x="512" y="279" width="82" height="28" rx="14" class="a8-cue"/></g>';
     if(G.peek && G.peek.cue==='alt') h += '<g data-verdict="bad"><path d="M14 288V86" class="a8-cueline"/><rect x="20" y="76" width="56" height="30" rx="12" class="a8-cue"/></g>';
-    if(G.ch && G.miss){ var mx=330; [['lat','icLat'],['alt','icAlt'],['need','needBowl']].forEach(function(q){ var n=G.miss[q[0]]; if(!n) return;
-      h += '<g data-keep="놓친 단서"><rect x="'+mx+'" y="4" width="84" height="44" rx="10" class="f-paper" stroke="#D9534F" stroke-width="2.5"/>'+useArt(q[1], mx+6, 9, 34, 34)+'<text x="'+(mx+62)+'" y="33" font-size="19" text-anchor="middle" class="a8-name">×'+n+'</text></g>'; mx+=90; }); }
+    if(G.ch && G.miss){ var mx=300; [['lat','위도 놓침'],['alt','높이 놓침'],['need','부탁 놓침']].forEach(function(q){ var n=G.miss[q[0]]; if(!n) return;   /* 블라인드 r2: 아이콘 뜻 불명 → 짧은 말 */
+      h += '<g data-keep="놓친 단서"><rect x="'+mx+'" y="6" width="116" height="36" rx="10" class="f-paper" stroke="#D9534F" stroke-width="2.5"/><text x="'+(mx+58)+'" y="31" font-size="19" text-anchor="middle" class="a8-name">'+q[1]+' '+n+'</text></g>'; mx+=122; }); }
+    if(newTown(G)){ var nt=G.si===1?'그림 없는 마을! 높이를 봐':'세 마을이 함께 불러!', nw=nt.length*20+40, ny=G.si===1?180:150, ncx=G.si===1?440:330;   /* B판 표지: 장면과 함께 들어옴(깃발판은 얼음 땅 위 빈자리, 판 끝까지) */
+      if(G.si===1){ nt='높이를 봐!'; nw=150; }
+      h += '<g data-keep="새 판"><rect x="'+(ncx-nw/2)+'" y="'+ny+'" width="'+nw+'" height="40" rx="20" fill="#2A3A4E"/><text x="'+ncx+'" y="'+(ny+27)+'" font-size="21" text-anchor="middle" fill="#FBF8F1" style="font-family:var(--game)">'+nt+'</text></g>'; }
+    if(SX) h='<g transform="translate('+SX.toFixed(1)+' 0)">'+h+'</g>';   /* 판 바뀜: 물건 줄은 그대로, 마을 장면만 밀려 나가고 들어옴 */
+    if(G.prev && !G.ch && G.phase!=='title' && !endCard(G)){ var pt=G.prev.ok+'/'+G.prev.n, cx0=456;   /* 앞 판 성과 칩(오른쪽 위: 산꼭대기 깃발을 가리지 않게, 3단계 끝 기온 선이 나오면 숨김) */
+      h += '<g data-keep="1판 칩"><rect x="'+cx0+'" y="8" width="132" height="32" rx="16" fill="#33475C"/><text x="'+(cx0+32)+'" y="31" font-size="19" text-anchor="middle" fill="#FBF8F1" style="font-family:var(--game)">1판</text>'
+        + '<circle cx="'+(cx0+66)+'" cy="24" r="10" class="f-grn"/><path d="M'+(cx0+61)+' 24l4 4 7-7" fill="none" stroke="#FBF8F1" stroke-width="3" stroke-linecap="round"/><text x="'+(cx0+104)+'" y="31" font-size="19" text-anchor="middle" fill="#FBF8F1" style="font-family:var(--game)">'+pt+'</text></g>'; }
     if(G.phase!=='title') for(var i=0;i<SUPS.length;i++) h += supSvg(G,i);   /* 첫 화면: 아래 줄을 비워 제목 카드 자리로(블라인드 1차) */
     if(endCard(G)){   /* 블라인드 1차(15): 큰 비교 카드가 판을 덮음 → 마을 곁 하늘에 기온 선 둘(키토는 산 위 도시 오른쪽, 누크는 북극 마을 위) */
       h += '<g data-keep="키토 기온">'+miniGraph(GQ.x, GQ.y, GQ.w, GQ.h, QUITO, '키토', '높이가 높아서', 'icAlt')+'</g>'

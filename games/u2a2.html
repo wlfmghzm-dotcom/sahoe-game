@@ -415,12 +415,16 @@ Object.assign(ASSETS,{sseonyang:{"vb":[-24,-24,48,48],"src":"data:image/png;base
    4단계: 공장 금고(jar)의 이윤을 연구소(lab)에 → 공장이 더 좋은 옷을 만든다 → 집이 좋은 옷을 산다.
    추적할 숫자는 점수 하나. 시간 제한 없음. */
 var SEED = 20261108;
-var T = { ready:1.0, hold:1.8, pts:10, via:5, comboStep:2, comboCap:4, comboWin:7, wage:1, price:2, work:1.0, coinFly:0.6, back:1.0,
+var T = { slideOut:0.6, slideIn:0.5, ready:1.0, hold:1.8, pts:10, via:5, comboStep:2, comboCap:4, comboWin:7, wage:1, price:2, work:1.0, coinFly:0.6, back:1.0,
           buyFly:0.7, profitAt:0.5, profitFly:0.7, labCost:3, labUp:0.8, labGood:1.4, roundHold:2.4, bonus:15, cap:6 };
 /* 3단계 가게: 자리 수·값(동전). 값은 교과서 64쪽(5인승 2천만 원, 7인승 3천만 원, 9인승 4천만 원)을 동전 하나 = 1천만 원으로 */
 var CARS = {c5:{seats:5, price:2, art:'carS'}, c7:{seats:7, price:3, art:'carM'}, c9:{seats:9, price:4, art:'carL'}};
 var BIKE = {price:2};
-var ROUNDS = [{fam:4, purse:4}, {fam:6, purse:5}];
+var ROUNDS = [{fam:4, purse:4}, {fam:6, purse:5},
+  /* B판(2026-11-09 판 늘리기 2차): 새 조건 — 3판 '작은 차가 늘 싼 것은 아님'(값이 교과서와 다른 가게), 4판 '자전거 둘'(남겨야 할 돈이 늘어남). 규칙·동작은 같음(rule choose).
+     값을 흔든 판이라 교과서 쪽수·값 이야기는 쓰지 않는다(대사·'왜?'는 '값을 견줘 봐'만) */
+  {fam:5, purse:4, cp:{c5:3, c7:2, c9:4}, bp:2, nb:1, B:1}, {fam:3, purse:6, cp:{c5:2, c7:3, c9:4}, bp:2, nb:2, B:1}];
+var RB = 2;   /* B판이 시작되는 판 번호 */
 var STAGES = [
   {name:'일하러 가요', rule:'work',   goal:4},
   {name:'물건을 사요', rule:'buy',    want:3, purse0:4},
@@ -496,7 +500,7 @@ function chMake(G,P){
   for(i=0;i<P.R;i++) R.push(chRound(G,P,need[i]));
   return R;
 }
-var TITLES = [[0,'마을 새내기'],[185,'마을 일꾼'],[235,'살림 박사'],[250,'마을 대장']];   /* full 제안 0/190/260/270 → 최고점 256(두 판 모두 알맞은 차)에 맞게 낮춤 */
+var TITLES = [[0,'마을 새내기'],[290,'마을 일꾼'],[340,'살림 박사'],[365,'마을 대장']];   /* 2026-11-09 3단계 3·4판 뒤: 성실 376, 무작위 최대 276, 힌트 연타 170 */   /* full 제안 0/190/260/270 → 최고점 256(두 판 모두 알맞은 차)에 맞게 낮춤 */
 var LOOPK = ['work','income','spend','profit'];
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
@@ -521,15 +525,17 @@ function wantsOf(si,G){
 }
 function startRound(G,ri){
   var R=roundsOf(G)[ri]; G.round=ri; G.fam=R.fam; G.purse=R.purse; G.car=null; G.bike=false; G.rHold=null; G.wants=wantsOf(G.si,G);
+  if(!G.ch){ if(R.cp){ G.cp=cl(R.cp); G.bp=R.bp; G.nb=R.nb; G.bk=0; G.carBad=0; if(R.nb>1) G.wants.push({k:'bike'}); } else { delete G.cp; delete G.bp; G.nb=1; G.bk=0; G.carBad=0; } G.rb=R.B?1:0; }
   if(G.ch){ G.cp=cl(R.cp); G.bp=R.bp; G.nb=R.nb; G.bk=0; G.rBad=0; G.carBad=0; if(R.nb>1) G.wants.push({k:'bike'}); }
 }
 function startStage(G0,si){
   var G=cl(G0), S=stOf(G0,si);
   G.si=si; G.phase='play'; G.t=0; G.ready=T.ready; G.holdAt=null; G.rHold=null; G.combo=0; G.lastDrop=null; G.jobs=[];
   G.wk=[{st:'home'},{st:'home'}]; G.lastAt=-9; G.labAt=-9; G.labUpAt=-9;
+  if(S.rule!=='choose' && !G.ch){ delete G.cp; delete G.bp; G.rb=0; G.nb=1; }
   if(S.rule==='work'){ G.purse=0; G.shelf=0; G.jar=0; G.good=0; G.lab=0; G.wants=[]; G.res={total:S.goal, served:0, missed:0}; }
   else if(S.rule==='buy'){ G.purse=S.purse0; G.shelf=Math.max(G.shelf,4); G.wants=wantsOf(si); G.res={total:S.want+2, served:0, missed:0}; }
-  else if(S.rule==='choose'){ G.rec[si]=[]; if(G.ch) G.chR=chMake(G,S.P); startRound(G,0); G.res={total:G.ch?G.chR.length:ROUNDS.length*2, served:0, missed:0}; }
+  else if(S.rule==='choose'){ G.rec[si]=[]; if(G.ch) G.chR=chMake(G,S.P); startRound(G,0); G.res={total:G.ch?G.chR.length:ROUNDS.reduce(function(a,r){ return a+1+(r.nb||1); },0), served:0, missed:0}; }
   else { G.purse=S.purse0; G.shelf=S.shelf0; G.good=0; G.lab=0; G.wants=wantsOf(si); G.res={total:4, served:0, missed:0}; }
   return G;
 }
@@ -542,7 +548,7 @@ function start(G){ var g=cl(G); g.score=0; g.rec=[]; g.loop={}; g.jar=0; g.stats
 
 /* 3단계: 이 차를 살 수 있나(자리·돈·이미 샀나) */
 function carWhy(G,c){ var C=CARS[c]; if(G.car) return 'onecar'; if(C.seats<G.fam) return 'seats'; if(G.purse<priceOf(G,c)) return 'money'; return null; }
-function bikeWhy(G){ if(G.ch ? G.bk>=G.nb : G.bike) return 'onebike'; if(G.purse<bikeP(G)) return 'money'; return null; }
+function bikeWhy(G){ if(G.ch || G.cp ? G.bk>=G.nb : G.bike) return 'onebike'; if(G.purse<bikeP(G)) return 'money'; return null; }
 function bestCar(fam,G){ var b=null; Object.keys(CARS).forEach(function(k){ var C=CARS[k], p=G?priceOf(G,k):C.price; if(C.seats>=fam && (b==null || p<(G?priceOf(G,b):CARS[b].price))) b=k; }); return b; }
 function chooseMoves(G){ var a=[]; Object.keys(CARS).forEach(function(k){ if(!carWhy(G,k)) a.push('car:'+k); }); if(!bikeWhy(G)) a.push('bike'); return a; }
 
@@ -558,7 +564,7 @@ function tick(G0,dt){
       if(!j.home && G.t>=j.t0+T.work+T.back){ j.home=1; G.wk[j.wi].st='home'; }
     } else if(j.k==='buy'){
       if(!j.got && G.t>=j.t0+T.buyFly){ j.got=1; var w=G.wants[j.wi]; if(w){ w.got=1; w.coming=0; } }
-      if(!j.prof && G.t>=j.t0+T.profitAt+T.profitFly){ j.prof=1; G.jar+=j.price; G.stats.profit+=j.price; ev.push({t:'profit'}); lit(G,ev,'profit','jar'); }
+      if(!j.prof && G.t>=j.t0+T.profitAt+T.profitFly){ j.prof=1; G.jar+=j.price; if(!(CARS[j.item]||j.item==='bike')) G.stats.profit+=j.price;   /* 블라인드 r2: 결과 기록은 일해서 번 돈의 고리만(3단계 차 고르기는 처음부터 준 돈이라 뺌) → 번 소득 = 쓴 돈 = 이윤 */ ev.push({t:'profit'}); lit(G,ev,'profit','jar'); }
     } else if(j.k==='lab'){
       if(!j.up && G.t>=j.t0+T.labGood){ j.up=1; G.good=1; ev.push({t:'better'}); firstName(G,ev,'better','item'); }
     }
@@ -577,13 +583,15 @@ function tick(G0,dt){
     }
   } else if(S.rule==='choose'){
     if(G.rHold==null && G.holdAt==null && G.t>=G.ready && !G.jobs.length && (!chooseMoves(G).length)){
-      var best=bestCar(G.fam), ok=G.car===best && G.bike;
-      G.rec[G.si].push({fam:G.fam, budget:ROUNDS[G.round].purse, car:G.car, bike:G.bike, best:best});
+      if(G.round+1===RB) ev.push({t:'roundEnd'});
+      var best=bestCar(G.fam,G), ok=G.car===best && G.bike;
+      G.rec[G.si].push({fam:G.fam, budget:ROUNDS[G.round].purse, car:G.car, bike:G.bike, best:best, cp:G.cp?cl(G.cp):null, bp:bikeP(G), nb:G.nb||1, B:G.rb||0});
       if(!G.bike){ G.res.missed++; firstName(G,ev,'short','want:1'); } else if(ok) { G.stats.best++; }
-      G.rHold=G.t+T.roundHold; ev.push({t:'round', ok:ok});
+      G.rHold=G.t+T.roundHold+(G.round+1===RB?T.slideOut:0); ev.push({t:'round', ok:ok});
     }
     if(G.rHold!=null && G.t>=G.rHold){
-      if(G.round+1<ROUNDS.length){ startRound(G,G.round+1); G.ready=G.t+0.6; ev.push({t:'newRound'}); }
+      if(G.round+1<ROUNDS.length){ var toB=G.round+1===RB; if(toB) G.prevA=G.rec[G.si].filter(function(r){ return r.car===r.best && r.bike; }).length;
+        startRound(G,G.round+1); G.ready=G.t+(toB?T.slideIn+0.1:0.6); if(toB){ G.r0=G.t; } ev.push({t:'newRound', B:toB?1:0}); }
       else { G.rHold=null; G.holdAt=G.t+0.2; }
     }
   } else if(G.holdAt==null && G.t>=G.ready && !G.jobs.length){
@@ -623,27 +631,29 @@ function drop(G0,src,dst,via){
     if(S.rule==='choose' && G.ch){
       if(dp[0]==='car'){ var cc=dp[1]; if(!CARS[cc]) return fail('dst'); var wc=carWhy(G,cc); if(wc) return fail(wc);
         var pc=priceOf(G,cc), good=pc===minFit({fam:G.fam, cp:G.cp});
-        G.purse-=pc; G.car=cc; G.stats.spent+=pc; G.wants[0].coming=1; G.lastAt=G.t;
+        G.purse-=pc; G.car=cc; G.wants[0].coming=1; G.lastAt=G.t;
         G.jobs.push({k:'buy', wi:0, t0:G.t, price:pc, item:cc});
         pts=0; if(good && !G.rBad){ pts=CH.pts; G.score+=pts; G.res.served++; }
         if(!good){ G.carBad=1; if(!G.rBad){ G.rBad=1; G.res.missed++; } }   /* 맞지 않는 차: 받아 주되 바로 판정(놓은 차 칸에 빨간 X) — 남은 돈으로 자전거를 다 못 산다 */
         ev.push({t:'buy', at:'car:'+cc, pts:pts, combo:0, item:cc}); if(!good) ev.push({t:'wrongCar', ok:false, at:'car:'+cc});
         return {G:G, ok:true, ev:ev}; }
       if(dst==='bike'){ var wb=bikeWhy(G); if(wb) return fail(wb);
-        G.purse-=bikeP(G); G.bk++; G.bike=G.bk>=G.nb; G.stats.spent+=bikeP(G); G.wants[G.bk].coming=1; G.lastAt=G.t;
+        G.purse-=bikeP(G); G.bk++; G.bike=G.bk>=G.nb; G.wants[G.bk].coming=1; G.lastAt=G.t;
         G.jobs.push({k:'buy', wi:G.bk, t0:G.t, price:bikeP(G), item:'bike'}); ev.push({t:'buy', at:'bike', pts:0, combo:0, item:'bike'});
         return {G:G, ok:true, ev:ev}; }
       return fail('dst');
     }
     if(S.rule==='choose'){
       if(dp[0]==='car'){ var c=dp[1]; if(!CARS[c]) return fail('dst'); var w1=carWhy(G,c); if(w1) return fail(w1);
-        G.purse-=CARS[c].price; G.car=c; G.stats.spent+=CARS[c].price; G.wants[0].coming=1;
-        G.jobs.push({k:'buy', wi:0, t0:G.t, price:CARS[c].price, item:c}); score(); ev.push({t:'buy', at:'car:'+c, pts:pts, combo:via?0:G.combo, item:c});
+        var pc0=priceOf(G,c); G.purse-=pc0; G.car=c; G.wants[0].coming=1;
+        G.jobs.push({k:'buy', wi:0, t0:G.t, price:pc0, item:c});
+        if(G.rb && c!==bestCar(G.fam,G)){ G.carBad=1; G.combo=0; G.res.missed++; ev.push({t:'buy', at:'car:'+c, pts:0, combo:0, item:c}); ev.push({t:'wrongCar', ok:false, at:'car:'+c}); return {G:G, ok:true, ev:ev}; }   /* B판: 값을 견주지 않은 차는 놓은 칸에 바로 빨간 X(점수 없음) */
+        score(); ev.push({t:'buy', at:'car:'+c, pts:pts, combo:via?0:G.combo, item:c});
         return {G:G, ok:true, ev:ev}; }
       if(dst==='bike'){ var w2=bikeWhy(G); if(w2) return fail(w2);
-        G.purse-=BIKE.price; G.bike=true; G.stats.spent+=BIKE.price; G.wants[1].coming=1;
-        var ex=(G.car && G.car===bestCar(G.fam))?T.bonus:0;
-        G.jobs.push({k:'buy', wi:1, t0:G.t, price:BIKE.price, item:'bike'}); score(ex); ev.push({t:'buy', at:'bike', pts:pts, combo:via?0:G.combo, item:'bike'});
+        var bp0=bikeP(G); G.purse-=bp0; G.bk=(G.bk||0)+1; G.bike=G.bk>=(G.nb||1); G.wants[G.bk].coming=1;
+        var ex=(G.bike && G.car && G.car===bestCar(G.fam,G))?T.bonus:0;
+        G.jobs.push({k:'buy', wi:G.bk, t0:G.t, price:bp0, item:'bike'}); score(ex); ev.push({t:'buy', at:'bike', pts:pts, combo:via?0:G.combo, item:'bike'});
         if(G.car) firstName(G,ev,'fit','want:0');
         return {G:G, ok:true, ev:ev}; }
       return fail('dst');
@@ -689,7 +699,7 @@ function targets(G){
 }
 function hintMove(G){
   var s=sources(G); if(!s.length) return null; var S=stOf(G);
-  if(S.rule==='choose'){ if(!G.car){ var b=bestCar(G.fam,G.ch?G:null); if(!carWhy(G,b)) return {src:'purse', dst:'car:'+b}; } if(!bikeWhy(G)) return {src:'purse', dst:'bike'};
+  if(S.rule==='choose'){ if(!G.car){ var b=bestCar(G.fam,G); if(!carWhy(G,b)) return {src:'purse', dst:'car:'+b}; } if(!bikeWhy(G)) return {src:'purse', dst:'bike'};
     var m=chooseMoves(G); return m.length?{src:'purse', dst:m[0]}:null; }
   if(s.indexOf('jar')>=0) return {src:'jar', dst:'lab'};
   if(s.indexOf('purse')>=0) return {src:'purse', dst:'item'};
@@ -707,7 +717,7 @@ var WK_ART=['person07','person02'];
 function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='wk') return WK_ART[+p[1]]; if(id==='purse') return 'purse'; if(id==='jar') return 'coin'; return null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,CARS:CARS,BIKE:BIKE,ROUNDS:ROUNDS,
+if(typeof module!=='undefined') module.exports={RB:RB,SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,CARS:CARS,BIKE:BIKE,ROUNDS:ROUNDS,
   CH:CH,CH_PARTIALS:CH_PARTIALS,CH_STAGES:CH_STAGES,chStages:chStages,chGoal:chGoal,stOf:stOf,nStages:nStages,chMake:chMake,partialMove:partialMove,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,
   bestCar:bestCar,chooseMoves:chooseMoves,carWhy:carWhy,canWork:canWork,WK_ART:WK_ART};
@@ -781,7 +791,7 @@ var GAME = {
   },
   stageRibbon: function(G){ if(G.si===2) return G.res.missed===0?'알맞게 골랐어요!':{text:'3단계 끝!', confetti:false}; return null; },
   result: {
-    label: '마을 돈 기록(동전)', note: '',
+    label: '일해서 번 돈의 흐름(동전)', note: '차 고르기 빼고',
     rows: function(G){ return [['번 소득', G.stats.income], ['쓴 돈(소비)', G.stats.spent], ['기업 이윤', G.stats.profit]]; },
     formula: '일 → 소득 → 소비 → 이윤 → 연구',
     next: '다음 시간: 일하는 사람의 권리는 어떻게 지킬까?',
@@ -820,8 +830,10 @@ var GAME = {
     else if(e.t==='lab'){ FX.score('lab', e.pts, false, e.combo); FX.burst('lab', 8); FX.progress(); }
     else if(e.t==='pay'){ FX.burst('purse', 3); }
     else if(e.t==='profit'){ FX.burst('jar', 3); }
+    else if(e.t==='roundEnd'){ if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0; }   /* A판 끝: 남은 말풍선이 B판에 뜨지 않게 */
+    else if(e.t==='newRound' && e.B){ if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0; }
     else if(e.t==='round'){ FX.progress(); if(e.ok===false) FX.comboOff(); }
-    else if(e.t==='wrongCar'){ FX.progress(); FX.explain({why:'이 차를 사면 남은 돈으로 자전거를 다 못 사요. 다 타는 차 중 값이 가장 싼 차를 골라요', def:NOPG(BADGES[2].def), page:'교과서 64쪽 참고'}); }
+    else if(e.t==='wrongCar'){ FX.progress(); FX.callout('남은 돈으로 자전거를 다 못 사요', e.at); FX.explain({why:'이 차를 사면 남은 돈으로 자전거를 다 못 사요. 다 타는 차 중 값이 가장 싼 차를 골라요(작은 차가 늘 싼 것은 아니에요)', def:NOPG(BADGES[2].def)}); }   /* 블라인드 1차 공통: 놓은 자리에 이유 한 줄 */
     else if(e.t==='bounce') FX.comboOff();
   }
 };
@@ -876,6 +888,16 @@ var SCENE = (function(){
   function slots(G){ return G.ch ? SLOT8 : SLOT; }
   function trayW(G){ return G.ch ? 114 : TRAY.w; }
   function wantX(G,i){ return i===0 ? 24 : 120+(i-1)*52; }
+  function multi(G){ return !!(G.ch || (G.nb||1)>1); }   /* 자전거 칸이 둘일 수 있는 판(도전, 개념 4판) */
+  function vb(G){ return !!(G.ch || G.rb); }               /* 놓은 차 칸에 바로 판정을 그리는 판(도전, 개념 B판) */
+  /* 판 바뀜(2026-11-09 블라인드 1차 공통): A판(1·2판) 끝에 자동차 가게·가족·지갑이 왼쪽으로 밀려 나가고, B판 가게가 오른쪽에서 들어온다 */
+  function slideX(G){
+    if(G.ch || G.phase!=='play' || rule(G)!=='choose') return 0;
+    if(G.rHold!=null && G.round+1===RB){ var r=G.rHold-G.t; if(r<T.slideOut){ var e=1-Math.max(0,r)/T.slideOut; return -e*e*700; } return 0; }
+    if(G.rb && G.round===RB && G.r0!=null && G.t-G.r0<T.slideIn){ var e2=1-(G.t-G.r0)/T.slideIn; return e2*e2*700; }
+    return 0;
+  }
+  function newShop(G){ return !G.ch && G.rb && G.round===RB && G.r0!=null && G.t-G.r0<3.2 && !G.car && G.phase==='play'; }
   function choose(G){ return rule(G)==='choose' && G.phase!=='title'; }
   function labOn(G){ return rule(G)==='lab' && G.phase!=='title'; }
   function mount(host){
@@ -899,12 +921,16 @@ var SCENE = (function(){
     if(!ch){
       h+=useArt('shop',SHOP.x,SHOP.y,SHOP.w,SHOP.h)+'<g id="tagShop">'+pill(532,350,62,'시장')+'</g>';
     } else {
-      h+='<rect x="320" y="150" width="318" height="266" rx="18" class="f-sand"/>';
+      h+='<g id="c2shop"><rect x="320" y="150" width="318" height="266" rx="18" class="f-sand"/>';
       Object.keys(TILE).forEach(function(k){ var p=TILE[k]; h+='<rect x="'+p[0]+'" y="'+p[1]+'" width="'+TW+'" height="'+TH+'" rx="14" class="f-paper" stroke="#B9852F" stroke-width="2"/>';
         if(k==='bike') h+=useArt('bike',p[0]+38,p[1]+8,74,58); else h+=useArt(CARS[k].art,p[0]+18,p[1]+4,114,68);
         var pr=k==='bike'?bikeP(G):priceOf(G,k); for(var c=0;c<pr;c++) h+=useArt('coin',p[0]+TW-25-c*19,p[1]+TH-33,22,22);
         if(k!=='bike') h+=txt(p[0]+8,p[1]+TH-14,CARS[k].seats+'인승',20,'#1E2B3A','start'); });
-      h+='<g id="tagShop">'+pill(480,140,108,'자동차 가게')+'</g>';
+      h+='<g id="tagShop">'+(G.rb&&!G.ch?pill(480,140,150,'새 자동차 가게','f-org'):pill(480,140,108,'자동차 가게'))+'</g>';   /* 블라인드 r2 중: B판은 간판 색·이름이 바뀜 */
+      if(G.rb && !G.ch && G.cp){ Object.keys(TILE).forEach(function(k){ var p=TILE[k], chg=k==='bike' ? (G.nb||1)>1 : G.cp[k]!==CARS[k].price; if(!chg) return;   /* 교과서 값과 달라진 칸(값·자전거 수)에 주황 빛 테두리 */
+          h+='<rect x="'+(p[0]+3)+'" y="'+(p[1]+3)+'" width="'+(TW-6)+'" height="'+(TH-6)+'" rx="12" fill="none" stroke="#E8743B" stroke-width="4" class="c2glow"/>';
+          if(k==='bike') h+='<rect x="'+(p[0]+8)+'" y="'+(p[1]+TH-40)+'" width="44" height="30" rx="10" class="f-org"/>'+txt(p[0]+30,p[1]+TH-18,'×'+G.nb,20,'#FBF8F1'); }); }
+      h+='</g>';
     }
     if(labOn(G)) h+='<g class="shopIn">'+useArt('lab',LAB.x,LAB.y,LAB.w,LAB.h)+'</g><g id="tagLab">'+pill(545,124,80,'연구소')+'</g>';
     L.bg.innerHTML=h;
@@ -936,15 +962,20 @@ var SCENE = (function(){
     var goal=rule(G)==='work'?S.goal:0;
     slots(G).forEach(function(s,i){ if(i<G.purse) h+=useArt('coin',s[0]-12,s[1]-12,24,24); else if(i<goal) h+='<circle cx="'+s[0]+'" cy="'+s[1]+'" r="9" fill="none" stroke="#FBF8F1" stroke-width="2.4" stroke-dasharray="4 3" opacity=".85"/>'; });
     /* 바라는 것(집 위 점선 칸) */
-    (G.wants||[]).forEach(function(w,i){ var car=w.k==='car', x=ch?(G.ch?wantX(G,i):(car?24:120)):WANTX[i], ww=car?88:46, art=wantArt(w,G);
+    (G.wants||[]).forEach(function(w,i){ var car=w.k==='car', x=ch?(multi(G)?wantX(G,i):(car?24:120)):WANTX[i], ww=car?88:46, art=wantArt(w,G);
       h+='<g id="want'+i+'"><rect x="'+x+'" y="'+WANTY+'" width="'+ww+'" height="46" rx="10" class="f-paper" opacity="'+(w.got?1:.75)+'" stroke="'+(w.got?'#3E9C5A':'#8A6A2A')+'" stroke-width="2.4"'+(w.got?'':' stroke-dasharray="6 4"')+'/>';
       h+= w.got ? (car?useArt(art,x+4,WANTY+2,80,44):useArt(art,x+5,WANTY+4,36,38)) : '<g opacity=".3">'+(car?useArt(art,x+4,WANTY+2,80,44):useArt(art,x+5,WANTY+4,36,38))+'</g>';
       if(G.rHold!=null && !w.got && w.k==='bike') h+='<path d="M'+(x+8)+' '+(WANTY+8)+'l30 30m0-30l-30 30" stroke="#D9534F" stroke-width="6" stroke-linecap="round"/>';
       h+='</g>'; });
     /* 도전: 고른 차 칸에 바로 판정(맞으면 초록 체크, 남은 돈으로 자전거를 다 못 사는 차면 빨간 X) */
-    if(ch && G.ch && G.car){ var tp=TILE[G.car];
+    if(ch && vb(G) && G.car){ var tp=TILE[G.car];
       h+= G.carBad ? '<g data-verdict="bad"><rect x="'+(tp[0]+2)+'" y="'+(tp[1]+2)+'" width="'+(TW-4)+'" height="'+(TH-4)+'" rx="13" fill="none" stroke="#D9534F" stroke-width="5"/><path d="M'+(tp[0]+46)+' '+(tp[1]+14)+'l58 58m0-58l-58 58" stroke="#D9534F" stroke-width="9" stroke-linecap="round" opacity=".9"/></g>'
         : '<g data-verdict="ok" transform="translate('+(tp[0]+TW-22)+' '+(tp[1]+22)+')"><circle r="17" class="f-grn" stroke="#FBF8F1" stroke-width="3"/><path d="M-7 1l4.5 5.5 10-12" fill="none" stroke="#FBF8F1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>'; }
+    /* 블라인드 r2 상: 고른 순간 그 차 칸에 '남은 돈' 동전(자전거를 살 수 있나 바로 보이게) */
+    if(ch && G.car && G.rHold==null && G.phase==='play'){ var tq=TILE[G.car], n=G.purse, bw=Math.max(52,n*22+12);
+      h+='<g data-keep="남은 돈"><rect x="'+(tq[0]+6)+'" y="'+(tq[1]+6)+'" width="'+bw+'" height="30" rx="12" class="f-paper" stroke="#8C603F" stroke-width="2"/>';
+      if(n>0){ for(var q=0;q<n;q++) h+=useArt('coin',tq[0]+12+q*22,tq[1]+9,24,24); } else h+=txt(tq[0]+6+bw/2,tq[1]+28,'0',20,'#D9534F');
+      h+='</g>'; }
     /* 이윤 금고 */
     h+='<g opacity="'+(ch?0.4:1)+'"><rect x="'+JAR.x+'" y="'+JAR.y+'" width="'+JAR.w+'" height="'+JAR.h+'" rx="14" class="f-paper" opacity=".85" stroke="#55657A" stroke-width="3"/><rect x="'+(JAR.x+14)+'" y="'+(JAR.y-8)+'" width="'+(JAR.w-28)+'" height="12" rx="4" class="f-navyl"/>';
     for(var c=0;c<Math.min(6,G.jar||0);c++) h+=useArt('coin',JAR.x+8+(c%2)*22,JAR.y+JAR.h-30-Math.floor(c/2)*20,24,24);
@@ -953,6 +984,8 @@ var SCENE = (function(){
     if(!ch){ for(var s2=0;s2<Math.min(4,G.shelf||0);s2++) h+=useArt(G.good?'shirtG':'shirt',SHELF[s2][0]-18,SHELF[s2][1]-18,38,38); }
     /* 공장 위 새 기계 별(연구 뒤) */
     if(labOn(G) && G.lab && G.t>=G.labAt+T.labUp) h+='<g class="pop">'+useArt('spark',356,8,34,34)+'</g>';
+    /* B판 표지(가게와 함께 들어옴): 값이 다른 가게 */
+    if(ch && newShop(G)) h+='<g data-keep="새 가게"><rect x="356" y="118" width="248" height="40" rx="20" fill="#2A3A4E"/>'+txt(480,145,'값이 다른 자동차 가게!',22,'#FBF8F1')+'</g>';
     setH(L.st,h);
   }
   /* ---- 움직이는 것(매 프레임): 일하는 일꾼, 동전, 옷, 차 ---- */
@@ -969,7 +1002,7 @@ var SCENE = (function(){
         var tgt=choose(G)?(j.item==='bike'?TILE.bike:TILE[j.item]):SHELF[0];
         var src=choose(G)?[tgt[0]+TW/2,tgt[1]+TH/2]:[tgt[0],tgt[1]];
         if(d<0.3){ for(var k=0;k<j.price;k++) h+='<g opacity="'+(1-d/0.3*0.3).toFixed(2)+'">'+useArt('coin',src[0]-14+k*10,src[1]-34-k*6,26,26)+'</g>'; }
-        if(d<T.buyFly){ var p2=ez(d/T.buyFly), w=G.wants[j.wi], ch=choose(G), wx=ch?(G.ch?wantX(G,j.wi)+(j.wi===0?44:23):(j.wi===0?68:144)):WANTX[j.wi]+23, dst=[wx,WANTY+23], pt2=lerp(src,dst,p2); pt2[1]-=60*Math.sin(Math.PI*p2);
+        if(d<T.buyFly){ var p2=ez(d/T.buyFly), w=G.wants[j.wi], ch=choose(G), wx=ch?(multi(G)?wantX(G,j.wi)+(j.wi===0?44:23):(j.wi===0?68:144)):WANTX[j.wi]+23, dst=[wx,WANTY+23], pt2=lerp(src,dst,p2); pt2[1]-=60*Math.sin(Math.PI*p2);
           var art=j.item==='bike'?'bike':CARS[j.item]?CARS[j.item].art:j.item==='good'?'shirtG':'shirt', big=!!CARS[j.item];
           h+=useArt(art,pt2[0]-(big?40:18),pt2[1]-(big?24:18),big?80:36,big?48:36); }
         if(d>=T.profitAt && d<T.profitAt+T.profitFly){ var pp=ez((d-T.profitAt)/T.profitFly), from=choose(G)?[src[0],src[1]]:qp(AR.profit.d,0), c2=pp<0.5?lerp(from,qp(AR.profit.d,0),pp*2):qp(AR.profit.d,(pp-0.5)*2);
@@ -983,33 +1016,44 @@ var SCENE = (function(){
     L.mv.innerHTML=h;
   }
   /* ---- 3단계 끝 카드: 고른 차 / 다른 차라면 ---- */
-  function carBox(x,y,car,fam,budget,mine){
-    var left=budget-CARS[car].price, fit=CARS[car].seats>=fam, bike=fit && left>=BIKE.price, h='';
-    /* u2: 왜 합리적인지 그림으로 — 왼쪽: 차 + 'n인승' + 가족이 다 타면 초록 체크 / 오른쪽: 차를 사고 남은 동전 → 자전거(살 수 있으면 체크, 못 사면 빨간 X) */
-    var ck=function(cx,cy,r){ return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" class="f-grn"/><path d="M'+(cx-r*0.5)+' '+cy+'l'+(r*0.35)+' '+(r*0.35)+' '+(r*0.65)+'-'+(r*0.7)+'" fill="none" stroke="#FBF8F1" stroke-width="3.5" stroke-linecap="round"/>'; };
+  function carBox(x,y,car,fam,budget,mine,r){
+    /* 블라인드 r2 상(이유 표 과밀): 칸마다 그림 둘 — 차 / 자전거(체크 또는 빨간 X). 동전·화살표·글자 뺌 */
+    var cp=r&&r.cp, nb=(r&&r.nb)||1, bp=(r&&r.bp)||BIKE.price, left=budget-(cp?cp[car]:CARS[car].price), fit=CARS[car].seats>=fam, bike=fit && left>=bp*nb, h='';
+    var ck=function(cx,cy,rr){ return '<circle cx="'+cx+'" cy="'+cy+'" r="'+rr+'" class="f-grn"/><path d="M'+(cx-rr*0.5)+' '+cy+'l'+(rr*0.35)+' '+(rr*0.35)+' '+(rr*0.65)+'-'+(rr*0.7)+'" fill="none" stroke="#FBF8F1" stroke-width="3.5" stroke-linecap="round"/>'; };
     h+='<rect x="'+x+'" y="'+y+'" width="140" height="98" rx="12" class="f-paper" stroke="'+(mine?'#E8743B':'#B9B2A2')+'" stroke-width="'+(mine?4:2)+'"/>';
-    h+=useArt(CARS[car].art,x+2,y+4,80,48)+txt(x+36,y+82,CARS[car].seats+'인승',20,'#1E2B3A')+(fit?ck(x+78,y+75,10):'');
-    if(left>0) for(var c=0;c<Math.min(3,left);c++) h+=useArt('coin',x+94+c*14,y+6,18,18); else h+='<circle cx="'+(x+113)+'" cy="'+(y+15)+'" r="7" fill="none" stroke="#8C603F" stroke-width="2" stroke-dasharray="3 3"/>';
-    h+='<path d="M'+(x+113)+' '+(y+27)+'v7m-5-4l5 5 5-5" fill="none" stroke="#8C603F" stroke-width="2.6" stroke-linecap="round"/>';
-    h+=useArt('bike',x+92,y+38,42,32)+(bike?ck(x+113,y+82,12):'<path d="M'+(x+94)+' '+(y+40)+'l38 30m0-30l-38 30" stroke="#D9534F" stroke-width="5" stroke-linecap="round"/>');
+    h+=useArt(CARS[car].art,x+4,y+22,78,50);
+    h+=useArt('bike',x+86,y+26,48,38)+(bike?ck(x+110,y+76,13):'<g data-verdict="bad"><path d="M'+(x+88)+' '+(y+28)+'l44 34m0-34l-44 34" stroke="#D9534F" stroke-width="6" stroke-linecap="round"/></g>');
     return h;
   }
   function drawCard(G){
     var k=(G.phase==='stageEnd' && rule(G)==='choose' && !G.ch) ? 'c'+G.si : '';
     if(k===cardKey) return; cardKey=k; L.card.innerHTML=''; if(!k) return;
-    var R=G.rec[G.si]||[], h='<g class="cardIn"><rect x="300" y="158" width="338" height="258" rx="16" class="f-paper" stroke="#B9852F" stroke-width="2.5"/>';
+    var R=G.rec[G.si]||[]; if(R.length>2) R=R.slice(-2);   /* B판까지 하면 카드는 B판 두 판(1·2판은 칩으로) */
+    var h='<g class="cardIn"><rect x="300" y="158" width="338" height="258" rx="16" class="f-paper" stroke="#B9852F" stroke-width="2.5"/>';
     h+=txt(420,184,'고른 차',20,'#E8743B')+txt(564,184,'다른 차라면',20,'#55657A');
-    R.forEach(function(r,i){ var y0=194+i*110, alt=(r.car===r.best)?'c9':r.best;
-      h+=useArt('person07',308,y0+8,34,51)+txt(325,y0+86,r.fam+'명',21,'#1E2B3A');
-      h+=r.car?carBox(350,y0,r.car,r.fam,r.budget,true):'';
-      h+=carBox(494,y0,alt,r.fam,r.budget,false); });
+    R.forEach(function(r,i){ var y0=194+i*110, sf=smallFit(r), alt=(r.car!==r.best)?r.best:(sf!==r.best?sf:'c9');
+      h+=txt(325,y0+56,r.fam+'명',22,'#1E2B3A');
+      h+=r.car?carBox(350,y0,r.car,r.fam,r.budget,true,r):'';
+      h+=carBox(494,y0,alt,r.fam,r.budget,false,r); });
     h+='</g>'; L.card.innerHTML=h;
   }
   function renderScene(G){
     if(!svg) return;
-    var s=(G.si||0)+'|'+(G.phase==='title')+(G.ch?'|'+G.ch+'|'+G.round+'|'+JSON.stringify(G.cp)+G.bp:'');   /* 도전: 판마다 차 값이 바뀌어 바탕(차 칸 동전)을 다시 그림 */
+    var s=(G.si||0)+'|'+(G.phase==='title')+(G.ch?'|'+G.ch+'|'+G.round:'')+'|'+JSON.stringify(G.cp||0)+(G.bp||0);   /* 도전: 판마다 차 값이 바뀌어 바탕(차 칸 동전)을 다시 그림 */
     if(s!==sig){ sig=s; buildBg(G); arKey=''; L.st._k=''; }
     drawArrows(G); drawStatic(G); drawMove(G); drawCard(G);
+    var sx=slideX(G), tr=sx?'translate('+sx.toFixed(1)+' 0)':'', sg=L.bg.querySelector('#c2shop');
+    if(L.st.getAttribute('transform')!==tr){ L.st.setAttribute('transform',tr); L.mv.setAttribute('transform',tr); }
+    if(sg && sg.getAttribute('transform')!==tr) sg.setAttribute('transform',tr);
+    drawChip(G);
+  }
+  /* 앞 판 성과 칩(B판 동안): '1·2판' + 체크 + 알맞게 고른 판 수 */
+  function drawChip(G){
+    var k=(!G.ch && rule(G)==='choose' && G.phase!=='title' && G.round>=RB && G.prevA!=null) ? 'p'+G.prevA : '';
+    if(L.chip==null){ L.chip=el('g',{}); svg.appendChild(L.chip); }
+    if(L.chip._k===k) return; L.chip._k=k; if(!k){ L.chip.innerHTML=''; return; }
+    L.chip.innerHTML='<g data-keep="앞 판 칩" class="pop"><rect x="8" y="14" width="150" height="34" rx="17" fill="#33475C"/>'+txt(46,38,'1·2판',20,'#FBF8F1')
+      +'<circle cx="92" cy="31" r="11" class="f-grn"/><path d="M86 31l4 4 8-8" fill="none" stroke="#FBF8F1" stroke-width="3" stroke-linecap="round"/>'+txt(130,38,G.prevA+'/2',20,'#FBF8F1')+'</g>';
   }
   function vbRect(G,id){
     var p=String(id).split(':'), ch=choose(G);
@@ -1022,8 +1066,8 @@ var SCENE = (function(){
     if(p[0]==='car'||id==='bike'){ if(!ch) return null; var t=TILE[p[0]==='car'?p[1]:'bike']; return {x:t[0], y:t[1], w:TW, h:TH}; }
     if(id==='famBox') return ch?{x:6, y:58, w:296, h:86}:null;
     if(id==='house') return {x:HOUSE.x, y:HOUSE.y, w:HOUSE.w, h:HOUSE.h};
-    if(p[0]==='want'){ var j=+p[1]; if(ch && G.ch) return {x:wantX(G,j), y:WANTY, w:j===0?88:46, h:46}; if(ch) return j===0?{x:24,y:WANTY,w:88,h:46}:{x:120,y:WANTY,w:46,h:46}; return {x:WANTX[j]||WANTX[0], y:WANTY, w:46, h:46}; }
-    if(id==='wants') return ch?{x:24,y:WANTY,w:G.ch&&G.nb>1?194:142,h:46}:{x:WANTX[0], y:WANTY, w:150, h:46};
+    if(p[0]==='want'){ var j=+p[1]; if(ch && multi(G)) return {x:wantX(G,j), y:WANTY, w:j===0?88:46, h:46}; if(ch) return j===0?{x:24,y:WANTY,w:88,h:46}:{x:120,y:WANTY,w:46,h:46}; return {x:WANTX[j]||WANTX[0], y:WANTY, w:46, h:46}; }
+    if(id==='wants') return ch?{x:24,y:WANTY,w:multi(G)&&G.nb>1?194:142,h:46}:{x:WANTX[0], y:WANTY, w:150, h:46};
     if(p[0]==='ar'){ var a=AR[p[1]]; return a?{x:a.lx-27, y:a.ly-15, w:54, h:30}:null; }
     if(id==='card') return {x:300, y:158, w:338, h:258};
     if(id==='tag:house') return {x:67, y:389, w:62, h:30};
@@ -1045,7 +1089,8 @@ var SCENE = (function(){
   var css=".road{stroke:var(--a-sand-d)}.pop{transform-box:fill-box;transform-origin:50% 50%;animation:pop .28s ease-out}@keyframes pop{0%{transform:scale(.3);opacity:.2}70%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}"
     +".cardIn{animation:cin .35s ease-out .5s both}@keyframes cin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}"
     +".shopIn{animation:cin .5s ease-out .3s both}"
-    +"@media (prefers-reduced-motion: reduce){.pop,.cardIn,.shopIn{animation:none}}";
+    +".c2glow{animation:c2g 0.9s ease-in-out 4 alternate}@keyframes c2g{from{opacity:1}to{opacity:.25}}"
+    +"@media (prefers-reduced-motion: reduce){.pop,.cardIn,.shopIn,.c2glow{animation:none}}";
   return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, labels:labels, keepClear:keepClear, idleAt:idleAt, css:css, aspect:'640/420'};
 })();
 /* ===== SCENE-END ===== */

@@ -432,14 +432,25 @@ var KINDS = ['env', 'gap', 'buy', 'labor'];
 var PART = {env:'tkEnv', gap:'tkGap', buy:'tkBuy', labor:'tkLabor'};
 var BART = {fac:'factoryK', tower:'towerK', shop:'shopB'};
 var NLOT = 9;
-var T = { ready:1.0, coin0:0.25, coin1:0.85, probAt:0.95, prob2At:1.35, hold:1.0, pts:10, via:5, comboStep:2, comboCap:4, comboWin:6 };
-/* inc = 이 건물 하나가 가·나 집에 주는 소득(막대 길이 단위). 2단계 회사는 가 집에 많이, 나 집에 조금 → 막대 차이가 벌어진다 */
+var T = { ready:1.0, coin0:0.25, coin1:0.85, probAt:0.95, prob2At:1.35, hold:1.0, pts:10, via:5, comboStep:2, comboCap:4, comboWin:6, retryPts:4, roundGap:1.6, slideOut:0.6, slideIn:0.5 };
+/* 건물 종류: inc = 가·나 집 소득(막대 길이 단위), probs = 생기는 문제. 회사(tower)는 가 집에 많이, 나 집에 조금 → 막대 차이. 커진 공장(fac2)은 환경 + 노사 갈등 */
+var BLD = {
+  fac:   {art:'fac',   inc:[1,1],   probs:['env']},
+  tower: {art:'tower', inc:[3,0.5], probs:['gap']},
+  shop:  {art:'shop',  inc:[1,1],   probs:['buy']},
+  fac2:  {art:'fac',   inc:[1,1],   probs:['env','labor']}
+};
+/* 판 길이(2026-11-09, 엔진 §22): 2~4단계에 둘째 판 '옆 동네'. 앞 단계에서 본 건물이 섞여 나오고(새 조합), 열린 문제 칸이 많아 알맞은 칸을 골라야 한다.
+   틀린 칸에 놓으면 튕길 뿐 아니라 그 문제 그림이 건물 옆으로 돌아가 커지고(판정 표시), 다시 맞게 놓아도 4점(대가). 1단계는 배우는 단계라 한 판.
+   둘째 판은 새 빈 땅(옆 동네)이 밀려 들어오고, 소득 막대·문제 목록은 이어진다. 다음 단계 첫 판은 그 동네에 이어 짓는다 */
 var STAGES = [
-  {name:'공장이 생겨요', rule:'env',   bld:'fac',   n:3, inc:[1,1],   probs:['env'],          open:['env']},
-  {name:'회사가 생겨요', rule:'gap',   bld:'tower', n:2, inc:[3,0.5], probs:['gap'],          open:['env','gap']},
-  {name:'가게가 생겨요', rule:'buy',   bld:'shop',  n:2, inc:[1,1],   probs:['buy'],          open:['env','gap','buy']},
-  {name:'공장이 커져요', rule:'labor', bld:'fac',   n:2, inc:[1,1],   probs:['env','labor'],  open:['env','gap','buy','labor']}
+  {name:'공장이 생겨요', rule:'env',   rounds:[{q:['fac','fac','fac']}],                                     open:['env']},
+  {name:'회사가 생겨요', rule:'gap',   rounds:[{q:['tower','tower']}, {q:['fac','tower','fac']}],             open:['env','gap']},
+  {name:'가게가 생겨요', rule:'buy',   rounds:[{q:['shop','shop']}, {q:['tower','shop','fac','shop']}],       open:['env','gap','buy']},
+  {name:'공장이 커져요', rule:'labor', rounds:[{q:['fac2','fac2']}, {q:['shop','fac2','tower','fac2']}],      open:['env','gap','buy','labor']}
 ];
+STAGES.forEach(function(S){ S.bld=BLD[S.rounds[0].q[0]].art; S.n=S.rounds[0].q.length; S.probs=BLD[S.rounds[0].q[0]].probs; });   /* 옛 이름(장면·해 보기가 씀): 첫 판 건물 */
+function wantOf(si,k){ var n=0; STAGES[si].rounds.forEach(function(r){ r.q.forEach(function(b){ BLD[b].probs.forEach(function(q){ if(q===k) n++; }); }); }); return n; }
 var BADGES = [
   {k:'grow',  name:'경제성장', art:'bdGrow',  def:'우리나라 경제는 다른 나라보다 빠르게 자라 생활이 좋아졌지만, 여러 문제도 함께 나타났어요. (교과서 85쪽 참고)'},
   {k:'env',   name:'환경 문제', art:'bdEnv',   def:'자연을 마구 개발하고, 공장과 집에서 나오는 오염 물질과 쓰레기가 늘면서 환경 문제가 생겼어요. (교과서 85쪽 참고)'},
@@ -455,15 +466,16 @@ var NAMES = {
   buy:   '너무 많이 사요: <em>과소비</em>',
   labor: '임금 다툼: <em>노사 갈등</em>'
 };
-var TITLES = [[0,'새내기 시장'],[200,'도시 관찰자'],[260,'도시 탐정'],[275,'문제 찾기 대장']];   /* full 제안 0/220/280/290을 사람 속도에 맞게 조금 낮춤 */
+var TITLES = [[0,'새내기 시장'],[300,'도시 관찰자'],[520,'도시 탐정'],[690,'문제 찾기 대장']];   /* 판 늘린 뒤(11-09): 성실 712, 무작위 350~462(중앙 400), 힌트 연타 220 → 둘째는 힌트 위, 셋째는 무작위 최대 위, 넷째는 성실의 0.97 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function firstName(G,ev,k,at){ if(!G.first[k]){ G.first[k]=1; ev.push({t:'name', k:k, at:at}); } }
 function award(G,ev,k){ if(G.badges.indexOf(k)<0){ G.badges.push(k); ev.push({t:'badge', k:k}); } }
-function live(G){ return G && G.phase==='play' && G.t>=G.ready && G.holdAt==null; }
+function live(G){ return G && G.phase==='play' && G.t>=G.ready && G.holdAt==null && G.gapT<0; }
 function probOn(G,p){ return p.st==='map' && G.t>=p.at; }
 function waiting(G){ return (G.probs||[]).some(function(p){ return p.st==='map'; }); }   /* 생긴 문제를 목록에 옮기기 전에는 다음 건물을 못 짓는다(상자가 흐려짐) */
 function canBuild(G){ return G.trayN>0 && !waiting(G); }
+function curBld(G){ return (G.queue||[])[0] || null; }
 function freeLots(G){ var a=[]; for(var i=0;i<NLOT;i++) if(!G.lots[i]) a.push(i); return a; }
 /* 지금 막대 길이(동전이 도착한 만큼만). 장면과 단계 끝 카드가 같이 쓴다 */
 function incNow(G){
@@ -472,26 +484,39 @@ function incNow(G){
 }
 function incFinal(G){ var v=[1,1]; (G.blds||[]).forEach(function(b){ v[0]+=b.inc[0]; v[1]+=b.inc[1]; }); return v; }
 
+function startRound(G){
+  var R=STAGES[G.si].rounds[G.ri];
+  G.queue=R.q.slice(); G.trayN=G.queue.length; G.gapT=-1; G.r0=G.t; G.rk={first:0, n:0};
+  if(G.ri>0){ G.lots=[]; G.ready=G.t+T.slideIn; G.dist=(G.dist||0)+1; }   /* 옆 동네: 새 빈 땅. 들어오는 동안 입력 막음 */
+}
 function startStage(G0,si){
-  var G=cl(G0), S=STAGES[si];
-  G.si=si; G.phase='play'; G.combo=0; G.trayN=S.n; G.holdAt=null; G.ready=G.t+T.ready; G.lastAct=null;
+  var G=cl(G0), S=STAGES[si], tot=0;
+  G.si=si; G.ri=0; G.phase='play'; G.combo=0; G.holdAt=null; G.ready=G.t+T.ready; G.lastAct=null;
   G.rec[si]={inc0:incFinal(G), inc1:null, probs:{}};
-  G.res={total:S.n, served:0, missed:0};   /* 진행 칸 = 건물 하나(짓고, 생긴 문제를 모두 목록에 옮기면 체크) */
-  G.pend=[];
+  S.rounds.forEach(function(r){ tot+=r.q.length; });
+  G.res={total:tot, served:0, missed:0};   /* 진행 칸 = 건물 하나(짓고, 생긴 문제를 모두 목록에 옮기면 체크) */
+  G.pend=[]; G.chips=[]; G.badAt=null;
+  if(si>0){ G.lots=[]; G.dist=(G.dist||0)+1; }   /* 블라인드 r2: 앞 동네 건물이 새 단계에 남아 보임 → 단계마다 새 빈 땅(소득 막대·문제 목록은 이어짐) */
+  startRound(G);
   return G;
 }
 function newGame(seed){
   return {seed:(seed||SEED)>>>0, si:0, phase:'title', t:0, score:0, combo:0, first:{}, badges:[], lots:[], blds:[], probs:[], nid:1,
-    board:{env:0,gap:0,buy:0,labor:0}, trayN:0, holdAt:null, ready:0, lastAct:null, rec:[], res:{total:0,served:0,missed:0}, stats:{built:0, found:0}, pend:[]};
+    board:{env:0,gap:0,buy:0,labor:0}, trayN:0, queue:[], ri:0, gapT:-1, r0:0, dist:0, chips:[], badAt:null, rk:{first:0,n:0}, holdAt:null, ready:0, lastAct:null, rec:[], res:{total:0,served:0,missed:0}, stats:{built:0, found:0, wrong:0}, pend:[]};
 }
 function start(G){ var g=cl(G); g.score=0; g.t=0; return startStage(g,0); }
 
-function stageDone(G){ return G.trayN===0 && G.probs.every(function(p){ return p.st==='board'; }); }
+function roundDone(G){ return G.trayN===0 && G.probs.every(function(p){ return p.st==='board'; }); }
+function stageDone(G){ return roundDone(G) && G.ri>=STAGES[G.si].rounds.length-1; }
 function tick(G0,dt){
   var G=cl(G0), ev=G.pend||[]; G.pend=[];
   if(G.phase!=='play') return {G:G, ev:ev};
   G.t+=dt;
   G.probs.forEach(function(p){ if(p.st==='map' && !p.shown && G.t>=p.at){ p.shown=1; ev.push({t:'appear', id:p.id, k:p.k}); } });
+  if(G.badAt && G.t-G.badAt.t>1.6) G.badAt=null;
+  if(G.gapT>=0){ G.gapT-=dt; if(G.gapT<0){ G.ri++; startRound(G); ev.push({t:'newRound', ri:G.ri}); } return {G:G, ev:ev}; }
+  if(G.holdAt==null && G.gapT<0 && roundDone(G) && !stageDone(G)){
+    G.chips.push({ri:G.ri, first:G.rk.first, n:G.rk.n, lots:G.lots.slice()}); G.gapT=T.roundGap; ev.push({t:'roundEnd', ri:G.ri}); return {G:G, ev:ev}; }
   if(G.holdAt==null && stageDone(G)) G.holdAt=G.t+T.hold;
   if(G.holdAt!=null && G.t>=G.holdAt){
     G.phase='stageEnd'; G.rec[G.si].inc1=incFinal(G);
@@ -516,11 +541,11 @@ function drop(G0,src,dst,via){
     if(dp[0]!=='lot') return fail('dst');
     var li=+dp[1]; if(!(li>=0 && li<NLOT)) return fail('dst');
     if(G0.lots[li]) return fail('taken');
-    var G=cl(G0), ev=[], b={lot:li, k:S.bld, at:G.t, inc:S.inc.slice(), si:G.si, need:S.probs.length}, bid=G0.blds.length;
-    G.lots[li]=S.bld; G.blds.push(b); G.trayN--; G.stats.built++;
-    S.probs.forEach(function(k,j){ G.probs.push({id:G.nid++, k:k, bid:bid, lot:k==='gap'?-1:li, slot:j, at:G.t+(j?T.prob2At:T.probAt), st:'map', si:G.si}); });
+    var G=cl(G0), ev=[], bk=G.queue[0], B=BLD[bk], b={lot:li, k:B.art, at:G.t, inc:B.inc.slice(), si:G.si, need:B.probs.length, d:G.dist}, bid=G0.blds.length;
+    G.lots[li]=B.art; G.blds.push(b); G.queue.shift(); G.trayN=G.queue.length; G.stats.built++;
+    B.probs.forEach(function(k,j){ G.probs.push({id:G.nid++, k:k, bid:bid, lot:k==='gap'?-1:li, slot:j, at:G.t+(j?T.prob2At:T.probAt), st:'map', si:G.si, wrong:0}); });
     var pts=bump(G,via); G.score+=pts;
-    ev.push({t:'build', lot:li, k:S.bld, pts:pts, combo:via?0:G.combo});
+    ev.push({t:'build', lot:li, k:B.art, pts:pts, combo:via?0:G.combo});
     firstName(G,ev,'grow','lot:'+li);
     return {G:G, ok:true, ev:ev};
   }
@@ -530,11 +555,14 @@ function drop(G0,src,dst,via){
     if(dp[0]==='lot') return fail('notLot');
     if(dp[0]!=='board' || KINDS.indexOf(dp[1])<0) return fail('dst');
     if(S.open.indexOf(dp[1])<0) return fail('locked');
-    if(dp[1]!==p0.k){ var g1=cl(G0); g1.combo=0; return fail('wrongSlot',g1); }
+    if(dp[1]!==p0.k){   /* 틀린 칸: 튕기고, 그 문제 그림이 건물 옆에서 커진다(대가: 다시 맞게 놓아도 4점), 놓은 칸에 빨간 가위표 */
+      var g1=cl(G0), q1=g1.probs.find(function(x){ return x.id===p0.id; }); g1.combo=0; g1.lastAct=null; q1.wrong=(q1.wrong||0)+1; g1.stats.wrong++; g1.badAt={k:dp[1], t:g1.t, id:q1.id};   /* 블라인드 r2: 손해로 읽히게 — 콤보 끊고(다음 맞은 수도 콤보 없이 시작), 놓은 칸에 회색 '+0', 그 문제는 다시 맞게 놓아도 +4. (튕긴 놓기에서 점수를 깎는 것은 check.js가 막음) */
+      return {G:g1, ok:false, why:'w_'+p0.k, ev:[{t:'bounce', why:'w_'+p0.k, src:src, dst:dst}, {t:'wrongProb', id:q1.id, k:p0.k, at:dp[1]}]}; }
     var G2=cl(G0), ev2=[], p=G2.probs.find(function(x){ return x.id===p0.id; });
     p.st='board'; p.bt=G2.t; G2.board[p.k]++; G2.stats.found++; G2.rec[G2.si].probs[p.k]=(G2.rec[G2.si].probs[p.k]||0)+1;
-    var pts2=bump(G2,via); G2.score+=pts2; var bb=G2.blds[p.bid]; bb.need--; if(bb.need<=0) G2.res.served++;
-    ev2.push({t:'file', id:p.id, k:p.k, pts:pts2, combo:via?0:G2.combo});
+    G2.rk.n++; if(!p.wrong && !via) G2.rk.first++;
+    var pts2=p.wrong ? (G2.combo=0, T.retryPts) : bump(G2,via); G2.score+=pts2; var bb=G2.blds[p.bid]; bb.need--; if(bb.need<=0) G2.res.served++;
+    ev2.push({t:'file', id:p.id, k:p.k, pts:pts2, combo:(via||p.wrong)?0:G2.combo});
     award(G2,ev2,p.k); firstName(G2,ev2,p.k,'board:'+p.k);
     return {G:G2, ok:true, ev:ev2};
   }
@@ -551,11 +579,11 @@ function hintMove(G){
 }
 function sources(G){ if(!live(G)) return []; var a=[]; if(canBuild(G)) a.push('tray'); G.probs.forEach(function(p){ if(probOn(G,p)) a.push('prob:'+p.id); }); return a; }
 function targets(G){ if(!live(G)) return []; var a=freeLots(G).map(function(i){ return 'lot:'+i; }); STAGES[G.si].open.forEach(function(k){ a.push('board:'+k); }); return a; }
-function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='tray') return BART[STAGES[G.si].bld]; if(p[0]==='prob'){ var q=G.probs.find(function(x){ return String(x.id)===p[1]; }); return q?PART[q.k]:null; } return null; }
+function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='tray'){ var cb=curBld(G); return cb ? BART[BLD[cb].art] : null; } if(p[0]==='prob'){ var q=G.probs.find(function(x){ return String(x.id)===p[1]; }); return q?PART[q.k]:null; } return null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
 if(typeof module!=='undefined') module.exports={SEED:SEED,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,T:T,KINDS:KINDS,PART:PART,BART:BART,NLOT:NLOT,
-  newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,canBuild:canBuild,incNow:incNow,incFinal:incFinal,probOn:probOn};
+  BLD:BLD,wantOf:wantOf,curBld:curBld,newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,canBuild:canBuild,incNow:incNow,incFinal:incFinal,probOn:probOn};
 /* LOGIC-END */
 
 /* ===== ① GAME-START: 게임 설정 (games/<이름>/game.js) ===== */
@@ -611,7 +639,7 @@ var GAME = {
   ],
   rulesModal: {
     cards: [['rBuild','건물을 빈 땅에'],['rEnv','생긴 문제를 문제 칸에'],['rGap','칸마다 다른 문제']],
-    note: '맞지 않는 칸에 놓으면 돌아와요.'
+    note: '맞지 않는 칸이면 돌아가 커져요.'
   },
   stageRibbon: function(G){ return ['소득도, 쓰레기도 늘었어!','소득 차이가 벌어졌어!','쇼핑백이 잔뜩!','문제 목록 완성!'][G.si]; },
   result: {
@@ -629,6 +657,11 @@ var GAME = {
     bounce: '다시!',
     reasons: {
       wrongSlot: {line:'다른 문제예요', why:'그림을 다시 봐요. 쓰레기·소득 차이·쇼핑백·팻말은 서로 다른 문제예요'},
+      /* 2차(11-09): 틀린 칸이면 놓은 칸 옆에 그 그림의 뜻 한 줄(이유별로 다르게), 그림은 건물 옆으로 돌아가 커진다 */
+      w_env:   {line:'', say:'쓰레기·연기는 환경 문제', why:'공장에서 나온 쓰레기와 연기는 환경 문제예요. 다시 맞게 놓아도 4점이에요', page:'교과서 85쪽 참고'},
+      w_gap:   {line:'', say:'막대 차이는 빈부 격차', why:'가 집과 나 집 막대 길이가 벌어진 것은 빈부 격차예요. 다시 맞게 놓아도 4점이에요', page:'교과서 86쪽 참고'},
+      w_buy:   {line:'', say:'쇼핑백 더미는 과소비', why:'필요보다 많이 사서 쌓인 쇼핑백은 과소비예요. 다시 맞게 놓아도 4점이에요', page:'교과서 87쪽 참고'},
+      w_labor: {line:'', say:'팻말은 노사 갈등', why:'임금을 두고 팻말을 든 근로자는 노사 갈등이에요. 다시 맞게 놓아도 4점이에요', page:'교과서 87쪽 참고'},
       taken:     {line:'이미 건물이 있어요', why:'점선으로 된 빈 땅에 지어요'},
       notProb:   {line:'건물은 땅에', why:'건물은 점선 빈 땅에, 생긴 문제는 오른쪽 문제 칸에 놓아요'},
       notLot:    {line:'문제는 문제 칸에', why:'생긴 문제 그림은 오른쪽 문제 목록 칸에 놓아요'},
@@ -653,6 +686,8 @@ var GAME = {
     else if(e.t==='file'){ FX.score('board:'+e.k, e.pts, false, e.combo); FX.burst('board:'+e.k, 8); FX.progress();
       FX.explain({def:NOPG(BADGES[KINDS.indexOf(e.k)+1].def), page:'교과서 '+({env:85,gap:86,buy:87,labor:87})[e.k]+'쪽 참고'}); }
     else if(e.t==='bounce') FX.comboOff();
+    else if(e.t==='roundEnd' || e.t==='newRound'){ if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0;   /* 앞 판 말풍선이 옆 동네에 뜨지 않게 */
+      if(e.t==='newRound') FX.burst('lot:4', 8); }
   }
 };
 /* ===== GAME-END ===== */
@@ -689,6 +724,7 @@ var SCENE = (function(){
   var BAR={x:232, w:122, y:[340,380], h:28, max:14};
   var GAPPOS={x:362, y:344, s:50};
   var LABEL={env:'환경 문제', gap:'빈부 격차', buy:'과소비', labor:'노사 갈등'};
+  var WHYLINE={env:'쓰레기·연기는 환경 문제', gap:'막대 차이는 빈부 격차', buy:'쇼핑백 더미는 과소비', labor:'팻말은 노사 갈등'};
   function el(tag,attrs,html){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(html!=null) e.innerHTML=html; return e; }
   function txt(x,y,s,size,fill,anchor,extra){ return '<text x="'+x+'" y="'+y+'" text-anchor="'+(anchor||'middle')+'" font-family="Jua,sans-serif" font-size="'+(size||20)+'" fill="'+(fill||'#1E2B3A')+'"'+(extra||'')+'>'+s+'</text>'; }
   function lotXY(i){ return {x:LOT0.x+(i%3)*PITCH, y:LOT0.y+Math.floor(i/3)*PITCH}; }
@@ -697,7 +733,9 @@ var SCENE = (function(){
   function isOpen(G,k){ return G.phase!=='title' && stg(G).open.indexOf(k)>=0; }
   function mount(host){
     svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
-    ['bg','lots','bars','board','probs','coins','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
+    svg.appendChild(el('defs',{},'<clipPath id="a7lotclip"><rect x="'+(LOT0.x-8)+'" y="'+(LOT0.y-8)+'" width="'+(PITCH*3+2)+'" height="'+(PITCH*3+2)+'" rx="16"/></clipPath>'));
+    ['bg','lotclip','tray','bars','board','probs','coins','note','card'].forEach(function(k){ L[k]=el('g',{}); svg.appendChild(L[k]); });
+    L.lotclip.setAttribute('clip-path','url(#a7lotclip)'); L.lots=el('g',{}); L.lotclip.appendChild(L.lots);   /* 옆 동네로 밀려 나가는 땅은 도시 판 안에서만 보인다 */
     host.insertBefore(svg, host.firstChild);
   }
   function bldArt(k,x,y){
@@ -706,8 +744,19 @@ var SCENE = (function(){
     return useArt('shopB',x+7,y+6,76,76);
   }
   function probRect(G,p){
-    if(p.k==='gap') return {x:GAPPOS.x, y:GAPPOS.y, w:GAPPOS.s, h:GAPPOS.s};
-    var c=lotXY(p.lot); return p.slot ? {x:c.x-6, y:c.y+44, w:50, h:50} : {x:c.x+46, y:c.y+44, w:50, h:50};
+    var r;
+    if(p.k==='gap') r={x:GAPPOS.x, y:GAPPOS.y, w:GAPPOS.s, h:GAPPOS.s};
+    else { var c=lotXY(p.lot); r=p.slot ? {x:c.x-6, y:c.y+44, w:50, h:50} : {x:c.x+46, y:c.y+44, w:50, h:50}; }
+    var g=Math.min(2,p.wrong||0)*12;   /* 틀린 칸에 놓았던 문제는 커진다(대가가 보임) */
+    if(g){ r={x:r.x-g/2, y:r.y-g/2, w:r.w+g, h:r.h+g}; if(p.k==='gap') r.x=Math.min(r.x, VB.w-BOARD.w-12-r.w); }
+    return r;
+  }
+  /* 판 바뀜(옆 동네): 끝난 동네가 왼쪽으로 밀려 나가고(0.6초) 새 빈 땅이 오른쪽에서 들어온다(0.5초, 그동안 입력 막힘) */
+  function slideX(G){
+    if(!G || G.phase!=='play') return 0;
+    if(G.gapT>=0 && G.gapT<T.slideOut){ var e=1-G.gapT/T.slideOut; return -e*e*560; }
+    if(G.ri>0 && G.gapT<0 && G.t-G.r0<T.slideIn){ var q=1-(G.t-G.r0)/T.slideIn; return q*q*560; }
+    return 0;
   }
   /* ---- 바탕 ---- */
   function buildBg(G){
@@ -717,7 +766,7 @@ var SCENE = (function(){
     h+='<rect x="8" y="58" width="104" height="206" rx="14" class="f-woodd"/><rect x="8" y="56" width="104" height="202" rx="14" class="f-wood"/>';
     h+=txt(60,84,'지을 건물',20,'#1E2B3A');
     /* 소득 막대 */
-    h+='<rect x="'+(LOT0.x-8)+'" y="320" width="300" height="96" rx="14" class="f-paper"/>';
+    h+='<rect x="'+(LOT0.x-8)+'" y="316" width="300" height="100" rx="14" class="f-paper"/>';
     h+=txt(BAR.x,336,'소득',20,'#55657A','start');
     /* u2: 두 집을 사람 그림 + 집 + '가 집'·'나 집' 이름으로(블라인드: 가·나가 누구인지 모름) */
     [0,1].forEach(function(i){ var y=BAR.y[i], pc=i?'#3C9064':'#2E6F8E';
@@ -725,25 +774,28 @@ var SCENE = (function(){
       h+=useArt(i?'houseB':'houseA',140,y-10,40,40)+txt(182,y+21,i?'나 집':'가 집',20,'#1E2B3A','start');
       h+='<rect x="'+BAR.x+'" y="'+y+'" width="'+BAR.w+'" height="'+BAR.h+'" rx="8" class="f-paperd"/>'; });
     L.bg.innerHTML=h;
-    L.bars.innerHTML='<rect id="a7b0" x="'+BAR.x+'" y="'+BAR.y[0]+'" width="10" height="'+BAR.h+'" rx="8" class="f-grn"/><rect id="a7b1" x="'+BAR.x+'" y="'+BAR.y[1]+'" width="10" height="'+BAR.h+'" rx="8" class="f-grn"/>'
+    L.bars.innerHTML='<g id="a7b0"></g>'
       +'<g id="a7gap" style="display:none"><path d="" stroke="#D9534F" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="" stroke="#D9534F" stroke-width="3" fill="none" stroke-dasharray="4 4"/></g>';
-    barEl=[L.bars.querySelector('#a7b0'), L.bars.querySelector('#a7b1'), L.bars.querySelector('#a7gap')];
+    barEl=[L.bars.querySelector('#a7b0'), null, L.bars.querySelector('#a7gap')]; barKey='';
   }
   /* ---- 땅·건물 ---- */
   function drawLots(G){
     var h='', tray=G.phase!=='title' && G.trayN>0;
     for(var i=0;i<NLOT;i++){ var c=lotXY(i), k=G.lots[i];
       if(!k){ h+='<rect x="'+(c.x+3)+'" y="'+(c.y+3)+'" width="'+(CELL-6)+'" height="'+(CELL-6)+'" rx="12" class="f-paper" opacity="'+(tray?'.6':'.35')+'" stroke="#8A6A2A" stroke-width="2.5" stroke-dasharray="7 5"/>'; continue; }
-      var b=(G.blds||[]).find(function(x){ return x.lot===i; }), fresh=b && G.t-b.at<0.4 && !RM;
+      var b=(G.blds||[]).find(function(x){ return x.lot===i && (x.d||0)===(G.dist||0); }), fresh=b && G.t-b.at<0.4 && !RM;
       h+='<rect x="'+c.x+'" y="'+(c.y+CELL-22)+'" width="'+CELL+'" height="22" rx="8" class="f-sandd"/>';
       h+=fresh?'<g class="a7pop">'+bldArt(k,c.x,c.y)+'</g>':bldArt(k,c.x,c.y);
     }
-    /* 상자 안 건물(남은 수만큼 아래 점) */
-    if(G.phase!=='title' && G.trayN>0){
-      h+='<g data-keep="지을 건물" opacity="'+(canBuild(G)?1:.35)+'">'+bldArt(stg(G).bld,16,104)+'</g>';
-      for(var n=0;n<G.trayN;n++) h+='<rect x="'+(60-G.trayN*11+n*22+3)+'" y="226" width="16" height="16" rx="4" class="f-org"/>';
+    L.lots.innerHTML=h; h='';
+    /* 상자 안 건물(지금 지을 것) + 남은 건물(작은 그림 줄, 둘째 판은 섞여 있음) */
+    var cb=curBld(G);
+    if(G.phase!=='title' && cb){
+      h+='<g data-keep="지을 건물" opacity="'+(canBuild(G)?1:.35)+'">'+bldArt(BLD[cb].art,16,104)+'</g>';
+      var rest=(G.queue||[]).slice(1), w=Math.min(30,92/Math.max(1,rest.length));
+      rest.forEach(function(k,n){ var a=BLD[k].art; h+=useArt(a==='fac'?'factoryK':a==='tower'?'towerK':'shopB', 60-rest.length*w/2+n*w, 214, 28, 28); });
     } else if(G.phase!=='title') h+='<rect x="22" y="104" width="76" height="110" rx="12" class="f-woodd" opacity=".35"/>';
-    L.lots.innerHTML=h;
+    L.tray.innerHTML=h;
   }
   /* ---- 문제 목록 ---- */
   function drawBoard(G){
@@ -754,29 +806,64 @@ var SCENE = (function(){
       var now=G.phase==='play' && S.open[S.open.length-1]===k;
       h+='<rect x="'+BOARD.x+'" y="'+y+'" width="'+BOARD.w+'" height="'+BOARD.h+'" rx="14" class="f-paper" stroke="'+(now?'#E8743B':'#B9852F')+'" stroke-width="'+(now?4:2.5)+'"/>';
       h+=txt(BOARD.x+12,y+26,LABEL[k],21,'#1E2B3A','start');
-      var want=0; if(G.phase==='play'||G.phase==='stageEnd') S.probs.forEach(function(q){ if(q===k) want+=S.n; });
+      var want=0; if(G.phase==='play'||G.phase==='stageEnd') want=wantOf(G.si,k);
       var mine=(G.rec[G.si]&&G.rec[G.si].probs[k])||0, dash=Math.max(0,want-mine), tot=n+dash, sz=40, gap=Math.min(42,(BOARD.w-16-sz)/Math.max(1,tot-1));
+      if(tot>6){   /* 블라인드 r2: 아이콘 12개가 얼룩으로 뭉침 → 넣은 것은 그림 하나 + 숫자, 남은 자리만 점선 */
+        var lastB=G.probs.filter(function(p){ return p.k===k && p.st==='board'; }).sort(function(a,b){ return b.bt-a.bt; })[0], popB=lastB && G.t-lastB.bt<0.35 && !RM;
+        if(n) h+=(popB?'<g class="a7pop">':'<g>')+useArt(PART[k],BOARD.x+8,y+40,sz,sz)+'</g>'+txt(BOARD.x+8+sz+6,y+68,'×'+n,24,'#1E2B3A','start');
+        for(var d=0;d<dash;d++){ var dx=BOARD.x+(n?104:8)+d*26; h+='<rect x="'+dx+'" y="'+(y+44)+'" width="22" height="32" rx="6" fill="none" stroke="#8A6A2A" stroke-width="2.4" stroke-dasharray="5 4" opacity=".7"/>'; }
+        tot=0; }
       for(var j=0;j<tot;j++){ var x=BOARD.x+8+j*gap, yy=y+40;
         if(j<n){ var last=G.probs.filter(function(p){ return p.k===k && p.st==='board'; }).sort(function(a,b){ return b.bt-a.bt; })[0], pop=j===n-1 && last && G.t-last.bt<0.35 && !RM;
           h+=(pop?'<g class="a7pop">':'')+useArt(PART[k],x,yy,sz,sz)+(pop?'</g>':''); }
         else h+='<rect x="'+(x+2)+'" y="'+(yy+2)+'" width="'+(sz-4)+'" height="'+(sz-4)+'" rx="8" fill="none" stroke="#8A6A2A" stroke-width="2.4" stroke-dasharray="6 4" opacity=".7"/>';
       }
     });
+    /* 틀린 칸: 놓은 칸에 빨간 가위표(1.6초) */
+    if(G.badAt && G.phase==='play'){ var by=slotY(G.badAt.k), bx=BOARD.x+BOARD.w-30;
+      h+='<g data-verdict="bad"><circle cx="'+bx+'" cy="'+(by+22)+'" r="15" class="f-paper" stroke="#D2483C" stroke-width="3"/><path d="M'+(bx-7)+' '+(by+15)+'l14 14M'+(bx+7)+' '+(by+15)+'l-14 14" stroke="#D2483C" stroke-width="3.6" stroke-linecap="round"/>'+'<g opacity=".85">'+txt(bx-28,by+30,'+0',24,'#8A94A0','end')+'<path d="M'+(bx-66)+' '+(by+22)+'h40" stroke="#8A94A0" stroke-width="3"/></g>'+'</g>'; }
+    /* 놓은 칸 안에 이유 한 줄(문제 종류마다 다름) — 엔진 말풍선은 칸을 피해 멀리 떠서 장면이 직접 그린다 */
+    if(G.badAt && G.phase==='play'){ var bq=(G.probs||[]).find(function(x){ return x.id===G.badAt.id; });
+      if(bq){ var py=slotY(G.badAt.k)+44; h+='<g data-verdict="bad"><rect x="'+(BOARD.x+5)+'" y="'+py+'" width="'+(BOARD.w-10)+'" height="38" rx="12" class="f-paper" stroke="#D2483C" stroke-width="2.5"/>'+txt(BOARD.x+BOARD.w/2,py+26,WHYLINE[bq.k],19,'#D2483C')+'</g>'; } }
     L.board.innerHTML=h;
+  }
+  /* 판 안내: 새 판 표지 '옆 동네!'(들어오는 순간부터 1.6초) + 앞 판 성과 칩(상자 위, 별 = 처음에 맞게 넣은 문제) */
+  function drawNote(G){
+    var h='';
+    if(G.phase==='play' && G.ri>0 && G.t-G.r0<1.6){ var cx=LOT0.x+PITCH*1.5-4; h+='<g><rect x="'+(cx-80)+'" y="'+(LOT0.y+PITCH-22)+'" width="160" height="44" rx="22" class="f-paper" stroke="#E8743B" stroke-width="3"/>'+txt(cx,LOT0.y+PITCH+8,'옆 동네!',22,'#E8743B')+'</g>'; }
+    /* 블라인드 r2: '1판 별 n'의 뜻이 안 읽힘 → 앞 동네 작은 그림(지은 건물 그대로) + 별 셋(처음에 맞게 넣은 비율) */
+    if(G.phase==='play' || G.phase==='stageEnd') (G.chips||[]).slice(-1).forEach(function(c){ var y=6, st=c.n&&c.first===c.n?3:c.n&&c.first>=c.n*0.6?2:c.first>0?1:0;
+      h+='<g><rect x="8" y="'+y+'" width="104" height="46" rx="10" class="f-paper" stroke="#B9852F" stroke-width="2"/><rect x="12" y="'+(y+4)+'" width="38" height="38" rx="5" class="f-landd" opacity=".6"/>';
+      for(var i=0;i<9;i++){ var a=(c.lots||[])[i], mx=13+(i%3)*12.3, my=y+5+Math.floor(i/3)*12.3;
+        if(a) h+=useArt(a==='fac'?'factoryK':a==='tower'?'towerK':'shopB',mx,my,12,12); else h+='<rect x="'+(mx+1.5)+'" y="'+(my+1.5)+'" width="9" height="9" rx="2" fill="none" stroke="#8A6A2A" stroke-width="1" opacity=".6"/>'; }
+      for(var j=0;j<3;j++){ var sx=56+j*18, sy=y+15; h+='<path d="M'+(sx+8)+' '+sy+'l2.4 5 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8z" fill="'+(j<st?'#F2B233':'none')+'" stroke="#C9971F" stroke-width="1.4"/>'; }
+      h+='</g>'; });
+    L.note.innerHTML=h;
   }
   function drawProbs(G){
     var h='';
     (G.probs||[]).forEach(function(p){ if(p.st!=='map' || G.t<p.at) return; var r=probRect(G,p), fresh=G.t-p.at<0.35 && !RM;
-      h+='<g'+(fresh?' class="a7pop"':'')+'><circle cx="'+(r.x+r.w/2)+'" cy="'+(r.y+r.h/2)+'" r="'+(r.w/2+3)+'" class="f-paper" stroke="#D9534F" stroke-width="3"/>'+useArt(PART[p.k],r.x+3,r.y+3,r.w-6,r.h-6)+'</g>'; });
+      h+='<g'+(fresh?' class="a7pop"':'')+(p.wrong?' data-verdict="bad"':'')+'><circle cx="'+(r.x+r.w/2)+'" cy="'+(r.y+r.h/2)+'" r="'+(r.w/2+3)+'" class="f-paper" stroke="#D9534F" stroke-width="'+(p.wrong?5:3)+'"/>'+useArt(PART[p.k],r.x+3,r.y+3,r.w-6,r.h-6)+'</g>'; });
     L.probs.innerHTML=h;
   }
   /* ---- 동전·막대(매 프레임) ---- */
+  /* 막대 눈금(블라인드 r2): 게임 전체 한 눈금(한 줄 = 16칸, 1단계 막대가 옛 판과 거의 같은 길이). 둘째 판 건물로 16칸을 넘으면
+     막대가 두 줄로 접히고 줄 높이를 반으로 줄여 같은 칸 안에 맞춘다(눈금은 그대로라 단계 사이 '처음' 막대가 들쭉날쭉하지 않음) */
+  var CAP=16;
+  function rowsSvg(x,y,w,h,v,cls,minW){
+    v=Math.max(0,v);
+    if(v<=CAP) return '<rect x="'+x+'" y="'+y+'" width="'+Math.max(minW,v/CAP*w).toFixed(1)+'" height="'+h+'" rx="'+Math.min(8,h/2.5).toFixed(1)+'" class="'+cls+'"/>';
+    var rh=(h-2)/2; return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+rh.toFixed(1)+'" rx="4" class="'+cls+'"/><rect x="'+x+'" y="'+(y+rh+2).toFixed(1)+'" width="'+Math.max(4,Math.min(1,(v-CAP)/CAP)*w).toFixed(1)+'" height="'+rh.toFixed(1)+'" rx="4" class="'+cls+'"/>';
+  }
+  function endX(v){ return BAR.x+(v<=CAP ? v : v-CAP)/CAP*BAR.w; }
+  var barKey='';
   function drawBars(G){
-    if(!barEl) return; var v=G.phase==='title'?[1,1]:incNow(G), u=BAR.w/BAR.max;
-    barEl[0].setAttribute('width',Math.max(10,v[0]*u).toFixed(1)); barEl[1].setAttribute('width',Math.max(10,v[1]*u).toFixed(1));
-    var d=v[0]-v[1];
-    /* u2: 차이를 양쪽 화살표로(가 집 막대 끝에서 점선이 내려와 나 집 막대 끝까지) */
-    if(d>1.2){ var x1=BAR.x+v[1]*u+4, x2=BAR.x+v[0]*u-2, ym=BAR.y[1]+BAR.h/2;
+    if(!barEl) return; var v=G.phase==='title'?[1,1]:incNow(G), k=v.map(function(x){ return Math.round(x*20); }).join(',');
+    if(k===barKey) return; barKey=k;
+    barEl[0].innerHTML=rowsSvg(BAR.x,BAR.y[0],BAR.w,BAR.h,v[0],'f-grn',10)+rowsSvg(BAR.x,BAR.y[1],BAR.w,BAR.h,v[1],'f-grn',10);
+    /* u2: 차이를 양쪽 화살표로(가 집 막대 끝에서 점선이 내려와 나 집 막대 끝까지). 가 집이 두 줄이면 나 집 줄 끝까지 */
+    var x1=BAR.x+Math.min(v[1],CAP)/CAP*BAR.w+4, x2=BAR.x+Math.min(v[0],CAP)/CAP*BAR.w-2, ym=BAR.y[1]+BAR.h/2;
+    if(v[0]-v[1]>1.2 && v[1]<=CAP && x2-x1>26){
       barEl[2].style.display=''; barEl[2].firstChild.setAttribute('d','M'+(x1+9).toFixed(1)+' '+ym+'H'+(x2-9).toFixed(1)+'M'+(x1+10).toFixed(1)+' '+(ym-7)+'l-9 7 9 7M'+(x2-10).toFixed(1)+' '+(ym-7)+'l9 7-9 7');
       barEl[2].lastChild.setAttribute('d','M'+x2.toFixed(1)+' '+(BAR.y[0]+BAR.h)+'V'+(ym-6)); }
     else barEl[2].style.display='none';
@@ -789,7 +876,7 @@ var SCENE = (function(){
       [0,1].forEach(function(hh){ var n=Math.max(1,Math.round(b.inc[hh]*1.4)); if(b.inc[hh]<1) n=1;
         for(var j=0;j<n;j++){ var key=bi+':'+hh+':'+j, e=coinEl[key]; seen[key]=1;
           if(!e){ e=coinEl[key]=el('g',{}, useArt('coin',-12,-12,24,24)); L.coins.appendChild(e); }
-          var q=Math.max(0,Math.min(1,(p-0.25-j*0.06)/0.6)), ex=BAR.x+((b.inc[hh]>=1?1:0.4)*BAR.w*0.6), ey=BAR.y[hh]+BAR.h/2, x, y;
+          var q=Math.max(0,Math.min(1,(p-0.25-j*0.06)/0.6)), ex=Math.min(BAR.x+BAR.w-8,endX(incNow(G)[hh])), ey=BAR.y[hh]+BAR.h/2, x, y;
           if(q<=0){ x=sx+(hh?10:-10)+j*4; y=sy-24*Math.min(1,p/0.25); }
           else { var qq=q*q*(3-2*q); x=sx+(ex-sx)*qq; y=sy-24+(ey-sy+24)*qq-40*Math.sin(Math.PI*q); }
           e.setAttribute('transform','translate('+x.toFixed(1)+' '+y.toFixed(1)+')'); e.style.opacity=q>=0.98?0:1; }
@@ -800,17 +887,18 @@ var SCENE = (function(){
   /* ---- 단계 끝 카드: 좋아진 것(처음 → 지금 막대) / 생긴 문제 ---- */
   function drawCard(G){
     var k=G.phase==='stageEnd' ? 's'+G.si : ''; if(k===cardKey) return; cardKey=k; L.card.innerHTML=''; if(!k) return;
-    var R=G.rec[G.si], u=84/BAR.max, h='<g class="a7card" id="a7card">';
+    var R=G.rec[G.si], h='<g class="a7card" id="a7card">';
     h+='<rect x="118" y="18" width="298" height="206" rx="16" class="f-paper" stroke="#B9852F" stroke-width="3"/>';
     h+=txt(208,46,'좋아진 것',22,'#3E9C5A')+txt(358,46,'생긴 문제',22,'#D9534F');
     h+='<path d="M302 30V212" stroke="#DCD4C2" stroke-width="2"/>';
     [0,1].forEach(function(i){ var y=60+i*80;
       h+=useArt(i?'houseB':'houseA',122,y+4,40,40)+txt(142,y+66,i?'나 집':'가 집',20,'#1E2B3A');
-      h+=txt(168,y+20,'처음',20,'#55657A','start')+'<rect x="212" y="'+(y+5)+'" width="'+(R.inc0[i]*u).toFixed(1)+'" height="18" rx="5" class="f-navyl"/>';
-      h+=txt(168,y+56,'지금',20,'#55657A','start')+'<rect x="212" y="'+(y+41)+'" width="'+(R.inc1[i]*u).toFixed(1)+'" height="18" rx="5" class="f-grn"/>';
+      h+=txt(168,y+20,'처음',20,'#55657A','start')+rowsSvg(212,y+5,84,18,R.inc0[i],'f-navyl',6);
+      h+=txt(168,y+56,'지금',20,'#55657A','start')+rowsSvg(212,y+41,84,18,R.inc1[i],'f-grn',6);
     });
-    var ks=Object.keys(R.probs), y0=ks.length>1?58:94;
-    ks.forEach(function(q,i){ var y=y0+i*80; h+=useArt(PART[q],310,y,60,60)+txt(392,y+40,'×'+R.probs[q],26,'#1E2B3A'); });
+    var ks=KINDS.filter(function(q){ return R.probs[q]; });
+    if(ks.length<=2){ var y0=ks.length>1?58:94; ks.forEach(function(q,i){ var y=y0+i*80; h+=useArt(PART[q],310,y,60,60)+txt(392,y+40,'×'+R.probs[q],26,'#1E2B3A'); }); }
+    else ks.forEach(function(q,i){ var y=54+i*42; h+=useArt(PART[q],318,y,38,38)+txt(388,y+28,'×'+R.probs[q],22,'#1E2B3A'); });   /* 둘째 판에서 문제가 섞여 3~4가지 */
     h+='</g>'; L.card.innerHTML=h;
   }
   function renderScene(G){
@@ -819,18 +907,22 @@ var SCENE = (function(){
     var s=G.si+'|'+G.phase+'|'+G.trayN+'|'+(G.lots||[]).join(',')+'|'+KINDS.map(function(k){ return G.board[k]; }).join(',')+'|'
       +(G.probs||[]).map(function(p){ return p.id+p.st+(G.t>=p.at?1:0)+(G.t-p.at<0.35?'n':''); }).join(',')+'|'+(G.blds||[]).map(function(b){ return G.t-b.at<0.4?1:0; }).join('')
       +'|'+(G.probs||[]).map(function(p){ return p.st==='board'&&G.t-p.bt<0.35?1:0; }).join('');
-    if(s!==sig){ sig=s; drawLots(G); drawBoard(G); drawProbs(G); }
+    s+='|'+G.ri+'|'+(G.dist||0)+'|'+(G.queue||[]).join(',')+'|'+(G.probs||[]).map(function(p){ return p.wrong||0; }).join('')+'|'+(G.badAt?G.badAt.k+G.badAt.t:'')+'|'+(G.chips||[]).length+'|'+(G.phase==='play'&&G.ri>0&&G.t-G.r0<1.6?1:0);
+    if(s!==sig){ sig=s; drawLots(G); drawBoard(G); drawProbs(G); drawNote(G); }
+    var sx=slideX(G), tf=sx?'translate('+sx.toFixed(1)+' 0)':''; [L.lots,L.probs,L.coins].forEach(function(g){ if((g.getAttribute('transform')||'')!==tf){ if(tf) g.setAttribute('transform',tf); else g.removeAttribute('transform'); } });
     drawBars(G); drawCoins(G); drawCard(G);
   }
   function vbRect(G,id){
     var p=String(id).split(':');
     if(id==='tray') return (G.phase!=='title' && canBuild(G)) ? {x:12, y:96, w:96, h:150} : null;
-    if(p[0]==='lot'){ var c=lotXY(+p[1]); return {x:c.x, y:c.y, w:CELL, h:CELL}; }
+    if(p[0]==='lot'){ var c=lotXY(+p[1]); return {x:c.x+slideX(G), y:c.y, w:CELL, h:CELL}; }
     if(p[0]==='board'){ if(KINDS.indexOf(p[1])<0) return null; return {x:BOARD.x, y:slotY(p[1]), w:BOARD.w, h:BOARD.h}; }
-    if(p[0]==='prob'){ var q=(G.probs||[]).find(function(x){ return String(x.id)===p[1]; }); if(!q || q.st!=='map' || G.t<q.at) return null; var r=probRect(G,q); return {x:r.x-3, y:r.y-3, w:r.w+6, h:r.h+6}; }
+    if(p[0]==='prob'){ var q=(G.probs||[]).find(function(x){ return String(x.id)===p[1]; }); if(!q || q.st!=='map' || G.t<q.at) return null; var r=probRect(G,q); return {x:r.x-3+(q.k==='gap'?0:slideX(G)), y:r.y-3, w:r.w+6, h:r.h+6}; }
     if(id==='bars') return {x:LOT0.x-8, y:320, w:300, h:96};
     if(id==='card') return G.phase==='stageEnd' ? {x:118, y:18, w:298, h:206} : null;
     if(id==='tag:tray') return {x:12, y:64, w:96, h:28};
+    if(id==='trayBox') return {x:8, y:56, w:104, h:206};
+    if(id==='lotsArea') return {x:LOT0.x-8, y:LOT0.y-8, w:PITCH*3+2, h:PITCH*3+2};
     return null;
   }
   function rectOf(G,id){
@@ -842,7 +934,8 @@ var SCENE = (function(){
   function mapProbs(G){ return (G.probs||[]).filter(function(p){ return p.st==='map' && G.t>=p.at; }).map(function(p){ return 'prob:'+p.id; }); }
   function avoid(G){ if(G.phase==='stageEnd') return ['card']; var a=mapProbs(G).concat(boardIds(G)); if(canBuild(G)) a.unshift('tray'); return a; }
   function labels(G){ return ['bars','tag:tray'].concat(boardIds(G)); }
-  function keepClear(G){ if(G.phase==='stageEnd') return ['card','bars'].concat(boardIds(G)); return ['bars'].concat(mapProbs(G)).concat(boardIds(G)); }
+  function keepClear(G){ if(G.phase==='title') return ['trayBox','lotsArea','bars'];   /* 블라인드 r2: 첫 화면 제목 카드가 '지을 건물'·빈 땅을 가림 → 엔진이 덜 가리는 자리를 고르게 */
+    if(G.phase==='stageEnd') return ['card','bars'].concat(boardIds(G)); return ['bars'].concat(mapProbs(G)).concat(boardIds(G)); }
   function idleAt(G){ return canBuild(G) ? 'tray' : 'bars'; }
   var css=".a7pop{transform-box:fill-box;transform-origin:50% 90%;animation:a7pop .3s ease-out}@keyframes a7pop{0%{transform:scale(.25);opacity:.2}70%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}"
     +".a7card{animation:a7cin .3s ease-out .7s both}@keyframes a7cin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}"

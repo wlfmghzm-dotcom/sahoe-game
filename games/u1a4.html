@@ -427,7 +427,7 @@ Object.assign(ASSETS, {"pCrane": {"vb": [-30, -50, 60, 100], "src": "data:image/
 /* 그림 블라인드(2026-11-08) 반영: 항구 = 무역항 Kenney 크레인·컨테이너·배(trade-games/assets/kenney-2d.js의 crane·boxes·shipIn), 염전 = 네모 칸 바닷물 + 하얀 소금 더미 + Kenney 삽,
    쓰레기 = 묶은 검은 쓰레기봉투 + Kenney 찌그러진 캔·병(쓰레기 더미), 관광객 배 = Kenney 작은 배(boat-house-a, 크루즈선만 사실적이던 것) */
 Object.assign(ASSETS, {
-  k_port: {vb:[0,0,64,64], svg:'<rect x="0" y="40" width="64" height="24" class="f-sea"/><rect x="0" y="36" width="34" height="6" class="f-paperd"/><use href="#a-pCrane" x="2" y="0" width="22" height="38"/><use href="#a-pBoxes" x="24" y="24" width="24" height="16"/><use href="#a-pShip" x="4" y="40" width="60" height="20"/>'},
+  k_port: {vb:[0,0,64,64], svg:'<rect x="0" y="40" width="64" height="24" class="f-sea"/><rect x="0" y="36" width="34" height="6" class="f-paperd"/><use href="#a-pCrane" x="2" y="0" width="22" height="38"/><use href="#a-pBoxes" x="24" y="24" width="24" height="16"/><rect x="34" y="36" width="30" height="6" class="f-paperd"/><rect x="40" y="31" width="4" height="6" rx="1.5" class="f-woodd"/><rect x="54" y="31" width="4" height="6" rx="1.5" class="f-woodd"/>'},   /* 블라인드 r2: 항구 안에 짐 배와 같은 배가 그려져 헷갈림 → 배 없이 빈 부두(말뚝 둘) */
   k_salt: {vb:[0,0,64,64], svg:'<rect x="2" y="24" width="60" height="38" rx="3" class="f-paperd"/><g fill="#BFE6F5" stroke="#9AA5B1" stroke-width="1.4"><rect x="5" y="27" width="17" height="15"/><rect x="24" y="27" width="17" height="15"/><rect x="43" y="27" width="17" height="15"/><rect x="5" y="44" width="17" height="15"/><rect x="24" y="44" width="17" height="15"/></g><g fill="#FFFFFF" stroke="#9AA5B1" stroke-width="1.4"><path d="M7 41l6-10 6 10z"/><path d="M26 58l6-10 6 10z"/><path d="M42 60l8-14 8 14z"/></g><use href="#a-shovelK" x="44" y="2" width="22" height="30"/>'},
   bag: {vb:[0,0,32,32], svg:'<path d="M5 28q-3-12 6-16l-2-5 7 3 6-4-1 6q8 4 6 16z" fill="#3A3F48" stroke="#1E2B3A" stroke-width="1.6"/><path d="M11 12q5 3 11 0" stroke="#8A93A0" stroke-width="1.6" fill="none"/><path d="M10 18q3-2 5 2M18 21q3-2 5 1" stroke="#6B7785" stroke-width="1.4" fill="none"/><use href="#a-bottleK" x="0" y="15" width="14" height="16"/><use href="#a-canK" x="17" y="18" width="15" height="14"/>'},
   k_boat: {vb:[-36,-28,72,56], svg:'<use href="#a-ferryK" x="-36" y="-28" width="72" height="56"/>'},
@@ -452,6 +452,8 @@ Object.assign(ASSETS, { broomB: {vb:[0,0,32,32], svg:'<circle cx="16" cy="16" r=
 /* 공통 안내역 「써냥이」(Kenney cube-pets/animal-cat, CC0) — 2026-11-08 교사 지시: 다음 게임부터 모든 게임의 안내역.
    쓰는 법: 게임 assets.js(B형 art.js) 맨 끝에 이 파일 내용을 그대로 붙이고, game.js(B형 content.js)에 guide: '써냥이'. */
 Object.assign(ASSETS,{sseonyang:{"vb":[-24,-24,48,48],"src":"data:image/png;base64,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"},captain:{"vb":[0,0,64,64],"svg":"<circle cx=\"32\" cy=\"32\" r=\"31\" fill=\"#F6D27A\"/><use href=\"#a-sseonyang\" x=\"5\" y=\"4\" width=\"54\" height=\"54\"/>"}});
+/* 2026-11-09 짐 배: 무역항 Kenney 배(pShip = trade-games/assets/kenney-2d.js shipIn, 컨테이너를 실은 배) — 관광객 배(작은 집배)와 모양·색이 다르게 */
+ASSETS.k_cargo = {vb:[0,0,80,62], svg:'<use href="#a-pShip" x="-12" y="18" width="104" height="34"/><use href="#a-pBoxes" x="16" y="0" width="44" height="30"/>'};   /* 블라인드 r2: 짐 배임이 안 읽힘 → 갑판 위에 짐 상자 더미 */
 /* ===== ASSETS-END ===== */
 </script>
 <script>
@@ -474,8 +476,8 @@ var TOURIST = { cliff:1, beach:1 };
 /* boats: 관광객 배 수, gap: 배 사이(초), pat: 기다림(초), cap: 이만큼 쌓이면 지저분, first: 첫 배 시각 */
 var STAGES = [
   {key:'s1', name:'해안 모양 보고', rule:'match', deck:['salt','tour','port','tour']},
-  {key:'s2', name:'관광객이 와요',   rule:'trash', boats:7,  gap:3.8, pat:10, cap:3, first:1.2, lanes:2, goal:5},   /* 블라인드 2차(재미 2.5, '아무렇게나 해도 같은 결말'): 수입 목표 5(7척 중). 관광지마다 봉지 3개까지라 두 곳에 나눠 보내야 6척, 한 곳만 고집하거나 엉뚱한 곳에 보내면 목표 실패 */
-  {key:'s3', name:'쉬어 가는 해변', rule:'rest',  boats:10, gap:3.4, pat:10, cap:3, first:1.2, lanes:2, fence:1}
+  {key:'s2', name:'관광객이 와요',   rule:'trash', kinds:'TTCTTCTCTT', gap:3.8, pat:10, cap:3, first:1.2, lanes:2, goal:8},   /* 2026-11-09 판 늘리기: 짐 배 3척 섞음(짐 배 → 항구, 1단계 '배가 드나드는 해안' 판단을 다시 씀). 목표 8 = 관광객 5 + 짐 배 3. 관광지마다 봉지 3개까지라 두 곳에 나눠야 함 */   /* 블라인드 2차(재미 2.5, '아무렇게나 해도 같은 결말'): 수입 목표 5(7척 중). 관광지마다 봉지 3개까지라 두 곳에 나눠 보내야 6척, 한 곳만 고집하거나 엉뚱한 곳에 보내면 목표 실패 */
+  {key:'s3', name:'쉬어 가는 해변', rule:'rest',  kinds:'TTTCCTTTCCTTTT', gap:3.0, pat:10, cap:3, first:1.2, lanes:2, fence:1}   /* 2026-11-09: 짐 배 4척 섞음(둘씩 두 번). '다음 배 2척 미리 보기'는 만들어 재 보니 쉬게 하는 때가 점수를 가르지 않아(배가 줄에서 기다리고 다른 관광지가 받음 — 미리 보는 봇·늘 쉬게 하는 봇·꽉 차면 쉬게 하는 봇 모두 10/10) 장식이 되므로 넣지 않았다 */
 ];
 /* §19 도전 — 모자람 도전 「바쁜 관광 철」(rule 'rest'만, 일반 판 3단계와 같은 동작·규칙). 내용은 CH(아래)에서 */
 /* 도전은 넣지 않았다(2026-11-08 공리 점검): '바쁜 관광 철'(배 수·줄 2→3·봉지 3→2·청소 느려짐)을 만들어 보니 성실 1.25초 봇은 6레벨 모두 만점(첫 실패 없음),
@@ -500,11 +502,14 @@ var NAMES = {
   trash:  '관광객이 쓰레기를 남겼어요',
   dirty:  '지저분해서 관광객이 돌아가요',
   nothing:'볼 게 없어 돌아가요',
+  cargo:  '<em>짐 배</em>도 와요',
+  port2:  '짐 배는 <em>항구</em>로!',
+  cargoNo:'짐을 내릴 곳이 없어요',
   leave:  '기다리다 돌아갔어요',
   rest:   '쉬는 동안 깨끗해져요',
   worry:  '쉬는 동안 주민 수입이 없어요'
 };
-var TITLES = [[0,'바닷가 새내기'],[280,'해안 마을 일꾼'],[380,'해안 마을 이장'],[430,'해안선 지킴이']];   /* 성실 440(만점) · 무작위 중앙 240 · 힌트 연타 220 */
+var TITLES = [[0,'바닷가 새내기'],[340,'해안 마을 일꾼'],[460,'해안 마을 이장'],[560,'해안선 지킴이']];   /* 2026-11-09 짐 배 뒤: 성실 580(만점) · 무작위 중앙 280·p90 320 · 힌트 연타 290 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
@@ -518,16 +523,18 @@ function mkSpots(built){
   if(built){ spotOfA(a,'c').b='tour'; spotOfA(a,'b').b='port'; spotOfA(a,'s').b='tour'; spotOfA(a,'m').b='salt'; a.forEach(function(s){ s.ok=true; }); }
   return a;
 }
+function kindsOf(G,S){ return S.kinds || new Array((S.boats||0)+1).join('T'); }
+function preview(G){ var S=stOf(G); return (G.phase==='play' && S && S.preview && G.endT<0) ? (G.queue||[]).slice(0,S.preview).map(function(q){ return q.kind||'tour'; }) : []; }
 function spotOfA(a,id){ for(var i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null; }
 function setupStage(G,si){
   var S=stOf(G,si);
-  G.si=si; G.t=0; G.endT=-1; G.bar=[]; G.anim=[]; G.boats=[]; G.queue=[]; G.fence=null;
+  G.si=si; G.t=0; G.endT=-1; G.bar=[]; G.anim=[]; G.boats=[]; G.queue=[]; G.fence=null; G.wrong=null;
   G.spots=mkSpots(si>0 || !!G.ch);
   if(S.deck){ G.deck=S.deck.map(function(k){ return {id:G.nid++, k:k}; }); G.res={total:G.deck.length, served:0, missed:0}; }
   else {
     G.deck=[];
-    var at=S.first; for(var i=0;i<S.boats;i++){ G.queue.push({at:at}); at+=S.jit ? S.gap*(1-S.jit+2*S.jit*rnd(G)) : S.gap; }
-    G.res={total:S.boats, served:0, missed:0};
+    var ks=kindsOf(G,S), at=S.first; for(var i=0;i<ks.length;i++){ G.queue.push({at:at, kind:ks[i]==='C'?'cargo':'tour'}); at+=S.jit ? S.gap*(1-S.jit+2*S.jit*rnd(G)) : S.gap; }
+    G.res={total:ks.length, served:0, missed:0}; G.tourT=ks.split('').filter(function(x){ return x==='T'; }).length; G.tourS=0;
     if(S.fence) G.fence={at:null};
   }
 }
@@ -544,7 +551,7 @@ function start(G){ var g=cl(G); g.score=0; g.phase='play'; g.first={}; g.badges=
 
 function laneFree(G,l){ return !G.boats.some(function(b){ return b.lane===l && (b.st==='wait' || b.st==='in'); }); }
 function lose(G,ev,b,why,at){
-  b.st='left'; b.t1=G.t; b.why=why; G.res.missed++; G.stats.lost[G.si]++; G.bar.push(0);
+  b.st='left'; b.t1=G.t; b.why=why; if(why!=='leave') G.wrong={at:at, why:why, t:G.t, n:(G.wrong?G.wrong.n:0)+1}; G.res.missed++; G.stats.lost[G.si]++; G.bar.push(0);
   ev.push({t:why==='leave'?'leave':'refuse', why:why, at:at||('boat:'+b.id), bad:true, ok:false});
 }
 function tick(G0,dt){
@@ -555,7 +562,7 @@ function tick(G0,dt){
     while(G.queue.length && G.queue[0].at<=G.t){
       var l=-1; for(var k=0;k<(S.lanes||2);k++) if(laneFree(G,k)){ l=k; break; }
       if(l<0){ G.queue[0].at=G.t+0.4; break; }
-      G.queue.shift(); G.boats.push({id:G.nid++, lane:l, w:0, pat:S.pat, st:'in', t1:G.t}); }
+      var q0=G.queue.shift(); G.boats.push({id:G.nid++, lane:l, w:0, pat:S.pat, st:'in', t1:G.t, kind:q0.kind||'tour'}); if(q0.kind==='cargo') firstName(G,ev,'cargo','lane:'+l); }
     G.boats.forEach(function(b){
       if(b.st==='in' && G.t-b.t1>=T.come){ b.st='wait'; }
       if(b.st==='wait'){ b.w+=dt; if(b.w>=b.pat){ lose(G,ev,b,'leave'); firstName(G,ev,'leave','lane:'+b.lane); } } });
@@ -571,8 +578,9 @@ function tick(G0,dt){
     G.boats=G.boats.filter(function(b){ return G.t-b.t1<1.6; });
     if(G.endT<0){
       G.phase='stageEnd';
-      if(G.si===1){ G.stats.s2Served=G.res.served; G.stats.s2Total=G.res.total; G.stats.s2Spots=G.spots.map(function(s){ return s.trash; }); }
-      if(G.si===2){ G.stats.s3Served=G.res.served; G.stats.s3Total=G.res.total; }
+      /* 비교 카드는 관광객 배만 센다(짐 배는 쓰레기와 상관없음) */
+      if(G.si===1){ G.stats.s2Served=G.tourS; G.stats.s2Total=G.tourT; G.stats.s2Spots=G.spots.map(function(s){ return s.trash; }); }
+      if(G.si===2){ G.stats.s3Served=G.tourS; G.stats.s3Total=G.tourT; G.stats.s3If=Math.min(G.tourT, 2*(stOf(G).cap||3)); }   /* '만약 쉬지 않았다면': 관광지 둘이 봉지 한도까지 차면 끝 */
       award(G,ev,['coast','impact','rest'][G.si]);
       ev.push({t:'stageEnd', si:G.si});
     }
@@ -595,7 +603,7 @@ function drop(G0,src,dst,via){
     if(good){ G.res.served++; G.stats.good++; } else { G.res.missed++; G.stats.bad++; }
     G.anim.push({k:'coin', at:s.id, n:good?3:1, t0:G.t, bi:G.bar.length-1});
     ev.push({t:'build', at:dst, k:card.k, good:good, pts:pts, ok:good, bad:!good});
-    if(good) firstName(G,ev,card.k,dst); else firstName(G,ev,'bad',dst);
+    if(good) firstName(G,ev,card.k,dst); else G.wrong={at:dst, why:'b_'+card.k, t:G.t, n:(G.wrong?G.wrong.n:0)+1};   /* 블라인드 1차 공통: 틀린 수는 놓은 자리에 이유 한 줄(장면이 그림) */
     return {G:G, ok:true, ev:ev};
   }
   if(sp[0]==='fence'){
@@ -612,10 +620,18 @@ function drop(G0,src,dst,via){
     var b=null; G.boats.forEach(function(x){ if(String(x.id)===sp[1] && x.st==='wait') b=x; }); if(!b) return fail('src');
     if(s.closed) return fail('closed');
     b.to=s.id;
-    if(!TOURIST[s.type]){ lose(G,ev,b,'nothing','spot:'+s.id); firstName(G,ev,'nothing','spot:'+s.id); return {G:G, ok:true, ev:ev}; }
+    if(b.kind==='cargo'){
+      /* 짐 배: 항구(깊은 만)로만. 관광지·갯벌에는 짐을 내릴 곳이 없어 돌아감 */
+      if(s.type!=='bay'){ lose(G,ev,b,'cargoNo','spot:'+s.id); return {G:G, ok:true, ev:ev}; }
+      b.st='go'; b.t1=G.t; G.res.served++; G.stats.served[G.si]++; G.stats.cargo=(G.stats.cargo||0)+1; G.bar.push(1);
+      var cp=via?T.via:T.serve; G.score+=cp; G.anim.push({k:'coin', at:s.id, n:1, t0:G.t, bi:G.bar.length-1});
+      ev.push({t:'serve', at:'spot:'+s.id, pts:cp, cargo:true, ok:true}); firstName(G,ev,'port2','spot:'+s.id);
+      return {G:G, ok:true, ev:ev};
+    }
+    if(!TOURIST[s.type]){ lose(G,ev,b,'nothing','spot:'+s.id); return {G:G, ok:true, ev:ev}; }
     var S=stOf(G);
-    if(s.trash>=S.cap){ lose(G,ev,b,'dirty','spot:'+s.id); G.stats.dirtyRef++; firstName(G,ev,'dirty','spot:'+s.id); return {G:G, ok:true, ev:ev}; }
-    b.st='go'; b.t1=G.t; s.trash++; s.t0=G.t; G.res.served++; G.stats.served[G.si]++; G.bar.push(1);
+    if(s.trash>=S.cap){ lose(G,ev,b,'dirty','spot:'+s.id); G.stats.dirtyRef++; return {G:G, ok:true, ev:ev}; }
+    b.st='go'; b.t1=G.t; s.trash++; s.t0=G.t; G.res.served++; G.tourS=(G.tourS||0)+1; G.stats.served[G.si]++; G.bar.push(1);
     var pts=via?T.via:T.serve; G.score+=pts;
     G.anim.push({k:'coin', at:s.id, n:1, t0:G.t, bi:G.bar.length-1});
     ev.push({t:'serve', at:'spot:'+s.id, pts:pts, trash:s.trash, ok:true});
@@ -638,24 +654,24 @@ function hintMove(G){
     var any=G.spots.filter(function(s){ return !s.b; })[0]; return (h.length && any) ? {src:'card:'+h[0].id, dst:'spot:'+any.id} : null;
   }
   var w=waiting(G), o=openTour(G);
+  var wc=w.filter(function(x){ return x.kind==='cargo'; }), wt=w.filter(function(x){ return x.kind!=='cargo'; });
   if(G.fence && !G.fence.at){
-    /* 쓰레기가 거의 찬 관광지는, 다른 곳이 열려 있으면 쉬게 한다 */
-    var hot=G.spots.filter(function(s){ return TOURIST[s.type] && !s.closed && s.trash>=S.cap-1; }).sort(function(a,b){ return b.trash-a.trash; })[0];
-    if(hot){ var other=o.filter(function(s){ return s.id!==hot.id && s.trash<S.cap-1; })[0];
-      var urgent=w.length && (w[0].pat-w[0].w)<2.2;
-      if(other && !urgent) return {src:'fence', dst:'spot:'+hot.id};
-      if(!w.length) return {src:'fence', dst:'spot:'+hot.id}; }
+    /* 다음 배를 보고 쉬게 할 때를 고른다: 꽉 차 가는 관광지가 있고, 기다리는 관광객 + 미리 보이는 관광객을 다른 관광지가 다 받을 수 있을 때(짐 배 틈) */
+    var hot2=G.spots.filter(function(s){ return TOURIST[s.type] && !s.closed && s.trash>=S.cap-1; }).sort(function(a,b){ return b.trash-a.trash; })[0];
+    if(hot2){ var room=0; G.spots.forEach(function(s){ if(TOURIST[s.type] && s.id!==hot2.id && !s.closed) room+=Math.max(0,S.cap-s.trash); });
+      var need=wt.length+preview(G).filter(function(k){ return k==='tour'; }).length;
+      if(room>=need || hot2.trash>=S.cap) return {src:'fence', dst:'spot:'+hot2.id}; }
   }
-  if(w.length && o.length) return {src:'boat:'+w[0].id, dst:'spot:'+o[0].id};
+  if(w.length){ if(w[0].kind==='cargo') return {src:'boat:'+w[0].id, dst:'spot:b'}; if(o.length) return {src:'boat:'+w[0].id, dst:'spot:'+o[0].id}; if(wc.length) return {src:'boat:'+wc[0].id, dst:'spot:b'}; }
   return null;
 }
 function sources(G){ if(!live(G)) return []; var a=[]; if(stOf(G).deck) G.deck.slice(0,2).forEach(function(c){ a.push('card:'+c.id); });
   waiting(G).forEach(function(b){ a.push('boat:'+b.id); }); if(G.fence && !G.fence.at) a.push('fence'); return a; }
 function targets(G){ if(!live(G)) return []; var S=stOf(G); return G.spots.filter(function(s){ return S.deck ? !s.b : true; }).map(function(s){ return 'spot:'+s.id; }); }
-function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='card'){ var c=G.deck.filter(function(x){ return String(x.id)===p[1]; })[0]; return c?'k_'+c.k:null; } if(p[0]==='boat') return 'k_boat'; if(id==='fence') return 'k_fence'; return null; }
+function itemOf(G,id){ var p=String(id).split(':'); if(p[0]==='card'){ var c=G.deck.filter(function(x){ return String(x.id)===p[1]; })[0]; return c?'k_'+c.k:null; } if(p[0]==='boat'){ var bb=(G.boats||[]).filter(function(x){ return String(x.id)===p[1]; })[0]; return bb&&bb.kind==='cargo'?'k_cargo':'k_boat'; } if(id==='fence') return 'k_fence'; return null; }
 function titleOf(p){ var t=TITLES[0][1]; TITLES.forEach(function(x){ if(p>=x[0]) t=x[1]; }); return t; }
 
-if(typeof module!=='undefined') module.exports={SEED:SEED,T:T,GOOD:GOOD,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,CH:CH,cfgFor:cfgFor,stOf:stOf,nStages:nStages,
+if(typeof module!=='undefined') module.exports={preview:preview,kindsOf:kindsOf,SEED:SEED,T:T,GOOD:GOOD,STAGES:STAGES,BADGES:BADGES,NAMES:NAMES,TITLES:TITLES,CH:CH,cfgFor:cfgFor,stOf:stOf,nStages:nStages,
   newGame:newGame,start:start,tick:tick,drop:drop,next:next,hintMove:hintMove,sources:sources,targets:targets,itemOf:itemOf,titleOf:titleOf,spotOf:spotOf,waiting:waiting,openTour:openTour};
 /* LOGIC-END */
 
@@ -693,7 +709,7 @@ var GAME = {
     title: '해안 마을을 지켜 봐!',
     startBtn: '시작',
     start: ['해안 모양을 보고 지어 봐!',
-            '동전 5개 모으기! 두 곳에 나눠!',
+            '동전 8개! 관광객은 두 곳에 나눠!',
             '쉼 줄로 해변을 쉬게 해!'],
     end: [['해안 모양에 맞는 생활이 있어!'],
           ['관광객은 수입도, 쓰레기도 남겨!'],
@@ -707,7 +723,7 @@ var GAME = {
   ],
   rulesModal: {
     cards: [['rMatch','해안 모양에 맞게 지어요'],['rTrash','쓰레기가 쌓이면 관광객이 안 와요'],['rRest','쉼 줄을 놓으면 깨끗해져요']],
-    note: '2단계: 동전 5개면 성공!'
+    note: '2단계: 동전 8개면 성공! 짐 배는 항구로.'
   },
   result: {
     label: '우리 해안 마을', note: '',
@@ -738,7 +754,13 @@ var GAME = {
     if(G.ch) return null;
     if(G.si===0){ var c=G.deck.slice(0,2).filter(function(x){ return x.k==='salt'; })[0]; return c ? {src:'card:'+c.id, dst:'spot:m', label:'갯벌에 염전'} : null; }
     var w=waiting(G);
-    if(G.si===1) return w.length ? {src:'boat:'+w[0].id, dst:w[0].lane===0?'spot:c':'spot:s', label:'관광객 받기', force:true} : {wait:true};   /* 블라인드 2차: 화살표가 엇갈려 보임 → 배와 같은 줄의 관광지로(위 줄 = 절벽, 아래 줄 = 모래사장) */
+    if(G.si===1){
+      /* 블라인드 r2(상): 첫 짐 배를 어디로 보낼지 몰랐다 → 배열 해 보기의 둘째: 첫 짐 배가 오면 손가락이 짐 배 → 항구 */
+      var wt=w.filter(function(b){ return b.kind!=='cargo'; }), wc=w.filter(function(b){ return b.kind==='cargo'; });
+      var first = wt.length ? {src:'boat:'+wt[0].id, dst:wt[0].lane===0?'spot:c':'spot:s', label:'관광객 받기', force:true} : {wait:true};
+      var second = wc.length ? {src:'boat:'+wc[0].id, dst:'spot:b', label:'짐 배는 항구로', force:true} : {later:true};
+      return [first, second];
+    }   /* 블라인드 2차: 화살표가 엇갈려 보임 → 배와 같은 줄의 관광지로(위 줄 = 절벽, 아래 줄 = 모래사장) */
     if(G.si===2){ var hot=G.spots.filter(function(s){ return (s.type==='beach'||s.type==='cliff') && s.trash>=1 && !s.closed; })[0];
       return (hot && G.fence && !G.fence.at) ? {src:'fence', dst:'spot:'+hot.id, label:'쉬게 하기', force:true} : {later:true}; }
     return null;
@@ -746,8 +768,8 @@ var GAME = {
   onEvent: function(e,FX){
     if(e.t==='build'){ if(e.pts>0) FX.score(e.at, e.pts, false, 0); if(e.good) FX.burst(e.at, 10); FX.progress();
       FX.explain(e.good ? XP4[e.k] : {why:'이 해안 모양에는 맞지 않아 조금밖에 안 나와요', def:XP4[e.k].why, page:XP4[e.k].page}); }
-    else if(e.t==='serve'){ FX.score(e.at, e.pts, false, 0); FX.burst(e.at, 6); FX.progress(); FX.explain(XP4.serve); }
-    else if(e.t==='refuse'){ FX.progress(); FX.explain(e.why==='dirty' ? XP4.dirty : {why:'항구·갯벌에는 관광객이 볼 경관이 없어요. 모래사장·절벽으로!', page:'교과서 24쪽 참고'}); }
+    else if(e.t==='serve'){ FX.score(e.at, e.pts, false, 0); FX.burst(e.at, 6); FX.progress(); FX.explain(e.cargo ? XP4.port : XP4.serve); }
+    else if(e.t==='refuse'){ FX.progress(); FX.explain(e.why==='dirty' ? XP4.dirty : e.why==='cargoNo' ? {why:'짐 배는 깊고 잔잔해 배가 드나들기 좋은 해안(항구)에서 짐을 내려요', page:'교과서 24쪽 참고'} : {why:'항구·갯벌에는 관광객이 볼 경관이 없어요. 모래사장·절벽으로!', page:'교과서 24쪽 참고'}); }
     else if(e.t==='leave'){ FX.progress(); }
     else if(e.t==='rest'){ FX.explain(XP4.rest); }
   }
@@ -888,7 +910,7 @@ var SCENE = (function(){
   function drawBoats(G){
     var h='';
     (G.boats||[]).forEach(function(b){ var p=boatPos(G,b); if(p.op<=0.01) return;
-      h+='<g opacity="'+p.op.toFixed(2)+'"'+(p.gray?' data-verdict="bad"':'')+'>'+useArt('k_boat',p.x,p.y,80,62);
+      h+='<g opacity="'+p.op.toFixed(2)+'"'+(p.gray?' data-verdict="bad"':'')+'>'+useArt(b.kind==='cargo'?'k_cargo':'k_boat',p.x,p.y,80,62);
       if(b.st==='wait' && b.pat>0){ var f=1-b.w/b.pat; h+='<circle cx="'+(p.x+40)+'" cy="'+(p.y+31)+'" r="40" fill="none" stroke="#FBF8F1" stroke-width="5" opacity=".5"/><path d="'+arc(p.x+40,p.y+31,40,f)+'" fill="none" stroke="'+(f<0.3?'#D2483C':'#4CAF7A')+'" stroke-width="6" stroke-linecap="round"/>'; }
       if(p.gray && b.why!=='leave' && b.to){ var s=SP[b.to]; h+=xMark(s.x+s.w/2,s.y+16); }
       h+='</g>'; });
@@ -898,11 +920,18 @@ var SCENE = (function(){
   /* 목표가 있는 단계(2단계): 목표 칸 뒤에 틈을 두어 깃발이 '5번째 칸 바로 뒤'로 읽히게(블라인드 3차: 6번째 칸 옆으로 보임) */
   function goalOf(G){ var S=G&&G.phase!=='title'?stOf(G):null; return S&&S.goal?S.goal:0; }
   function won(G){ var g=goalOf(G); return g>0 && G.res.served>=g; }
-  function slotBox(G,i){ var n=Math.max(1,G.res.total||1), gl=goalOf(G), gap=gl?18:0, w=Math.min(84,(SB.w-96-gap)/n); return {x:SB.x+92+i*w+(gl && i>=gl?gap:0), y:SB.y+4, w:w-6, h:SB.h-8}; }
+  function slotBox(G,i){ if(G.si>0 && G.phase!=='title'){ var nn=Math.max(1,G.res.total||1), W=SB.w-100, ww=W/nn; return {x:SB.x+92+i*ww, y:SB.y+9, w:ww, h:SB.h-18}; } var n=Math.max(1,G.res.total||1), gl=goalOf(G), gap=gl?18:0, w=Math.min(84,(SB.w-96-gap)/n); return {x:SB.x+92+i*w+(gl && i>=gl?gap:0), y:SB.y+4, w:w-6, h:SB.h-8}; }
   function landed(G,i){ var a=(G.anim||[]).filter(function(x){ return x.k==='coin' && x.bi===i; })[0]; return !a || G.t-a.t0>=1.0 || G.phase!=='play'; }
   function drawBar(G){
     var n=G.res.total||0, k=n+'|'+(G.bar||[]).join('')+'|'+G.si+'|'+Math.floor((G.t||0)*5); if(st.bar===k) return; st.bar=k;
     var h='<rect x="'+SB.x+'" y="'+SB.y+'" width="'+SB.w+'" height="'+SB.h+'" rx="12" class="f-paper"/>'+useArt('purse',SB.x+4,SB.y+2,36,36)+txt(SB.x+64,SB.y+28,'수입',19,'#8C603F'), s1=G.si===0;
+    if(!s1 && G.phase!=='title'){
+      /* 블라인드 r2(중): 2·3단계 동전 칸 10~14개가 화면을 복잡하게 함 → 채워지는 막대 하나(동전이 날아와 닿은 만큼 참) + 목표 깃발 */
+      var x0=SB.x+92, W=SB.w-100, got=0; (G.bar||[]).forEach(function(v,i){ if(v===1 && landed(G,i)) got++; });
+      h+='<rect x="'+x0+'" y="'+(SB.y+9)+'" width="'+W+'" height="'+(SB.h-18)+'" rx="11" fill="none" stroke="#B9852F" stroke-width="2"/>';
+      if(got) h+='<rect x="'+(x0+2)+'" y="'+(SB.y+11)+'" width="'+Math.max(8,(W-4)*got/n)+'" height="'+(SB.h-22)+'" rx="9" class="f-org"/>'+useArt('coin',x0+Math.max(8,(W-4)*got/n)-14,SB.y+8,24,24);
+      n=0;
+    }
     for(var i=0;i<n;i++){ var b=slotBox(G,i), v=(G.bar||[])[i], ok=v!=null && landed(G,i);
       if(goalOf(G) && i<goalOf(G)) h+='<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="7" class="f-sand" opacity=".55"/>';
       h+='<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="7" fill="none" stroke="#B9852F" stroke-width="1.6" stroke-dasharray="4 3"/>';
@@ -912,7 +941,7 @@ var SCENE = (function(){
         h+= (ok && v===1) ? useArt('coin',cx2-r,cy2-r,2*r,2*r) : '<circle cx="'+cx2+'" cy="'+cy2+'" r="'+(r-2)+'" fill="none" stroke="#C9B48A" stroke-width="1.4"/>'; }
       /* 블라인드 3차: 성공한 판의 돌아간 배 칸은 빨간 가위표 대신 회색 '꽉 찬 쓰레기통'(빨간 가위표는 실패한 판에만) */
       if(v===0 && ok){ if(won(G)) h+='<g opacity=".6">'+useArt('bin',b.x+b.w/2-12,b.y+(b.h-24)/2,24,24)+'</g>'; else h+='<path d="M'+(b.x+b.w-14)+' '+(b.y+6)+'l9 9M'+(b.x+b.w-5)+' '+(b.y+6)+'l-9 9" stroke="#D2483C" stroke-width="2.6" stroke-linecap="round"/>'; } }
-    var S=stOf(G); if(S && S.goal && G.phase!=='title'){ var gb=slotBox(G,S.goal-1), fx=gb.x+gb.w+9, ok=(G.bar||[]).filter(function(v){ return v===1; }).length>=S.goal;
+    var S=stOf(G); if(S && S.goal && G.phase!=='title'){ var gb=slotBox(G,S.goal-1), fx=(G.si>0) ? SB.x+92+(SB.w-100)*S.goal/(G.res.total||1) : gb.x+gb.w+9, ok=(G.bar||[]).filter(function(v){ return v===1; }).length>=S.goal;
       h+='<path d="M'+fx+' '+(SB.y+3)+'V'+(SB.y+SB.h+8)+'" stroke="'+(ok?'#4CAF7A':'#E8743B')+'" stroke-width="4" stroke-linecap="round"/>'+useArt('flag',fx-2,SB.y+SB.h-2,20,26)
         +'<rect x="'+(fx+16)+'" y="'+(SB.y+SB.h+2)+'" width="54" height="26" rx="13" class="f-paper" stroke="'+(ok?'#4CAF7A':'#E8743B')+'" stroke-width="2"/>'+txt(fx+43,SB.y+SB.h+21,'목표',19,ok?'#2E7D57':'#C95F2C'); }
     L.bar.innerHTML='<g data-keep="동전 줄">'+h+'</g>';
@@ -922,7 +951,7 @@ var SCENE = (function(){
     var S=stOf(G), items=[];
     if(G.phase==='play'){ if(S.deck) G.deck.slice(0,2).forEach(function(c){ items.push({k:c.k}); }); if(G.fence) items.push({k:'fence', off:!!G.fence.at}); }
     var show=!!(S.deck || G.fence), k=G.si+'|'+G.phase+'|'+items.map(function(x){ return x.k+(x.off?0:1); }).join(',')+'|'+(G.deck||[]).length; if(st.tray===k) return; st.tray=k;
-    if(!show || G.phase==='title'){ L.tray.innerHTML=''; return; }
+    if(!show || G.phase!=='play'){ L.tray.innerHTML=''; return; }   /* 블라인드 r2: 단계 끝 리본이 빈 카드 줄 위에 겹쳐 보임 → 단계 끝에는 카드 줄을 숨김 */
     var s='<rect x="190" y="352" width="260" height="72" rx="14" class="f-woodd"/><rect x="190" y="350" width="260" height="70" rx="14" class="f-wood"/>';
     var NM={salt:'염전', port:'항구', tour:'관광지', fence:'쉼 줄'};
     TRAY.forEach(function(b,i){ var c=items[i];
@@ -947,14 +976,27 @@ var SCENE = (function(){
   function drawCard(G){
     var k=(G.phase==='stageEnd' && G.si===2 && !G.ch)?'c':''; if(st.cd===k) return; st.cd=k; if(!k){ L.card.innerHTML=''; return; }
     var h='<g class="c1card" data-keep="비교 카드"><rect x="436" y="58" width="198" height="288" rx="16" class="f-paper" stroke="#B9852F" stroke-width="2.5"/>';
-    function half(y,title,served,dirty){ var s='<rect x="446" y="'+y+'" width="178" height="130" rx="12" class="'+(dirty?'f-paperd':'f-paper')+'" stroke="#C9B48A" stroke-width="1.6"/>';
-      s+=txt(535,y+26,title,20,dirty?'#33475C':'#C95F2C');
+    /* 블라인드 r2(중): 성공 화면에 화난 주민 6명이 남아 모순 → 위 칸은 '만약' 판(점선·흐림·'만약' 머리글, 3단계를 쉬지 않았다면 = 관광지 둘이 봉지 한도까지), 숫자 옆에 관광객 배 그림 */
+    function half(y,title,served,dirty){ var s='<g'+(dirty?' opacity=".6"':'')+'><rect x="446" y="'+y+'" width="178" height="130" rx="12" class="'+(dirty?'f-paperd':'f-paper')+'" stroke="'+(dirty?'#7D8794':'#4CAF7A')+'" stroke-width="'+(dirty?2.4:3)+'"'+(dirty?' stroke-dasharray="7 5"':'')+'/>';
+      s+=txt(535,y+26,title,20,dirty?'#5A5F66':'#C95F2C');
       s+=useArt('beachIc',452,y+34,70,70); if(dirty){ s+=useArt('bag',462,y+64,26,26)+useArt('bag',484,y+70,26,26)+useArt('bag',500,y+62,26,26); } else s+='<path d="M470 '+(y+70)+'l8 8 16-16" fill="none" stroke="#4CAF7A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
-      s+=useArt(dirty?'faceW':'faceH',526,y+40,40,40)+txt(592,y+70,served+'명',26,'#1E2B3A');
-      s+=useArt('k_boat',530,y+88,52,40);
-      return s; }
-    h+=half(68,'쉬지 않은 해변',G.stats.s2Served,true)+half(206,'쉬며 지킨 해변',G.stats.s3Served,false);
+      s+=useArt('k_boat',526,y+48,48,38)+txt(600,y+76,served,28,'#1E2B3A');
+      return s+'</g>'; }
+    h+=half(68,'만약 쉬지 않았다면',G.stats.s3If!=null?G.stats.s3If:G.stats.s2Served,true)+half(206,'쉬며 지킨 해변',G.stats.s3Served,false);
     L.card.innerHTML=h+'</g>';
+  }
+  /* 블라인드 1차 공통(2026-11-09): 틀린 수에 이유가 없음 → 놓은 자리 위에 이유 한 줄(.nope, 1.6초). 그때 떠 있거나 기다리는 말풍선은 지운다 */
+  var WL={nothing:'관광객은 관광지로', dirty:'쓰레기가 꽉 찼어요', cargoNo:'짐 배는 항구로', b_salt:'염전은 갯벌에', b_port:'항구는 깊은 만에', b_tour:'관광지는 모래사장·절벽에'};
+  var wrongK=null, wrongEl=null;
+  function renderWrong(G){
+    var w=G.phase==='play' && G.wrong, on=w && G.t-w.t<1.6, k=on ? w.at+'|'+w.n : null; if(k===wrongK) return; wrongK=k;
+    if(wrongEl){ wrongEl.remove(); wrongEl=null; } if(!on) return;
+    var ov=document.getElementById('ovl'), r=rectOf(G,w.at); if(!ov||!r) return;
+    ov.querySelectorAll('.callout').forEach(function(d){ d.style.visibility='hidden'; });
+    try{ if(typeof U!=='undefined' && U.callQ) U.callQ.length=0; }catch(e){}
+    var d=document.createElement('div'); d.className='nope c1a4shake'; d.textContent=WL[w.why]||'다시!'; ov.appendChild(d); wrongEl=d;
+    var o=ov.getBoundingClientRect(), dw=d.offsetWidth, dh=d.offsetHeight;
+    d.style.left=Math.max(4,Math.min(o.width-dw-4,r.cx-o.left-dw/2))+'px'; d.style.top=Math.max(4,r.top-o.top-dh-6)+'px';
   }
   function renderScene(G){
     if(!svg) return;
@@ -963,7 +1005,7 @@ var SCENE = (function(){
     L.world.setAttribute('class',G.phase==='title'?'c1ttl':''); if(G.phase==='title') L.world.setAttribute('clip-path','url(#c1a4clip)'); else L.world.removeAttribute('clip-path');
     drawFence(G);
     var s=G.si+'|'+G.phase+'|'+(G.ch?G.seed+'/'+G.ch:''); if(s!==sig){ sig=s; buildBg(G); st={}; }
-    drawSpots(G); drawBld(G); drawTrash(G); drawPpl(G); drawBoats(G); drawBar(G); drawTray(G); drawFly(G); drawCard(G);
+    drawSpots(G); drawBld(G); drawTrash(G); drawPpl(G); drawBoats(G); drawBar(G); drawTray(G); drawFly(G); drawCard(G); renderWrong(G);
   }
   function vbRect(G,id){
     var p=String(id).split(':');
@@ -988,11 +1030,12 @@ var SCENE = (function(){
   function keepClear(G){ var a=['bar']; if(G.phase==='stageEnd' && G.si===2) a.push('cmp'); (G.boats||[]).forEach(function(b){ if(b.st==='wait') a.push('lane:'+b.lane); }); if(G.si>0) a.push('spot:s','spot:c','res:c','res:s','gauge:c','gauge:s'); if(G.phase==='play' && (stOf(G).deck||G.fence)) a.push('tray'); return a; }
   function idleAt(G){ return stOf(G).deck ? 'tray' : 'lane:0'; }
   var css=".c1pop{transform-box:fill-box;transform-origin:50% 80%;animation:c1pop .32s ease-out}@keyframes c1pop{0%{transform:scale(.3);opacity:.2}70%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}"
-    +".c1in{animation:c1in .3s ease-out}@keyframes c1in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}"
+    +".c1in{animation:c1in .3s ease-out}@keyframes c1in{from{transform:translateY(8px)}to{transform:none}}"
+    +".c1a4shake{animation:c1s4 .36s ease-out}@keyframes c1s4{0%{transform:scale(.6);opacity:0}30%{transform:scale(1.05);opacity:1}100%{transform:none}}"
     +".c1card{animation:c1card .35s ease-out .5s both}@keyframes c1card{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}"
     +".c1ttl text{display:none}"   /* 첫 화면 작은 그림에서는 이름표를 숨김(글자가 작아짐) */
     +"#prog{display:none!important}"   /* 블라인드: 위 동전 줄과 오른쪽 점 줄이 같은 진행을 둘로 → 동전 줄 하나로 */
-    +"@media (prefers-reduced-motion: reduce){.c1pop,.c1in,.c1card{animation:none}}";
+    +"@media (prefers-reduced-motion: reduce){.c1pop,.c1in,.c1card,.c1a4shake{animation:none}}";
   return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, keepClear:keepClear, idleAt:idleAt, css:css, aspect:'640/424'};
 })();
 /* ===== SCENE-END ===== */
