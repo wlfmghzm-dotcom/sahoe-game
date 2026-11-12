@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /sahoe-game/teacher/
 Sitemap: https://wlfmghzm-dotcom.github.io/sahoe-game/sitemap.xml
