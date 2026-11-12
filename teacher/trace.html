@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>기록 관리 (교사용)</title>
+<style>
+  body{margin:0;font:20px/1.5 system-ui,sans-serif;background:#F6F4EE;color:#2A2D3A;display:grid;place-items:center;min-height:100vh}
+  main{max-width:640px;width:calc(100% - 40px);padding:24px 0}
+  h1{font-size:28px;margin:0 0 8px}
+  .st{font-size:24px;font-weight:700;margin:16px 0}
+  .on{color:#2E7D4F}.off{color:#9A3B3B}
+  button{font:inherit;font-size:22px;padding:14px 20px;border:0;border-radius:12px;margin:6px 6px 6px 0;cursor:pointer;background:#3D49A8;color:#fff}
+  button.sub{background:#E4E1D8;color:#2A2D3A}
+  button.warn{background:#9A3B3B}
+  p.m{font-size:16px;color:#5A5D6A}
+</style>
+</head>
+<body>
+<main>
+  <h1>게임 행동 기록 (교사용)</h1>
+  <p class="m">이 기기에서만 기록하고, 어디로도 보내지 않습니다. 이름 같은 개인 정보는 없고 기기마다 무작위 ID 하나만 붙습니다.</p>
+  <div class="st" id="st"></div>
+  <div>
+    <button id="tog"></button>
+    <button class="sub" id="dl">기록 내려받기</button>
+    <button class="warn" id="clr">기록 지우기</button>
+  </div>
+  <p class="m" id="info"></p>
+</main>
+<script>
+(function(){
+  var K='sgtrace:', ls=window.localStorage;
+  function log(){ try{ return JSON.parse(ls.getItem(K+'log')||'[]'); }catch(e){ return []; } }
+  function draw(){
+    var on=ls.getItem(K+'on')==='1', L=log(), n=0, g={};
+    L.forEach(function(s){ n+=s.e.length; g[s.g]=1; });
+    var st=document.getElementById('st');
+    st.textContent=on?'● 이 기기 기록: 켜짐':'○ 이 기기 기록: 꺼짐'; st.className='st '+(on?'on':'off');
+    document.getElementById('tog').textContent=on?'기록 끄기':'이 기기 기록 켜기';
+    document.getElementById('info').textContent='기기 ID '+(ls.getItem(K+'did')||'(아직 없음)')+' · 판 '+L.length+'개 · 행동 '+n+'개 · 게임 '+Object.keys(g).length+'종';
+  }
+  document.getElementById('tog').onclick=function(){ if(ls.getItem(K+'on')==='1') ls.removeItem(K+'on'); else ls.setItem(K+'on','1'); draw(); };
+  document.getElementById('dl').onclick=function(){
+    var L=log(); if(!L.length){ alert('아직 기록이 없습니다.'); return; }
+    var did=ls.getItem(K+'did')||'x', t=new Date(), d=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+    var b=new Blob([JSON.stringify({did:did, exported:new Date().toISOString(), sessions:L})],{type:'application/json'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='trace-'+did+'-'+d+'.json'; document.body.appendChild(a); a.click(); a.remove();
+  };
+  document.getElementById('clr').onclick=function(){ if(confirm('이 기기의 기록을 모두 지울까요? 되돌릴 수 없습니다.')){ ls.removeItem(K+'log'); draw(); } };
+  draw();
+})();
+</script>
+</body>
+</html>
