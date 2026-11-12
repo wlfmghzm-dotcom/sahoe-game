@@ -403,7 +403,8 @@ var H32 = {
   /* 근거 그림 48×50 */
   eDeed: {vb:[0,0,48,50], svg:h32doc('<path d="M14 40l6-6 6 6v6h-12z" fill="#C88B4E"/><path d="M12 40l8-8 8 8" fill="none" stroke="#8A5A2E" stroke-width="2"/><circle cx="35" cy="38" r="6" fill="#C8483C"/>')},
   eDeal: {vb:[0,0,48,50], svg:h32doc('<rect x="12" y="32" width="12" height="12" rx="3" fill="#D9B07C" stroke="#9C7A4E" stroke-width="1.6"/><path d="M27 38h9M32 34l5 4-5 4" fill="none" stroke="#E8743B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="44" r="4" fill="#5B6B7E"/>')},
-  eLost: {vb:[0,0,64,48], svg:'<path d="M4 30 L30 18 L60 26 L34 40Z" fill="#C9BFA9" stroke="#9C9283" stroke-width="2" stroke-dasharray="5 4"/><path d="M14 22 L50 38" stroke="#5B6B7E" stroke-width="4" stroke-linecap="round"/><path d="M30 2v14M24 10l6 7 6-7" fill="none" stroke="#5B6B7E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'},
+  /* 땅 잃음: 빈 밭(점선) + 자물쇠(블라인드 1차: 선로·못 그림이 철로·공사로 읽힘) */
+  eLost: {vb:[0,0,64,48], svg:'<path d="M2 34 L30 20 L62 30 L34 46Z" fill="#D8CFBC" stroke="#9C9283" stroke-width="2" stroke-dasharray="5 4"/><path d="M24 14v-5a8 8 0 0 1 16 0v5" fill="none" stroke="#5B6B7E" stroke-width="4"/><rect x="19" y="13" width="26" height="21" rx="4" fill="#E8A33B" stroke="#9C6A1E" stroke-width="2"/><circle cx="32" cy="22" r="3" fill="#5B3A12"/><rect x="31" y="23" width="2" height="6" fill="#5B3A12"/>'},
   /* 밭(칸 그림) 64×44 */
   fOwn:  {vb:[0,0,64,44], svg:h32field('<path d="M40 14l8-8 8 8v10h-16z" fill="#E9D3A9"/><path d="M38 15l10-10 10 10" fill="none" stroke="#A9532C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="45" y="17" width="6" height="7" fill="#8A5A2E"/>')},
   fRent: {vb:[0,0,64,44], svg:h32field('<rect x="42" y="4" width="16" height="20" rx="2" fill="#F6EFDD" stroke="#C9B994" stroke-width="1.6"/><path d="M45 9h10M45 13h10M45 17h6" stroke="#9C8B6A" stroke-width="1.6"/>')},
@@ -469,22 +470,25 @@ var GOAL = { train:{name:'독립군 기르기', art:'gTrain', site:'man'}, learn
 var SITES = { man:{name:'만주', place:'신흥 강습소'}, usa:{name:'미국', place:'흥사단'}, home:{name:'국내 마을', place:''} };
 var YEARS = [1916, 1924, 1932];
 var BOOK = {1916:36.8, 1924:42.2, 1932:54.8};   /* 교과서 126쪽 그래프(조선 총독부 농림국, 1938) */
-var T = { pts:10, firstPts:6, retryPts:2, hintPts:5, jam:0.9, show:1.0, slideOut:0.6, slideIn:0.5, comboWin:6 };
+var T = { pts:6, firstPts:4, retryPts:1, hintPts:3,   /* 블라인드 1차: 점수가 크게 뜀 → 줄임 */
+          jam:0.9, show:1.0, slideOut:0.6, slideIn:0.5, comboWin:6 };
 /* 판: t = 줄에 서는 것. 1·2단계 '근거@해'(해는 16·24·32), 3단계 독립운동가 키 */
-function R(t){ return {t:t.split(',')}; }
+function R(t,ys){ var o={t:t.split(',')}; if(ys) o.years=ys; return o; }
 var STAGES = [
   {name:'근거를 보고 그래프에', rule:'deed', kind:'graph', years:[1916], R:[
     R('deed@16,deal@16,deed@16'), R('deal@16,deed@16,deed@16'), R('deed@16,deal@16,deed@16'), R('deal@16,deed@16'),
     R('deed@16,deed@16,deal@16'), R('deal@16,deed@16,deed@16'), R('deed@16,deal@16')]},
   {name:'땅을 잃으면 빌린 땅', rule:'lost', kind:'graph', years:[1924,1932], R:[
-    R('deed@24,lost@24,deal@32,deed@32'), R('lost@32,deed@32,deed@24,lost@24'), R('deal@24,deed@32,lost@32'),
-    R('deed@24,lost@32,deed@32,deed@24'), R('deal@32,lost@32,deed@32')]},
+    /* 블라인드 1차: 처음엔 한 해씩(1924 → 1932), 뒤 판에서 두 해를 함께. 마을 합계 1924 3/7, 1932 6/11 */
+    R('deed@24,lost@24,deed@24',[1924]), R('deal@24,deed@24,lost@24',[1924]),
+    R('lost@32,deed@32,deal@32',[1932]), R('deed@32,lost@32,deed@32,lost@32',[1932]),
+    R('deed@24,deal@32,deed@32',[1924,1932]), R('lost@32,deed@32',[1924,1932])]},
   {name:'목적에 맞는 곳으로', rule:'abroad', kind:'map', R:[
     R('hoe,ahn'), R('youth,stud,youth'), R('stud,youth,stud'), R('youth,stud,stud,youth'), R('stud,youth,youth'), R('youth,stud,stud')]}
 ];
 var BADGES = [
   {k:'deed',   name:'빌린 땅에서 농사',   art:'bdDeed',   def:'일제는 토지 주인을 확인한다며 토지 조사 사업을 벌였고, 많은 농민이 땅을 잃거나 불리한 조건으로 남의 땅을 빌려 농사지었어요.(교과서 126쪽 참고)'},
-  {k:'lost',   name:'늘어난 빌린 땅 농민', art:'bdLost',   def:'빌린 토지에서 농사짓는 농민의 비율은 1916년 36.8%, 1924년 42.2%, 1932년 54.8%로 늘었어요.(교과서 126쪽 그래프 참고)'},
+  {k:'lost',   name:'늘어난 빌린 땅', art:'bdLost',   def:'빌린 토지에서 농사짓는 농민의 비율은 1916년 36.8%, 1924년 42.2%, 1932년 54.8%로 늘었어요.(교과서 126쪽 그래프 참고)'},
   {k:'abroad', name:'국외에서 기른 힘',   art:'bdAbroad', def:'독립운동가들은 국외로 옮겨 학교와 단체를 세웠어요. 이회영은 만주에 신흥 강습소를 세워 독립군을 길렀고, 안창호는 미국에서 흥사단을 만들어 민족의 실력을 키웠어요.(교과서 126쪽 참고)'}
 ];
 var NAMES = {
@@ -495,7 +499,7 @@ var NAMES = {
   learn: '미국에서 <em>실력</em>을 키워요',
   found: '학교·단체를 <em>세웠어요</em>'
 };
-var TITLES = [[0,'마을 이야기를 들은 사람'],[320,'마을 이야기 기록자'],[620,'농민의 삶을 기록한 사람'],[820,'빼앗긴 땅과 떠난 이들의 기록자']];   /* 역할 기록 말(등급 말 X) */   /* 봇: 성실·느림 880, 무작위 중앙 390·p90 446, 힌트만 약 275 */
+var TITLES = [[0,'마을 이야기를 들은 사람'],[200,'마을 이야기 기록자'],[340,'농민의 삶 기록자'],[520,'빼앗긴 땅의 기록자']];   /* 역할 기록 말(등급 말 X). 봇: 성실·느림 550, 무작위 중앙 262·p90 307, 힌트만 약 165 */
 
 function cl(o){ return JSON.parse(JSON.stringify(o)); }
 function rnd(G){ var s=(G.seed+0x6D2B79F5)>>>0; G.seed=s; var t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }
@@ -531,7 +535,7 @@ function setupStage(G,si){
 }
 function startRound(G){
   var S=stOf(G), Rd=G.ch ? chRound(G,S.P,G.ri) : S.R[G.ri];
-  G.kind=Rd.kind||S.kind; G.years=Rd.years||S.years||[]; G.rt=0; G.endT=-1; G.rOk=true; G.rBad=0; G.zbad=null;
+  G.kind=Rd.kind||S.kind; G.years=Rd.years||S.years||[]; G.rt=0; G.endT=-1; G.rOk=true; G.rBad=0; G.zbad=null; G.lastOk=null;
   if(G.ch && G.kind==='graph'){ G.rec={1916:{own:[],rent:[]},1924:{own:[],rent:[]},1932:{own:[],rent:[]}}; }
   G.tray=[null,null,null,null]; Rd.t.slice(0,4).forEach(function(s,i){ G.tray[i]=token(s,G.nid++); });
 }
@@ -572,6 +576,7 @@ function drop(G0,src,dst,via){
     if(first) G.stats.perfect++;
     G.score+=pts; G.combo=first?G.combo+1:0;
     var found=false;
+    G.lastOk={at:dst, art:tk.kind==='fam'?EVID[tk.ev].art:ACT[tk.who].art, n:G.stats.ok};   /* 맞은 칸에 근거 칩(무엇이 맞았는지) */
     if(tk.kind==='fam'){ G.rec[tk.y][dp[2]].push({ev:tk.ev, look:tk.look}); }
     else { found=G.sites[dp[1]].length===0; G.sites[dp[1]].push(tk.who); }
     ev.push({t:'rec', k:tk.kind==='fam'?tk.ev:tk.who, row:dp[2]||dp[1], y:tk.y||0, pts:pts, perfect:first, found:found, at:dst});
@@ -796,8 +801,8 @@ function itemSvg(item){ return iconSvg(item,'it'); }
    아래: 줄 네 칸(가족 + 근거 그림, 2단계는 해 표 / 독립운동가 + 하려는 일 그림).
    틀린 칸: 빨간 X(data-verdict="bad") + 놓은 것의 근거 칩 + 이유 한 줄(엔진 말풍선). 판이 바뀌면 줄이 왼쪽으로 밀려 나가고 새 줄이 들어온다. */
 var SCENE = (function(){
-  var VB={w:600,h:440}, TRAY_Y=324, COLX=[130,287,444], COLW=150, ZR={y:44,h:110}, ZO={y:158,h:110};
-  var svg, gBg, gB, gTray, gCard, bSig='', traySig='', cardSig='', bgSig='', SX=0;
+  var VB={w:600,h:440}, TRAY_Y=324, COLX=[130,287,444], COLW=150, ZR={y:44,h:110}, ZO={y:158,h:110}, YC={1916:'#5E4B38',1924:'#2F6FB5',1932:'#7A4FB0'};
+  var svg, gBg, gB, gTray, gTab, gCard, tabSig='', bSig='', traySig='', cardSig='', bgSig='', SX=0;
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
   var POPT={};
   function pop(key){ var n=performance.now(), t=POPT[key]; if(t==null) t=POPT[key]=n; var e=n-t; return e<300 ? ' class="h32pop" style="animation-delay:-'+Math.round(e)+'ms"' : ''; }
@@ -822,17 +827,19 @@ var SCENE = (function(){
     g+='<g data-keep="배경"><rect x="4" y="6" width="118" height="300" rx="12" fill="#E2DCCF"/>'+
        '<rect x="16" y="12" width="94" height="30" rx="15" fill="#2E2418"/>'+txt(63,34,'1910년',19,'h32inv h32b')+
        useArt('kMuseum',18,48,90,80)+txt(63,148,'조선 총독부',18,'h32lab h32b')+
-       useArt('pMp',22,166,56,66)+useArt('iEye',70,178,44,30)+txt(63,262,'헌병 경찰',18,'h32lab h32b')+'</g>';
+       useArt('pMp',14,166,52,62)+useArt('iEye',66,170,48,32)+txt(90,224,'감시',18,'h32lab h32b')+txt(63,258,'헌병 경찰',18,'h32lab h32b')+'</g>';
     [1916,1924,1932].forEach(function(y,i){
       var x=COLX[i], on=act.indexOf(y)>=0, past=!on && (GG.rec[y].own.length+GG.rec[y].rent.length)>0, op=on?1:past?0.85:0.4;
       g+='<g opacity="'+op+'">';
       g+='<rect x="'+x+'" y="6" width="'+COLW+'" height="262" rx="12" fill="'+(on?'#F6EFE0':'#E9E3D6')+'"/>';
-      g+=txt(x+COLW/2,36,y+'년',24,'h32lab h32b');
+      if(y===1916) g+=txt(x+COLW/2,36,y+'년',24,'h32lab h32b');
+      else g+='<rect x="'+(x+COLW/2-48)+'" y="12" width="96" height="32" rx="16" fill="'+YC[y]+'"/>'+txt(x+COLW/2,36,y+'년',22,'h32inv h32b');   /* 줄 카드의 해 표와 같은 색 */
       ['rent','own'].forEach(function(row){ var Z=zoneRect(y,row), list=GG.rec[y][row];
         g+='<rect x="'+(Z.x+4)+'" y="'+Z.y+'" width="'+(COLW-8)+'" height="'+(Z.h-4)+'" rx="10" fill="'+(row==='rent'?'#FBE3CF':'#DDEFD4')+'" stroke="'+(row==='rent'?'#E8A36B':'#8FC07A')+'" stroke-width="2"/>';
         g+=useArt(row==='rent'?'fRent':'fOwn',Z.x+8,Z.y+4,54,38)+txt(Z.x+104,Z.y+30,row==='rent'?'빌린 땅':'내 땅',19,'h32lab h32b');
         g+=famIcons(list,Z.x+10,Z.y+46,COLW-16,6,21);
         if(on && GG.endT<0 && GG.phase==='play') g+='<rect x="'+(Z.x+1)+'" y="'+(Z.y-3)+'" width="'+(COLW-2)+'" height="'+(Z.h+2)+'" rx="12" fill="none" stroke="#F2B640" stroke-width="2.6" stroke-dasharray="8 7" class="h32blink"/>';
+        var lo=GG.lastOk; if(lo && lo.at==='z:'+y+':'+row) g+='<rect x="'+(Z.x+4)+'" y="'+Z.y+'" width="'+(COLW-8)+'" height="'+(Z.h-4)+'" rx="10" fill="#FFF6C9" opacity=".7" class="h32glow"/>'+famIcons(list,Z.x+10,Z.y+46,COLW-16,6,21)+'<g'+pop('lo'+lo.n)+'><rect x="'+(Z.x+8)+'" y="'+(Z.y+2)+'" width="44" height="40" rx="8" fill="#FBF8F1" stroke="#4CAF7A" stroke-width="2.6"/>'+useArt(lo.art,Z.x+12,Z.y+5,36,34)+'</g>';   /* 블라인드 1차: 맞은 칸에 짧은 빛 + 근거 칩(튐 없음) */
         if(zb && zb.at==='z:'+y+':'+row) g+='<g data-verdict="bad"'+pop('zc'+zb.n)+'><rect x="'+(Z.x+COLW-56)+'" y="'+(Z.y+46)+'" width="46" height="48" rx="8" fill="#FBF8F1" stroke="#D9534F" stroke-width="2.6"/>'+useArt(zb.art,Z.x+COLW-52,Z.y+50,38,40)+'</g>'+xMark(Z.x+COLW/2-10,Z.y+Z.h/2+8,'zx'+zb.n);
       });
       g+='</g>';
@@ -844,7 +851,7 @@ var SCENE = (function(){
     if(k==='home') g+='<path d="M'+x+' '+(y+30)+'L'+B.px+' '+B.py+'" stroke="#5E4B38" stroke-width="3" stroke-dasharray="6 4"/><circle cx="'+B.px+'" cy="'+B.py+'" r="6" fill="#8C99A5" stroke="#FBF8F1" stroke-width="2"/>';
     g+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="14" fill="'+(k==='man'?'#F6EEDA':k==='usa'?'#EAF2DC':'#E4E2DE')+'" stroke="'+(built?'#4CAF7A':'#CDBFA6')+'" stroke-width="'+(built?3.2:2.4)+'"/>';
     g+=txt(x+12,y+28,SITES[k].name,22,'h32lab h32b','start');
-    if(k==='home'){ g+=useArt('kHouse',x+4,y+36,66,58)+useArt('pMp',x+72,y+40,38,46)+useArt('iEye',x+98,y+32,38,26); }
+    if(k==='home'){ g+=useArt('kHouse',x+4,y+36,66,58)+useArt('pMp',x+64,y+42,34,42)+useArt('iEye',x+100,y+34,36,24)+txt(x+119,y+80,'감시',18,'h32lab h32b'); }
     else {
       var gl=k==='man'?'gTrain':'gLearn';
       g+=useArt(gl,x+w-40,y+6,32,32);
@@ -858,13 +865,13 @@ var SCENE = (function(){
     return g;
   }
   function trayHtml(G,GG){
-    var h='<rect x="10" y="'+(TRAY_Y-18)+'" width="104" height="28" rx="8" fill="#B5895A"/>'+txt(62,TRAY_Y+1,GG.kind==='map'?'독립운동가':'마을 가족',18,'h32lab');
+    var h='';
     h+='<rect x="2" y="'+TRAY_Y+'" width="596" height="114" rx="14" fill="#A8794A"/><rect x="2" y="'+TRAY_Y+'" width="596" height="108" rx="14" fill="#D9B07C"/>';
     for(var i=0;i<4;i++){ var x=8+i*148, k=GG.tray[i];
       h+='<rect x="'+x+'" y="'+(TRAY_Y+7)+'" width="140" height="96" rx="12" fill="'+(k&&k.fails?'#FBE9E4':'#F5E6C8')+'"/>';
       if(!k) continue;
       if(k.kind==='fam'){ h+=useArt(FARM_ART[k.look],x+6,TRAY_Y+10,54,62)+useArt(EVID[k.ev].art,x+62,TRAY_Y+12,k.ev==='lost'?70:54,k.ev==='lost'?52:56)+txt(x+70,TRAY_Y+96,EVID[k.ev].name,20,'h32lab h32b');
-        if(GG.years && GG.years.length>1) h+='<rect x="'+(x+2)+'" y="'+(TRAY_Y+2)+'" width="58" height="26" rx="13" fill="#2E2418"/>'+txt(x+31,TRAY_Y+22,String(k.y),18,'h32inv h32b'); }
+        if(GG.years && (GG.years.length>1 || GG.years[0]!==1916)) h+='<rect x="'+(x+2)+'" y="'+(TRAY_Y+2)+'" width="58" height="26" rx="13" fill="'+YC[k.y]+'"/>'+txt(x+31,TRAY_Y+22,String(k.y),18,'h32inv h32b'); }
       else { var a=ACT[k.who]; h+=useArt(a.art,x+6,TRAY_Y+10,56,64)+useArt(GOAL[a.goal].art,x+72,TRAY_Y+14,54,54)+txt(x+70,TRAY_Y+96,a.name,20,'h32lab h32b'); }
     }
     return h;
@@ -912,8 +919,8 @@ var SCENE = (function(){
 
   function mount(host){
     svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
-    gBg=el('g',{}); gB=el('g',{}); gTray=el('g',{}); gCard=el('g',{});
-    [gBg,gB,gTray,gCard].forEach(function(g){ svg.appendChild(g); });
+    gBg=el('g',{}); gB=el('g',{}); gTray=el('g',{}); gTab=el('g',{}); gCard=el('g',{});
+    [gBg,gB,gTray,gTab,gCard].forEach(function(g){ svg.appendChild(g); });
     host.insertBefore(svg, host.firstChild);
   }
   var TITLE_G={phase:'title', kind:'graph', years:[1916], endT:-1, rt:9, zbad:null,
@@ -931,7 +938,7 @@ var SCENE = (function(){
     var GG=G.phase==='title'?TITLE_G:G, kind=G.phase==='stageEnd'?'graph':GG.kind;
     var bs=(G.phase==='title'?'t':'p')+kind; if(bs!==bgSig){ bgSig=bs;
       gBg.innerHTML='<rect x="-700" y="-600" width="2000" height="1640" fill="#7A6450"/>'+(kind==='map'?mapSvg():'<rect x="0" y="0" width="600" height="316" rx="16" fill="#EDE3CF"/>'); }
-    var zb=GG.zbad?GG.zbad.at+GG.zbad.n:'';
+    var zb=(GG.zbad?GG.zbad.at+GG.zbad.n:'')+(GG.lastOk?'|'+GG.lastOk.at+GG.lastOk.n:'');
     var sig=G.phase==='stageEnd'?'end':[G.phase,G.si,G.ch?1:0,G.ri,kind,(GG.years||[]).join(','),GG.endT>=0?1:0,zb,JSON.stringify(GG.rec),JSON.stringify(GG.sites)].join('|');
     if(sig!==bSig){ bSig=sig; gB.innerHTML = G.phase==='stageEnd' ? '' : (kind==='map' ? siteHtml(G,GG,'man')+siteHtml(G,GG,'usa')+siteHtml(G,GG,'home') : graphHtml(G,GG)); }
     /* 판 전환: 줄(사람)이 밀려 나가고 들어온다(그래프·지도는 그대로 남아 쌓임이 보이게) */
@@ -940,19 +947,20 @@ var SCENE = (function(){
     if(ts!==traySig){ traySig=ts; gTray.innerHTML = G.phase==='stageEnd' ? trayHtml(G,{kind:kind,tray:[null,null,null,null]}) : trayHtml(G,GG); }
     /* 단계 첫 판(리본이 뜬 동안)은 줄이 제자리에 보이게(무엇을 끌지 보이도록). 판 사이 전환만 밀려 나가고 들어옴 */
     var TX=(G.phase==='play' && G.rt<0) ? 0 : SX;
+    var tb=kind==='map'?'독립운동가':'마을 가족'; if(tb!==tabSig){ tabSig=tb; gTab.innerHTML='<rect x="10" y="'+(TRAY_Y-22)+'" width="112" height="30" rx="8" fill="#B5895A"/>'+txt(66,TRAY_Y-1,tb,19,'h32lab h32b'); }   /* 탭은 줄과 따로(밀려 나가지 않게, 줄 판에 덮이지 않게) */
     gTray.setAttribute('transform', TX?'translate('+TX.toFixed(1)+' 0)':'');
     var cs=G.phase==='stageEnd' && G.card ? 'c'+G.si : ''; if(cs!==cardSig){ cardSig=cs; gCard.innerHTML = cs ? cardHtml(G) : ''; }
   }
   function vbRect(G,id){
     var p=String(id).split(':'), GG=G.phase==='title'?TITLE_G:G;
-    if(p[0]==='tray'){ if(G.phase==='play' && G.rt<0) return null; var i=+p[1]; return {x:8+i*148+SX, y:TRAY_Y+7, w:140, h:96}; }
+    if(p[0]==='tray'){ var i=+p[1]; return {x:8+i*148+((G.phase==='play' && G.rt<0)?0:SX), y:TRAY_Y+7, w:140, h:96}; }
     if(p[0]==='card') return G.phase==='stageEnd' ? {x:14,y:8,w:572,h:304} : null;
     if(G.phase==='stageEnd') return null;
     if(p[0]==='bgL') return GG.kind==='graph' ? {x:4,y:6,w:118,h:300} : null;
     if(p[0]==='z'){ if(GG.kind!=='graph') return null; return zoneRect(p[1],p[2]); }
     if(p[0]==='site'){ if(GG.kind!=='map') return null; var B=SITE[p[1]]; return B?{x:B.x,y:B.y,w:B.w,h:B.h}:null; }
     if(p[0]==='pt'){   /* +점수: 칸 오른쪽 위 모서리(칸 이름표와 떼기) */
-      if(p[1]==='man'||p[1]==='usa'||p[1]==='home'){ var S=SITE[p[1]]; return {x:S.x+S.w-62, y:S.y+S.h-40, w:58, h:34}; }
+      if(p[1]==='man'||p[1]==='usa'||p[1]==='home'){ var S=SITE[p[1]]; return p[1]==='man' ? {x:S.x+S.w+6, y:S.y+40, w:58, h:34} : {x:S.x-64, y:S.y+40, w:58, h:34}; }   /* 블라인드 1차: '신흥 강습소' 이름을 가림 → 칸 밖 */
       var Z=zoneRect(p[1],p[2]); return {x:Z.x+COLW-60, y:Z.y+Z.h-40, w:56, h:34}; }
     return null;
   }
@@ -966,6 +974,7 @@ var SCENE = (function(){
     if(G.phase==='stageEnd') return ['card'];
     if(cardSig) renderScene(G);
     var GG=G.phase==='title'?TITLE_G:G, k=['tray:0','tray:1','tray:2','tray:3'];
+    if(G.phase==='play' && G.rt<0) return k;   /* 단계 첫 판 전: 리본은 그래프·지도 위에 뜨고 아래 줄(끌 것)은 비워 둔다 */
     if(GG.kind==='map') k=k.concat(['site:man','site:usa','site:home']);
     else { k.push('bgL'); (GG.years||[]).forEach(function(y){ k.push('z:'+y+':rent'); k.push('z:'+y+':own'); }); }
     return k;
@@ -974,7 +983,14 @@ var SCENE = (function(){
   var css = '.h32lab{fill:#2E2418;font-family:var(--game)}.h32b{font-weight:700}.h32inv{fill:#FFFFFF;font-family:var(--game)}'+
     'div.fx{background:#2E2418;color:#FFFFFF;border-radius:14px;padding:0 10px;font-size:26px;text-shadow:none;box-shadow:0 3px 0 #E8743B}div.fx.fast{font-size:28px;color:#FFD95A}'+
     '@keyframes h32pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}.h32pop{transform-box:fill-box;transform-origin:center;animation:h32pop .28s ease-out}'+
+    '@keyframes h32gl{0%{opacity:.95}100%{opacity:0}}.h32glow{animation:h32gl 1.2s ease-out forwards}'+
     '@keyframes h32bl{50%{opacity:.25}}.h32blink{animation:h32bl 1s ease-in-out infinite}'+
+    /* 블라인드 1차: 진행 줄 뜻 → 끝낸 판 수 / 전체 판 수(엔진 칸을 CSS 카운터로 셈), 결과 배지에 짧은 이름 */
+    '#prog{counter-reset:h3pd h3pt}#prog .pc{counter-increment:h3pt}#prog .pc:has(.ck){counter-increment:h3pt h3pd}'+
+    '#prog::before{content:"판";font-family:var(--game);font-size:18px;color:#3A4756;margin-right:4px;flex:none}'+
+    '#prog::after{content:counter(h3pd) " / " counter(h3pt);font-family:var(--game);font-size:19px;color:#1E2B3A;margin-left:auto;padding-left:6px;flex:none;white-space:nowrap}'+
+    '.res .shelf{gap:6px;flex-wrap:nowrap}.res .shelf .bd{width:auto;min-width:58px;height:auto;display:flex;flex-direction:column;align-items:center;padding:4px 6px}.res .shelf .bd svg{width:40px;height:40px}'+
+    '.res .shelf .bd::after{content:attr(aria-label);font-family:var(--game);font-size:18px;line-height:1.1;color:#1E2B3A;white-space:nowrap}'+
     '@media (prefers-reduced-motion:reduce){.h32pop,.h32blink{animation:none}}';
   return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, keepClear:keepClear, idleAt:idleAt, css:css, aspect:'600/440'};
 })();

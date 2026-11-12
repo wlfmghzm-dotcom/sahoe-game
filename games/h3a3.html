@@ -511,9 +511,9 @@ var CARD = {
   yu:   {name:'유관순',      art:'pYu'},
   gov:  {name:'임시 정부',   art:'tGov'},
   link: {name:'비밀 연락',   art:'tLink'},
-  fund: {name:'모금함',      art:'tFund'},
-  news: {name:'신문',        art:'tNews'},
-  dip:  {name:'외교 문서',   art:'tDip'}
+  fund: {name:'자금 모으기',      art:'tFund'},
+  news: {name:'신문 알리기',        art:'tNews'},
+  dip:  {name:'외교 활동',   art:'tDip'}
 };
 /* 임시 정부 일이 필요한 곳(교과서 129쪽: 비밀 연락망으로 지휘, 독립운동 자금, 신문으로 알림, 외교로 국제 사회에 알림) */
 var PLACE = {
@@ -762,6 +762,7 @@ if(typeof module!=='undefined') module.exports={SEED:SEED,TOWNS:TOWNS,ROADS:ROAD
 var GAME = {
   title: '만세 소리가 퍼지다',
   subtitle: '5학년 2학기 사회 · 3·1 운동과 대한민국 임시 정부 · 128~130쪽',
+  titlePos: 'top',
   sceneLabel: '1919년 우리나라 지도와 고을들, 왼쪽 달력, 오른쪽 소식을 전할 사람 선반',
   guide: '써냥이',
   seed: SEED,
@@ -836,7 +837,7 @@ var GAME = {
   },
   onEvent: function(e,FX){
     if(e.t==='spread'){
-      if(e.ok){ if(e.pts>0) FX.score('pts:'+e.town, e.pts, e.perfect, 0); FX.burst(e.at, 5); FX.progress();
+      if(e.ok){ FX.burst(e.at, 5); FX.progress();
         FX.explain(e.stu ? {why:'학생이 고향으로 내려가 만세 시위를 이끌었어요', def:BADGES[1].def.replace(/\(교과서.*$/,''), page:'교과서 128쪽 참고'}
                          : {why:'소식이 온 고을과 길로 이어진 고을로 만세 소식이 퍼졌어요', def:BADGES[0].def.replace(/\(교과서.*$/,''), page:'교과서 128쪽 참고'}); }
       else { FX.comboOff(); FX.progress(); FX.callout(e.line, e.at);
@@ -845,14 +846,14 @@ var GAME = {
                  : {why:'학생 이름표에 적힌 고향을 지도에서 찾아요', page:'교과서 128쪽 참고'}); }
     }
     else if(e.t==='site'){
-      if(e.ok){ if(e.pts>0) FX.score('pts:site', e.pts, e.perfect, 0); FX.burst('site:sh', 5); FX.progress();
+      if(e.ok){ FX.burst('site:sh', 5); FX.progress();
         FX.explain({why:'상하이는 각 나라 외교 기관이 모여 있고 일제의 탄압을 피할 수 있었어요', def:BADGES[2].def.replace(/\(교과서.*$/,''), page:'교과서 129쪽 참고'}); }
       else { FX.comboOff(); FX.callout(e.line, e.at);
         FX.explain(e.why==='seoul' ? {why:'서울은 일제의 감시가 심해 임시 정부가 일하기 어려워요. 두 조건을 모두 봐요', page:'교과서 129쪽 참고'}
                                    : {why:'외교 기관이 없으면 다른 나라에 독립 의지를 알리기 어려워요. 두 조건을 모두 봐요', page:'교과서 129쪽 참고'}); }
     }
     else if(e.t==='task'){
-      if(e.ok){ if(e.pts>0) FX.score('ptp:'+e.id, e.pts, e.perfect, 0); FX.burst(e.at, 5); FX.progress();
+      if(e.ok){ FX.burst(e.at, 5); FX.progress();
         var W={link:'비밀 연락망으로 국내 독립운동을 지휘했어요', fund:'독립운동 자금을 모았어요', news:'신문을 만들어 임시 정부의 활동을 알렸어요', dip:'외교로 국제 사회에 독립 의지를 알렸어요'};
         FX.explain({why:W[e.kind], page:'교과서 129쪽 참고'}); }
       else { FX.comboOff(); FX.callout(e.line, e.at); FX.explain({why:CARD[e.k].name+'은(는) 이곳에 맞지 않아요. 이곳 사람이 바라는 것을 봐요', page:'교과서 129쪽 참고'}); }
@@ -892,7 +893,7 @@ function itemSvg(item){ return iconSvg(item,'it'); }
    놓은 자리에서 바로(0.3초 안): 고을에 태극기가 솟음 / 틀리면 빨간 X(data-verdict="bad")와 까닭 한 줄(엔진 말풍선).
    단계 끝: 지도 자리에 비교 카드(3월 1일 지도 | 지금 지도, 3단계는 상하이 임시 정부 조건과 한 일). */
 var SCENE = (function(){
-  var VB={w:600,h:440}, SHX=486, SHW=108, SLH=104, CX0=6, CW=112;
+  var VB={w:600,h:440}, SHX=486, SHW=108, SLH=96, CX0=6, CW=112;
   var LAND='M146 8C159 4 194 6 220 6C246 6 273 10 300 10C327 10 355 5 380 4C405 3 439 -0 452 4C465 8 459 21 458 30C457 39 449 49 446 60C443 71 439 84 440 96C441 108 452 118 450 130C448 142 427 155 426 166C425 177 438 186 446 198C454 210 470 223 476 238C482 253 480 275 480 290C480 305 474 316 474 330C474 344 482 357 478 372C474 387 465 410 452 420C439 430 419 432 400 434C381 436 358 430 340 430C322 430 306 436 290 436C274 436 260 434 246 432C232 430 218 430 208 424C198 418 189 408 184 396C179 384 176 363 178 350C180 337 189 329 194 318C199 307 207 294 208 282C209 270 207 257 202 244C197 231 185 220 180 206C175 192 169 175 170 160C171 145 186 130 186 118C186 106 176 96 170 86C164 76 152 65 148 56C144 47 144 38 144 30C144 22 133 12 146 8Z';
   var svg, gBg, gMap, gCol, gShelf, gCard, mapSig='', colSig='', shSig='', cardSig='', bgSig='';
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
@@ -901,12 +902,13 @@ var SCENE = (function(){
   function TX(x,y,s,txt,extra){ return '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-size="'+s+'" class="h3a3-lab'+(extra||'')+'">'+txt+'</text>'; }
   function xMark(x,y,key){ return '<g data-verdict="bad"'+pop(key)+'><circle cx="'+x+'" cy="'+y+'" r="14" fill="#D9534F" stroke="#FBF8F1" stroke-width="3"/><path d="M'+(x-6)+' '+(y-6)+'l12 12M'+(x+6)+' '+(y-6)+'l-12 12" stroke="#FBF8F1" stroke-width="3.6" stroke-linecap="round"/></g>'; }
   function okMark(x,y,key){ return '<g'+pop(key)+'><circle cx="'+x+'" cy="'+y+'" r="13" fill="#4CAF7A" stroke="#FBF8F1" stroke-width="3"/><path d="M'+(x-6)+' '+y+'l4 4 8-9" stroke="#FBF8F1" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>'; }
-  function slotY(i){ return 8+i*107; }
+  function slotY(i){ return 36+i*101; }
+  function cond(art,x,y,l1,l2){ var o=useArt(art,x,y,30,30); if(l2) o+=TX(x+67,y+13,14,l1)+TX(x+67,y+29,14,l2); else o+=TX(x+67,y+21,15,l1); return o; }
   function isGov(G){ return G.phase!=='title' && stOf(G).rule==='gov'; }
   function siteRound(G){ return isGov(G) && !G.site; }
   function placeBox(G,q){
     if(q.at==='emb') return {x:10, y:14, w:104, h:190, emb:1};
-    var t=TOWNS[q.at]; return {x:Math.max(126,Math.min(474-84,t.x-42)), y:Math.max(4,Math.min(436-78,t.y-40)), w:84, h:78};
+    var t=TOWNS[q.at]; return {x:Math.max(126,Math.min(474-84,t.x-42)), y:Math.max(4,t.y-66), w:84, h:78};
   }
   function shownPlaces(G){ return (G.places||[]).filter(function(q){ return q.st==='wait' || ((q.st==='ok'||q.st==='miss') && q.t<0.9); }); }
 
@@ -928,15 +930,15 @@ var SCENE = (function(){
     var tw=''; TOWNS.forEach(function(t){ if(vis(t.id)) tw += townHtml(G,t); });
     /* 이름표는 모든 고을 위에(옆 고을 깃발이 가리지 않게) */
     TOWNS.forEach(function(t){ if(vis(t.id) && t.name) tw += nameTag(t); });
-    h += '<g'+(sr?' opacity=".45"':'')+'>'+tw+'</g>';
+    h += '<g'+(sr?' opacity=".3"':'')+'>'+tw+'</g>';
     /* 틀린 자리 표시 */
     (G.marks||[]).forEach(function(m,k){ var p=String(m.at).split(':');
       if(p[0]==='town'){ var t=TOWNS[+p[1]]; h += '<circle cx="'+t.x+'" cy="'+t.y+'" r="24" fill="none" stroke="#D9534F" stroke-width="4" data-verdict="bad"/>'+xMark(t.x+18, t.y-18, 'x'+m.at+'_'+(G.stats?G.stats.wrong:0)); } });
     /* 3단계: 서울 후보 */
     if(sr){ var s=TOWNS[0];
-      h += '<g data-keep="후보"><rect x="'+(s.x-34)+'" y="'+(s.y-34)+'" width="112" height="68" rx="14" fill="#FBF8F1" fill-opacity=".93" stroke="#3E6FA8" stroke-width="3" stroke-dasharray="8 5"/>'+townHtml(G,s)+
-        useArt('cDip', s.x+28, s.y-30, 30, 30)+useArt('cEye', s.x+42, s.y+2, 30, 30)+'</g>';
-      var sm=(G.marks||[]).find(function(m){ return m.at==='site:seoul'; }); if(sm) h += xMark(s.x+70, s.y-30, 'xs'+G.siteFails);
+      h += '<g data-keep="후보"><rect x="'+(s.x-34)+'" y="'+(s.y-34)+'" width="178" height="68" rx="14" fill="#FBF8F1" fill-opacity=".96" stroke="#3E6FA8" stroke-width="3" stroke-dasharray="8 5"/>'+townHtml(G,s)+nameTag(s)+
+        cond('cDip', s.x+30, s.y-32, '외교 기관')+cond('cEye', s.x+30, s.y+1, '감시')+'</g>';
+      var sm=(G.marks||[]).find(function(m){ return m.at==='site:seoul'; }); if(sm) h += xMark(s.x+138, s.y-30, 'xs'+G.siteFails);
     }
     /* 3단계: 일이 필요한 곳(지도 위) */
     if(gov) shownPlaces(G).forEach(function(q){ if(q.at==='emb') return; h += placeHtml(G,q); });
@@ -974,8 +976,8 @@ var SCENE = (function(){
     /* 위 칸: 산골 후보 → 세운 뒤에는 외국 대사관 자리 */
     if(sr){
       h += '<rect x="10" y="12" width="104" height="194" rx="12" fill="#FBF8F1" stroke="#3E6FA8" stroke-width="3" stroke-dasharray="8 5"/>';
-      h += useArt('mtn', 12, 30, 100, 60)+useArt('hCabin', 40, 62, 46, 40)+TX(62, 128, 20, '산골', ' h3a3-b');
-      h += useArt('cNoDip', 18, 146, 40, 40)+useArt('cSafe', 66, 146, 40, 40);
+      h += useArt('mtn', 12, 22, 100, 60)+useArt('hCabin', 40, 54, 46, 40)+TX(62, 122, 20, '산골', ' h3a3-b');
+      h += cond('cNoDip', 14, 136, '외교 기관', '없음')+cond('cSafe', 14, 172, '탄압 피함');
       if(mk('site:mount')) h += xMark(104, 22, 'xm'+G.siteFails);
     } else {
       var e=(G.places||[]).find(function(q){ return q.at==='emb' && (q.st==='wait' || ((q.st==='ok'||q.st==='miss') && q.t<0.9)); });
@@ -985,8 +987,8 @@ var SCENE = (function(){
     /* 아래 칸: 상하이 */
     h += '<rect x="10" y="214" width="104" height="216" rx="12" fill="#FBF8F1" stroke="'+(sr?'#3E6FA8':'#4CAF7A')+'" stroke-width="3"'+(sr?' stroke-dasharray="8 5"':'')+'/>';
     if(sr){
-      h += useArt('ccA', 20, 236, 34, 46)+useArt('ccE', 48, 246, 58, 43)+'<path d="M14 296q24-8 48 0t48 0v8H14z" fill="#9CC6DA"/>'+TX(62, 330, 20, '상하이', ' h3a3-b');
-      h += useArt('cDip', 18, 346, 40, 40)+useArt('cSafe', 66, 346, 40, 40);
+      h += useArt('ccA', 20, 236, 34, 46)+useArt('ccE', 48, 246, 58, 43)+'<path d="M14 296q24-8 48 0t48 0v8H14z" fill="#9CC6DA"/>'+TX(62, 326, 20, '상하이', ' h3a3-b');
+      h += cond('cDip', 14, 340, '외교 기관')+cond('cSafe', 14, 380, '탄압 피함');
     } else {
       h += '<g'+pop('gov')+'>'+useArt('kGov', 16, 240, 92, 86)+'<rect x="80" y="222" width="3" height="34" fill="#6B5843"/>'+useArt('flagK', 83, 223, 26, 17.3)+'</g>';
       h += TX(62, 352, 20, '상하이', ' h3a3-b')+TX(62, 380, 18, '임시 정부');
@@ -996,15 +998,16 @@ var SCENE = (function(){
   /* ---- 선반 ---- */
   function cardHtml1(c,x,y){
     var h='';
-    if(c.k==='cit'){ h += useArt(artOf(c), x+26, y+4, 56, 64)+TX(x+SHW/2, y+94, 20, '시민', ' h3a3-b'); }
+    if(c.k==='cit'){ h += useArt(artOf(c), x+26, y+2, 56, 62)+TX(x+SHW/2, y+88, 20, '시민', ' h3a3-b'); }
     else if(c.k==='stu'||c.k==='yu'){ h += useArt(c.k==='yu'?'mfc':'mff', x+24, y+2, 48, 54)+useArt('kBook', x+66, y+30, 24, 24);
-      h += TX(x+SHW/2, y+74, 18, c.k==='yu'?'유관순':'학생', ' h3a3-b');
-      h += '<rect x="'+(x+8)+'" y="'+(y+80)+'" width="'+(SHW-16)+'" height="22" rx="11" fill="#3E6FA8"/><text x="'+(x+SHW/2)+'" y="'+(y+97)+'" text-anchor="middle" font-size="16" class="h3a3-wlab">고향 '+TOWNS[c.home].name+'</text>'; }
-    else { h += useArt(CARD[c.k].art, x+22, y+4, 64, 64)+TX(x+SHW/2, y+94, c.k==='dip'?18:19, CARD[c.k].name, ' h3a3-b'); }
+      h += TX(x+SHW/2, y+70, 18, c.k==='yu'?'유관순':'학생', ' h3a3-b');
+      h += '<rect x="'+(x+8)+'" y="'+(y+74)+'" width="'+(SHW-16)+'" height="20" rx="10" fill="#3E6FA8"/><text x="'+(x+SHW/2)+'" y="'+(y+90)+'" text-anchor="middle" font-size="16" class="h3a3-wlab">고향 '+TOWNS[c.home].name+'</text>'; }
+    else { h += useArt(CARD[c.k].art, x+24, y+2, 60, 60)+TX(x+SHW/2, y+88, 18, CARD[c.k].name, ' h3a3-b'); }
     return h;
   }
   function shelfHtml(G){
-    var h='', dx=0, op=1;
+    var h='', dx=0, op=1, gv=isGov(G), hd=G.phase!=='play'?'':!gv?'전할 사람':!G.site?'세울 것':'임시 정부의 일';
+    if(hd) h += '<rect x="'+(SHX+2)+'" y="6" width="'+(SHW-4)+'" height="26" rx="13" fill="#FBF8F1"/>'+TX(SHX+SHW/2, 25, hd.length>5?14:16, hd, ' h3a3-b');
     if(G.rs==='in') dx=130*(1-Math.min(1,G.rt/T.inT)); else if(G.rs==='out') dx=130*Math.min(1,G.rt/T.outT);
     for(var i=0;i<4;i++){ var y=slotY(i);
       h += '<rect x="'+SHX+'" y="'+y+'" width="'+SHW+'" height="'+SLH+'" rx="12" fill="#F5E6C8" stroke="#D8C39D" stroke-width="2"/>';
@@ -1060,7 +1063,9 @@ var SCENE = (function(){
     [gBg,gMap,gCol,gShelf,gCard].forEach(function(g){ svg.appendChild(g); });
     host.insertBefore(svg, host.firstChild);
   }
+  function progLab(G){ var p=document.getElementById('prog'); if(!p) return; var l=G.phase==='title'?'':isGov(G)?'임시 정부의 일':'밝힐 고을'; if(p.getAttribute('data-h3a3')!==l) p.setAttribute('data-h3a3',l); }
   function renderScene(G){
+    progLab(G);
     if(G.phase!=='play') POPT={};
     if(!bgSig){ bgSig='1'; gBg.innerHTML='<rect x="-700" y="-600" width="2000" height="1640" fill="#BFD8E4"/><rect x="0" y="0" width="600" height="440" fill="#CFE3EC"/><path d="'+LAND+'" fill="#EFE3C8" stroke="#B9A47E" stroke-width="4" stroke-linejoin="round"/>'+
       '<rect x="'+(SHX-4)+'" y="2" width="'+(SHW+8)+'" height="436" rx="14" fill="#A8794A"/>'; }
@@ -1081,11 +1086,12 @@ var SCENE = (function(){
     if(p[0]==='card'){ if(p.length===1) return G.phase==='stageEnd' ? {x:126,y:8,w:354,h:424} : null; return {x:SHX, y:slotY(+p[1]), w:SHW, h:SLH}; }
     if(p[0]==='town'){ t=TOWNS[+p[1]]; return t ? {x:t.x-26, y:t.y-26, w:52, h:52} : null; }
     if(p[0]==='pts'){ if(p[1]==='site') return {x:24, y:220, w:76, h:30}; t=TOWNS[+p[1]]; return t ? {x:t.x>400?t.x-76:t.x+22, y:t.y-13, w:54, h:26} : null; }
-    if(p[0]==='site'){ if(p[1]==='seoul'){ t=TOWNS[0]; return {x:t.x-34, y:t.y-34, w:112, h:68}; } if(p[1]==='mount') return {x:10, y:12, w:104, h:194}; if(p[1]==='sh') return {x:10, y:214, w:104, h:216}; return null; }
+    if(p[0]==='site'){ if(p[1]==='seoul'){ t=TOWNS[0]; return {x:t.x-34, y:t.y-34, w:178, h:68}; } if(p[1]==='mount') return {x:10, y:12, w:104, h:194}; if(p[1]==='sh') return {x:10, y:214, w:104, h:216}; return null; }
     if(p[0]==='pl'||p[0]==='ptp'){ var q=(G.places||[]).find(function(z){ return String(z.id)===p[1]; }); if(!q) return null; var b=placeBox(G,q);
       if(p[0]==='pl') return {x:b.x, y:b.y, w:b.w, h:b.h}; return {x:b.x+15, y:Math.min(410,b.y+b.h+2), w:54, h:26}; }
     if(p[0]==='cardL') return G.phase==='stageEnd' ? {x:136,y:18,w:160,h:330} : null;
     if(p[0]==='cardR') return G.phase==='stageEnd' ? {x:296,y:18,w:174,h:330} : null;
+    if(p[0]==='calCol') return {x:6, y:6, w:112, h:428};
     if(p[0]==='colTop') return {x:10, y:12, w:104, h:194};
     return null;
   }
@@ -1097,12 +1103,12 @@ var SCENE = (function(){
   function avoid(G){ return sources(G).concat(targets(G)); }
   function keepClear(G){
     if(G.phase==='stageEnd') return ['cardL','cardR'];
-    var k=[]; if(isGov(G)){ k.push('site:sh'); if(!G.site){ k.push('site:mount'); k.push('site:seoul'); } (G.places||[]).forEach(function(q){ if(q.st==='wait') k.push('pl:'+q.id); }); }
+    var k=[]; if(G.phase==='title') k.push('calCol'); if(isGov(G)){ k.push('site:sh'); if(!G.site){ k.push('site:mount'); k.push('site:seoul'); } (G.places||[]).forEach(function(q){ if(q.st==='wait') k.push('pl:'+q.id); }); }
     [0,1,2,3].forEach(function(i){ k.push('card:'+i); });
     return k;
   }
   function idleAt(G){ return 'card:0'; }
-  var css = '.h3a3-lab{fill:#2E2418;font-family:var(--game);paint-order:stroke;stroke:#FBF8F1;stroke-width:3px;stroke-linejoin:round}.h3a3-b{font-weight:700}.h3a3-wlab{fill:#FFFFFF;font-family:var(--game);font-weight:700}'+
+  var css = '#prog[data-h3a3]::before{content:attr(data-h3a3);flex:none;font:700 16px var(--game);color:#2E2418;margin-right:4px;white-space:nowrap}'+'.h3a3-lab{fill:#2E2418;font-family:var(--game);paint-order:stroke;stroke:#FBF8F1;stroke-width:3px;stroke-linejoin:round}.h3a3-b{font-weight:700}.h3a3-wlab{fill:#FFFFFF;font-family:var(--game);font-weight:700}'+
     'div.fx{background:#2E2418;color:#FFFFFF;border-radius:14px;padding:0 10px;font-size:24px;text-shadow:none;box-shadow:0 3px 0 #E8743B}div.fx.fast{font-size:26px;color:#FFD95A}'+
     '@keyframes h3a3pop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}.h3a3-pop{transform-box:fill-box;transform-origin:center bottom;animation:h3a3pop .28s ease-out}'+
     '@media (prefers-reduced-motion:reduce){.h3a3-pop{animation:none}}';

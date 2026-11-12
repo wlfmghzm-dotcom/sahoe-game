@@ -405,8 +405,10 @@ var H7_ART = {
   /* 고향이 초록이면 고향으로: 지도 조각(위 주황 띠, 아래 초록)의 초록 쪽 집 → 그 집 앞에 선 가족 */
   rHome: {vb:[0,0,120,60], svg:'<rect x="2" y="2" width="52" height="56" rx="7" fill="#9CD3A0"/><path d="M2 9q0-7 7-7h38q7 0 7 7v9H2z" fill="#F2A774"/><path d="M2 18H54" stroke="#C8553D" stroke-width="4"/>'+
          h7u('kHouse',10,24,36,30)+'<path d="M60 32h12M68 26l7 6-7 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'+h7u('kHouse',78,22,34,30)+h7u('fig0',98,14,16,30)+h7u('fig3',108,28,12,20)},
-  rShip: {vb:[0,0,120,60], svg:h7u('crate',4,8,30,30)+'<path d="M4 6l30 34M34 6l-30 34" stroke="#D9534F" stroke-width="4" stroke-linecap="round"/>'+
-         '<path d="M40 26h14M50 20l7 6-7 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'+h7u('ship',60,18,60,34)+h7u('fig2',84,4,14,24)+h7u('fig3',98,10,14,20)},
+  /* 블라인드 2차: X 대신 '상자가 배에서 부두로 내려감 → 빈 의자 → 사람이 앉음' */
+  rShip: {vb:[0,0,120,60], svg:'<rect x="2" y="20" width="40" height="16" rx="3" fill="#3E5871"/>'+h7u('crate',10,2,22,22)+'<path d="M21 26v20M15 40l6 7 6-7" fill="none" stroke="#E8743B" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="50" width="40" height="8" rx="2" fill="#A57C52"/>'+
+         '<path d="M48 30h10M54 25l6 5-6 5" fill="none" stroke="#E8743B" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'+
+         '<rect x="66" y="24" width="50" height="7" rx="2" fill="#9C7A4E"/><rect x="66" y="42" width="50" height="7" rx="2" fill="#B08A5E" stroke="#7A5C38"/><rect x="70" y="31" width="4" height="22" fill="#7A5C38"/><rect x="108" y="31" width="4" height="22" fill="#7A5C38"/>'+h7u('fig0',78,10,18,34)+h7u('fig3',96,20,16,26)},
   /* 배지 48×48 */
   bdFlee: {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-org"/>'+h7u('fam2',6,6,36,38)},
   bdFlow: {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-grn"/><path d="M16 36V12M10 18l6-7 6 7" fill="none" stroke="#FBF8F1" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 12v24M26 30l6 7 6-7" fill="none" stroke="#FBF8F1" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'},
@@ -471,13 +473,13 @@ function frontLat(ph,lon){ var L=FRONT_LON, a=PHASES[ph].lat, i;
 function safeAt(ph,town){ var t=TOWNS[town]; return t.lat < frontLat(ph,t.lon); }
 /* 사건 카드(교과서 146~149쪽): dir 'down' 주황 화살표(남쪽으로 밀려옴), 'up' 초록 화살표 */
 var EVENTS = {
-  e625:   {name:'북한군의 남침',      date:'1950. 6. 25', dir:'down'},
-  south:  {name:'더 남쪽으로 후퇴',   date:'',            dir:'down'},
-  nak:    {name:'낙동강까지 후퇴',    date:'',            dir:'down'},
-  incheon:{name:'인천 상륙 작전',     date:'',            dir:'up'},
-  china:  {name:'중국군의 참전',      date:'',            dir:'down'},
-  retake: {name:'서울을 다시 되찾음', date:'',            dir:'up'},
-  hungnam:{name:'흥남 철수',          date:'1950. 12',    dir:'ship'}
+  e625:   {name:'북한군의 남침',      date:'1950. 6. 25', dir:'down', say:'북한군이 내려옴'},
+  south:  {name:'더 남쪽으로 후퇴',   date:'',            dir:'down', say:'북한군이 더 내려옴'},
+  nak:    {name:'낙동강까지 후퇴',    date:'',            dir:'down', say:'낙동강 아래만 남음'},
+  incheon:{name:'인천 상륙 작전',     date:'',            dir:'up', say:'다시 북으로 올라감'},
+  china:  {name:'중국군의 참전',      date:'',            dir:'down', say:'다시 남으로 내려옴'},
+  retake: {name:'서울을 다시 되찾음', date:'',            dir:'up', say:'다시 북으로 올라감'},
+  hungnam:{name:'흥남 철수',          date:'1950. 12',    dir:'ship', say:'배로 남쪽까지'}
 };
 var T = { pts:10, firstPts:10, shipPts:15, cratePts:5, hintPts:5, jam:0.9, show:0.9, band:1.3, slideOut:0.6, slideIn:0.5, famIn:0.35, seats:6, pierN:3, comboWin:6 };
 /* 판: ph = 이 판의 지도 시기(판이 시작될 때 띠가 여기로 움직임), ev = 사건 카드, pins = 보낼 수 있는 마을, f = 가족(고향, 그림 v)
@@ -495,7 +497,7 @@ var STAGES = [
     {ph:5, ev:'hungnam', crates:3, q:'FFCFFCF'},
     {ph:5, ev:'hungnam', crates:4, q:'FCFFCFF'},
     {ph:5, ev:'hungnam', crates:4, q:'FFCFFCFF'},
-    {ph:6, ev:'retake',  pins:TOWN_KEYS, f:[{v:2,home:'seoul'},{v:0,home:'gwangju'},{v:3,home:'chun'},{v:1,home:'busan'},{v:0,home:'daejeon'}]}]}
+    {ph:6, ev:'retake',  pins:TOWN_KEYS, f:[{v:2,home:'seoul'},{v:0,home:'gwangju'},{v:3,home:'chun'},{v:1,home:'busan'},{v:0,home:'daejeon'},{v:2,home:'daegu'}]}]}
 ];
 var BADGES = [
   {k:'flee',    name:'피란',       art:'bdFlee', def:'피란: 전쟁 같은 난리를 피해 안전한 곳으로 옮겨 가는 것이에요. 6·25 전쟁 때 많은 피란민이 낙동강 이남, 임시 수도 부산으로 모였어요.(교과서 146·148쪽 참고)'},
@@ -518,7 +520,7 @@ var NAMES = {
   left:    '다음 배를 기다려요'
 };
 /* 칭호 = 역할 기록 말(등급 말 X, cards53 '말투·보상 연출') */
-var TITLES = [[0,'피란길을 지켜본 사람'],[340,'피란민을 도운 사람'],[560,'피란길을 함께 걸은 사람'],[720,'피란길을 끝까지 함께한 길잡이']];
+var TITLES = [[0,'피란길을 지켜본 사람'],[340,'피란민을 도운 사람'],[560,'피란길을 함께 걸은 사람'],[720,'끝까지 함께한 길잡이']];
 
 function stOf(G,si){ var i=si==null?G.si:si; return STAGES[i]; }
 function nStages(){ return STAGES.length; }
@@ -540,7 +542,7 @@ function setupStage(G,si){
   G.si=si; G.phase='play'; G.t=0; G.ri=0; G.combo=0; G.card=null; G.endT=-1;
   G.cnt={safe:0, home:0, again:0, gone:0, board:0, left:0, dump:0, crate:0};
   G.res={total:famCount(S), served:0, missed:0};
-  startRound(G); G.rt=-1.2;   /* 단계 시작 리본이 빈 판 위에 뜬 뒤(1.2초) 판이 들어온다 */
+  startRound(G); G.rt=si===2?0:-1.2;   /* 3단계(배)는 첫 판이 곧바로 보이게(블라인드 2차) */   /* 단계 시작 리본이 빈 판 위에 뜬 뒤(1.2초) 판이 들어온다 */
   return G;
 }
 /* 판 시작: 띠가 이 판의 시기로 움직이고(bt 0 → band), 가족이 들어온다 */
@@ -874,7 +876,7 @@ function itemSvg(item){ return iconSvg(item,'it'); }
    판이 끝나면 오른쪽 판이 왼쪽으로 밀려 나가고(0.6초) 새 판이 들어온다(0.5초). 단계 끝에는 화면 전체에 비교 카드. */
 var SCENE = (function(){
   var VB={w:600,h:440}, MAPW=292, RX=298, CW=72, CH2=46;
-  var svg, gBg, gMap, gPins, gRight, gCard, mapSig='', pinSig='', rightSig='', cardSig='', SX=0;
+  var gPh, svg, gBg, gMap, gPins, gRight, gCard, mapSig='', pinSig='', rightSig='', cardSig='', SX=0;
   var COL={north:'#F2A774', northD:'#C8553D', south:'#9CD3A0', sea:'#CFE8F3', ink:'#1E2B3A'};
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
   /* 땅 윤곽(경도, 위도) — 단순화한 한반도 */
@@ -889,13 +891,14 @@ var SCENE = (function(){
   function north(ph){ return ph>=5 ? '북한군과 중국군' : '북한군'; }
   /* 지도 한 장(장면 좌표, 지도 칸 0~292 기준). id = clipPath 이름이 겹치지 않게 */
   function mapSvg(id,ph,phFrom,e,opt){
-    opt=opt||{}; var fp=frontPts(ph,phFrom==null?ph:phFrom,e==null?1:e);
+    opt=opt||{}; var hl=!!opt.hl; var fp=frontPts(ph,phFrom==null?ph:phFrom,e==null?1:e);
     var nd='M'+P(123,43.2)+'L'+P(131.5,43.2)+'L'+fp.slice().reverse().map(function(p){ return P(p[0],p[1]); }).join('L')+'Z';
     var fl='M'+fp.map(function(p){ return P(p[0],p[1]); }).join('L');
     var h='<clipPath id="'+id+'"><path d="'+LANDD+'"/></clipPath>';
     h+='<path d="'+LANDD+'" fill="'+COL.south+'" stroke="#6E8F72" stroke-width="2"/>';
     h+='<g clip-path="url(#'+id+')"><path d="'+nd+'" fill="'+COL.north+'"/><path d="'+fl+'" fill="none" stroke="'+COL.northD+'" stroke-width="7" stroke-linejoin="round" opacity=".85"/></g>';
     h+='<path d="'+LANDD+'" fill="none" stroke="#5E7A62" stroke-width="2"/>';
+    if(hl){ var sd='M'+fp.map(function(p){ return P(p[0],p[1]); }).join('L')+'L'+P(131.5,33)+'L'+P(123,33)+'Z'; h+='<g clip-path="url(#'+id+')"><path d="'+sd+'" fill="#5FD07A" stroke="#1F8A3E" stroke-width="8" class="h7glow"/></g>'; }   /* 블라인드 2차: 띠가 멈추면 초록 지역을 잠깐 깜빡임 */
     h+='<path d="M'+RIVER.map(function(p){ return P(p[0],p[1]); }).join('L')+'" fill="none" stroke="#3E8DD0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
     /* 38도선(점선) */
     h+='<path d="M'+P(124.2,38)+'H'+mapX(130.6)+'" stroke="#3B5B7A" stroke-width="1.6" stroke-dasharray="5 4" opacity=".75"/>';
@@ -934,8 +937,10 @@ var SCENE = (function(){
     else { var up=E.dir==='up', c=up?'#3E9D57':'#D9622B';
       h+='<rect x="'+(RX+12)+'" y="16" width="62" height="66" rx="10" fill="'+(up?'#DDF1DF':'#FBE2D3')+'"/>';
       h+='<path d="'+(up?'M'+(RX+43)+' 72V30M'+(RX+30)+' 43l13-14 13 14':'M'+(RX+43)+' 26V68M'+(RX+30)+' 55l13 14 13-14')+'" fill="none" stroke="'+c+'" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>'; }
-    if(E.date) h+='<text x="'+(RX+188)+'" y="36" text-anchor="middle" font-size="19" class="h7lab">'+E.date+'</text>';
-    h+='<text x="'+(RX+188)+'" y="'+(E.date?72:60)+'" text-anchor="middle" font-size="'+(E.name.length>7?24:27)+'" class="h7ttl">'+E.name+'</text>';
+    /* 블라인드 2차: 화살표 뜻을 한마디로(날짜 · 이름 · 한마디) */
+    if(E.date) h+='<text x="'+(RX+188)+'" y="28" text-anchor="middle" font-size="17" class="h7lab">'+E.date+'</text>';
+    h+='<text x="'+(RX+188)+'" y="'+(E.date?55:46)+'" text-anchor="middle" font-size="'+(E.name.length>7?23:25)+'" class="h7ttl">'+E.name+'</text>';
+    if(E.say) h+='<text x="'+(RX+188)+'" y="'+(E.date?81:78)+'" text-anchor="middle" font-size="18" class="h7lab" fill="'+(E.dir==='up'?'#2E7D4F':E.dir==='down'?'#B4472A':'#2E5E8A')+'">'+E.say+'</text>';
     return h+'</g>';
   }
   /* 가족 카드(한 칸) */
@@ -1055,10 +1060,11 @@ var SCENE = (function(){
   function mount(host){
     svg=el('svg',{viewBox:'0 0 '+VB.w+' '+VB.h, preserveAspectRatio:'xMidYMid meet'});
     gBg=el('g',{}); gMap=el('g',{}); gPins=el('g',{}); gRight=el('g',{}); gCard=el('g',{});
+    gPh=el('g',{}); gPh.innerHTML='<g opacity=".55"><rect x="'+(RX+2)+'" y="6" width="296" height="86" rx="14" fill="none" stroke="#B9AE95" stroke-width="2.4" stroke-dasharray="8 6"/><rect x="'+(RX+4)+'" y="102" width="144" height="188" rx="14" fill="none" stroke="#B9AE95" stroke-width="2.4" stroke-dasharray="8 6"/><rect x="'+(RX+154)+'" y="102" width="144" height="188" rx="14" fill="none" stroke="#B9AE95" stroke-width="2.4" stroke-dasharray="8 6"/>'+useArt('progFam',RX+56,170,40,48)+useArt('progFam',RX+206,170,40,48)+'</g>';
     var wrap=el('g',{'clip-path':'url(#h7rc)'}); wrap.appendChild(gRight);
-    [gBg,gMap,gPins,wrap,gCard].forEach(function(g){ svg.appendChild(g); });
+    [gBg,gPh,gMap,gPins,wrap,gCard].forEach(function(g){ svg.appendChild(g); });
     host.insertBefore(svg, host.firstChild);
-    gBg.innerHTML='<rect x="-700" y="-600" width="2000" height="1640" fill="#5E6E7E"/><rect x="0" y="0" width="'+MAPW+'" height="440" rx="16" fill="'+COL.sea+'"/><rect x="'+RX+'" y="0" width="302" height="440" rx="16" fill="#E9E2D0"/><g opacity=".55"><rect x="'+(RX+2)+'" y="6" width="296" height="86" rx="14" fill="none" stroke="#B9AE95" stroke-width="2.4" stroke-dasharray="8 6"/><rect x="'+(RX+4)+'" y="102" width="144" height="188" rx="14" fill="none" stroke="#B9AE95" stroke-width="2.4" stroke-dasharray="8 6"/><rect x="'+(RX+154)+'" y="102" width="144" height="188" rx="14" fill="none" stroke="#B9AE95" stroke-width="2.4" stroke-dasharray="8 6"/>'+useArt('progFam',RX+56,170,40,48)+useArt('progFam',RX+206,170,40,48)+'</g><clipPath id="h7rc"><rect x="'+RX+'" y="0" width="302" height="440" rx="16"/></clipPath>';
+    gBg.innerHTML='<rect x="-700" y="-600" width="2000" height="1640" fill="#5E6E7E"/><rect x="0" y="0" width="'+MAPW+'" height="440" rx="16" fill="'+COL.sea+'"/><rect x="'+RX+'" y="0" width="302" height="440" rx="16" fill="#E9E2D0"/><clipPath id="h7rc"><rect x="'+RX+'" y="0" width="302" height="440" rx="16"/></clipPath>';
   }
   function slideX(G){
     if(G.phase!=='play') return 0;
@@ -1072,8 +1078,9 @@ var SCENE = (function(){
   function renderScene(G){
     var title=G.phase==='title', end=G.phase==='stageEnd'||G.phase==='end';
     var ph=title?1:G.ph, pf=title?1:G.phFrom, e=title?1:bandE(G);
-    var ms=[ph,pf,e.toFixed(2)].join('|');
-    if(ms!==mapSig){ mapSig=ms; gMap.innerHTML=mapSvg('h7land',ph,pf,e); }
+    var hl=!title && G.phase==='play' && G.bt<99 && G.bt>=T.band && G.bt<T.band+1.8;
+    var ms=[ph,pf,e.toFixed(2),hl?1:0].join('|');
+    if(ms!==mapSig){ mapSig=ms; gMap.innerHTML=mapSvg('h7land',ph,pf,e,{hl:hl}); }
     /* 이름표·뱃길 */
     var pins = title ? [] : (G.ship||end) ? [] : (G.pins||[]);   /* 첫 화면: 제목 띠가 놓일 가운데 띠를 비움 */
     var placed = title ? [] : (G.placed||[]);
@@ -1096,6 +1103,7 @@ var SCENE = (function(){
         else { (G.fams||[]).filter(function(f){ return f.st==='wait'; }).forEach(function(f){ h+=famCard(G,f); }); h+=legend(G.ph); }
       }
       gRight.innerHTML=h; }
+    gPh.style.display=(G.phase==='play' && !G.ship && (G.rt<T.slideIn))?'':'none';   /* 빈 자리 표시: 판이 들어오기 전에만 */
     SX=slideX(G); gRight.setAttribute('transform', SX?'translate('+SX.toFixed(1)+' 0)':'');
     var cs=G.phase==='stageEnd' && G.card ? 'c'+G.si : ''; if(cs!==cardSig){ cardSig=cs; gCard.innerHTML = cs ? cardHtml(G) : ''; }
   }
@@ -1104,6 +1112,7 @@ var SCENE = (function(){
     if(p[0]==='card') return G.phase==='stageEnd' ? {x:66,y:6,w:468,h:340} : null;
     if(G.phase==='play' && G.rt<0 && p[0]!=='map') return null;
     if(p[0]==='map') return {x:0,y:0,w:MAPW,h:440};
+    if(p[0]==='mapS') return {x:0,y:G.ship?150:200,w:MAPW,h:G.ship?290:240};
     if(p[0]==='ev') return {x:RX+2+SX, y:6, w:296, h:86};
     if(p[0]==='legend') return (G.ship||G.phase!=='play') ? null : {x:RX+4+SX, y:304, w:292, h:124};
     if(p[0]==='pin'||p[0]==='pt'){ var t=p[1]; if(!TOWNS[t]) return null; var c=cardXY(t);
@@ -1131,7 +1140,7 @@ var SCENE = (function(){
     if(G.phase==='stageEnd'){ renderScene(G); return ['card']; }   /* 단계 끝 리본 자리를 고를 때 지난 판 글(못 만난 줄 등)이 아직 DOM에 남아 있지 않게 먼저 그림 */
     if(cardSig) renderScene(G);
     if(G.phase==='title') return ['ev','tslot:0','tslot:1'];
-    var k=['ev'];
+    var k=['ev','mapS'];   /* 블라인드 2차: 말풍선이 이름표·남쪽 지도(거제도)를 가리지 않게 지도 아래쪽을 비움 */
     if(G.ship){ k.push('ship','dump','pier:0','pier:1','pier:2'); return k; }
     (G.pins||[]).forEach(function(t){ k.push('pin:'+t); });
     k.push('slot:0','slot:1','legend');
@@ -1142,7 +1151,9 @@ var SCENE = (function(){
     '@keyframes h7pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}.h7pop{transform-box:fill-box;transform-origin:center;animation:h7pop .28s ease-out}'+
     '@keyframes h7sh{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}.h7shake{animation:h7sh .4s ease-in-out}'+
     '@keyframes h7lt{0%,55%{opacity:0}100%{opacity:1}}.h7late{animation:h7lt 1.1s ease-out}'+
-    '@media (prefers-reduced-motion:reduce){.h7pop,.h7shake,.h7late{animation:none}}';
+    '.callout{box-shadow:0 0 0 2px #2E3F50,0 4px 0 rgba(30,43,58,.22)!important}'+
+    '@keyframes h7gl{0%,100%{opacity:0}25%,75%{opacity:.55}50%{opacity:.15}}.h7glow{animation:h7gl 1.8s ease-in-out;opacity:0}'+
+    '@media (prefers-reduced-motion:reduce){.h7glow{animation:none;opacity:.35}.h7pop,.h7shake,.h7late{animation:none}}';
   return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, keepClear:keepClear, idleAt:idleAt, css:css, aspect:'600/440'};
 })();
 

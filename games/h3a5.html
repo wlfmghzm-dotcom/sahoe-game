@@ -416,7 +416,7 @@ Object.assign(ASSETS, {
     '<path d="M20 30q35 -20 70 0" stroke="#8C7646" stroke-width="2" fill="none"/>'+
     '<rect x="48" y="52" width="18" height="30" fill="#2B2B33"/><rect x="26" y="52" width="14" height="13" fill="#2B2B33"/><rect x="72" y="52" width="14" height="13" fill="#2B2B33"/>'},
   /* 1930년대 후반 일제 정책 벽보 그림 */
-  poHist: {vb:[0,0,120,100], svg:'<use href="#a-kBooks" x="10" y="6" width="80" height="80"/><path d="M14 52q40 -18 82 0" stroke="#7E858C" stroke-width="5" fill="none"/><use href="#a-kLock" x="64" y="44" width="50" height="54"/>'},
+  poHist: {vb:[0,0,120,100], svg:'<use href="#a-kBooks" x="16" y="8" width="84" height="84"/><circle cx="58" cy="50" r="40" fill="none" stroke="#C0392B" stroke-width="8"/><path d="M30 22L86 78" stroke="#C0392B" stroke-width="8" stroke-linecap="round"/>'},
   poMind: {vb:[0,0,120,100], svg:'<rect x="10" y="86" width="100" height="10" rx="3" fill="#B9AE98"/>'+
     '<rect x="26" y="26" width="10" height="62" fill="#A2483A"/><rect x="84" y="26" width="10" height="62" fill="#A2483A"/>'+
     '<path d="M6 16Q60 6 114 16V24H6z" fill="#3B302A"/><rect x="14" y="34" width="92" height="8" fill="#A2483A"/><rect x="56" y="24" width="8" height="12" fill="#A2483A"/>'},
@@ -448,7 +448,7 @@ Object.assign(ASSETS, {
   /* 규칙 칸 120×60 */
   rRail: {vb:[0,0,120,60], svg:'<use href="#a-kLoco" x="2" y="10" width="40" height="40"/><path d="M46 30h22M62 22l8 8-8 8" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-kShip" x="70" y="12" width="48" height="34"/>'},
   rTown: {vb:[0,0,120,60], svg:'<rect x="2" y="4" width="56" height="52" rx="8" fill="#5C6489"/><rect x="62" y="4" width="56" height="52" rx="8" fill="#3B4050"/><circle cx="30" cy="22" r="14" fill="#FFE08A" opacity=".6"/><use href="#a-kLamp" x="20" y="8" width="20" height="46"/><use href="#a-sWell" x="66" y="20" width="48" height="36"/>'},
-  rKeep: {vb:[0,0,120,60], svg:'<rect x="4" y="4" width="54" height="52" rx="6" fill="#8A6A48"/><rect x="8" y="8" width="46" height="44" rx="4" fill="#F4ECD8"/><use href="#a-poHist" x="10" y="12" width="42" height="36"/><path d="M64 30h16M74 22l8 8-8 8" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-efStudy" x="84" y="12" width="34" height="34"/>'},
+  rKeep: {vb:[0,0,120,60], svg:'<rect x="4" y="4" width="54" height="52" rx="6" fill="#8A6A48"/><rect x="8" y="8" width="46" height="44" rx="4" fill="#F4ECD8"/><use href="#a-kBooks" x="12" y="10" width="38" height="38"/><path d="M64 30h16M74 22l8 8-8 8" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-efStudy" x="84" y="12" width="34" height="34"/>'},
   progPhoto: {vb:[0,0,40,40], svg:'<rect x="4" y="6" width="32" height="28" rx="4" fill="#FFFFFF" stroke="#8C7A62" stroke-width="2.6"/><rect x="9" y="11" width="22" height="16" fill="#CFE3B4"/><path d="M9 27l7-8 5 5 4-4 6 7z" fill="#8FBF8A"/>'},
   bdRail: {vb:[0,0,60,60], svg:'<circle cx="30" cy="30" r="28" fill="#FBE3D2"/><use href="#a-kLoco" x="6" y="12" width="30" height="30"/><use href="#a-kRice" x="30" y="24" width="26" height="26"/>'},
   bdTown: {vb:[0,0,60,60], svg:'<circle cx="30" cy="30" r="28" fill="#4A5170"/><path d="M30 2A28 28 0 0 0 30 58z" fill="#6E76A0"/><circle cx="18" cy="22" r="10" fill="#FFE08A" opacity=".7"/><use href="#a-kLamp" x="10" y="10" width="16" height="40"/><use href="#a-sWell" x="32" y="26" width="26" height="22"/>'},
@@ -459,7 +459,7 @@ var ASSETS_SVG_WHY = {
   sSoldier1: 'sSoldier의 한 사람(단계 끝 비교 카드에서 기차 한 대 = 한 그림)',
   sWell: 'Kenney에 우물이 없음(분수 fountain은 뜻이 다름) → 돌 둘레·기둥·두레박',
   sDark: 'Kenney 집은 서양식뿐 → 1930년대 한국인 동네의 초가집, 불 꺼진 창(전기가 잘 안 들어옴)',
-  poHist: 'Kenney 책(kBooks)·자물쇠(kLock)를 묶은 그림 + 사슬 선 한 줄',
+  poHist: 'Kenney 책(kBooks) + 빨간 금지 표시(블라인드: 자물쇠는 금지로 안 읽힘)',
   poMind: '신사는 Kenney에 없음 → 기둥 둘·가로대 둘의 단순한 문(교과서 137쪽 신사)',
   poWar: '지도(Kenney에 없음) → 바다·땅 덩어리와 밖으로 뻗는 화살표(침략 전쟁)',
   sFlagKR: '태극기는 Kenney에 없음 → 건·곤·감·리와 태극(붉은 쪽 위)',
@@ -509,7 +509,9 @@ var ITEM = {
 var SPOT = {
   port:{name:'군산항'}, base:{name:'군대'}, city:{name:'도시'},
   jp:{name:'일본인 동네'}, kr:{name:'한국인 동네'},
-  hist:{name:'우리 역사 금지', art:'poHist'}, mind:{name:'신사 참배', art:'poMind'}, war:{name:'침략 전쟁', art:'poWar'}
+  /* 3단계 벽보 = '지키려 한 것'(name)과 그것을 없애려 한 일제 정책(pol). 짝은 교과서 137~138쪽 서술 그대로:
+     역사 수업 금지·역사 왜곡 ↔ 역사 연구(우리 역사) / 민족정신을 없애는 정책 ↔ 저항하는 글로 민족의식을 일깨움 / 침략 전쟁 ↔ 한국광복군·나라를 되찾으려는 노력 */
+  hist:{name:'우리 역사', pol:'일제: 역사 수업 금지', art:'poHist'}, mind:{name:'민족의식', pol:'일제: 민족정신 없애기', art:'poMind'}, war:{name:'나라 되찾기', pol:'일제: 침략 전쟁', art:'poWar'}
 };
 var BOARD_SPOTS = { rail:['city','base','port'], town:['jp','kr'] };
 var T = { pts:[20,4,2], hintPts:5, jam:1.0, show:1.35, slideOut:0.6, slideIn:0.5, startWait:1.2, comboWin:6, lots:8 };
@@ -534,11 +536,11 @@ var NAMES = {
   town: '<em>동네마다</em> 달랐어요',
   keep: '탄압에 <em>맞섰어요</em>'
 };
-/* 틀린 놓기 한 줄: 철도·동네는 '놓은 곳이 실제로 무엇이었나'(정답 자리를 바로 말하지 않음), 벽보는 '그 노력이 무엇에 맞섰나' */
+/* 틀린 놓기 한 줄: 놓은 곳이 실제로 무엇이었나/무엇이 필요한가(정답 카드를 바로 말하지 않음) */
 var WRONG = {
   city:'도시엔 <em>사람들</em>이 오갔어요', base:'군대로는 <em>군인</em>을 날랐어요', port:'항구에선 <em>쌀</em>을 배에 실었어요',
   jp:'이 동네엔 <em>근대 시설</em>이 모였어요', kr:'이 동네는 <em>혜택</em>을 못 누렸어요',
-  study:'역사 연구는 <em>역사 왜곡</em>에 맞섰어요', write:'글은 <em>민족의식</em>을 깨웠어요', kbg:'광복군은 <em>나라</em>를 되찾으려 했어요'
+  hist:'<em>우리 역사</em>를 지킬 노력이 필요해요', mind:'<em>민족의식</em>을 깨울 노력이 필요해요', war:'<em>나라를 되찾을</em> 노력이 필요해요'
 };
 var TITLES = [[0,'수첩을 편 기자'],[300,'사진을 모은 기자'],[560,'두 동네를 기록한 기자'],[800,'그 시대를 바로 기록한 기자']];   /* 역할 기록 말(등급 말 X) */
 
@@ -626,7 +628,7 @@ function drop(G0,src,dst,via){
       firstName(G,ev,'keep',at); award(G,ev,'keep');
     } else {
       p.fails++; p.bad=k; p.badT=T.jam; G.rOk=false; G.stats.wrong++;
-      ev.push({t:'rec', ok:0, k:k, pk:p.k, line:WRONG[k], at:at});
+      ev.push({t:'rec', ok:0, k:k, pk:p.k, line:WRONG[p.k], at:at});
     }
   } else {
     if(dp[0]!=='d' || BOARD_SPOTS[G0.board].indexOf(dp[1])<0) return fail('dst');
@@ -738,15 +740,15 @@ var GAME = {
   source: ['134쪽 일제가 도로·항구·철도를 건설(경부선 1905년), 사람과 물자가 빨라졌지만 주로 군대 이동과 빼앗은 자원을 일본으로 실어 나르는 데 쓰임 → 1단계',
            '134쪽 임피역: 남부 평야의 쌀을 모아 군산항으로, 일본으로 보내기 편리 → 1단계 쌀 기차와 군산항',
            '135쪽 일본인이 모여 산 곳에 은행·백화점·상가, 한국인이 모여 산 곳은 전기가 잘 안 들어오고 공동 우물 → 2단계 두 동네',
-           '137쪽 1930년대 후반 민족정신을 없애는 정책: 신사 참배 강요, 성과 이름을 일본식으로, 일본어 강요, 학교에서 우리말·역사 금지, 침략 전쟁 → 3단계 벽보',
-           '138쪽 우리 역사를 연구해 역사 왜곡에 맞섬(신채호), 저항하는 글로 민족의식을 일깨움, 한국광복군 창설 → 3단계 노력 카드',
+           '137쪽 1930년대 후반 민족정신을 없애는 정책(신사 참배·일본식 이름·일본어 강요·학교에서 우리말과 역사 금지), 침략 전쟁 → 3단계 벽보의 일제 정책 한 줄',
+           '138쪽 우리 역사를 연구해 역사 왜곡에 맞섬(신채호), 저항하는 글로 민족의식을 일깨움, 한국광복군 창설·나라를 되찾으려는 노력 → 3단계 벽보의 지키려 한 것과 노력 카드(교과서가 나란히 쓴 짝만)',
            '다루지 않음: 강제 동원·일본군 위안부 장면(교사 수업), 인공 조미료(136쪽 읽을거리)'],
   say: {
     title: '같은 도시인데 왜 달랐을까?',
     startBtn: '시작',
     start: ['기차가 갈 곳에 사진을 붙여!',
             '사진을 찍은 동네에 붙여!',
-            '맞선 노력을 벽보에 놓아!'],
+            '지키려 한 것에 노력을 놓아!'],
     end: [['쌀은 일본으로, 군대도 철도로!', '철도는 주로 일제를 위해 쓰였어!'],
           ['같은 도시, 동네마다 달랐어!', '한국인 동네는 혜택을 못 누렸어!'],
           ['탄압 속에서도 노력은 이어졌어!']],
@@ -755,9 +757,9 @@ var GAME = {
   ruleCards: [
     [['rRail','실은 것 → 갈 곳']],
     [['rTown','찍은 동네에',1]],
-    [['rKeep','맞선 노력을',1]]
+    [['rKeep','지킨 노력을',1]]
   ],
-  rulesModal: { cards: [['rRail','기차가 실은 것을 보고 갈 곳에'],['rTown','사진을 찍은 동네에'],['rKeep','탄압 벽보에 맞선 노력을']],
+  rulesModal: { cards: [['rRail','기차가 실은 것을 보고 갈 곳에'],['rTown','사진을 찍은 동네에'],['rKeep','지키려 한 것에 맞는 노력을']],
     note: '수첩의 사진을 끌어 지도·동네·벽보에 놓아요. 틀리면 다시 할 수 있지만 한 번에 맞히면 점수가 커요.' },
   stageRibbon: function(G){ return {text:(G.si+1)+'단계 마침', confetti:false}; },   /* cards53 말투·보상: 성공·축하 말 없이 */
   result: {
@@ -785,14 +787,14 @@ var GAME = {
       var r=stOf(G).rule;
       if(r==='rail') return {why:'철도로 사람과 물자가 빨라졌지만, 주로 군대를 옮기고 쌀 같은 자원을 일본으로 실어 갔어요', def:BADGES[0].def.replace(/\(교과서.*$/,''), page:'교과서 134쪽 참고'};
       if(r==='town') return {why:'일본인 동네에는 백화점·은행과 전기가, 한국인 동네에는 공동 우물이 있었어요', def:BADGES[1].def.replace(/\(교과서.*$/,''), page:'교과서 135쪽 참고'};
-      return {why:'역사를 지우려 하면 역사 연구로, 민족정신을 없애려 하면 글로, 침략 전쟁에는 한국광복군으로 맞섰어요', def:BADGES[2].def.replace(/\(교과서.*$/,''), page:'교과서 137~138쪽 참고'};
+      return {why:'역사 수업을 막자 역사를 연구해 우리 역사를 지키고, 민족정신을 없애려 하자 글로 민족의식을 일깨우고, 한국광복군을 만들어 나라를 되찾으려 했어요', def:BADGES[2].def.replace(/\(교과서.*$/,''), page:'교과서 137~138쪽 참고'};
     }
   },
   toast: {show:'name'},
   /* 해 보기: 단계마다 판이 바뀌므로 첫 판에서 한 번(같은 끌기라도 새 규칙이라 force) */
   tryIt: function(G){
     if(G.ch || G.phase!=='play') return null;
-    var m=hintMove(G), lab=['실은 것 → 갈 곳','찍은 동네에','맞선 노력을'][G.si];
+    var m=hintMove(G), lab=['실은 것 → 갈 곳','찍은 동네에','지킨 노력을'][G.si];
     return m ? {src:m.src, dst:m.dst, label:lab, force:true} : {wait:true};
   },
   /* §19 추론형 도전: logic.js CH 주석 */
@@ -803,13 +805,13 @@ var GAME = {
     goal: chGoal,
     partials: CH_PARTIALS,
     say: {start: ['한 번도 안 틀리고 기록해!']},
-    ruleCards: [[['rRail','실은 것 → 갈 곳'],['rTown','찍은 동네에'],['rKeep','맞선 노력을']]]
+    ruleCards: [[['rRail','실은 것 → 갈 곳'],['rTown','찍은 동네에'],['rKeep','지킨 노력을']]]
   },
   onEvent: function(e,FX){
     if(e.t==='rec'){
       if(e.ok){ FX.progress();   /* cards53 말투·보상: 수탈·민족 말살 장면이라 +점수 튐·불꽃 없음(점수는 HUD 숫자로만 조용히) */
         var I=ITEM[e.k];
-        if(e.pk) FX.explain({why:SPOT[e.pk].name+'에 '+I.name+'(으)로 맞섰어요', def:BADGES[2].def.replace(/\(교과서.*$/,''), page:'교과서 137~138쪽 참고'});
+        if(e.pk) FX.explain({why:{hist:'신채호는 고대 역사를 연구해 우리 역사를 지켰어요', mind:'일제에 저항하는 글로 민족의식을 일깨웠어요', war:'한국광복군을 만들어 나라를 되찾으려 했어요'}[e.pk], def:BADGES[2].def.replace(/\(교과서.*$/,''), page:'교과서 137~138쪽 참고'});
         else if(I.to==='port'||I.to==='base'||I.to==='city') FX.explain({why:(I.to==='port'?'쌀은 군산항에서 배에 실려 일본으로 갔어요':I.to==='base'?'철도로 군대를 빨리 옮겼어요':'철도로 사람들도 빨리 오갈 수 있었어요'), page:'교과서 134쪽 참고'});
         else FX.explain({why:I.name+' 사진은 '+SPOT[I.to].name+'에서 찍었어요', def:BADGES[1].def.replace(/\(교과서.*$/,''), page:'교과서 135쪽 참고'}); }
       else { FX.comboOff(); FX.callout(e.line, e.at);
@@ -853,7 +855,7 @@ function itemSvg(item){ return iconSvg(item,'it'); }
    판이 끝나면 판 위 것들이 왼쪽으로 밀려 나가고(0.6초) 새 판이 오른쪽에서 들어온다(0.5초, 그동안 입력 막힘 — logic sliding). */
 var SCENE = (function(){
   var VB={w:600,h:440}, TRAY_Y=310, SLOT_W=168, SLOT_H=122;
-  var svg, gBg, gBoard, gMove, gTray, gCard, bgSig='', boardSig='', moveSig='', traySig='', cardSig='', SX=0;
+  var svg, gBg, gBoard, gMove, gTray, gCard, bgSig='', boardSig='', hiSig='', moveSig='', traySig='', cardSig='', SX=0;
   var DEST={ city:{x:12,y:6,w:190,h:136}, base:{x:212,y:6,w:190,h:136}, port:{x:412,y:6,w:182,h:288} };
   var CORE={ city:{x:30,y:10,w:150,h:70}, base:{x:230,y:10,w:150,h:70}, port:{x:440,y:84,w:136,h:92} };
   var TRK=[214,284];   /* 기차역 철길 두 줄(기차 바닥 y) */
@@ -977,15 +979,17 @@ var SCENE = (function(){
     return h;
   }
   function polHtml(G,p){
-    var cx=polCx(p), x=cx-118, y=18, w=236, hh=262, h='';
+    /* 벽보: 위 = 일제 정책 한 줄 + 그림, 아래 = '지킬 것' 이름표(글). 붙인 노력 카드는 그림 자리에(이름표를 가리지 않음) */
+    var cx=polCx(p), x=cx-118, y=18, w=236, hh=262, h='', S=SPOT[p.k];
     h+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="12" fill="#8A6A48"/><rect x="'+(x+8)+'" y="'+(y+8)+'" width="'+(w-16)+'" height="'+(hh-16)+'" rx="8" fill="#F4ECD8"/>';
+    h+='<rect x="'+(x+8)+'" y="'+(y+8)+'" width="'+(w-16)+'" height="34" rx="8" fill="#5B4636"/>'+lab(cx, y+32, S.pol, 17, 'h3a5-b h3a5-w');
     if(p.have) h+='<rect x="'+(x-4)+'" y="'+(y-4)+'" width="'+(w+8)+'" height="'+(hh+8)+'" rx="14" fill="none" stroke="#F2B640" stroke-width="5"/>';
-    h+='<g opacity="'+(p.have?0.4:1)+'">'+useArt(SPOT[p.k].art, cx-80, y+16, 160, 132)+'</g>';
-    h+=lab(cx, y+180, SPOT[p.k].name, 23, 'h3a5-b');
-    if(p.have){ h+='<g'+pop('hv'+p.id)+'><rect x="'+(cx-62)+'" y="'+(y+60)+'" width="124" height="124" rx="10" fill="#FFFFFF" stroke="#F2B640" stroke-width="4"/>'+useArt(ITEM[p.have].art, cx-54, y+66, 108, 90)+lab(cx, y+176, ITEM[p.have].name, 19, 'h3a5-b')+'</g>';
-      h+=okMark(cx+90, y+20, p.fails===0, 'ok'+p.id); }
-    else if(p.st==='wait' && G.endT<0) h+='<rect x="'+(x-6)+'" y="'+(y-6)+'" width="'+(w+12)+'" height="'+(hh+12)+'" rx="16" fill="none" stroke="#F2B640" stroke-width="3" stroke-dasharray="9 7" class="h3a5-blink"/>';
-    if(p.bad){ h+='<g data-verdict="bad">'+mini(p.bad, x+12, y+196, 54)+'</g>'+xMark(x+64, y+200, 'x'+p.id+'_'+p.fails, 14); }
+    if(p.have) h+='<g'+pop('hv'+p.id)+'><rect x="'+(cx-74)+'" y="'+(y+48)+'" width="148" height="122" rx="10" fill="#FFFFFF" stroke="#F2B640" stroke-width="4"/>'+useArt(ITEM[p.have].art, cx-50, y+52, 100, 84)+lab(cx, y+160, ITEM[p.have].name, 19, 'h3a5-b')+'</g>'+okMark(cx+92, y+58, false, 'ok'+p.id);
+    else h+=useArt(S.art, cx-62, y+50, 124, 104);
+    h+='<rect x="'+(x+18)+'" y="'+(y+180)+'" width="'+(w-36)+'" height="68" rx="10" fill="#FFF8E6" stroke="#D8C29C" stroke-width="2"/>';
+    h+=lab(cx, y+202, '지킬 것', 16)+lab(cx, y+236, S.name, 26, 'h3a5-b');
+    if(!p.have && p.st==='wait' && G.endT<0) h+='<rect x="'+(x-6)+'" y="'+(y-6)+'" width="'+(w+12)+'" height="'+(hh+12)+'" rx="16" fill="none" stroke="#F2B640" stroke-width="3" stroke-dasharray="9 7" class="h3a5-blink"/>';
+    if(p.bad){ h+='<g data-verdict="bad">'+mini(p.bad, x+w-74, y+52, 56)+'</g>'+xMark(x+w-22, y+56, 'x'+p.id+'_'+p.fails, 14); }
     return h;
   }
   /* ---------- 수첩 ---------- */
@@ -1009,7 +1013,7 @@ var SCENE = (function(){
       h+=lab(210,44,'일제를 위해',22,'h3a5-b');
       col.forEach(function(q,j){ var x0=j===2?410:30+j*184, L=c.sent[q[0]]||[];
         h+=useArt(q[1], x0+42, 54, 76, 58)+lab(x0+80, 132, q[2], 21, 'h3a5-b');
-        L.forEach(function(k,i){ h+=useArt(SENT_ART[k], x0+6+(i%4)*40, 146+Math.floor(i/4)*44, 40, 38); }); });
+        L.forEach(function(k,i){ if(k==='rice') h+=useArt('kRice', x0+6+(i%4)*42, 144+Math.floor(i/4)*50, 44, 44); else h+=useArt(SENT_ART[k], x0+4+(i%5)*35, 142+Math.floor(i/5)*68, 34, 64); }); });
       if(!(c.sent.city||[]).length) h+=lab(490,200,'—',22);
     } else if(c.si===1){
       h+='<rect x="24" y="16" width="270" height="270" rx="14" fill="#5C6489"/><rect x="306" y="16" width="270" height="270" rx="14" fill="#3B4050"/>';
@@ -1020,9 +1024,9 @@ var SCENE = (function(){
         L.forEach(function(l,i){ var x=x0+(i%3)*86+8, y=i<3?66:170; h+=lotArt(l.k,x,y); }); });
     } else {
       var rows=[['hist','study'],['mind','write'],['war','kbg']];
-      h+=lab(170,40,'일제가 없애려 함',21,'h3a5-b')+lab(440,40,'맞선 노력',21,'h3a5-b');
+      h+=lab(170,40,'지키려 한 것',21,'h3a5-b')+lab(440,40,'지킨 노력',21,'h3a5-b');
       rows.forEach(function(r,i){ var y=54+i*78, on=c.kept.indexOf(r[0])>=0;
-        h+='<g'+(on?'':' opacity=".45"')+'><rect x="30" y="'+y+'" width="250" height="70" rx="10" fill="#EDE3CF"/>'+useArt(SPOT[r[0]].art,38,y+4,74,62)+lab(196,y+44,SPOT[r[0]].name,20,'h3a5-b');
+        h+='<g'+(on?'':' opacity=".45"')+'><rect x="30" y="'+y+'" width="250" height="70" rx="10" fill="#EDE3CF"/>'+useArt(SPOT[r[0]].art,38,y+6,70,58)+lab(194,y+30,SPOT[r[0]].pol.replace('일제: ',''),16)+lab(194,y+58,SPOT[r[0]].name,22,'h3a5-b');
         h+='<path d="M290 '+(y+35)+'h34M314 '+(y+25)+'l12 10-12 10" fill="none" stroke="#E8743B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
         h+='<rect x="334" y="'+y+'" width="236" height="70" rx="10" fill="#FFF1D2" stroke="#F2B640" stroke-width="2"/>'+useArt(ITEM[r[1]].art,342,y+4,80,62)+lab(494,y+44,ITEM[r[1]].name,20,'h3a5-b')+'</g>'; });
     }
@@ -1040,8 +1044,8 @@ var SCENE = (function(){
   function slideX(G){
     if(G.phase!=='play') return 0;
     if(G.endT>=0){ var r=G.endT-G.t; if(r<T.slideOut){ var e=1-Math.max(0,r)/T.slideOut; return -e*e*700; } return 0; }
-    if(G.rt<0) return 700;
-    if(G.rt<T.slideIn){ var e2=1-G.rt/T.slideIn; return e2*e2*700; }
+    if(G.rt<0) return 0;   /* 단계 첫 판: 단계 카드 동안 이미 제자리(놓을 곳이 보이게, 끌기는 sliding 동안 막힘) */
+    if(G.rt<T.slideIn && G.ri>0){ var e2=1-G.rt/T.slideIn; return e2*e2*700; }
     return 0;
   }
   function renderScene(G){
@@ -1059,11 +1063,15 @@ var SCENE = (function(){
       if(!end){ if(b==='rail') h=sentHtml(GG)+railMove(GG)+railBad(GG); else if(b==='town') h=townBad(GG); else GG.pols.forEach(function(p){ h+=polHtml(GG,p); }); }
       gMove.innerHTML=h; }
     SX=slideX(G);
-    var mv = (b==='rail') ? SX : SX;   /* 철도: 기차·X만 밀려 남(지도는 그대로) */
-    gMove.setAttribute('transform', mv?'translate('+mv.toFixed(1)+' 0)':'');
+    var op=1;
+    if(b==='keep' && SX){ op=Math.max(0,1-Math.abs(SX)/350); SX=0; }   /* 벽보는 밀려 나가지 않고 제자리에서 흐려졌다 나타남(화면 밖으로 잘리지 않게) */
+    gMove.setAttribute('transform', SX?'translate('+SX.toFixed(1)+' 0)':''); gMove.setAttribute('opacity', op.toFixed(2));
+    /* 철도: 기차가 기다리는 동안 갈 곳 세 칸을 깜빡이는 점선으로(블라인드: 붙일 자리가 안 보임) */
+    var hs = (!end && b==='rail' && G.phase==='play' && G.endT<0 && GG.items.some(function(it){ return it.st==='wait'; })) ? 'on' : '';
+    if(hs!==hiSig){ hiSig=hs; gBoard.innerHTML = hs ? ['city','base','port'].map(function(k){ var d=DEST[k]; return '<rect x="'+(d.x-3)+'" y="'+(d.y-3)+'" width="'+(d.w+6)+'" height="'+(d.h+6)+'" rx="16" fill="none" stroke="#F2B640" stroke-width="3" stroke-dasharray="9 7" class="h3a5-blink"/>'; }).join('') : ''; }
     var show=!end && G.phase==='play' && G.endT<0;   /* 단계 시작 카드 동안에도 첫 판 카드가 보이게(끌기는 sliding 동안 막힘) */
     var ts=[G.phase, G.si, G.ri, show?1:0, GG.tray.join(',')].join('|');
-    if(ts!==traySig){ traySig=ts; gTray.innerHTML=trayHtml(GG,show); }
+    if(ts!==traySig){ traySig=ts; gTray.innerHTML = end ? '' : trayHtml(GG,show); }   /* 단계 끝: 빈 수첩을 치워 '○단계 마침' 리본이 겹쳐 보이지 않게 */
     var cs=end && G.card ? 'c'+G.si : ''; if(cs!==cardSig){ cardSig=cs; gCard.innerHTML = cs ? cardHtml(G) : ''; }
   }
   function vbRect(G,id){
@@ -1071,14 +1079,15 @@ var SCENE = (function(){
     if(p[0]==='tray'){ var i=+p[1]; return {x:slotX(i), y:TRAY_Y+4, w:SLOT_W, h:SLOT_H-6}; }
     if(p[0]==='card') return G.phase==='stageEnd' ? {x:12,y:6,w:576,h:290} : null;
     if(p[0]==='d'){ if(G.phase!=='play') return null; if(b==='rail' && DEST[p[1]]) return DEST[p[1]]; if(b==='town' && TOWN[p[1]]) return TOWN[p[1]]; return null; }
+    if(p[0]==='rl') return b==='rail' ? {x:396, y:172, w:200, h:124} : null;   /* 항구 부두·선로·'군산항' 이름표 */
     if(p[0]==='dc'){ if(b==='rail' && CORE[p[1]]) return CORE[p[1]]; if(b==='town' && TOWN[p[1]]) return {x:TOWN[p[1]].x+50, y:12, w:190, h:40}; return null; }
     if(p[0]==='pt'){
       if(DEST[p[1]] && b==='rail'){ var d=DEST[p[1]]; return p[1]==='port' ? {x:420, y:206, w:56, h:36} : {x:d.x+d.w-58, y:d.y+86, w:52, h:36}; }
       if(TOWN[p[1]] && b==='town'){ var t=TOWN[p[1]]; return {x:t.x+t.w-62, y:t.y+56, w:52, h:36}; }
-      var q=(G.pols||[]).find(function(z){ return String(z.id)===p[1]; }); if(q){ var cx=polCx(q)+SX; return {x:cx+40, y:60, w:54, h:36}; }
+      var q=(G.pols||[]).find(function(z){ return String(z.id)===p[1]; }); if(q){ var cx=polCx(q)+SX; return {x:cx-27, y:140, w:54, h:36}; }
       return null; }
-    if(p[0]==='p'){ var po=(G.pols||[]).find(function(z){ return String(z.id)===p[1]; }); if(!po || (G.phase==='play' && G.rt<0)) return null; var c2=polCx(po)+SX; return {x:c2-118, y:18, w:236, h:262}; }
-    if(p[0]==='train'){ var it=(G.items||[]).find(function(z){ return String(z.id)===p[1]; }); if(!it || G.rt<0) return null; var y=TRK[it.b]; return {x:30+SX, y:y-74, w:200, h:76}; }
+    if(p[0]==='p'){ var po=(G.pols||[]).find(function(z){ return String(z.id)===p[1]; }); if(!po) return null; var c2=polCx(po)+SX; return {x:c2-118, y:18, w:236, h:262}; }
+    if(p[0]==='train'){ var it=(G.items||[]).find(function(z){ return String(z.id)===p[1]; }); if(!it) return null; var y=TRK[it.b]; return {x:30+SX, y:y-74, w:200, h:76}; }
     return null;
   }
   function rectOf(G,id){
@@ -1091,7 +1100,7 @@ var SCENE = (function(){
     if(G.phase==='stageEnd') return ['card'];
     if(cardSig) renderScene(G);
     var k=['tray:0','tray:1','tray:2'], b=G.phase==='title'?'town':G.board;
-    if(b==='rail'){ k.push('dc:city','dc:base','dc:port'); (G.items||[]).forEach(function(it){ if(it.st==='wait') k.push('train:'+it.id); }); }
+    if(b==='rail'){ k.push('dc:city','dc:base','dc:port','rl'); (G.items||[]).forEach(function(it){ if(it.st==='wait') k.push('train:'+it.id); }); }
     else if(b==='town'){ k.push('dc:jp','dc:kr'); }
     else (G.pols||[]).forEach(function(p){ k.push('p:'+p.id); });
     return k;

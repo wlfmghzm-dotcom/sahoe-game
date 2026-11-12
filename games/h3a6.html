@@ -417,8 +417,10 @@ Object.assign(ASSETS, {
   slip: {vb:[0,0,40,10], svg:'<rect x="1" y="1" width="38" height="8" rx="2" fill="#FFFFFF" stroke="#9AA0A6" stroke-width="1.4"/><path d="M8 3v4M13 3v4" stroke="#1E2B3A" stroke-width="1.6"/>'},
   /* 규칙 칸 120×60 */
   rBack: {vb:[0,0,120,60], svg:'<use href="#a-bJpBook" x="4" y="4" width="48" height="52"/><path d="M52 30h16M62 22l8 8-8 8" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-iKrBook" x="68" y="4" width="48" height="52"/>'},
-  rStep: {vb:[0,0,120,60], svg:'<rect x="6" y="44" width="26" height="12" fill="#D9C9A3"/><rect x="32" y="34" width="26" height="22" fill="#CDB98E"/><rect x="58" y="24" width="26" height="32" fill="#C1A97A"/><rect x="84" y="14" width="26" height="42" fill="#B59A68"/><use href="#a-eVote" x="8" y="22" width="22" height="22"/><path d="M96 12V2" stroke="#8A6440" stroke-width="2"/><use href="#a-sFlagKR" x="97" y="1" width="18" height="12"/>'},
-  rName: {vb:[0,0,120,60], svg:'<use href="#a-kManQ" x="2" y="6" width="28" height="50"/><rect x="30" y="4" width="40" height="22" rx="8" fill="#FFFFFF" stroke="#9AA0A6" stroke-width="2"/><path d="M76 34h12M84 28l6 6-6 6" fill="none" stroke="#E8743B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-bBox" x="88" y="26" width="30" height="24"/>'},
+  rStep: {vb:[0,0,120,60], svg:'<rect x="6" y="44" width="26" height="12" fill="#D9C9A3"/><rect x="32" y="34" width="26" height="22" fill="#CDB98E"/><rect x="58" y="24" width="26" height="32" fill="#C1A97A"/><rect x="84" y="14" width="26" height="42" fill="#B59A68"/>'+
+    [[19,36,'1'],[45,26,'2'],[71,16,'3'],[97,6,'4']].map(function(q){ return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="7" fill="#FFFFFF" stroke="#8A6A48" stroke-width="1.6"/><text x="'+q[0]+'" y="'+(q[1]+4)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#1E2B3A" font-family="sans-serif">'+q[2]+'</text>'; }).join('')},
+  rName: {vb:[0,0,120,60], svg:'<use href="#a-kManQ" x="0" y="8" width="26" height="48"/><rect x="22" y="2" width="44" height="24" rx="8" fill="#FFFFFF" stroke="#9AA0A6" stroke-width="2"/><rect x="28" y="9" width="32" height="3" rx="1" fill="#8C95A6"/><rect x="28" y="16" width="22" height="3" rx="1" fill="#8C95A6"/>'+
+    '<use href="#a-slip" x="34" y="36" width="26" height="8"/><path d="M64 40h14M73 34l6 6-6 6" fill="none" stroke="#E8743B" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><use href="#a-slip" x="88" y="16" width="26" height="8"/><path d="M101 26v6" stroke="#E8743B" stroke-width="3" stroke-linecap="round"/><use href="#a-bBox" x="82" y="28" width="36" height="28"/>'},
   progStep: {vb:[0,0,40,40], svg:'<rect x="4" y="26" width="11" height="10" fill="#C1A97A"/><rect x="15" y="18" width="11" height="18" fill="#B59A68"/><rect x="26" y="10" width="11" height="26" fill="#A68A58"/>'},
   bdBack: {vb:[0,0,60,60], svg:'<circle cx="30" cy="30" r="28" fill="#E3F2EA"/><use href="#a-iKrBook" x="10" y="10" width="40" height="40"/>'},
   bdStep: {vb:[0,0,60,60], svg:'<circle cx="30" cy="30" r="28" fill="#FBEFD8"/><rect x="10" y="40" width="12" height="8" fill="#C1A97A"/><rect x="22" y="32" width="12" height="16" fill="#B59A68"/><rect x="34" y="24" width="12" height="24" fill="#A68A58"/><use href="#a-sFlagKR" x="30" y="8" width="24" height="16"/>'},
@@ -486,9 +488,9 @@ var STAGES = [
       {s:['shut','jpName'], t:['myName','hist','news']}, {s:['jpBook','lockH'], t:['hist','myName','krBook']}, {s:['jpName','lockH'], t:['krBook','myName','hist']},
       {s:['shut','jpBook'], t:['hist','news','krBook']}, {s:['lockH','shut'], t:['news','krBook','hist']}]},
   {name:'정부를 세우는 계단', rule:'step', board:'step',
-   R:[{f:[0,1,2]}, {f:[0,3,4]}, {f:[0,2,4]}, {f:[1,4]}, {f:[0,4]}, {f:[2,3]}, {f:[1,3]}]},
+   R:[{f:[0,1,2]}, {f:[0,3,4]}, {f:[0,2,4]}, {f:[1,4]}, {f:[0,4]}, {f:[2,3]}, {f:[1,3]}, {f:[0,1]}]},
   {name:'나라 이름 정하기', rule:'name', board:'name',
-   R:[[['opD',3]], [['opG',2],['opD',2]], [['opJ',2],['opD',3]], [['opD',2],['opG',3]], [['opH',1],['opD',3]], [['opG',2],['opD',2]], [['opD',2]]]}
+   R:[[['opD',3]], [['opG',2],['opD',2]], [['opJ',2],['opD',3]], [['opD',2],['opG',3]], [['opH',1],['opD',3]], [['opG',1],['opD',1]], [['opD',2]], [['opG',1],['opD',1]]]}   /* 단계마다 8판(진행 표시 칸 수를 맞춤). 표 합 = 교과서 17·7·2·1 */
 ];
 var BADGES = [
   {k:'back', name:'되찾은 것',   art:'bdBack', def:'1945년 8월 15일 광복으로 우리말로 수업하고, 한글 신문이 다시 나오고, 원래 성과 이름을 쓰게 됐어요.(교과서 141~142쪽 참고)'},
@@ -850,6 +852,10 @@ var SCENE = (function(){
   function stepBg(){
     var h='<rect x="0" y="0" width="600" height="300" rx="16" fill="#DCEAF4"/>';
     for(var i=0;i<5;i++){ var x=stepX(i), y=stepTop(i); h+='<rect x="'+x+'" y="'+y+'" width="118" height="'+(300-y)+'" fill="'+['#D9C9A3','#D1BF95','#C9B587','#C1AB7A','#B9A16C'][i]+'"/><rect x="'+x+'" y="'+y+'" width="118" height="5" fill="#FFFFFF" opacity=".5"/>'; }
+    /* 차례가 화면 안에 보이게(블라인드): 계단마다 번호 ①~⑤와 다음 칸으로 오르는 화살표 */
+    for(var j=0;j<5;j++){ var cx=stepX(j)+100, cy=stepTop(j)+17;
+      h+='<circle cx="'+cx+'" cy="'+cy+'" r="13" fill="#FFFFFF" stroke="#8A6A48" stroke-width="2.4"/>'+lab(cx, cy+7, String(j+1), 18, 'h3a6-b');
+      if(j<4){ var x1=cx+14, y1=cy-4, x2=cx+104, y2=cy-34; h+='<path d="M'+x1+' '+y1+'Q'+(x1+56)+' '+(y1-2)+' '+x2+' '+y2+'" fill="none" stroke="#E8743B" stroke-width="3.4" stroke-linecap="round"/><path d="M'+(x2-11)+' '+(y2-1)+'L'+x2+' '+y2+'L'+(x2-2)+' '+(y2+11)+'" fill="none" stroke="#E8743B" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'; } }
     return h;
   }
   function stepCard(G,st){
@@ -862,7 +868,7 @@ var SCENE = (function(){
     }
     var given=st.st==='given', L=LINES2[k];
     h+='<g'+(given?'':pop('st'+G.ri+'_'+st.i))+'><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="10" fill="'+(given?'#F4F1EA':'#FFF4D6')+'" stroke="'+(given?'#BFB49B':'#F2B640')+'" stroke-width="'+(given?2:3.4)+'"/>';
-    h+=useArt(ITEM[k].art, x+4, y+6, 50, 46)+lab(x+82, y+30, L[0], L[0].length>4?16:18, 'h3a6-b')+lab(x+82, y+52, L[1], 18, 'h3a6-b');
+    h+=useArt(ITEM[k].art, x+4, y+6, 44, 44)+lab(x+80, y+30, L[0], L[0].length>4?14:18, 'h3a6-b')+lab(x+80, y+52, L[1], 18, 'h3a6-b');
     if(ITEM[k].when) h+=lab(x+w/2, y+76, ITEM[k].when, 15);
     h+='</g>';
     if(!given) h+=okMark(x+w-6, y+4, st.ok, 'ok'+G.ri+'_'+st.i);
@@ -899,7 +905,8 @@ var SCENE = (function(){
         var words=c.line.split(' '), l1='', l2=''; words.forEach(function(w){ if((l1+' '+w).trim().length<=7 && !l2) l1=(l1+' '+w).trim(); else l2=(l2+' '+w).trim(); });
         h+='<rect x="'+(x+50)+'" y="'+(TRAY_Y+10)+'" width="112" height="60" rx="12" fill="#FFF9EC" stroke="#CDBFA6" stroke-width="2"/><path d="M'+(x+56)+' '+(TRAY_Y+54)+'l-10 12 18-6z" fill="#FFF9EC" stroke="#CDBFA6" stroke-width="2"/>';
         h+=lab(x+106, TRAY_Y+36, l1, 17, 'h3a6-b')+(l2?lab(x+106, TRAY_Y+59, l2, 17, 'h3a6-b'):'');
-        for(var j=0;j<c.n;j++) h+=useArt('slip', x+54+j*27, TRAY_Y+84, 26, 16);
+        for(var j=0;j<c.n;j++) h+=useArt('slip', x+54+j*24, TRAY_Y+86, 22, 14);
+        h+=lab(x+54+c.n*24+18, TRAY_Y+99, c.n+'표', 17, 'h3a6-b');   /* 블라인드: 이 카드가 '표'를 넣는 것임이 보이게 */
       } else {
         h+=useArt(I.art, x+44, TRAY_Y+10, 80, 74)+lab(x+SLOT_W/2, TRAY_Y+106, I.name, I.name.length>6?17:20, 'h3a6-b');
       }
@@ -920,8 +927,9 @@ var SCENE = (function(){
     } else if(c.si===1){
       for(var i=0;i<5;i++){ var x=24+i*112, y=214-i*42, k=STEPS[i], L=LINES2[k];
         h+='<rect x="'+x+'" y="'+(y+60)+'" width="112" height="'+(226-y)+'" fill="'+['#D9C9A3','#D1BF95','#C9B587','#C1AB7A','#B9A16C'][i]+'"/>';
-        h+='<rect x="'+(x+3)+'" y="'+(y-28)+'" width="106" height="86" rx="10" fill="#FFF4D6" stroke="#F2B640" stroke-width="2.4"/>'+useArt(ITEM[k].art,x+6,y-24,46,42)+lab(x+80,y-4,L[0],L[0].length>4?15:17,'h3a6-b')+lab(x+80,y+16,L[1],17,'h3a6-b');
-        if(ITEM[k].when) h+=lab(x+56,y+48,ITEM[k].when,15); }
+        h+='<rect x="'+(x+3)+'" y="'+(y-28)+'" width="106" height="86" rx="10" fill="#FFF4D6" stroke="#F2B640" stroke-width="2.4"/>'+useArt(ITEM[k].art,x+6,y-24,42,40)+lab(x+78,y-4,L[0],L[0].length>4?14:17,'h3a6-b')+lab(x+80,y+16,L[1],17,'h3a6-b');
+        if(ITEM[k].when) h+=lab(x+56,y+48,ITEM[k].when,15);
+        h+='<circle cx="'+(x+24)+'" cy="'+(y+80)+'" r="13" fill="#FFFFFF" stroke="#8A6A48" stroke-width="2"/>'+lab(x+24,y+86,String(i+1),17,'h3a6-b'); }
     } else {
       var mx=17, V=c.votes;
       NAMES4.forEach(function(k,i){ var y=40+i*62, n=V[k]||0, w=Math.round(n/mx*300);
@@ -943,8 +951,8 @@ var SCENE = (function(){
   function slideX(G){
     if(G.phase!=='play') return 0;
     if(G.endT>=0){ var r=G.endT-G.t; if(r<T.slideOut){ var e=1-Math.max(0,r)/T.slideOut; return -e*e*700; } return 0; }
-    if(G.rt<0) return 700;
-    if(G.rt<T.slideIn){ var e2=1-G.rt/T.slideIn; return e2*e2*700; }
+    if(G.rt<0) return 0;   /* 단계 첫 판은 단계 카드 동안 이미 제자리(놓을 곳이 보이게) */
+    if(G.rt<T.slideIn && G.ri>0){ var e2=1-G.rt/T.slideIn; return e2*e2*700; }
     return 0;
   }
   function renderScene(G){
@@ -965,22 +973,22 @@ var SCENE = (function(){
     gMove.setAttribute('transform', SX?'translate('+SX.toFixed(1)+' 0)':'');
     var show=!end && G.phase==='play' && G.endT<0;   /* 단계 시작 카드 동안에도 첫 판 카드가 보이게 */
     var ts=[G.phase, G.si, G.ri, show?1:0, GG.tray.map(function(c){ return c?c.id:''; }).join(',')].join('|');
-    if(ts!==traySig){ traySig=ts; gTray.innerHTML=trayHtml(GG,show); }
+    if(ts!==traySig){ traySig=ts; gTray.innerHTML = end ? '' : trayHtml(GG,show); }   /* 단계 끝: 빈 수첩을 치워 리본이 겹쳐 보이지 않게 */
     var cs=end && G.card ? 'c'+G.si : ''; if(cs!==cardSig){ cardSig=cs; gCard.innerHTML = cs ? cardHtml(G) : ''; }
   }
   function vbRect(G,id){
     var p=String(id).split(':'), b=G.phase==='title'?'step':G.board;
     if(p[0]==='tray'){ var i=+p[1]; return {x:slotX(i), y:TRAY_Y+4, w:SLOT_W, h:SLOT_H-6}; }
     if(p[0]==='card') return G.phase==='stageEnd' ? {x:12,y:6,w:576,h:290} : null;
-    if(G.phase==='play' && G.rt<0 && b!=='name') return null;
     if(p[0]==='o'){ var s=(G.spots||[]).find(function(z){ return String(z.id)===p[1]; }); if(!s) return null; var cx=spotCx(s)+SX; return {x:cx-112, y:52, w:224, h:238}; }
     if(p[0]==='s'){ var i2=+p[1]; return {x:stepX(i2)+3+SX, y:stepTop(i2)-88, w:112, h:84}; }
     if(p[0]==='n'){ var k=NAMES4.indexOf(p[1]); if(k<0 || b!=='name') return null; return {x:colX(k), y:38, w:134, h:246}; }
     if(p[0]==='pt'){
       if(/^s\d$/.test(p[1])){ var j=+p[1].slice(1); return {x:stepX(j)+60+SX, y:Math.max(2,stepTop(j)-126), w:54, h:36}; }
       var nk=NAMES4.indexOf(p[1]); if(nk>=0) return {x:colX(nk)+40, y:44, w:54, h:36};
-      var s2=(G.spots||[]).find(function(z){ return String(z.id)===p[1]; }); if(s2){ var c2=spotCx(s2)+SX; return {x:c2+50, y:56, w:54, h:36}; }
+      var s2=(G.spots||[]).find(function(z){ return String(z.id)===p[1]; }); if(s2){ var c2=spotCx(s2)+SX; return {x:c2+44, y:248, w:54, h:34}; }   /* +점수: 자리 아래쪽 안(칠판 날짜 띠·이름표와 떨어지게) */
       return null; }
+    if(p[0]==='chalk') return b==='back' ? {x:150, y:10, w:300, h:34} : null;
     if(p[0]==='hd'){ var q=NAMES4.indexOf(p[1]); return q>=0 ? {x:colX(q), y:176, w:134, h:108} : null; }
     return null;
   }
@@ -994,7 +1002,7 @@ var SCENE = (function(){
     if(G.phase==='stageEnd') return ['card'];
     if(cardSig) renderScene(G);
     var k=['tray:0','tray:1','tray:2'], b=G.phase==='title'?'step':G.board;
-    if(b==='back') (G.spots||[]).forEach(function(s){ k.push('o:'+s.id); });
+    if(b==='back'){ k.push('chalk'); (G.spots||[]).forEach(function(s){ k.push('o:'+s.id); }); }
     else if(b==='step'){ for(var i=0;i<5;i++) k.push('s:'+i); }
     else NAMES4.forEach(function(n){ k.push('hd:'+n); });
     return k;

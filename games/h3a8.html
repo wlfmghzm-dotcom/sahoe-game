@@ -394,10 +394,14 @@ function h8u(k,x,y,w,h){ return '<use href="#a-'+k+'" x="'+x+'" y="'+y+'" width=
 var H8_ART = {
   iHome:   {vb:[0,0,30,30], svg:'<path d="M4 14L15 5l11 9v12H4z" fill="#F2B640" stroke="#8C6B45" stroke-width="2"/><path d="M2 15L15 4l13 11" fill="none" stroke="#B3463B" stroke-width="3" stroke-linecap="round"/><rect x="12" y="17" width="6" height="9" fill="#8C6B45"/>'},
   iPort:   {vb:[0,0,30,30], svg:'<rect x="0" y="22" width="30" height="8" fill="#7FB6D6"/><path d="M3 17H27L24 24H6Z" fill="#3E5871"/><rect x="8" y="9" width="7" height="8" fill="#EEF1F3" stroke="#9AA6B0"/><rect x="10" y="4" width="3" height="6" fill="#2E3F50"/>'},
-  iTrain:  {vb:[0,0,30,30], svg:'<rect x="4" y="5" width="22" height="18" rx="4" fill="#4A6A8A"/><rect x="7" y="8" width="7" height="6" rx="1" fill="#D6ECFB"/><rect x="16" y="8" width="7" height="6" rx="1" fill="#D6ECFB"/><circle cx="10" cy="25" r="3" fill="#2E3F50"/><circle cx="20" cy="25" r="3" fill="#2E3F50"/><path d="M2 29H28" stroke="#8C6B45" stroke-width="2"/>'},
-  /* 블라인드 1차: '강 다리'가 기둥 건물로, '피란길'이 언덕+막대로 읽힘 → 강 위 아치 다리 / 보따리 진 사람이 걷는 길 */
+  /* 블라인드 2차: '기차역'이 버스로 읽힘 → 굴뚝·연기 있는 증기 기관차 + 철길 */
+  iTrain:  {vb:[0,0,30,30], svg:'<circle cx="8" cy="5" r="3" fill="#B9C2CA"/><circle cx="12" cy="3" r="2.4" fill="#C7CED4"/><rect x="6" y="7" width="5" height="7" fill="#2E3F50"/><rect x="3" y="13" width="17" height="9" rx="2" fill="#2E3F50"/><rect x="18" y="8" width="9" height="14" rx="1.5" fill="#B3463B"/><rect x="20" y="10" width="5" height="4" fill="#D6ECFB"/><circle cx="8" cy="24" r="3" fill="#5B6B7E"/><circle cx="20" cy="24" r="3" fill="#5B6B7E"/><path d="M0 28.5H30" stroke="#8C6B45" stroke-width="2"/><path d="M3 27v3M9 27v3M15 27v3M21 27v3M27 27v3" stroke="#8C6B45" stroke-width="1.6"/>'},
   iBridge: {vb:[0,0,30,30], svg:'<rect x="0" y="19" width="30" height="11" fill="#4AA3E8"/><path d="M0 22q4-2 8 0t7 0 7 0 8 0" fill="none" stroke="#D6ECFB" stroke-width="1.6"/><path d="M0 13H30" stroke="#8C6B45" stroke-width="4"/><path d="M2 15Q15 0 28 15" fill="none" stroke="#8C6B45" stroke-width="3"/><path d="M2 15v8M28 15v8" stroke="#8C6B45" stroke-width="3"/>'},
-  iRoad:   {vb:[0,0,30,30], svg:'<path d="M6 30L13 12h4l7 18z" fill="#D9C08F"/><path d="M15 14v14" stroke="#FBF8F1" stroke-width="1.6" stroke-dasharray="3 3"/><circle cx="21" cy="4.5" r="3" fill="#5B4632"/><path d="M21 8v8M21 16l-3 6M21 16l3 6M21 10l-4 4M21 10l3 3" stroke="#5B4632" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="25" cy="10" rx="3.6" ry="3.4" fill="#E7C46A" stroke="#9C7A3A" stroke-width="1.2"/>'},
+  /* 블라인드 2차: '피란길'이 등산으로 읽힘 → 평지 길을 보따리 이고 걷는 두 사람 */
+  iRoad:   {vb:[0,0,30,30], svg:'<path d="M0 25H30V30H0z" fill="#D9C08F"/><circle cx="9" cy="7" r="2.8" fill="#5B4632"/><ellipse cx="9" cy="3" rx="4" ry="2.4" fill="#E7C46A" stroke="#9C7A3A"/><path d="M9 10v8M9 18l-3 6M9 18l3 6M9 12l-3 4M9 12l3 4" stroke="#5B4632" stroke-width="2.2" stroke-linecap="round"/>'+
+           '<circle cx="21" cy="11" r="2.4" fill="#5B4632"/><path d="M21 14v6M21 20l-2.4 5M21 20l2.4 5M21 15l-3 3M21 15l3 3" stroke="#5B4632" stroke-width="2" stroke-linecap="round"/><ellipse cx="25" cy="15" rx="3" ry="2.6" fill="#E7C46A" stroke="#9C7A3A"/>'},
+  /* 휴전선 너머 가족: 얼굴 없는 회색 실루엣(누구인지 모름) */
+  silN:    {vb:[0,0,96,52], svg:'<g fill="#8C99A5"><circle cx="18" cy="12" r="8"/><path d="M6 52V34q0-12 12-12t12 12v18z"/><circle cx="48" cy="16" r="7"/><path d="M38 52V36q0-10 10-10t10 10v16z"/><circle cx="76" cy="20" r="6"/><path d="M68 52V38q0-8 8-8t8 8v14z"/></g><text x="48" y="10" text-anchor="middle" font-size="12" fill="#5B6B7E">?</text>'},
   iSum:    {vb:[0,0,30,30], svg:'<circle cx="15" cy="15" r="7" fill="#F2B640"/><path d="M15 2v5M15 23v5M2 15h5M23 15h5M6 6l3.5 3.5M20.5 20.5L24 24M24 6l-3.5 3.5M9.5 20.5L6 24" stroke="#F2B640" stroke-width="2.6" stroke-linecap="round"/>'},
   iWin:    {vb:[0,0,30,30], svg:'<path d="M15 2v26M3.7 8.5l22.6 13M3.7 21.5l22.6-13" stroke="#4AA3E8" stroke-width="3" stroke-linecap="round"/><path d="M11 4l4 4 4-4M11 26l4-4 4 4" fill="none" stroke="#4AA3E8" stroke-width="2.4" stroke-linecap="round"/>'},
   /* 끌 때 유령: 사연 피켓 */
@@ -528,7 +532,9 @@ function genRound(G,P){
   board.forEach(function(b,j){ b.id=G.nid++; b.head=heads[j%heads.length]; b.st='on'; });
   seek=shuffle(G,seek);
   /* 첫 찾는 사람은 게시판에 가족이 있는 사람(3단계 첫 수가 '못 만난 줄'이 아니게) */
-  var fm=seek.findIndex(function(s){ return s.match; }); if(fm>0){ var t2=seek[0]; seek[0]=seek[fm]; seek[fm]=t2; }
+  /* 3단계 첫 판(개념 판): 짝 없는 사람이 먼저 와서 '휴전선 너머 줄' 해 보기가 단계 시작에 바로 보이게(블라인드 2차). 그 밖에는 짝 있는 사람이 먼저 */
+  var first = (P.none && !G.ch && G.ri===0) ? seek.findIndex(function(s){ return !s.match; }) : seek.findIndex(function(s){ return s.match; });
+  if(first>0){ var t2=seek[0]; seek[0]=seek[first]; seek[first]=t2; }
   seek.forEach(function(s,j){ s.id=G.nid++; s.head=heads[(board.length+j)%heads.length]; s.tries=0; });
   return {board:board, seek:seek};
 }
@@ -545,7 +551,7 @@ function setupStage(G,si){
   G.si=si; G.phase='play'; G.t=0; G.ri=0; G.combo=0; G.card=null; G.endT=-1;
   G.cnt={meet:0, north:0, wrong:0, wait:0, lureHit:0};
   G.res={total:S.R*S.P.k, served:0, missed:0}; G.met=[]; G.notyet=[]; G.sample=null;
-  startRound(G); G.rt=-1.2;
+  startRound(G); G.rt=si===2?0:-1.2;   /* 3단계는 첫 게시판이 곧바로 보이게(블라인드 2차) */
   return G;
 }
 function startRound(G){
@@ -703,8 +709,8 @@ var GAME = {
     art: function(G){
       var t=function(x,y,s){ return '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-size="19" fill="#1E2B3A">'+s+'</text>'; };
       var h=useArt('hA',30,26,56,56)+useArt('hF',78,26,56,56)+t(82,122,'다시 만난 가족');
-      h+='<rect x="198" y="10" width="10" height="100" rx="3" fill="#B04A35"/><path d="M203 14v92" stroke="#FBF8F1" stroke-width="2" stroke-dasharray="6 6"/>'+t(203,130,'휴전선');
-      h+='<rect x="226" y="22" width="136" height="68" rx="10" fill="#E3E6EA" stroke="#5B6B7E" stroke-width="2" stroke-dasharray="6 4"/>'+useArt('hC',236,30,50,50)+useArt('hG',300,30,50,50)+t(300,122,'아직 못 만난 가족');
+      h+='<rect x="198" y="10" width="10" height="100" rx="3" fill="#B04A35"/><path d="M203 14v92" stroke="#FBF8F1" stroke-width="2" stroke-dasharray="6 6"/>'+t(184,130,'휴전선');
+      h+='<rect x="226" y="22" width="136" height="68" rx="10" fill="#E3E6EA" stroke="#5B6B7E" stroke-width="2" stroke-dasharray="6 4"/>'+useArt(((G.notyet||[])[0]||{a:'hC'}).a,236,30,50,50)+useArt(((G.notyet||[])[1]||{a:'hG'}).a,300,30,50,50)+t(304,122,'아직 못 만난 가족');
       return {vb:[0,0,400,136], svg:h};
     }
   },
@@ -843,6 +849,7 @@ var SCENE = (function(){
     var m=(G.met||[]).slice(-4); m.forEach(function(p,i){ var px=14+i*44; h+=useArt(p.a,px,380,24,24)+useArt(p.b,px+16,382,24,24); }); h+='</g>';
     return h;
   }
+  var BANNER='<rect x="8" y="8" width="180" height="48" rx="10" fill="#B3463B" stroke="#FBF8F1" stroke-width="2"/><text x="98" y="31" text-anchor="middle" font-size="19" fill="#FBF8F1" class="h8w">이산가족 찾기</text><text x="98" y="50" text-anchor="middle" font-size="15" fill="#FBE2D3" class="h8w">1983년 생방송</text>';
   var TITLE_SEEK={c:{home:'ham'}, head:'hA', tries:0};
   function lowHtml(G){
     var h='', y=336;
@@ -851,7 +858,7 @@ var SCENE = (function(){
       h+='<rect x="'+(BX+262)+'" y="'+(y+4)+'" width="12" height="92" rx="3" fill="#B04A35"/><path d="M'+(BX+268)+' '+(y+8)+'v84" stroke="#FBF8F1" stroke-width="2" stroke-dasharray="6 6"/>';
       h+='<text x="'+(BX+128)+'" y="'+(y+34)+'" text-anchor="middle" font-size="21" class="h8ttl">아직 못 만난 가족</text>';
       h+='<text x="'+(BX+334)+'" y="'+(y+30)+'" text-anchor="middle" font-size="17" class="h8lab">휴전선 너머</text>';
-      h+='<g opacity=".8">'+useArt('kKidA',BX+300,y+40,26,48)+useArt('kKidC',BX+330,y+40,26,48)+useArt('kPerson',BX+358,y+52,30,40)+'</g>';
+      h+=useArt('silN',BX+290,y+40,96,52);   /* 휴전선 너머 가족 = 얼굴 없는 실루엣(블라인드 2차: 다른 얼굴로 읽히지 않게) */
       (G.notyet||[]).slice(-6).forEach(function(n,i){ h+=useArt(n.a, BX+14+i*40, y+48, 38, 38); });
       h+='</g>';
       if(G.bad && G.bad.at==='north') h+=xMark(BX+244, y+14);
@@ -871,18 +878,15 @@ var SCENE = (function(){
     '<path d="M60 10h30v20h-30z" fill="#B3463B"/><path d="M52 12l23-14 23 14z" fill="#5B4632"/><path d="M40 40l10 14-6 10 8 14M110 34l-8 16 10 10" stroke="#5B4632" stroke-width="2.6" fill="none"/><path d="M118 86l8-14 16 2 4 12z" fill="#A69273"/></g>'; }
   function cardHtml(G){
     var c=G.card; if(!c) return '';
-    var h='<g data-keep="비교 카드" transform="translate(60 0) scale(.8)"><rect x="8" y="8" width="584" height="424" rx="18" fill="#FBF8F1" stroke="#DCD4C2" stroke-width="3"/>';
+    var h='<g data-keep="비교 카드" transform="translate(78 60) scale(.74)"><rect x="8" y="8" width="584" height="424" rx="18" fill="#FBF8F1" stroke="#DCD4C2" stroke-width="3"/>';
     if(c.si===0){
-      h+='<rect x="20" y="20" width="270" height="400" rx="14" fill="#F3EFE4"/>'+lab(155,54,'전쟁이 남긴 피해',25);
-      h+=bridgeArt(70,70)+lab(150,186,'부서진 다리',22,'h8lab');
-      h+=fortArt(80,214)+lab(155,330,'훼손된 수원 화성',22,'h8lab');
-      h+='<rect x="304" y="20" width="276" height="400" rx="14" fill="#E9EEF2"/>'+lab(442,54,'이산가족',27);
-      h+=useArt('kKidB',330,80,40,72)+useArt('kPerson',372,104,34,50)+'<path d="M420 120h40" stroke="#B04A35" stroke-width="4" stroke-dasharray="7 6"/>'+useArt('kKidC',476,80,40,72)+useArt('kKidA',520,82,38,70);
-      h+=lab(442,184,'피란 중 헤어진 가족',21,'h8lab');
-      h+=lab(442,236,'다시 만난 가족',22);
-      (c.met||[]).slice(0,4).forEach(function(p,i){ var px=330+i*62; h+=useArt(p.a,px,250,32,32)+useArt(p.b,px+22,252,32,32); });
-      h+=lab(442,322,'전쟁고아',22)+useArt('kPerson',424,330,40,58);
-      h+='<text x="442" y="408" text-anchor="middle" font-size="22" class="h8lab">부모를 잃은 아이</text>';
+      /* 블라인드 2차: 이산가족 하나로. 부서진 다리·성곽은 흐린 배경으로만 */
+      h+='<rect x="20" y="20" width="560" height="400" rx="14" fill="#E9EEF2"/><g opacity=".22">'+bridgeArt(40,300)+fortArt(420,300)+'</g>';
+      h+=lab(300,58,'이산가족',28)+lab(300,90,'피란 중 가족과 헤어져 만나지 못한 가족',20,'h8lab');
+      h+=useArt('kKidB',150,108,46,82)+useArt('kPerson',198,136,38,56)+'<path d="M262 160h76" stroke="#B04A35" stroke-width="5" stroke-dasharray="9 7"/>'+useArt('kKidC',364,108,46,82)+useArt('kKidA',412,110,44,80);
+      h+=lab(300,240,'1983년 방송으로 다시 만난 가족',22);
+      (c.met||[]).slice(0,5).forEach(function(p,i){ var px=128+i*72; h+=useArt(p.a,px,258,36,36)+useArt(p.b,px+24,260,36,36); });
+      h+=useArt('kPerson',282,312,36,52)+lab(300,396,'부모를 잃은 전쟁고아도 많았어요',20,'h8lab');
     } else if(c.si===1){
       var s=c.sample||{c:{home:'pyong',place:'port'}, lure:{home:'pyong',place:'train'}, clues:['home','place']};
       h+='<rect x="20" y="20" width="560" height="68" rx="14" fill="#33496A"/>'+lab(300,52,'1983년 · 138일 생방송',24,'h8w')+lab(300,78,'만 명이 넘는 가족이 다시 만남',21,'h8w');
@@ -900,7 +904,7 @@ var SCENE = (function(){
       h+='<rect x="330" y="20" width="16" height="400" rx="4" fill="#B04A35"/><path d="M338 28v384" stroke="#FBF8F1" stroke-width="2.4" stroke-dasharray="8 8"/>';
       h+='<rect x="356" y="20" width="224" height="400" rx="14" fill="#E3E6EA"/>'+lab(468,56,'아직 못 만난',25)+lab(468,86,'가족',25);
       (c.notyet||[]).slice(0,4).forEach(function(n,i){ var px=378+(i%2)*100, py=106+Math.floor(i/2)*84; h+=useArt(n.a,px,py,60,60); });
-      h+='<g opacity=".8">'+useArt('kKidA',392,282,34,62)+useArt('kKidC',436,282,34,62)+useArt('kPerson',480,298,40,48)+'</g>';
+      h+=useArt('silN',400,286,136,72);
       h+=lab(468,370,'휴전선 너머',21,'h8lab')+lab(468,402,'오늘날까지 분단',22);
     }
     return h+'</g>';
@@ -938,7 +942,7 @@ var SCENE = (function(){
   function vbRect(G,id){
     var p=String(id).split(':');
     if(p[0]==='card' && p.length===1) return null;
-    if(id==='bigcard') return G.phase==='stageEnd' ? {x:66,y:6,w:468,h:340} : null;
+    if(id==='bigcard') return G.phase==='stageEnd' ? {x:84,y:66,w:432,h:314} : null;
     if(id==='pk') return G.phase==='play' ? {x:8, y:62, w:180, h:270} : null;
     if(id==='seek') return (G.phase==='play' && G.cur) ? {x:8, y:62, w:180, h:270} : null;
     if(id==='north') return G.hasNone ? {x:BX, y:336, w:396, h:100} : null;
@@ -965,6 +969,7 @@ var SCENE = (function(){
   function idleAt(G){ return G.cur ? 'seek' : 'banner'; }
   var css = '.h8lab{fill:#1E2B3A;font-family:var(--game)}.h8ttl{fill:#1E2B3A;font-family:var(--game);font-weight:700}.h8w{font-family:var(--game);font-weight:700}'+
     '@keyframes h8pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}.h8pop{transform-box:fill-box;transform-origin:center;animation:h8pop .28s ease-out}'+
+    '.callout{box-shadow:0 0 0 2px #2E3F50,0 4px 0 rgba(30,43,58,.22)!important}'+
     '@media (prefers-reduced-motion:reduce){.h8pop{animation:none}}';
   return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, keepClear:keepClear, idleAt:idleAt, css:css, aspect:'600/440'};
 })();
