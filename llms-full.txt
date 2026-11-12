@@ -97,6 +97,24 @@
 - [다시 만난 가족](https://wlfmghzm-dotcom.github.io/sahoe-game/games/h3a8.html) — A 개념 체험: 1983년 이산가족 찾기 방송에서 사연 피켓의 단서(고향·헤어진 곳)를 게시판 카드와 맞춰 헤어진 가족을 다시 잇고, 휴전선 너머 가족은 '아직 못 만난 가족' 줄에 남겨요.
 - [전쟁이 남긴 것](https://wlfmghzm-dotcom.github.io/sahoe-game/games/h3b8.html) — B 떠올리기 연습: 6·25 전쟁이 남긴 피해와 오늘날까지 이어지는 일을 나눠 담아요.
 
+## 5-2 과학 (아이스크림미디어) 4. 자원과 에너지
+
+- [주제 1 자원을 계속 이용할 수 있을까? (교과서 88~89쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-4-1.html): 자원 창고 마을, 어떤 자원일까
+  - [자원 창고 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4a1.html): A 개념 체험. 손님이 주문한 물건의 재료를 물 탱크·숲·광산에서 꺼내 줘요. 물은 천천히, 나무는 더 천천히 다시 차고 광산은 다시 차지 않아요.
+  - [어떤 자원일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4b1.html): B 떠올리기 연습. 생활 속 물건과 쓰임을 물 자원·산림 자원·광물 자원 칸에 나눠 담아요.
+- [주제 2 재생 에너지가 궁금해! (교과서 90~91쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-4-2.html): 바람과 햇볕의 섬, 무엇에서 얻는 에너지일까?
+  - [바람과 햇볕의 섬](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4a2.html): A 개념 체험. 섬의 햇볕 들판·바람 언덕·계곡 물·바다·땅속 열·목장에 맞는 발전기를 세워 집에 불을 켜요. 날씨가 바뀌어도 불이 꺼지지 않게 섞어 세워요.
+  - [무엇에서 얻는 에너지일까?](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4b2.html): B 떠올리기 연습. 에너지를 얻는 모습을 보고 햇빛·바람·물·땅속 열과 생물 중 무엇에서 얻는지 나눠 담아요.
+- [주제 3 에너지를 지속가능하게 이용하려면? (교과서 92~93쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-4-3.html): 오늘도 내일도 에너지 마을, 어떤 방법일까?
+  - [오늘도 내일도 에너지 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4a3.html): A 개념 체험. 마을의 오늘 필요 바구니를 채우면서 미래 몫 저금통도 남겨요. 재생 에너지를 먼저, 안 쓰면 끄고, 가까우면 자전거를 타요.
+  - [어떤 방법일까?](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4b3.html): B 떠올리기 연습. 행동 카드를 재생 에너지·사용 줄이기·친환경 기술·낭비 중 알맞은 칸에 나눠 담아요.
+- [주제 4 자원과 에너지의 효율적인 이용 방법은? (교과서 94~95쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-4-4.html): 덜 쓰는 우리 집, 어떻게 아끼는 방법일까?
+  - [덜 쓰는 우리 집](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4a4.html): A 개념 체험. 이번 달 쓸 수 있는 물·종이·전기로 집안일을 해요. 같은 일을 덜 쓰는 물건을 고르고, 다 쓴 물건은 다시 쓰거나 분리배출하고, 1등급 제품을 골라요.
+  - [어떻게 아끼는 방법일까?](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4b4.html): B 떠올리기 연습. 생활 속 실천을 다시 써요·되살려 써요·덜 쓰는 물건·끄고 잠가요 칸에 나눠 담아요.
+- [주제 5 효율적으로 에너지를 이용하는 집 모형 (교과서 96~97쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-4-5.html): 따뜻한 집 모형 실험실, 에너지를 아끼는 집
+  - [따뜻한 집 모형 실험실](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4a5.html): A 개념 체험. 겨울밤 집 모형 두 채의 온도를 지켜요. 열이 새는 곳에 단열재를 붙이고 해 드는 지붕에 빛판을 올리면, 손난로를 빼도 온도가 덜 내려가요.
+  - [에너지를 아끼는 집](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4b5.html): B 떠올리기 연습. 집의 여러 모습을 열이 새요·열을 지켜요·직접 만들어요 칸에 나눠 담아요.
+
 ## 6-2 과학 (아이스크림미디어) 2. 물질의 연소
 
 ### 주제 1 서로 다른 물질을 섞으면 어떻게 될까?
