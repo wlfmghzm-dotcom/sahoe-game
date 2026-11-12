@@ -34,6 +34,24 @@
   - [다시 만난 가족](https://wlfmghzm-dotcom.github.io/sahoe-game/games/h3a8.html): A 개념 체험. 1983년 이산가족 찾기 방송에서 사연 피켓의 단서(고향·헤어진 곳)를 게시판 카드와 맞춰 헤어진 가족을 다시 잇고, 휴전선 너머 가족은 '아직 못 만난 가족' 줄에 남겨요.
   - [전쟁이 남긴 것](https://wlfmghzm-dotcom.github.io/sahoe-game/games/h3b8.html): B 떠올리기 연습. 6·25 전쟁이 남긴 피해와 오늘날까지 이어지는 일을 나눠 담아요.
 
+## 5-2 과학 (아이스크림미디어) 2. 날씨와 우리 생활
+
+- [주제 1 날마다 다른 날씨를 표현하는 기상 요소 (교과서 36~37쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-2-1.html): 날씨 방송국, 어떤 기상 요소일까
+  - [날씨 방송국](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2a1.html): A 개념 체험. 창밖 날씨를 보고 방송 날씨판에 구름의 양·강수량·습도·하루 기온 변화를 채워요. 비 오는 날과 맑은 날의 기상 요소가 어떻게 다른지 알아야 해요.
+  - [어떤 기상 요소일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2b1.html): B 떠올리기 연습. 날씨를 나타내는 말 카드를 기온·구름의 양·강수량·습도·바람 칸에 나눠 담아요.
+- [주제 2 우리 생활에 영향을 주는 날씨 (교과서 38~39쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-2-2.html): 내일 날씨 준비, 어떤 날씨에 할 일일까
+  - [내일 날씨 준비](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2a2.html): A 개념 체험. 내일 날씨 예보를 보고 마을 사람에게 알맞은 준비물을 미리 건네요. 준비가 맞으면 웃고, 틀리면 비에 젖거나 농작물이 피해를 입어요.
+  - [어떤 날씨에 할 일일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2b2.html): B 떠올리기 연습. 생활 모습 카드를 맑은 날·더운 날·추운 날·바람 센 날 칸에 나눠 담아요.
+- [주제 3 이슬, 안개, 구름을 비교해 보자! (교과서 40~43쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-2-3.html): 물방울 만들기, 이슬일까 안개일까 구름일까
+  - [물방울 만들기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2a3.html): A 개념 체험. 주문 카드의 이슬·안개·구름이 생기도록 호수의 수증기를 알맞은 곳에 보내요. 차가운 곳에서만 물방울이 생기고, 생기는 자리에 따라 이름이 달라요.
+  - [이슬일까 안개일까 구름일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2b3.html): B 떠올리기 연습. 물방울 이야기 카드를 이슬·안개·구름 칸에 나눠 담아요. 물방울이 생긴 곳을 떠올려요.
+- [주제 4 고기압과 저기압에서의 날씨가 궁금해! (교과서 44~45쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-2-4.html): 날씨 지도 예보관, 고기압일까 저기압일까
+  - [날씨 지도 예보관](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2a4.html): A 개념 체험. 마을 위 공기 기둥을 둘레 마을과 견주어 고기압인지 저기압인지 알아내고, 맑음과 흐림·비를 예보해요. 마지막엔 구름 사진만 보고 기압을 찾아요.
+  - [고기압일까 저기압일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2b4.html): B 떠올리기 연습. 날씨·공기 이야기 카드를 고기압·저기압 칸에 나눠 담아요.
+- [주제 5 바람은 어느 방향으로 불까? (교과서 46~49쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-2-5.html): 바람아 불어라, 해풍일까 육풍일까
+  - [바람아 불어라](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2a5.html): A 개념 체험. 두 곳 사이에 바람을 놓아 연기·깃발·배를 움직여요. 고기압과 저기압, 차갑고 따뜻한 곳, 바닷가의 낮과 밤을 보고 바람이 부는 쪽을 골라야 해요.
+  - [해풍일까 육풍일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/w2b5.html): B 떠올리기 연습. 바닷가 상황 카드를 해풍(낮)·육풍(밤) 칸에 나눠 담아요.
+
 ## 5-2 과학 (아이스크림미디어) 4. 자원과 에너지
 
 - [주제 1 자원을 계속 이용할 수 있을까? (교과서 88~89쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-5-2-4-1.html): 자원 창고 마을, 어떤 자원일까
