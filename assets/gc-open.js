@@ -9,9 +9,10 @@
     var ref = document.referrer || '';
     if (ref.indexOf(location.origin + '/sahoe-game/') === 0) return;   /* 대문·QR 이동 페이지에서 온 경우: 이미 셈 */
     var t = (document.title || gid).split(' – ')[0];
-    var i = new Image();
-    i.src = 'https://sahoe-game.goatcounter.com/count?p=' + encodeURIComponent('direct-' + gid) +
+    var u = 'https://sahoe-game.goatcounter.com/count?p=' + encodeURIComponent('direct-' + gid) +
       '&t=' + encodeURIComponent(t + ' · 바로 열기') + '&e=true&s=' + screen.width + ',' + screen.height + ',' + (window.devicePixelRatio || 1) +
       '&r=' + encodeURIComponent(ref) + '&rnd=' + Math.random().toString(36).slice(2);
+    /* count.js와 같은 방식: sendBeacon(페이지를 떠나도 전송 보장), 안 되면 그림 요청 */
+    if (!(navigator.sendBeacon && navigator.sendBeacon(u))) { var i = new Image(); i.src = u; }
   } catch (e) {}
 })();

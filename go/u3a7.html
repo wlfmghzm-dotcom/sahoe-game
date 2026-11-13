@@ -3,6 +3,6 @@
 <body><p><a href="../games/u3a7.html">게임 여는 중…</a></p><script>
 (function(){var to="../games/u3a7.html",done=false;function go(){if(done)return;done=true;location.replace(to+location.hash);}
 try{var n=1,f=function(){if(--n<=0)go();},b='https://sahoe-game.goatcounter.com/count?rnd='+Math.random().toString(36).slice(2)+'&s='+screen.width+','+screen.height+','+(window.devicePixelRatio||1)+'&r=';
-[['qr-u3a7','QR로 열기','&e=true']].forEach(function(h){var i=new Image();i.onload=i.onerror=f;i.src=b+'&p='+encodeURIComponent(h[0])+'&t='+encodeURIComponent(h[1])+h[2];});}catch(e){go();}
+[['qr-u3a7','QR로 열기','&e=true']].forEach(function(h){var u=b+'&p='+encodeURIComponent(h[0])+'&t='+encodeURIComponent(h[1])+h[2];var sent=false;try{sent=!!(navigator.sendBeacon&&navigator.sendBeacon(u));}catch(e){}if(sent){f();}else{var i=new Image();i.onload=i.onerror=f;i.src=u;}});}catch(e){go();}
 setTimeout(go,700);})();
 </script></body></html>
