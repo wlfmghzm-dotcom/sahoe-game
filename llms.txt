@@ -1,6 +1,6 @@
 # 차게임의 게임공장
 
-> 차게임의 게임공장: 6학년 사회·과학 개념 체험 게임. 아이스크림미디어 6-2 사회, 아이스크림미디어 6-2 과학 교과서 차시별 수업용 개념 체험 웹 게임 모음. 단원·차시로 찾아 QR로 바로 열고, 로그인 없이 무료로 써요.
+> 차게임의 게임공장: 초등 5·6학년 사회·과학 개념 체험 게임. 아이스크림미디어 5-2·6-2 사회, 5-2·6-2 과학 교과서 차시별 수업용 개념 체험 웹 게임 모음. 단원·차시로 찾아 QR로 바로 열고, 로그인 없이 무료로 써요.
 > English: Free browser games for Korean elementary social studies and science (grade 6), organized by textbook lesson; each lesson page links to playable games (no login, QR access).
 
 - 만든 사람: 초등 교사(개인, 비영리). 교과서 출판사와 관계없는 자료이며, 교과서 문장을 옮기지 않고 바꿔 썼습니다.
