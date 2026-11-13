@@ -1064,9 +1064,9 @@ function loadViews(){
   if(!S.gc) return;
   Object.keys(G).forEach(id=>{
     if(viewN[id]!=null||!/^games\//.test((G[id]||{}).file||'')) return;
-    /* 조회 = 사이트에서 연 횟수(open-<id>, 처음부터) + QR로 연 횟수(qr-<id>) */
+    /* 조회 = 사이트에서 연 횟수(open-<id>, 처음부터) + QR로 연 횟수(qr-<id>) + 다른 곳에 올린 주소로 바로 연 횟수(direct-<id>, 2026-11-13부터) */
     const one=p=>fetch('https://'+S.gc+'.goatcounter.com/counter/'+encodeURIComponent(p)+'.json').then(r=>r.ok?r.json():{count:'0'}).then(j=>+(String(j.count).replace(/\D/g,''))||0).catch(()=>0);
-    Promise.all([one('open-'+id),one('qr-'+id)]).then(([a,b])=>{ const v=String(Math.max(a+b,+viewN[id]||0)); viewN[id]=v; document.querySelectorAll('[data-vw="'+id+'"]').forEach(s=>s.textContent=v); showVTotal(); });
+    Promise.all([one('open-'+id),one('qr-'+id),one('direct-'+id)]).then(([a,b,c])=>{ const v=String(Math.max(a+b+c,+viewN[id]||0)); viewN[id]=v; document.querySelectorAll('[data-vw="'+id+'"]').forEach(s=>s.textContent=v); showVTotal(); });
   });
 }
 function like(id,btn){
