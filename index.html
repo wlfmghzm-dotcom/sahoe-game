@@ -740,17 +740,17 @@ function renderMenu(){
 }
 /* ---------- 교과서로 찾기(왼쪽): 출판사 → 학년 → 학기 → 과목 ---------- */
 const PUBS=[...new Set(L.map(l=>l.publisher).filter(Boolean))];
-let F={pub:PUBS[0]||'',gr:0,sem:0,sc:''}, emptySel=false;
+let F={pub:'',gr:0,sem:0,sc:''}, emptySel=false;   /* pub '' = 출판사 종합(모든 출판사) */
 const gOf=(sc,gr,sem)=>{ const s=NODES.get(sc); return s&&s.kids.find(g=>g.grade===gr+'-'+sem)||null; };
 const unitsFor=g=>g?g.kids.filter(u=>!F.pub||u.publisher===F.pub):[];
 const fCount=(sc,gr,sem)=>{ const g=gOf(sc,gr,sem); return g?readyN(unitsFor(g).flatMap(u=>u.lessons)):0; };
 function syncF(){ if(!scope) return; const g=pathTo(scope).find(x=>x.lv==='g'), s=subjOf(scope), u=unitOf(scope);
-  if(s) F.sc=s.code; if(g){ const m=/^(\d+)-(\d+)$/.exec(g.grade); if(m){ F.gr=+m[1]; F.sem=+m[2]; } } if(u&&u.publisher) F.pub=u.publisher; }
+  if(s) F.sc=s.code; if(g){ const m=/^(\d+)-(\d+)$/.exec(g.grade); if(m){ F.gr=+m[1]; F.sem=+m[2]; } } if(u&&u.publisher&&F.pub) F.pub=u.publisher; }
 function renderFinder(){
   const box=document.getElementById('finder'); if(!box) return; syncF();
   const anyG=gr=>[1,2].some(se=>ROOT.kids.some(s=>fCount(s.code,gr,se)));
   box.innerHTML=`<h2 class="fh">교과서로 찾기</h2>
-  <label class="fpub"><span>출판사</span><select id="fpub" aria-label="출판사">${PUBS.map(p=>`<option${p===F.pub?' selected':''}>${esc(p)}</option>`).join('')}</select></label>
+  <label class="fpub"><span>출판사</span><select id="fpub" aria-label="출판사"><option value=""${F.pub?'':' selected'}>출판사 종합</option>${PUBS.map(p=>`<option${p===F.pub?' selected':''}>${esc(p)}</option>`).join('')}</select></label>
   <div class="frow" role="group" aria-label="학년">${[1,2,3,4,5,6].map(n=>`<button class="fg${anyG(n)?' has':''}" data-f="gr" data-v="${n}" aria-pressed="${F.gr===n}" aria-label="${n}학년">${n}</button>`).join('')}<span class="fl">학년</span></div>
   <div class="frow" role="group" aria-label="학기">${[1,2].map(n=>`<button class="fs" data-f="sem" data-v="${n}" aria-pressed="${F.sem===n}" aria-label="${n}학기">${n}</button>`).join('')}<span class="fl">학기</span></div>
   <ul class="fsub">${ROOT.kids.map(s=>{ const c=fCount(s.code,F.gr,F.sem); return `<li><button class="fsj ${subjCls(s.code)}" data-f="sc" data-v="${esc(s.code)}" aria-pressed="${F.sc===s.code}"><span class="dt"></span>${esc(s.label)}<small>${c?'게임 '+c+'개':'준비 중'}</small></button></li>`; }).join('')}</ul>`;
@@ -778,7 +778,7 @@ function renderPick(){
   document.getElementById('clrq').innerHTML=searching?`<button class="btn alt sm" data-act="clearq">찾기 지우기</button>`:'';
   if(!searching&&(emptySel||(scope&&scope.lv==='g'))){ pills.hidden=true; lrow.hidden=true; vsw.hidden=true;
     if(emptySel){ const sj=NODES.get(F.sc); h.textContent=`${F.gr}학년 ${F.sem}학기 ${sj?sj.label:''}`; f.textContent='';
-      document.getElementById('view').innerHTML=`<div class="empty">${esc(F.pub)} ${F.gr}학년 ${F.sem}학기 ${esc(sj?sj.label:'')} 게임은 아직 준비 중이에요.<br>왼쪽에서 다른 학년·과목을 골라 보세요.</div>`; return; }
+      document.getElementById('view').innerHTML=`<div class="empty">${F.pub?esc(F.pub)+' ':''}${F.gr}학년 ${F.sem}학기 ${esc(sj?sj.label:'')} 게임은 아직 준비 중이에요.<br>왼쪽에서 다른 학년·과목을 골라 보세요.</div>`; return; }
     h.textContent=`${subjOf(scope).label} ${scope.label}`; f.textContent=`단원 ${unitsFor(scope).length}개 · 게임 ${readyN(unitsFor(scope).flatMap(u=>u.lessons))}개`;
     document.getElementById('view').innerHTML=unitRows(scope); return; }
   if(searching){
