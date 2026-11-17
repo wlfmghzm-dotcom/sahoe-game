@@ -246,6 +246,15 @@
   - [바꾸고 넘겨요](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3a8.html): A 개념 체험. 종이컵·전등 같은 생활 물건을 바꾸고 친구에게 바통을 넘기며 더하기·빼기 실천을 익혀요.
   - [더하기일까 빼기일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/u3b8.html): B 떠올리기 연습. 실천 카드를 더하기 노력·빼기 노력 칸에 나눠 담아요.
 
+## 6-2 실과 (이춘식) 2. 자연을 배려하는 지속가능한 생활의 실천
+
+- [1차시 건강과 환경을 생각하는 삶이 중요해요 (교과서 98~99쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/pra-6-2-2-1.html): 가열화 줄무늬 마을, 배려했을까
+  - [가열화 줄무늬 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/p2a1.html): A 개념 체험. 마을 사람이 부탁한 전기·이동·쓰레기 치우기를 해결해요. 고른 방법에 따라 온실가스 구름이 쌓이고 가열화 줄무늬 색과 빙하·바다·들판·동물이 달라져요.
+  - [배려했을까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/p2b1.html): B 떠올리기 연습. 자연을 배려하지 않았을 때 생기는 일과 배려했을 때 생기는 일 카드를 나눠 담아요.
+- [2차시 지속가능한 의식주 생활을 실천해요 (교과서 100쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/pra-6-2-2-2.html): 지구 용량 달력, 의식주 실천
+  - [지구 용량 달력](https://wlfmghzm-dotcom.github.io/sahoe-game/games/p2a2.html): A 개념 체험. 우리 집 옷방·부엌·거실의 낭비 습관을 지속가능한 물건으로 바꿔요. 낭비가 오래 있을수록 올해 지구 자원이 빨리 바닥나 초과의 날이 앞당겨져요.
+  - [의식주 실천](https://wlfmghzm-dotcom.github.io/sahoe-game/games/p2b2.html): B 떠올리기 연습. 지속가능한 생활 실천 카드를 의생활·식생활·주생활 칸에 나눠 담아요.
+
 ## Optional
 
 - [전체 설명(llms-full.txt)](https://wlfmghzm-dotcom.github.io/sahoe-game/llms-full.txt): 차시마다 학생이 겪는 활동과 다루는 개념을 더 자세히 적은 글
