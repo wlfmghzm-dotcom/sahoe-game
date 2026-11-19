@@ -469,6 +469,12 @@ Object.assign(ASSETS, {
   bdPort:  {vb:[0,0,48,48], svg:'<circle cx="24" cy="24" r="22" class="f-org"/><use href="#a-cFactory" x="6" y="10" width="36" height="30"/>'}
 });
 /* SVG로 둔 것과 까닭 */
+/* 배포 게임에서 가져온 Kenney 스프라이트(CC0) — kit/libsprite.py
+   kBox ← r3a1.html의 kBox */
+Object.assign(ASSETS, {
+  kBox: {vb:[-44,-34,88,68], src:'data:image/png;base64,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'}
+});
+
 var ASSETS_SVG_WHY = {
   cHarbor: '항구 묶음: Kenney 부두(pirate/structure-platform-dock)·고깃배(watercraft/boat-fishing-small)를 씀. 방파제·등대는 찾아봄(kenney --find lighthouse → Cartography Pack 선 그림뿐, 3D 키트에 등대 없음) → 직접 그림',
   cFarm: '양식장: 3D·2D 팩 모두 양식 틀·김 줄 없음(--find farm|net|seaweed → 밭·바닷속 풀뿐). 부표만 Kenney watercraft/buoy',
@@ -557,12 +563,12 @@ var STAGES = [
 var BADGES = [
   {k:'build', name:'사람이 만든 것', art:'bdBuild', def:'항구(배가 안전하게 드나드는 곳)·양식장(사람의 힘으로 물고기·김을 기르는 곳)·식당·숙박 시설은 사람이 바닷가에 만든 것이에요. 갯벌·모래사장은 원래 있던 자연이에요.'},
   {k:'work',  name:'바닷가 사람들의 일', art:'bdWork', def:'바닷가 사람들은 바다에서 물고기를 잡고, 양식장에서 일하고, 수산물 직판장에서 생선을 사고팔아요. 놀러 온 사람들은 모래사장에서 놀아요.'},
-  {k:'port',  name:'공업', art:'bdPort', def:'공업은 원료로 생활에 필요한 물건을 만드는 일이에요. 바다가 있는 지역은 배로 원료와 제품을 실어 나를 수 있어 공업이 발달하기도 해요.'}
+  {k:'port',  name:'공업', art:'bdPort', def:'공업은 원료(물건을 만들 재료)로 생활에 필요한 물건을 만드는 일이에요. 바다가 있는 지역은 배로 원료와 제품을 실어 나를 수 있어 공업이 발달하기도 해요.'}
 ];
 var NAMES = {
   harbor:'<em>항구</em>: 배가 안전해요', farm:'<em>양식장</em>: 김을 길러요', food:'<em>식당</em>에서 먹어요', inn:'<em>숙박 시설</em>에서 쉬어요',
   fisher:'바다에서 <em>물고기</em>를 잡아요', farmer:'<em>양식장</em>에서 일해요', tourist:'<em>모래사장</em>에서 공놀이!', seller:'<em>직판장</em>에서 생선 팔아요',
-  near:'배가 <em>원료</em>를 바로 줘요', house:'일하러 온 사람들의 집', box:'<em>제품</em>을 배에 실어요', miss:'해가 졌어요'
+  near:'배가 <em>만들 재료</em>를 바로 줘요', house:'일하러 온 사람들의 집', box:'<em>제품</em>을 배에 실어요', miss:'해가 졌어요'
 };
 var TITLES = [[0,'새내기 마을지기'],[460,'바닷가 마을지기'],[560,'솜씨 마을지기'],[640,'으뜸 바닷가 마을지기']];
 
@@ -654,7 +660,7 @@ function checkEnd(G,ev){
     if(!left){ bonus=(CFG.day-G.hour)*CFG.sunK; G.score+=bonus; }
   }
   G.rx.left=left; G.sx.left+=left; G.stats.left+=left; G.stats.days++;
-  var good = port ? (G.rx.farF===0 && !left) : !left; if(good){ G.res.served++; G.stats.happy++; } else G.res.missed++;
+  var good = port ? (G.rx.farF===0 && !left) : !left; if(good){ G.res.served++; G.stats.happy++; if(!G.ch){ G.stats.hs=G.stats.hs||[0,0,0]; G.stats.hs[G.si]++; } } else G.res.missed++;
   G.endT=G.t+CFG.endPause;
   ev.push({t:'roundEnd', bonus:bonus, left:left, good:good, at:'sun'});
 }
@@ -773,7 +779,7 @@ var GAME = {
     startBtn: '시작',
     start: ['해 지기 전에 필요한 것을 지어요',
             '해 지기 전에 사람을 일터로 보내요',
-            '공장을 놓아 배를 제품으로 채워요'],
+            '공장을 놓아 배 칸을 채워요'],
     end: [['자연에 사람이 만든 것을 더했어!'],
           ['바다 덕분에 하는 일이 많아!'],
           ['배로 나르니 공업이 발달해!', '울산도 이렇게 바뀌었어!']],
@@ -782,9 +788,9 @@ var GAME = {
   ruleCards: [
     [['rNeed','필요한 것',1],['rSun','놓으면 해가 져요']],
     [['rWork','하는 일',1],['rSun','놓으면 해가 져요']],
-    [['rPort','배로 원료·제품',1],['rSun','놓으면 해가 져요']]
+    [['rPort','배로 재료·제품',1],['rSun','놓으면 해가 져요']]
   ],
-  rulesModal: { cards: [['rNeed','필요한 곳에 알맞은 것'],['rSun','한 번 놓으면 해가 하나 져요'],['rPort','배가 원료와 제품을 날라요']],
+  rulesModal: { cards: [['rNeed','필요한 곳에 알맞은 것'],['rSun','한 번 놓으면 해가 하나 져요'],['rPort','배가 만들 재료와 제품을 날라요']],
     note: '아래 카드를 끌어 바닷가에 놓아요. 해가 다 지기 전에 모두 도와요.' },
   stageRibbon: function(G){ var ok=G.res.missed===0; return ok ? (G.si+1)+'단계 성공!' : {text:(G.si+1)+'단계 끝!', confetti:false}; },
   result: {
@@ -794,8 +800,9 @@ var GAME = {
     next: '다음 시간: 환경을 개발하면 무엇이 달라질까?',
     say: '친구 점수와 비교해 봐!',
     art: function(G){
-      var n=Math.min(G.stats.happy,18), h='', i;
-      for(i=0;i<n;i++) h+=useArt('progSun', 4+i*28, 10, 26, 26)+useArt('okMark', 18+i*28, 28, 14, 14);
+      /* 단계별로 묶어(사이를 띄워) 보여 줌: 그림 수 = 모두 도운 날 */
+      var hs=G.stats.hs||[G.stats.happy,0,0], h='', x=4, i, j, n=0;
+      for(j=0;j<3;j++){ for(i=0;i<(hs[j]||0);i++){ h+=useArt('progSun', x, 10, 24, 24)+useArt('okMark', x+13, 26, 13, 13); x+=26; n++; } x+=18; }
       return n ? {vb:[0,0,520,50], svg:h} : null;
     }
   },
@@ -807,7 +814,7 @@ var GAME = {
       var r=stOf(G).rule;
       if(r==='build') return {why:'바닷가에는 원래 갯벌·모래사장 같은 자연이 있어요. 사람들은 필요해서 항구·양식장·식당·숙박 시설을 만들어요', def:BADGES[0].def, page:'교과서 117쪽 참고'};
       if(r==='work') return {why:'어부는 바다에서 물고기를 잡고, 양식장에서는 김·물고기를 길러요. 상인은 직판장에서, 관광객은 모래사장에서 놀아요', def:BADGES[1].def, page:'교과서 117쪽 참고'};
-      return {why:'항구 옆 공장은 배가 원료를 바로 내려 주고 제품을 바로 실어 가요. 언덕 너머 공장은 트럭이 오가느라 제품이 적어요', def:BADGES[2].def, page:'교과서 118쪽 참고'};
+      return {why:'항구 옆 공장은 배가 만들 재료(원료)를 바로 내려 주고 제품을 바로 실어 가요. 언덕 너머 공장은 트럭이 오가느라 제품이 적어요', def:BADGES[2].def, page:'교과서 118쪽 참고'};
     }
   },
   /* 도전은 뺐다(조율자 2026-11-20): 결과를 보고 숫자를 맞춘 설계, 레벨이 카드 수만 올림 → 공리 정신(교훈 20·26) 미달 */
@@ -821,9 +828,9 @@ var GAME = {
   onEvent: function(e,FX){
     if(e.t==='ok'){ if(e.pts>0) FX.score(e.at.replace('spot:','pts:'), e.pts, false, 0); FX.burst(e.at, 8); FX.explain({why:OKWHY[e.c]||'', page:'교과서 117쪽 참고'}); }
     else if(e.t==='put'){ if(e.pts>0) FX.score(e.at.replace('spot:','pts:'), e.pts, false, 0); FX.burst(e.at, 6);
-      if(e.c==='factory' && e.k==='far') FX.callout('원료가 멀리서 와요', e.at);
-      FX.explain({why:e.c==='house'?'공장에서 일하러 온 사람들이 살 집이에요':e.k==='near'?'배가 원료를 바로 내려 주고 제품을 바로 실어 가요':'언덕 너머라 트럭이 오가느라 늦어요', def:BADGES[2].def, page:'교과서 118쪽 참고'}); }
-    else if(e.t==='box'){ if(e.pts>0) FX.score('shipPts', e.pts, false, 0); }
+      if(e.c==='factory' && e.k==='far') FX.callout('재료가 멀리서 와요', e.at);
+      FX.explain({why:e.c==='house'?'공장에서 일하러 온 사람들이 살 집이에요':e.k==='near'?'배가 만들 재료를 바로 내려 주고 제품을 바로 실어 가요':'언덕 너머라 트럭이 오가느라 늦어요', def:BADGES[2].def, page:'교과서 118쪽 참고'}); }
+    else if(e.t==='box'){ }   /* 블라인드 1차: 3단계 숫자는 배 칸 하나만(상자마다 +3 띄우지 않음) */
     else if(e.t==='wrong'){ FX.comboOff(); var w=WRONG[e.why]||{line:'다시!'}; FX.explain({why:w.why, page:'교과서 117쪽 참고'}); }   /* 이유 한 줄은 장면이 놓은 자리 안에 그린다(scene.js missLine) */
     else if(e.t==='roundEnd'){ FX.progress(); if(e.bonus>0) FX.score('sun', e.bonus, false, 0); }
     else if(e.t==='newRound'){ if(typeof U!=='undefined' && U && U.callQ) U.callQ.length=0; FX.progress(); }
@@ -887,7 +894,7 @@ function itemSvg(item){ return iconSvg(item,'it'); }
    판이 바뀌면 앞 판이 왼쪽으로 밀려 나가고 새 판이 오른쪽에서 함께 들어온다(0.6초, 하늘·땅·바다·선반은 제자리). */
 var SCENE = (function(){
   var VB={w:600,h:440}, TRAY_Y=330, LB=196, FB=150;
-  var X={L0:75,L1:205,L2:335,L3:465,W0:250,W1:410,N0:75,N1:205,F0:432,F1:540};
+  var X={L0:75,L1:205,L2:335,L3:465,W0:250,W1:410,N0:62,N1:170,F0:470,F1:552};
   var SHIP={x:120, y:250, w:210};
   var svg, L={}, bgKey='';
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
@@ -942,10 +949,9 @@ var SCENE = (function(){
     var h='';
     if(G.phase==='play' || G.phase==='title'){
       var left=CFG.day-(G.hour||0);
-      var fresh=G.phase==='play' && G.t-G.slideT<0.9, nR=G.phase==='play'?nRounds(G):0;
-      h+='<g data-keep="sun"><rect x="8" y="6" width="'+(nR?330:252)+'" height="34" rx="12" fill="#FBF8F1" opacity=".92"/>'+txt(46,30,'남은 해',17,'#5B6B7E');
-      for(var i=0;i<CFG.day;i++){ var cx=100+i*26; h+= i<left ? '<g'+(fresh?' class="r3a4-pop" style="animation-delay:'+(0.1+i*0.07)+'s"':'')+'>'+ua('sunOn',cx-11,12,22,22)+'</g>' : ua('sunOff',cx-9,14,18,18); }
-      if(nR) h+='<path d="M262 12V34" stroke="#C9CED6" stroke-width="2"/>'+txt(298,30,(G.ri+1)+'/'+nR+'일',18,'#1E2B3A',' font-weight="700"');
+      var fresh=G.phase==='play' && G.t-G.slideT<0.9;
+      h+='<g data-keep="sun"><rect x="8" y="6" width="214" height="34" rx="12" fill="#FBF8F1" opacity=".92"/>'+txt(44,30,'남은 해',17,'#5B6B7E');
+      for(var i=0;i<CFG.day;i++){ var cx=96+i*22; h+= i<left ? '<g'+(fresh?' class="r3a4-pop" style="animation-delay:'+(0.1+i*0.07)+'s"':'')+'>'+ua('sunOn',cx-11,12,22,22)+'</g>' : ua('sunOff',cx-9,14,18,18); }
       h+='</g>';
     }
     setH(L.hud,h);
@@ -957,7 +963,8 @@ var SCENE = (function(){
     if(sl==='B') return hasB2(spots) ? {x:4, y:218, w:78, h:104} : {x:4, y:218, w:156, h:104};
     if(sl==='B2') return {x:84, y:218, w:78, h:104};
     if(sl[0]==='W') return {x:cx-76, y:220, w:152, h:102};
-    if(sl[0]==='F') return {x:cx-52, y:46, w:104, h:112};
+    if(sl[0]==='F') return {x:cx-44, y:46, w:88, h:112};
+    if(sl[0]==='N') return {x:cx-54, y:80, w:108, h:124};
     return {x:cx-62, y:80, w:124, h:124};
   }
   function bubble(cx,y,icon){ return '<g data-keep="bub"><path d="M'+(cx-38)+' '+y+'h76a10 10 0 0 1 10 10v34a10 10 0 0 1-10 10h-30l-8 10-8-10h-30a10 10 0 0 1-10-10v-34a10 10 0 0 1 10-10z" fill="#FBF8F1" stroke="#8C99A5" stroke-width="2.4"/>'+ua(icon,cx-28,y+4,56,46)+'</g>'; }
@@ -984,8 +991,8 @@ var SCENE = (function(){
       h+= sl==='B2' ? '' : ua('kParasol',b.x+4,226,46,52);
       if(done) h+=pop(ua('fB',bx-14,236,36,46)+ua('ball',bx+12,232,26,26));
       else h+=ua('ball',bx+(sl==='B2'?-12:6),278,28,28); }
-    else if(k==='market'){ h+=ua('kStall',cx-54,LB-104,108,92)+'<rect x="'+(cx-26)+'" y="'+(LB-48)+'" width="52" height="14" rx="3" fill="#C99A5E"/>'+ua('fishB',cx-26,LB-58,26,14)+ua('fishO',cx,LB-58,26,14)+ua('kWomN',cx+34,LB-62,28,54);
-      if(done) h=pop(h+ua('mA',cx-20,LB-96,40,46)); else h+=''; }
+    else if(k==='market'){ h+=ua('kStall',cx-54,LB-104,108,92)+'<rect x="'+(cx-26)+'" y="'+(LB-48)+'" width="52" height="14" rx="3" fill="#C99A5E"/>'+ua('fishB',cx-26,LB-58,26,14)+ua('fishO',cx,LB-58,26,14);
+      if(done) h=pop(h+ua('mA',cx-20,LB-96,40,46)+ua('kWomN',cx+34,LB-62,28,54)); }
     else if(k==='near'||k==='far'){ h+=plotArt(G,s,cx); }
     if(s.ghost) return h;
     /* 맞힘 체크 / 놓친 자리 */
@@ -1002,16 +1009,14 @@ var SCENE = (function(){
     return '<rect x="'+(cx-fw/2)+'" y="'+y+'" width="'+fw+'" height="30" rx="12" fill="#FFFFFF" stroke="#D9534F" stroke-width="2.4"/>'+txt(cx,y+22,n,18,'#B03A36'); }
   /* 3단계 땅: 빈 땅(점선) / 공장(항구 옆 = 기중기 줄로 원료, 언덕 너머 = 트럭이 길 위) / 집 */
   function plotArt(G,s,cx){
-    var far=s.k==='far', base=far?FB:LB, h='';
-    if(s.st==='empty'){ h+='<rect x="'+(cx-46)+'" y="'+(base-44)+'" width="92" height="40" rx="8" fill="#C9A77A" stroke="#8C6A4A" stroke-width="2.4" stroke-dasharray="7 5"/>'; return h; }
+    var far=s.k==='far', base=far?FB:LB, h='', fw=far?84:100, pw=far?80:92;
+    if(s.st==='empty'){ h+='<rect x="'+(cx-pw/2)+'" y="'+(base-44)+'" width="'+pw+'" height="40" rx="8" fill="#C9A77A" stroke="#8C6A4A" stroke-width="2.4" stroke-dasharray="7 5"/>'; return h; }
     if(s.st==='fac'){
-      h+=ua('cFactory',cx-50,base-84,100,80);
-      if(!far){ h+='<path d="M'+(cx+30)+' '+(base-60)+'L'+(SHIP.x+SHIP.w/2-30)+' 214" stroke="#5B6B7E" stroke-width="2" stroke-dasharray="5 4"/>'; }
-      else { var ph=((G.hour-s.at)%CFG.farEvery)/CFG.farEvery, tx=338+ph*(cx-338), ty=200-ph*38;
-        h+=ua('truck',tx-24,ty-26,48,24); }
-      if(s.boxes) h+='<g><rect x="'+(cx+8)+'" y="'+(base-104)+'" width="64" height="28" rx="10" fill="#FBF8F1" opacity=".92"/>'+ua('gCont',cx+10,base-102,28,24)+txt(cx+54,base-83,'×'+s.boxes,18,'#1E2B3A',' font-weight="700"')+'</g>';
+      h+=ua('cFactory',cx-fw/2,base-fw*0.84,fw,fw*0.8);
+      if(far){ var ph=((G.hour-s.at)%CFG.farEvery)/CFG.farEvery, tx=338+ph*(cx-60-338), ty=200-Math.min(1,ph*1.6)*38;
+        h+=ua('truck',tx-24,ty-26,48,24)+ua('kBox',tx-12,ty-40,22,17); }   /* 트럭이 상자를 싣고 언덕 길을 천천히 오간다 */
     }
-    if(s.st==='house') h+=ua('cHouse',cx-40,base-84,80,80);
+    if(s.st==='house') h+=ua('cHouse',cx-fw*0.4,base-fw*0.84,fw*0.8,fw*0.8);
     return h;
   }
   /* 맞힌 순간(0.6초): 놓은 카드가 그 자리로 줄어들며 들어간다 */
@@ -1021,13 +1026,15 @@ var SCENE = (function(){
       h+='<g opacity="'+o.toFixed(2)+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+(40+a*40).toFixed(1)+'" fill="none" stroke="#3FA56B" stroke-width="4"/>'+ua(CARDS[s.what].art,cx-w/2,cy-w/2,w,w)+'</g>'; }
     return h;
   }
-  function labName(s){ var d=SPOTS[s.k]; if(s.k==='near'||s.k==='far') return s.st==='fac'?'공장':s.st==='house'?'집':d.name; return s.st==='done' && d.ok ? d.ok : d.name; }
+  function labName(s){ var d=SPOTS[s.k]; if(s.k==='far' && s.st==='empty') return '';   /* 빈 언덕 너머 땅은 이름표 하나로 묶음(lab:far) */
+    if(s.k==='near'||s.k==='far') return s.st==='fac'?'공장':s.st==='house'?'집':d.name; return s.st==='done' && d.ok ? d.ok : d.name; }
   function labPos(s,spots){ var b=spotBox(s,spots), sl=s.slot;
     if(sl[0]==='W' || sl[0]==='B') return {x:b.x+b.w/2, y:312};
     if(sl[0]==='F') return {x:X[sl], y:FB+30};
     return {x:X[sl], y:LB+12}; }
   function labSize(n){ return n.length>5?16:18; }
-  function labArt(G,s,spots){ var p=labPos(s,spots), n=labName(s); return pill(p.x,p.y,n,labSize(n)); }
+  function labArt(G,s,spots){ var p=labPos(s,spots), n=labName(s); return n ? pill(p.x,p.y,n,labSize(n)) : ''; }
+  function farEmpty(spots){ return (spots||[]).some(function(s){ return s.k==='far' && s.st==='empty'; }); }
   /* 쓰지 않은 칸의 장식(이미 지은 마을) */
   function decor(G,spots){
     var r=rule(G), used={}, h=''; (spots||[]).forEach(function(s){ used[s.slot]=1; });
@@ -1040,12 +1047,14 @@ var SCENE = (function(){
   /* 3단계 화물선: 갑판 점선 칸 = 실을 수 있는 제품, 채운 칸 = 실은 제품 */
   function shipArt(G,ship,max){
     var h='', sx=SHIP.x, sy=SHIP.y, w=SHIP.w;
-    h+=ua('crane',290,112,56,96);
     h+='<path d="M'+(sx-8)+' '+sy+'H'+(sx+w+10)+'L'+(sx+w-8)+' '+(sy+62)+'H'+(sx+10)+'Z" fill="#3E6FB0" stroke="#2B4F82" stroke-width="2.4"/>'+
        '<rect x="'+(sx+w-34)+'" y="'+(sy-30)+'" width="30" height="30" rx="4" fill="#FBF8F1" stroke="#5B6B7E" stroke-width="2"/><rect x="'+(sx+w-29)+'" y="'+(sy-24)+'" width="20" height="8" fill="#7FB3D8"/>';
     var shown=Math.max(0,ship-(G.fx||[]).filter(function(f){ return f.k==='box' && G.t-f.at<0.6; }).length);
     for(var i=0;i<max;i++){ var col=i%6, row=Math.floor(i/6), x=sx+4+col*28, y=sy+6+row*26;
-      h+= i<shown ? ua('gCont',x,y-2,26,22) : '<rect x="'+(x+2)+'" y="'+y+'" width="22" height="18" rx="3" fill="#FBF8F1" fill-opacity=".3" stroke="#FBF8F1" stroke-width="2" stroke-dasharray="4 3"/>'; }
+      h+= i<shown ? ua('kBox',x-1,y-2,28,22) : '<rect x="'+(x+2)+'" y="'+y+'" width="22" height="18" rx="3" fill="#FBF8F1" fill-opacity=".3" stroke="#FBF8F1" stroke-width="2" stroke-dasharray="4 3"/>'; }
+    /* 목표 = 하나의 숫자: 배에 실을 제품 n/m (칸 채움과 같은 수) */
+    h+='<rect x="338" y="268" width="214" height="38" rx="14" fill="#FBF8F1" stroke="#2B4F82" stroke-width="2.4"/>'+ua('kBox',344,275,28,22)+
+       '<text x="376" y="293" font-size="17" fill="#1E2B3A" class="r3a4-t">배에 실을 제품</text>'+'<text x="544" y="296" text-anchor="end" font-size="22" font-weight="700" fill="#2B4F82" class="r3a4-t">'+shown+'/'+max+'</text>';
     return '<g data-keep="ship">'+h+'</g>';
   }
   function village(G,spots,occ,ship,max){
@@ -1055,6 +1064,7 @@ var SCENE = (function(){
     spots.forEach(function(s){ h+=labArt(G,s,spots); });
     if(r!=='port' && !spots.some(function(s){ return s.slot==='B'; })) h+=pill(80,312,'모래사장',18);
     if(r==='port') (occ||[]).forEach(function(sl){ h+=pill(X[sl],LB+12,'이미 선 공장',16); });
+    if(r==='port' && farEmpty(spots)) h+=pill(511,FB+30,'언덕 너머 땅',17);
     return h;
   }
   /* ---- 선반 ---- */
@@ -1063,6 +1073,9 @@ var SCENE = (function(){
     if(G.phase==='stageEnd'){ setH(L.tray,''); return; }
     var h='', n=(G.tray||[]).length, on=G.phase==='play'||G.phase==='title';
     h+='<rect x="4" y="'+TRAY_Y+'" width="592" height="106" rx="14" fill="#C9A26A"/><rect x="4" y="'+TRAY_Y+'" width="592" height="100" rx="14" fill="#E3C28D"/>';
+    var empty=!(G.tray||[]).some(function(c){ return c; });
+    if(G.phase==='play' && empty){ var m=G.endT>=0 ? '하루 끝! 다음 날이 와요' : '공장이 상자를 만들어요';
+      h+=ua(G.endT>=0?'sunOff':'kBox',300-m.length*10-34,TRAY_Y+32,G.endT>=0?30:36,G.endT>=0?30:28)+txt(300+18,TRAY_Y+56,m,20,'#5B4A2E'); }
     (G.tray||[]).forEach(function(c,i){ if(!c) return; var x=trayX(i,n), a=CARDS[c].art, nm=CARDS[c].name;
       h+='<g'+(on?'':' opacity=".5"')+'><rect x="'+(x-58)+'" y="'+(TRAY_Y+6)+'" width="116" height="90" rx="12" fill="#F5E6C8"/>'+ua(a,x-36,TRAY_Y+8,72,60)+
         txt(x,TRAY_Y+88,nm,nm.length>5?16:19)+'</g>'; });
@@ -1073,8 +1086,8 @@ var SCENE = (function(){
     var h='';
     if(G.phase==='play' && rule(G)==='port') (G.fx||[]).forEach(function(f){ if(f.k!=='box') return; var a=G.t-f.at; if(a<0||a>0.6) return;
       var s=(G.spots||[]).find(function(x){ return x.id===f.id; }); if(!s) return;
-      var e=ease(a/0.6), base=s.k==='far'?FB:LB, x0=X[s.slot]+30, y0=base-20, x1=SHIP.x+SHIP.w/2, y1=SHIP.y, x=x0+(x1-x0)*e, y=y0+(y1-y0)*e-Math.sin(e*Math.PI)*40;
-      h+=ua('gCont',x-14,y-12,28,24); });
+      var e=ease(a/0.6), base=s.k==='far'?FB:LB, x0=X[s.slot]+20, y0=base-70, x1=SHIP.x+SHIP.w-30, y1=SHIP.y, x=x0+(x1-x0)*e, y=y0+(y1-y0)*e-Math.sin(e*Math.PI)*40;
+      h+=ua('kBox',x-14,y-11,28,22); });
     setH(L.fx,h);
   }
   /* ---- 단계 끝 카드(개념의 증거) ---- */
@@ -1102,10 +1115,10 @@ var SCENE = (function(){
       h+='<rect x="34" y="150" width="242" height="44" rx="8" fill="#5DA9E9"/>'+ua('gRow',50,152,60,34)+ua('gRow',200,160,54,30)+ua('houseA',40,64,70,70)+ua('houseC',114,70,60,60)+'<rect x="186" y="96" width="80" height="44" rx="6" fill="#C9D98A"/><path d="M194 106h64M194 118h64M194 130h64" stroke="#9BB55A" stroke-width="3"/>';
       h+='<rect x="324" y="150" width="242" height="44" rx="8" fill="#5DA9E9"/>'+ua('gCargo',330,140,120,56)+ua('crane',446,92,40,70)+ua('cFactory',326,56,90,72)+ua('cFactory',474,62,84,66)+ua('kBldg',420,54,52,46)+ua('kKidA',486,124,18,34)+ua('kWomN',504,124,18,34)+ua('kKidA',522,124,18,34)+ua('kWomN',540,124,18,34);
       h+='<rect x="24" y="214" width="552" height="104" rx="14" fill="#FFF1D6"/>';
-      h+=txt(152,240,'항구 옆 공장',20)+txt(448,240,'언덕 너머 공장',20);
-      for(var i=0;i<6;i++) h+=ua('gCont',44+i*36,252,32,28);
-      for(var j=0;j<2;j++) h+=ua('gCont',380+j*36,252,32,28);
-      h+=ua('truck',470,252,56,28)+txt(300,306,'배로 원료·제품을 바로 날라요',20,'#5B6B7E');
+      h+=txt(152,240,'항구 옆 공장 (가까움)',20)+txt(448,240,'언덕 너머 공장 (멂)',20);
+      for(var i=0;i<6;i++) h+=ua('kBox',44+i*36,254,32,25);
+      for(var j=0;j<2;j++) h+=ua('kBox',380+j*36,254,32,25);
+      h+=ua('truck',470,252,56,28)+txt(300,306,'배로 재료·제품을 바로 날라요',20,'#5B6B7E');
     }
     setH(L.card,h+'</g>');
   }
@@ -1132,8 +1145,8 @@ var SCENE = (function(){
       if(sl[0]==='L'||sl[0]==='N') return {x:bb.x+bb.w/2-20, y:44, w:40, h:28};
       if(sl[0]==='F') return {x:bb.x-34, y:70, w:40, h:28};
       return {x:bb.x+4, y:bb.y+2, w:40, h:28}; }
-    if(p[0]==='lab'){ if(p[1]==='sand') return {x:30,y:299,w:100,h:26}; s=(G.spots||[]).find(function(x){ return String(x.id)===p[1]; }); if(!s) return null; var q=labPos(s,G.spots), n=labName(s), w=n.length*labSize(n)+16; return {x:q.x-w/2, y:q.y-13, w:w, h:26}; }
-    if(p[0]==='sun') return (G.phase==='play'||G.phase==='title') ? {x:8, y:6, w:(G.phase==='play'?330:252), h:34} : null;
+    if(p[0]==='lab'){ if(p[1]==='sand') return {x:30,y:299,w:100,h:26}; if(p[1]==='far') return farEmpty(G.spots) ? {x:511-112,y:FB+17,w:224,h:26} : null; s=(G.spots||[]).find(function(x){ return String(x.id)===p[1]; }); if(!s) return null; var q=labPos(s,G.spots), n=labName(s); if(!n) return null; var w=n.length*labSize(n)+16; return {x:q.x-w/2, y:q.y-13, w:w, h:26}; }
+    if(p[0]==='sun') return (G.phase==='play'||G.phase==='title') ? {x:8, y:6, w:214, h:34} : null;
     if(p[0]==='ship') return (G.phase==='play' && rule(G)==='port') ? {x:SHIP.x-6, y:SHIP.y-40, w:SHIP.w+18, h:100} : null;
     if(p[0]==='endcard') return G.phase==='stageEnd' ? {x:10, y:8, w:580, h:424} : null;
     return null;
@@ -1150,7 +1163,7 @@ var SCENE = (function(){
     if(G.phase==='title'){ (G.spots||[]).forEach(function(s){ k.push('spot:'+s.id); }); (G.tray||[]).forEach(function(c,i){ k.push('card:'+i); }); }
     return k;
   }
-  function labels(G){ if(G.phase==='stageEnd') return []; var a=(G.spots||[]).map(function(s){ return 'lab:'+s.id; }); if(rule(G)!=='port') a.push('lab:sand'); return a; }
+  function labels(G){ if(G.phase==='stageEnd') return []; var a=(G.spots||[]).map(function(s){ return 'lab:'+s.id; }); if(rule(G)!=='port') a.push('lab:sand'); else a.push('lab:far'); return a; }
   function idleAt(G){ return rule(G)==='port' ? 'ship' : 'sun'; }
   var css = '.r3a4-t{font-family:var(--game)}'+
     '@keyframes r3a4r{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}.r3a4-rock{transform-box:fill-box;transform-origin:center bottom;animation:r3a4r 1.1s ease-in-out infinite}'+
@@ -1158,7 +1171,7 @@ var SCENE = (function(){
     '@keyframes r3a4j{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}.r3a4-jump{animation:r3a4j 1s ease-in-out infinite}'+
     '@keyframes r3a4p{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}.r3a4-pop{transform-box:fill-box;transform-origin:center;animation:r3a4p .3s ease-out both}'+
     'body .nextq{font-size:20px;line-height:1.3;color:#3A4A5E;padding-bottom:20px}'+
-    '#prog{counter-reset:r3a4t r3a4d}#prog .pc{counter-increment:r3a4t}#prog .pc:has(.ck){counter-increment:r3a4t r3a4d}#prog::after{content:counter(r3a4d) " / " counter(r3a4t);margin-left:8px;font-size:18px;font-weight:700;color:#5B6B7E;white-space:nowrap;align-self:center}'+
+    '#prog{counter-reset:r3a4t r3a4d}#prog .pc{counter-increment:r3a4t}#prog .pc:has(.ck){counter-increment:r3a4t r3a4d}#prog::after{content:"끝낸 하루 " counter(r3a4d) "/" counter(r3a4t);margin-left:8px;font-size:18px;font-weight:700;color:#5B6B7E;white-space:nowrap;align-self:center}'+
     '@media (prefers-reduced-motion:reduce){.r3a4-rock,.r3a4-wave,.r3a4-jump,.r3a4-pop{animation:none}}';
   return {mount:mount, renderScene:renderScene, rectOf:rectOf, avoid:avoid, keepClear:keepClear, labels:labels, idleAt:idleAt, css:css, aspect:'600/440'};
 })();
