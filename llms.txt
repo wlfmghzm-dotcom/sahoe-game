@@ -31,6 +31,33 @@
   - [따끈따끈 지킴이](https://wlfmghzm-dotcom.github.io/sahoe-game/games/t3a7.html): A 개념 체험. 군고구마는 따뜻하게, 아이스크림은 차갑게! 통에서 열이 새는 곳(주황 화살표)을 보고 단열재·뚜껑·양산 가운데 알맞은 것을 골라 막아요.
   - [무엇을 막을까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/t3b7.html): B 떠올리기 연습. 생활 속 단열을 전도·대류·복사 중 무엇을 막는지에 따라 나눠 담아요.
 
+## 4-2 사회 (아이스크림미디어) 3. 다양한 환경과 삶의 모습
+
+- [1-1 자연환경과 인문환경 (교과서 109~110쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-1.html): 시간 되감기 카메라, 자연일까 사람일까
+  - [시간 되감기 카메라](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a1.html): A 개념 체험. 모자란 되감기 딱지를 사람이 만든 것(논·항구·건물·도로·목장)에만 붙여 마을을 사람이 오기 전 모습으로 되돌려요. 산·하천·비·눈 같은 자연 그대로인 것에 붙이면 딱지를 잃어요. 마지막엔 거꾸로 자연 위에 필요한 것을 지어요.
+  - [자연일까 사람일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b1.html): B 떠올리기 연습. 환경 카드를 자연환경과 인문환경 칸에 나눠 담아요.
+- [1-2 산이 많은 지역의 환경과 생활 모습 (교과서 111~113쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-2.html): 산골 마을 꾸미기, 산에서는
+  - [산골 마을 꾸미기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a2.html): A 개념 체험. 산의 바람 센 능선·계곡·눈 쌓인 비탈·풀밭·숲을 보고 풍력 발전기·댐·스키장·목장·삼림욕장을 알맞은 곳에 지어요. 스키장이 생겨 관광객이 오면 산비탈 밭에 식당·숙박 시설을 놓아 평창의 변화를 만들어요.
+  - [산에서는](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b2.html): B 떠올리기 연습. 산이 많은 지역의 모습을 자연환경, 일하는 곳, 즐기는 곳으로 나눠 담아요.
+- [1-3 들이 펼쳐진 지역의 환경과 생활 모습 (교과서 114~116쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-3.html): 넓은 들의 변화, 들에서는
+  - [넓은 들의 변화](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a3.html): A 개념 체험. 넓은 들에서 논을 하천·저수지 가까운 땅에 놓아 벼를 기르고, 사람이 모여들면 바라는 것(살 곳·일할 곳·길·상점·문화 시설)을 빈터에 세워요. 마지막엔 1970년 지도에 아파트·학교·도로 기호를 놓아 2023년 지도로 바꿔요.
+  - [들에서는](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b3.html): B 떠올리기 연습. 들이 펼쳐진 지역의 모습을 농사짓는 모습과 사람이 모여 생긴 시설로 나눠 담아요.
+- [1-4 바다가 있는 지역의 환경과 생활 모습 (교과서 117~118쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-4.html): 바닷가 하루, 어느 지역일까
+  - [바닷가 하루](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a4.html): A 개념 체험. 바닷가 마을에 필요한 항구·양식장·식당·숙박 시설을 짓고, 어부·관광객·상인을 일하는 곳에 보내요. 마지막엔 울산처럼 공장을 항구 옆에 둘지 언덕 너머에 둘지 골라 배로 원료와 제품을 날라요.
+  - [어느 지역일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b4.html): B 떠올리기 연습. 여러 지역의 모습을 산이 많은 지역, 들이 펼쳐진 지역, 바다가 있는 지역으로 나눠 담아요.
+- [1-5 환경의 이용과 개발에 따른 영향 (교과서 120~124쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-5.html): 개발과 지킴, 개발의 두 얼굴
+  - [개발과 지킴](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a5.html): A 개념 체험. 산·들·갯벌에 스키장·도로·간척 같은 개발 카드를 놓으면 좋은 점과 문제가 함께 생겨요. 문제에 맞는 생태 통로·생태 하천·자연 휴식년제를 골라 놓아 동식물이 돌아오게 해요.
+  - [개발의 두 얼굴](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b5.html): B 떠올리기 연습. 환경을 이용·개발한 결과를 좋은 점, 문제점, 자연과 함께하려는 노력으로 나눠 담아요.
+- [2-1 도시와 도시의 특징 (교과서 129~135쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-6.html): 도시가 되어 가요, 도시에 있는 것
+  - [도시가 되어 가요](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a6.html): A 개념 체험. 도시로 모여든 사람들·땅 모양·일하는 모습을 보고 아파트·병원·항구·기차역 같은 시설과 제조업·상업 같은 산업 간판을 알맞은 자리에 놓아 도시를 만들어요. 사람 수, 바다·철길, 만드는지 파는지를 보고 골라야 해요.
+  - [도시에 있는 것](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b6.html): B 떠올리기 연습. 도시에서 볼 수 있는 모습을 사는 곳·편의 시설, 산업, 교통으로 나눠 담아요.
+- [2-2 도시에 사는 사람들의 생활 모습 (교과서 136~138쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-7.html): 도시의 하루, 도시의 하루
+  - [도시의 하루](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a7.html): A 개념 체험. 도시 사람들의 말풍선(원하는 것)을 보고 그 사람을 알맞은 집·출근 교통·여가 장소에 데려다줘요. 아파트와 단독 주택, 지하철과 도로, 미술관·영화관·공원·놀이터 가운데 사람마다 다른 곳을 골라야 해요.
+  - [도시의 하루](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b7.html): B 떠올리기 연습. 도시 사람들의 생활 모습을 사는 곳, 하는 일, 여가 생활로 나눠 담아요.
+- [2-3 도시 생활의 좋은 점과 문제점 (교과서 140~142쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/4-2-3-8.html): 도시 고민 해결단, 도시의 고민
+  - [도시 고민 해결단](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3a8.html): A 개념 체험. 도시 동네에서 바라는 사람에게 회사·기차·아파트·병원을 지어 주고, 미세 먼지·쓰레기 더미·교통 혼잡에는 바람길 숲·장바구니와 물병·버스를 놓아 고민 막대를 멈춰요. 지으면 사람이 모여 생기는 고민도 함께 풀어요.
+  - [도시의 고민](https://wlfmghzm-dotcom.github.io/sahoe-game/games/r3b8.html): B 떠올리기 연습. 도시 생활의 모습을 좋은 점, 문제점, 해결하려는 노력으로 나눠 담아요.
+
 ## 4-2 과학 (아이스크림미디어) 4. 기후변화와 우리 생활
 
 - [주제 1 기후변화 현상의 예를 찾아라! (교과서 88~89쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/sci-4-2-4-1.html): 기후 관측소, 어떤 변화일까
