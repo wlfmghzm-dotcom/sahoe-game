@@ -388,6 +388,57 @@
   - [따뜻한 집 모형 실험실](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4a5.html): A 개념 체험. 겨울밤 집 모형 두 채의 온도를 지켜요. 열이 새는 곳에 단열재를 붙이고 해 드는 지붕에 빛판을 올리면, 손난로를 빼도 온도가 덜 내려가요.
   - [에너지를 아끼는 집](https://wlfmghzm-dotcom.github.io/sahoe-game/games/e4b5.html): B 떠올리기 연습. 집의 여러 모습을 열이 새요·열을 지켜요·직접 만들어요 칸에 나눠 담아요.
 
+## 3-2 사회 (아이스크림미디어) 2. 옛날과 오늘날의 생활 모습
+
+- [1-1 풍습이 무엇인지 알아볼까요 (교과서 67~68쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-1.html): 풍습 이어 주기, 언제 하는 풍습일까
+  - [풍습 이어 주기](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a1.html): A 개념 체험. 생일·이사·명절 같은 때에 맞는 풍습을 놓으면 할머니에서 엄마, 나로 이어져요. 한 번만 한 일은 사진첩에 넣어요.
+  - [언제 하는 풍습일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b1.html): B 떠올리기 연습. 생활 속 풍습을 언제 하는 일인지에 따라 나눠 담아요.
+- [1-2 옛날의 일상생활 속 풍습 (교과서 69~71쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-2.html): 서로 돕는 우리 마을, 무엇을 함께 나눌까
+  - [서로 돕는 우리 마을](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a2.html): A 개념 체험. 큰 농사일엔 두레를, 이웃 집안일엔 품앗이를 보내요. 기쁜 일엔 축하, 슬픈 일엔 위로하러 가고 금줄 친 집은 조용히 지나가요.
+  - [무엇을 함께 나눌까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b2.html): B 떠올리기 연습. 옛날 사람들이 함께 나눈 것을 일손·기쁨·슬픔 칸에 나눠 담아요.
+- [1-3 옛날과 오늘날의 일상 풍습 비교 (교과서 72~76쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-3.html): 옛날 혼례, 오늘 결혼식, 혼례일까 결혼식일까
+  - [옛날 혼례, 오늘 결혼식](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a3.html): A 개념 체험. 옛날 혼례와 오늘날 결혼식의 장소·옷·물건을 위아래 줄에 놓아 견주고, 같은 마음은 가운데에, 옛 풍습은 이어지는 길과 사라지는 길로 나눠요.
+  - [혼례일까 결혼식일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b3.html): B 떠올리기 연습. 옛날 혼례와 오늘날 결혼식의 모습, 둘 다 같은 것을 나눠 담아요.
+- [1-4 옛날의 세시 풍속 (교과서 77~82쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-4.html): 명절 바퀴, 어느 명절일까
+  - [명절 바퀴](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a4.html): A 개념 체험. 한 해 바퀴가 돌아 명절이 오면 그 명절에 먹고 놀고 하는 것을 알맞은 마당에 차려요. 이름 없이 날짜만 보고도 맞혀 봐요.
+  - [어느 명절일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b4.html): B 떠올리기 연습. 음식과 놀이를 설날·정월 대보름·단오·추석 칸에 나눠 담아요.
+- [1-5 옛날과 오늘날의 세시 풍속 비교 (교과서 83~85쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-5.html): 마을 잔치 달력, 오늘날 명절은 어떨까
+  - [마을 잔치 달력](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a5.html): A 개념 체험. 옛 농사 마을과 오늘날 도시의 달력에 풍속을 놓아 사람들을 모아요. 오늘날엔 큰 명절과 축제에 더 많이 모여요.
+  - [오늘날 명절은 어떨까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b5.html): B 떠올리기 연습. 오늘날 세시 풍속이 옛날과 같은지, 새로 생겼는지, 줄어들었는지 나눠 담아요.
+- [2-1 교통이 무엇인지 알아볼까요 (교과서 95~96쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-6.html): 어디로 보낼까? 교통 배차원, 어느 길로 다닐까
+  - [어디로 보낼까? 교통 배차원](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a6.html): A 개념 체험. 길 끝에서 기다리는 사람과 짐에게 도로·철도·물길·하늘길에 맞는 교통수단을 보내요. 많은 짐은 트럭, 구조는 헬기!
+  - [어느 길로 다닐까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b6.html): B 떠올리기 연습. 교통수단을 도로·물길·철도·하늘길 칸에 나눠 담아요.
+- [2-2 옛날의 교통수단 (교과서 97~98쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-7.html): 옛길 탈것 대장, 무슨 힘으로 갈까
+  - [옛길 탈것 대장](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a7.html): A 개념 체험. 옛 마을의 일에 사람·소·바람의 힘으로 가는 옛 탈것을 골라 보내요. 바람이 멎으면 돛단배는 못 가요.
+  - [무슨 힘으로 갈까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b7.html): B 떠올리기 연습. 탈것을 사람·동물·바람·기계 가운데 무슨 힘으로 움직이는지 나눠 담아요.
+- [2-3 오늘날의 교통수단과 교통 시설 (교과서 99~104쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-8.html): 교통 시설 건설 대장, 어느 시설에 갈까
+  - [교통 시설 건설 대장](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a8.html): A 개념 체험. 기다리는 교통수단에 맞는 타는 곳과 주유소·정비소·휴게소를 짓고, 위험한 곳엔 안전 신호를 세워요.
+  - [어느 시설에 갈까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b8.html): B 떠올리기 연습. 필요한 일을 기차역·버스 터미널·정비소·휴게소 칸에 나눠 담아요.
+- [2-4 교통수단의 변화로 달라진 생활 모습 (교과서 105~110쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-9.html): 옛날 길 오늘 길, 무슨 일을 할까
+  - [옛날 길 오늘 길](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a9.html): A 개념 체험. 같은 손님을 옛날 탈것과 오늘 탈것으로 날라 걸린 시간을 견줘요. 새 탈것엔 새 일꾼을 태우고 옛 일은 사진첩에 넣어요.
+  - [무슨 일을 할까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b9.html): B 떠올리기 연습. 교통과 관련된 직업을 모는 일·고치는 일·돕는 일 칸에 나눠 담아요.
+- [2-5 교통 문제와 해결 노력 (교과서 111~113쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-10.html): 교통 문제 해결단, 어떤 문제를 줄일까
+  - [교통 문제 해결단](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a10.html): A 개념 체험. 거리에 생긴 막힘·매연·사고 위험에 맞는 해결을 놓아요. 공유 자전거는 막힘과 매연을 한 번에 줄여요.
+  - [어떤 문제를 줄일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b10.html): B 떠올리기 연습. 교통 문제를 줄이는 노력을 사고 막기·환경 지키기·막힘 풀기 칸에 나눠 담아요.
+- [2-6 미래의 교통수단 (교과서 114~116쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-11.html): 미래 교통 배차왕, 어떤 미래 교통일까
+  - [미래 교통 배차왕](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a11.html): A 개념 체험. 달·먼 도시·빌딩 옥상·꽉 막힌 길·공원에 가려는 손님에게 알맞은 미래 탈것을 보내요.
+  - [어떤 미래 교통일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b11.html): B 떠올리기 연습. 미래의 이동 모습을 알맞은 미래 교통수단 칸에 나눠 담아요.
+- [3-1 통신이 무엇인지 알아볼까요 (교과서 121~122쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-12.html): 소식 잇는 가게, 통신일까 교통일까
+  - [소식 잇는 가게](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a12.html): A 개념 체험. 소식이나 정보가 필요한 사람에게 알맞은 통신수단을 건네고, 자동차·기차 같은 교통수단은 주차장에 둬요.
+  - [통신일까 교통일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b12.html): B 떠올리기 연습. 물건과 하는 일을 통신수단과 교통수단 칸에 나눠 담아요.
+- [3-2 옛날의 통신수단 (교과서 123~125쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-13.html): 옛날 소식 전달꾼, 옛날엔 어떻게 알렸을까
+  - [옛날 소식 전달꾼](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a13.html): A 개념 체험. 옛 나라에 생긴 소식을 서찰·방·파발·봉수로 전해요. 낮엔 연기, 밤엔 불, 비 오면 파발!
+  - [옛날엔 어떻게 알렸을까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b13.html): B 떠올리기 연습. 옛날 통신수단을 글로·눈에 보이게·소리로 알리는 칸에 나눠 담아요.
+- [3-3 오늘날의 통신수단 (교과서 126~130쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-14.html): 소식 배달 대장, 소식이 누구에게 갈까
+  - [소식 배달 대장](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a14.html): A 개념 체험. 받는 사람 수와 보낼 것, 장소에 맞는 통신수단을 골라 소식을 한꺼번에 전해요. 전화로 여럿에게 보내면 한 명씩이라 느려요.
+  - [소식이 누구에게 갈까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b14.html): B 떠올리기 연습. 소식 전하기를 한 사람에게·여러 사람에게·내가 찾아보기 칸에 나눠 담아요.
+- [3-4 통신수단의 변화로 달라진 생활 모습 (교과서 131~135쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-15.html): 옛날 하루, 오늘 하루, 언제의 전화기일까
+  - [옛날 하루, 오늘 하루](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a15.html): A 개념 체험. 휴대 전화가 없던 옛날 하루와 오늘 하루에 같은 할 일을 해내요. 기지국을 세워 산 너머까지 신호를 보내요.
+  - [언제의 전화기일까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b15.html): B 떠올리기 연습. 전화기의 모습과 쓰는 법을 맨 처음·그다음·오늘날 칸에 나눠 담아요.
+- [3-5 통신수단을 바르게 이용하는 방법 (교과서 136~138쪽)](https://wlfmghzm-dotcom.github.io/sahoe-game/lessons/3-2-2-16.html): 폰, 쓸까? 둘까?, 무엇을 해칠까
+  - [폰, 쓸까? 둘까?](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2a16.html): A 개념 체험. 하루 장면마다 알림이 오면 휴대 전화를 쓸지 둘지 정해요. 몸·마음 건강과 할 일 바구니를 둘 다 채워요.
+  - [무엇을 해칠까](https://wlfmghzm-dotcom.github.io/sahoe-game/games/o2b16.html): B 떠올리기 연습. 잘못된 휴대 전화 사용이 몸·마음·다른 사람 가운데 무엇을 해치는지 나눠 담아요.
+
 ## 6-2 과학 (아이스크림미디어) 2. 물질의 연소
 
 ### 주제 1 서로 다른 물질을 섞으면 어떻게 될까?
